@@ -20,10 +20,10 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 
 <p align="center">
   <img 
-    alt="Mercury logo"
+    alt="Mercury Greetings notebook"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_greetings.png" width="40%" />
   <img 
-    alt="Mercury logo"
+    alt="Mercury Greetings app"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_app_greetings.png" width="50%" />  
 </p>
 
@@ -32,7 +32,7 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 
 <p align="center">
   <img 
-    alt="Mercury logo"
+    alt="Mercury share multiple notebooks"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_share_multiple_notebooks.png" width="90%" />
     
 </p>
@@ -44,3 +44,5 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 ## Running locally
 
 ## Running in production
+
+## Mercury Pro
