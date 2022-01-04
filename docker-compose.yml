@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+    nginx: 
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/nginx/Dockerfile
+        ports:
+            - 80:80
+        volumes:
+            - static_volume:/app/mercury/django_static
+            - media_volume:/app/mercury/media
+            - ./docker/nginx:/etc/nginx/conf.d
+        depends_on: 
+            - mercury
+    mercury:
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: ./docker/mercury/Dockerfile
+        entrypoint: /app/docker/mercury/entrypoint.sh
+        volumes:
+            - static_volume:/app/mercury/django_static
+            - media_volume:/app/mercury/media
+        expose:
+            - 8000     
+
+volumes:
+    static_volume: {}
+    media_volume: {}

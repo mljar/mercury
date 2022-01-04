@@ -1,0 +1,9 @@
+*.sqlite3
+*.sqlite
+*.pyc
+*__pycache__*
+media/
+venv/
+frontend-dist/
+*.egg-info
+static/
