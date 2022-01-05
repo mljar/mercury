@@ -26,10 +26,11 @@ The demo with several example notebooks is running at [http://mercury.mljar.com]
 You can share as many notebooks as you want. In the main view of the Mercury there is gallery with notebooks. You can select any notebook by clicking `Open` button.
 
 <p align="center">
-  <img 
-    alt="Mercury share multiple notebooks"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_share_multiple_notebooks.png" width="90%" />
-    
+  <a href="http://mercury.mljar.com" target="_blank">
+    <img 
+      alt="Mercury share multiple notebooks"
+      src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_share_multiple_notebooks.png" width="90%" />
+  </a>  
 </p>
 
 ## Convert Notebook to web app with YAML
