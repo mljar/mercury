@@ -52,8 +52,8 @@ Allowed parameters in YAML config:
 - `title` - string with a title of the notebook. It is used in the app side bar and in the gallery view.
 - `author` - string with a author name (optional).
 - `description` - string describing the content of the notebook. It is used in the gallery view.
-- `show-code` - can be `True` or `False`. Default is set to `False`. It decides if the notebook's code will be displayed or not.
-- `show-prompt` - can be `True` or `False`. Default is set to `False`. If set to `True` the prompt information will be displayed for each cell in the notebook.
+- `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
+- `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` the prompt information will be displayed for each cell in the notebook.
 - `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the side bar. Each parameter should have unique name that correspont to the variable name used in the code.
 
 ## Define widget with YAML
@@ -101,7 +101,7 @@ params:
 <p align="left" >
   <img 
     alt="Mercury Slider"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_slider.png" width="30%" />
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_slider.png" width="35%" />
 </p>
 
 #### Range
@@ -111,7 +111,7 @@ Additional parameters:
 - `min` - the minimum value for slider (default is set to 0),
 - `max` - the maximum value for slider (default is set to 100).
 
-Example:
+Example YAML:
 
 ```yaml
 params:
@@ -125,7 +125,7 @@ params:
 <p align="left" >
   <img 
     alt="Mercury Range"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_range.png" width="30%" />
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_range.png" width="35%" />
 </p>
 
 #### Select 
@@ -134,6 +134,8 @@ Additional parameters:
 
 - `multi` - a boolean value that decides if user can select several options (default is set to `False`).
 - `choices` - a list with available choices.
+
+Example YAML:
 
 ```yaml
 params:
@@ -148,15 +150,119 @@ params:
 <p align="left" >
   <img 
     alt="Mercury Select"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_select.png" width="30%" />
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_select.png" width="35%" />
+</p>
+
+#### Checkbox
+
+There are no additional parameters.
+
+Example YAML:
+
+```yaml
+params:
+    checkbox_variable:
+        label: This is checkbox label
+        input: checkbox
+        value: True
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury Checkbox"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_checkbox.png" width="35%" />
+</p>
+
+#### Numeric
+
+Additional parameters:
+
+- `min` - a minimum allowed value (default set to 0),
+- `max` - a maximum allowed value (default set to 100),
+- `step` - a step value (default set to 1).
+
+```yaml
+params:
+    numeric_variable:
+        label: This is numeric label
+        input: numeric
+        value: 5.5
+        min: 0
+        max: 10
+        step: 0.1
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury Numeric"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_numeric.png" width="35%" />
+</p>
+
+### Full example YAML
+
+```yaml
+---
+title: My notebook
+author: Piotr
+description: My first notebook in Mercury
+params:
+    my_variable:
+        label: This is slider label
+        input: slider
+        value: 5
+        min: 0
+        max: 10
+    range_variable:
+        label: This is range label
+        input: range
+        value: [3,6]
+        min: 0
+        max: 10    
+    select_variable:
+        label: This is select label
+        input: select
+        value: Cześć
+        choices: [Cześć, Hi, Hello]
+        multi: False
+    checkbox_variable:
+        label: This is checkbox label
+        input: checkbox
+        value: True
+    numeric_variable:
+        label: This is numeric label
+        input: numeric
+        value: 5.5
+        min: 0
+        max: 10
+        step: 0.1
+---
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury widgets"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_widgets.png" width="40%" />
 </p>
 
 
-### Example YAML
+### Use variables in the code
 
+To use variables in the code simply define the variable with the same name as widget name. You can also assign the same value as defined in YAML. Please define all variables in the one cell (it can be below the cell with YAML config).
+
+When the user will interact with widgets and click the `Run` button, the code with variables will be updated with user select values
+
+Example:
+
+<p align="left" >
+  <img 
+    alt="Mercury Variables"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_variables.png" width="70%" />
+</p>
 
 
 ## Installation
+
+You can install Mercury directly from PyPi repository with `pip` command:
 
 ```
 pip install mljar-mercury
