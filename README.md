@@ -239,6 +239,8 @@ params:
 ---
 ```
 
+Widgets rendered from above YAML config:
+
 <p align="left" >
   <img 
     alt="Mercury widgets"
@@ -250,7 +252,7 @@ params:
 
 To use variables in the code simply define the variable with the same name as widget name. You can also assign the same value as defined in YAML. Please define all variables in the one cell (it can be below the cell with YAML config).
 
-When the user will interact with widgets and click the `Run` button, the code with variables will be updated with user select values
+When the user will interact with widgets and click the `Run` button, the code with variables will be updated with user selected values.
 
 Example:
 
@@ -285,7 +287,7 @@ Execute the following command to add notebook to Mercury database:
 mercury add <path_to_notebook>
 ```
 
-If you would like to add all notebooks in the directory you can use wildcard:
+If you would like to add all notebooks in the directory you can use a wildcard:
 
 ```
 mercury add <directory_with_notebooks>/*.ipynb
@@ -297,7 +299,7 @@ Please start the Mercury server to see your apps (created from notebooks).
 
 The Mercury `watch` command is perfect when you are creating a new notebook and would like to see how it will look like as web app with live changes.
 
-Run following command:
+Please run the following command:
 
 ```
 mercury watch <path_to_your_notebook>
@@ -340,7 +342,7 @@ Run frontend:
 yarn start
 ```
 
-The fronted is served at `http://localhost:3000`.
+The frontend is served at `http://localhost:3000`.
 
 ### Server
 
