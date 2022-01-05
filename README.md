@@ -56,23 +56,101 @@ Allowed parameters in YAML config:
 - `show-prompt` - can be `True` or `False`. Default is set to `False`. If set to `True` the prompt information will be displayed for each cell in the notebook.
 - `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the side bar. Each parameter should have unique name that correspont to the variable name used in the code.
 
-### YAML widget
+## Define widget with YAML
 
+#### Widget name is a variable name
 Definition of the widget (in `params`) starts with the widget name. It will correspond to the variable in the code. The name should be a valid Python variable. 
 
-The next thing is to select the input type. It can be: `slider`, `range`, `select`, `checkbox`, `numeric`. For each input we need to define a `label`. It will be a text displayed above (or near) the widget.
+#### Widget input type
+The next thing is to select the input type. It can be: `slider`, `range`, `select`, `checkbox`, `numeric`. 
 
+#### Widget label
+For each input we need to define a `label`. It will be a text displayed above (or near) the widget.
+
+#### Widget default value
+You can set a default widget by setting the `value`. The format of the `value` depends on the input type:
+
+- for `slider` a `value` should be a number, example: `value: 5`,
+- for `range` a `value` should be a list with two numbers, example `value: [3,6]`,
+- for `select` with `mutli: False` a `value` should be a string, example `value: hey`,
+- for `select` with `multi: True` a `value` should be a list of strings, example `value: [cześć, hi, hello]`,
+- for `checkbox` a `value` should be a boolean (`True` or `False`), example: `value: True`,
+- for `numeric` a `value` should be a number, example: `value: 10.2`.
+
+The rest of parameters depends on widget input type.
+
+#### Slider
+
+Additional parameters:
+
+- `min` - the minimum value for slider (default is set to 0),
+- `max` - the maximum value for slider (default is set to 100).
+
+Example YAML:
 
 ```yaml
 params:
-  my_variable:
-    label: This is widget label
-    input: slider
-    value: 5
-    min: 0
-    max: 10
-
+    my_variable:
+        input: slider
+        label: This is slider label
+        value: 5
+        min: 0
+        max: 10
 ```
+
+<p align="left" >
+  <img 
+    alt="Mercury Slider"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_slider.png" width="30%" />
+</p>
+
+#### Range
+
+Additional parameters:
+
+- `min` - the minimum value for slider (default is set to 0),
+- `max` - the maximum value for slider (default is set to 100).
+
+Example:
+
+```yaml
+params:
+    range_variable:
+        input: range
+        label: This is range label
+        value: [3,6]
+        min: 0
+        max: 10
+```
+<p align="left" >
+  <img 
+    alt="Mercury Range"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_range.png" width="30%" />
+</p>
+
+#### Select 
+
+Additional parameters:
+
+- `multi` - a boolean value that decides if user can select several options (default is set to `False`).
+- `choices` - a list with available choices.
+
+```yaml
+params:
+    select_variable:
+        label: This is select label
+        input: select
+        value: Cześć
+        choices: [Cześć, Hi, Hello]
+        multi: False
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury Select"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_select.png" width="30%" />
+</p>
+
 
 ### Example YAML
 
