@@ -4,6 +4,8 @@
 *__pycache__*
 media/
 venv/
+menv/
 frontend-dist/
-*.egg-info
+*.egg-info*
 static/
+dist/
