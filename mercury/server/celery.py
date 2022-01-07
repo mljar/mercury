@@ -7,7 +7,7 @@ sys.path.insert(0, CURRENT_DIR)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
 
-#  celery -A server worker --loglevel=info -P gevent --concurrency 2 -E
+#  celery -A server worker --loglevel=info -P gevent --concurrency 1 -E
 app = Celery("server")
 
 # Using a string here means the worker doesn't have to serialize

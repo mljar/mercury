@@ -15,7 +15,7 @@ import nbformat
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
-    for i in range(max(len(cells), 10)):
+    for i in range(min(len(cells), 10)):
         cnt = 0
         if cells[i]["cell_type"] == "code" and not cells[i]["source"].startswith("---"):
 
@@ -68,12 +68,10 @@ def task_execute(self, job_params):
                             .isdigit()
                         )
                         and (
-                            widgets_params[k].get("min") is not None
-                            and task_value >= widgets_params[k]["min"]
+                            task_value >= widgets_params[k].get("min", 0)
                         )
                         and (
-                            widgets_params[k].get("max") is not None
-                            and task_value <= widgets_params[k]["max"]
+                            task_value <= widgets_params[k].get("max", 100)
                         )
                     ):
                         inject_code += f"{k} = {task_value}\n"
@@ -111,12 +109,10 @@ def task_execute(self, job_params):
                             .isdigit()
                         )
                         and (
-                            widgets_params[k].get("min") is not None
-                            and task_value >= widgets_params[k]["min"]
+                            task_value >= widgets_params[k].get("min", 0)
                         )
                         and (
-                            widgets_params[k].get("max") is not None
-                            and task_value <= widgets_params[k]["max"]
+                            task_value <= widgets_params[k].get("max", 100)
                         )
                     ):
                         inject_code += f"{k} = {task_value}\n"
@@ -143,20 +139,16 @@ def task_execute(self, job_params):
                             .isdigit()
                         )
                         and (
-                            widgets_params[k].get("min") is not None
-                            and task_value[0] >= widgets_params[k]["min"]
+                            task_value[0] >= widgets_params[k].get("min", 0)
                         )
                         and (
-                            widgets_params[k].get("max") is not None
-                            and task_value[0] <= widgets_params[k]["max"]
+                            task_value[0] <= widgets_params[k].get("max", 100)
                         )
                         and (
-                            widgets_params[k].get("min") is not None
-                            and task_value[1] >= widgets_params[k]["min"]
+                            task_value[1] >= widgets_params[k].get("min", 0)
                         )
                         and (
-                            widgets_params[k].get("max") is not None
-                            and task_value[1] <= widgets_params[k]["max"]
+                            task_value[1] <= widgets_params[k].get("max", 100)
                         )
                     ):
                         inject_code += f"{k} = {task_value}\n"
