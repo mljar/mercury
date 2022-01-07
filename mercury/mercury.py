@@ -3,7 +3,6 @@
 import os
 import sys
 import django
-
 import json
 from glob import glob
 
@@ -22,9 +21,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    
-    if os.environ.get("DJANGO_SUPERUSER_USERNAME") is not None:
-        execute_from_command_line(["mercury.py", "createsuperuser", "--noinput"])
+
+
+    execute_from_command_line(["mercury.py", "migrate"])
+    #if os.environ.get("DJANGO_SUPERUSER_USERNAME") is not None:
+    #    execute_from_command_line(["mercury.py", "createsuperuser", "--noinput"])
     if os.environ.get("SERVE_STATIC") is not None:
         execute_from_command_line(["mercury.py", "collectstatic", "--noinput"])
     if os.environ.get("NOTEBOOKS") is not None:
@@ -38,7 +39,7 @@ def main():
             notebooks = [notebooks_str]
         for nb in notebooks:
             execute_from_command_line(["mercury.py", "add", nb])
-    execute_from_command_line(["mercury.py", "migrate"])
+    
     execute_from_command_line(sys.argv)
 
 if __name__ == "__main__":

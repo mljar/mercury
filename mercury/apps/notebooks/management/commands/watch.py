@@ -65,6 +65,7 @@ class Command(BaseCommand):
                 kill(server.pid)
                 kill(worker.pid)
                 self.delete_notebook(notebook_id)
+                self.clear_celery_backend()
                 self.stdout.write(self.style.SUCCESS("Stop watching"))
                 sys.exit(0)
             except SystemExit:
@@ -75,3 +76,10 @@ class Command(BaseCommand):
     def delete_notebook(self, id):
         Notebook.objects.filter(pk=id).delete()
         self.stdout.write(self.style.HTTP_INFO(f"Notebook deleted"))
+
+    def clear_celery_backend(self):
+        try:
+            if os.path.exists("celery.sqlite"):
+                os.remove("celery.sqlite")
+        except Exception as e:
+            print("Problem with removing Celery backend", str(e))
