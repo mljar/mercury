@@ -13,6 +13,7 @@ import nbformat
 import yaml
 
 from apps.notebooks.models import Notebook
+from apps.tasks.models import Task
 
 
 def get_hash():
@@ -234,6 +235,9 @@ def task_watch(self, notebook_id):
         ]:
             notebook.state = "WATCH_WAIT"
             notebook.save()
+            # clear all tasks
+            Task.objects.filter(notebook__id=notebook.id).delete()
+            # initialize updated notebook
             task_init_notebook(
                 notebook.path,
                 render_html=True,

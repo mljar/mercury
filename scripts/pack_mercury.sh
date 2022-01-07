@@ -3,6 +3,7 @@
 echo 'Pack Mercury'
 
 cd frontend
+yarn install
 yarn local-build
 
 cd ..

@@ -49,16 +49,14 @@ export const fetchCurrentTask =
 
             const sessionId = getSessionId();
 
-            console.log("fetch current task");
-
             try {
                 const url = `/api/v1/latest_task/${notebookId}/${sessionId}`;
                 const { data } = await axios.get(url);
-                console.log(data)
                 dispatch(setCurrentTask(data))
 
             } catch (error) {
-                //
+                console.clear();
+                dispatch(setCurrentTask({} as ITask));
             }
 
         };
