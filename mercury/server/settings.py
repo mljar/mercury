@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # DEBUG=False
 # SERVE_STATIC=True
 # SECRET_KEY=django-insecure-)$12ir6-s6vbcufpva*va7bf$s$$(76ue$twwz9noath0&e91h
-load_dotenv()  
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +27,9 @@ CELERY_RESULT_BACKEND = "db+sqlite:///celery.sqlite"
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-)$12ir6-s6vbcufpva*va7bf$s$$(76ue$twwz9noath0&e91h")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-)$12ir6-s6vbcufpva*va7bf$s$$(76ue$twwz9noath0&e91h"
+)
 # Please keep SECRET_KEY secret!
 # Generate new SECRET_KEY with the following code:
 # from django.core.management.utils import get_random_secret_key
@@ -60,8 +62,9 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 MIDDLEWARE = ["django.middleware.security.SecurityMiddleware"]
 if SERVE_STATIC:
     MIDDLEWARE += ["whitenoise.middleware.WhiteNoiseMiddleware"]
-    
-MIDDLEWARE += ["django.contrib.sessions.middleware.SessionMiddleware",
+
+MIDDLEWARE += [
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -162,4 +165,3 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-

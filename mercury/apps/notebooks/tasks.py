@@ -150,7 +150,7 @@ def task_init_notebook(
                 settings.MEDIA_ROOT,
                 "--to",
                 "html",
-                "--Application.log_level=40", # 30 is default, 40 is ERROR, 50 is Critical
+                "--Application.log_level=40",  # 30 is default, 40 is ERROR, 50 is Critical
             ]
             if "show-code" in params and not params["show-code"]:
                 command += ["--no-input"]
@@ -186,9 +186,9 @@ def task_init_notebook(
                 default_view_path=os.path.join(
                     settings.MEDIA_URL, f"{notebook_output_file}.html"
                 ),
-                file_updated_at=make_aware(datetime.fromtimestamp(
-                    os.path.getmtime(notebook_path)
-                )),
+                file_updated_at=make_aware(
+                    datetime.fromtimestamp(os.path.getmtime(notebook_path))
+                ),
             )
         else:
 
@@ -204,9 +204,9 @@ def task_init_notebook(
             notebook.default_view_path = os.path.join(
                 settings.MEDIA_URL, f"{notebook_output_file}.html"
             )
-            notebook.file_updated_at = make_aware(datetime.fromtimestamp(
-                os.path.getmtime(notebook_path)
-            ))
+            notebook.file_updated_at = make_aware(
+                datetime.fromtimestamp(os.path.getmtime(notebook_path))
+            )
 
         notebook.save()
         return notebook.id
