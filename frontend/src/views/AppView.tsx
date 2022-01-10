@@ -41,7 +41,6 @@ function App() {
   };
 
   useEffect(() => {
-    console.log("get it");
     dispatch(fetchNotebook(notebookId));
     dispatch(fetchCurrentTask(notebookId));
   }, [dispatch, notebookId]);

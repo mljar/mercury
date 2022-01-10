@@ -29,16 +29,6 @@ export default function MainView({
       className="col-md-9 ms-sm-auto col-lg-9"
       style={{ paddingTop: "0px", paddingRight: "0px", paddingLeft: "0px" }}
     >
-      {`${axios.defaults.baseURL}${notebookPath}`}
-      <br />
-      {errorMsg}
-      <br />
-      {watchMode? "yes": "no"}
-      <br />
-      {loadingState}
-      <br />
-      {waiting? "yes": "no"}
-      <br/>
       <BlockUi tag="div" blocking={waiting}>
         <div>
           {loadingState === "loading" && !watchMode && (
