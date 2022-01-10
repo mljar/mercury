@@ -42,6 +42,13 @@ SERVE_STATIC = os.environ.get("SERVE_STATIC", "False") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "mercury.mljar.com"]
 
+if os.environ.get("ALLOWED_HOSTS") is not None:
+    try:
+        ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+    except Exception as e:
+        print("Cant set ALLOWED_HOSTS, using default")
+        ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "mercury.mljar.com"]
+
 # Application definition
 
 INSTALLED_APPS = [
