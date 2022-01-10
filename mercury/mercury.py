@@ -26,7 +26,6 @@ def main():
 
     execute_from_command_line(["mercury.py", "migrate"])
 
-
     superuser_username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
     if (
         superuser_username is not None
@@ -35,9 +34,12 @@ def main():
     ):
         try:
             from django.contrib.auth import get_user_model
+
             User = get_user_model()
             if not User.objects.filter(username=superuser_username):
-                execute_from_command_line(["mercury.py", "createsuperuser", "--noinput"])
+                execute_from_command_line(
+                    ["mercury.py", "createsuperuser", "--noinput"]
+                )
         except Exception as e:
             print(str(e))
     if os.environ.get("SERVE_STATIC") is not None:
@@ -55,7 +57,7 @@ def main():
             execute_from_command_line(["mercury.py", "add", nb])
 
     worker = None
-    if os.environ.get("RUN_WORKER", "False") == "True" or sys.argv[1] == "runworker":
+    if os.environ.get("RUN_WORKER", "False") == "True" or "runworker" in sys.argv:
         worker_command = [
             "celery",
             "-A",
@@ -69,12 +71,16 @@ def main():
             "-E",
         ]
         worker = subprocess.Popen(worker_command)
-        if sys.argv[1] == "runworker":
+        if "runworker" in sys.argv:
             worker.wait()
 
     try:
-        arguments = sys.argv 
-        if arguments[1] == "runserver" and "--noreload" not in arguments:
+        arguments = sys.argv
+        if (
+            len(sys.argv) > 1
+            and arguments[1] == "runserver"
+            and "--noreload" not in arguments
+        ):
             arguments += ["--noreload"]
         execute_from_command_line(arguments)
     except KeyboardInterrupt:
@@ -84,6 +90,7 @@ def main():
             os._exit(0)
     except Exception as e:
         print("Notebook watch error.", str(e))
+
 
 if __name__ == "__main__":
     main()
