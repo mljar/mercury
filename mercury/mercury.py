@@ -4,11 +4,13 @@ import os
 import sys
 import django
 import json
+import subprocess
 from glob import glob
-    
+
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "mercury")
 sys.path.insert(0, BACKEND_DIR)
+
 
 def main():
     """Run administrative tasks."""
@@ -52,8 +54,36 @@ def main():
         for nb in notebooks:
             execute_from_command_line(["mercury.py", "add", nb])
 
-    execute_from_command_line(sys.argv)
+    worker = None
+    if os.environ.get("RUN_WORKER", "False") == "True" or sys.argv[1] == "runworker":
+        worker_command = [
+            "celery",
+            "-A",
+            "mercury.server" if sys.argv[0].endswith("mercury") else "server",
+            "worker",
+            "--loglevel=error",
+            "-P",
+            "gevent",
+            "--concurrency",
+            "1",
+            "-E",
+        ]
+        worker = subprocess.Popen(worker_command)
+        if sys.argv[1] == "runworker":
+            worker.wait()
 
+    try:
+        arguments = sys.argv 
+        if arguments[1] == "runserver" and "--noreload" not in arguments:
+            arguments += ["--noreload"]
+        execute_from_command_line(arguments)
+    except KeyboardInterrupt:
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)
+    except Exception as e:
+        print("Notebook watch error.", str(e))
 
 if __name__ == "__main__":
     main()
