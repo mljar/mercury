@@ -14,16 +14,16 @@ done
 # path with jupyter
 export PATH="$HOME/.local/bin:$PATH"
 
-echo "Add requirements for notebooks"
-REQ=/app/notebooks/requirements.txt
-if test -f "$REQ"; then
-    pip install -r $REQ
-fi
+# echo "Add requirements for notebooks"
+# REQ=/app/notebooks/requirements.txt
+# if test -f "$REQ"; then
+#     pip install -r $REQ
+# fi
 
-echo "Add notebooks"
-for filepath in /app/notebooks/*.ipynb; do
-    python manage.py add_notebook $filepath
-done
+# echo "Add notebooks"
+# for filepath in /app/notebooks/*.ipynb; do
+#     python manage.py add_notebook $filepath
+# done
 
 DEBUG=False python manage.py collectstatic --noinput
 

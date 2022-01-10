@@ -21,6 +21,6 @@ ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
 ADD ./mercury/manage.py /app/mercury/
 ADD ./docker /app/docker
-ADD ./notebooks /app/notebooks
+# ADD ./notebooks /app/notebooks
 
 RUN chmod +x /app/docker/mercury/entrypoint.sh
