@@ -1,3 +1,10 @@
+/* Loading Bullet in BlockUI */
+
+.loading-bullet {
+  color: #0099cc !important;
+}
+
+/* widgets */
 textarea:focus,
 input[type="text"]:focus,
 input[type="password"]:focus,

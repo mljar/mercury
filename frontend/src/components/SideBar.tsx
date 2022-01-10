@@ -149,7 +149,7 @@ export default function SideBar({
             </div>
             {waiting && (
               <div className="alert alert-primary mb-3" role="alert">
-                <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is executed ...
+                <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is executed. Please wait.
               </div>
             )}
             {watchMode && (
