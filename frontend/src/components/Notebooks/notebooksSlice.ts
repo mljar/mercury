@@ -51,10 +51,6 @@ const notebooksSlice = createSlice({
     },
     setSelectedNotebook(state, action: PayloadAction<INotebook>) {
 
-      // console.log(state.selectedNotebook.state, action.payload.state)
-      // console.log(state.selectedNotebook.file_updated_at, action.payload.file_updated_at)
-
-
       if (action.payload.state.startsWith("WATCH") && state.selectedNotebook.file_updated_at === action.payload.file_updated_at) {
         // console.log("skip notebook update")
       } else {

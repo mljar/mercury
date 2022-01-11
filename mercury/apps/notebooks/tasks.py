@@ -69,7 +69,11 @@ def task_init_notebook(
 
         kernels = available_kernels()
 
-        params = {}
+        params = {
+            "title": "Please provide title",
+            "author": "Please provide author",
+            "description": "Please provide description"
+        }
         nb = None
         update_notebook = False
         with open(notebook_path) as f:
@@ -108,11 +112,6 @@ def task_init_notebook(
             params["date"] = str(params["date"])
 
         notebook_title = params.get("title", "")
-        if notebook_title == "":
-            notebook_title = os.path.basename(notebook_path)
-            if notebook_title.endswith(".ipynb"):
-                notebook_title = notebook_title[:-6]
-
         notebook_slug = slugify(notebook_title)
         notebook_output_file = notebook_slug
         if notebook_id is not None:
