@@ -58,6 +58,7 @@ export default function MainView({
             <iframe
               width="100%"
               height={height - 58}
+              key={notebookPath}
               src={`${axios.defaults.baseURL}${notebookPath}`}
               title="display"
             ></iframe>
