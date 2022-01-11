@@ -89,36 +89,16 @@ def task_init_notebook(
                     print("*" * 42)
                     print(f"Your notebook kernel name is set to '{kernel_name}'.")
                     print(f"In this system available kernels are {kernels}.")
-                    print("You need to provide other kernel name in the notebook.")
-                    print("*" * 42)
-                    print("You can do this manually, steps below:")
-                    print("1. Close this script(Ctrl+C)")
-                    print(
-                        "2. Change the kernel name in the notebook (or add new kernel in the system)."
-                    )
-                    print("3. Rerun this command.")
-                    print("*" * 42)
-                    print("The other option:")
-                    print(
-                        "Please provide the selected kernel name and this script will update the kernel name in the notebook for you."
-                    )
 
-                    new_kernel_name = ""
-                    for i in range(
-                        3
-                    ):  # you have 3 chances to provide kernel name from the list
-                        print(
-                            f"Please write the selected kernel name from the kernels list: {kernels}"
-                        )
-                        new_kernel_name = input()
-                        if new_kernel_name in kernels:
-                            break
-                    if new_kernel_name not in kernels:
-                        print("Sorry, cant update the kernel name in the notebook.")
-                        print("Wrong kernel name selected.")
+                    if len(kernels) > 0:
+                        print(f"The script will change the kernel name to {kernels[0]}")
+                        new_kernel_name = kernels[0]
+                        nb["metadata"]["kernelspec"]["name"] = new_kernel_name
+                        update_notebook = True
+                    else:
+                        print("Sorry, cant automatically update the kernel name in the notebook.")
                         return
-                    nb["metadata"]["kernelspec"]["name"] = new_kernel_name
-                    update_notebook = True
+                    
 
         if update_notebook and nb is not None:
             with open(notebook_path, "w") as f:

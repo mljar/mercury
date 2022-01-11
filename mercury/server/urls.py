@@ -28,8 +28,7 @@ if settings.DEBUG or settings.SERVE_STATIC:
 
     # Serve static and media files from development server
     urlpatterns += [
-        path("", index),
-        re_path("app", index),
+        path("", index)
     ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
