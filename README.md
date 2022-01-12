@@ -312,9 +312,9 @@ You can now open the web browser at `http://127.0.0.1:8000` and find your notebo
 
 Running in production is easy. We provide several tutorials how it can be done.
 
-- Deploy to Heroku (comming soon)
-- Deploy to Digital Ocean (comming soon)
+- [Deploy to Heroku](https://github.com/mljar/mercury/wiki/Deploy-to-Heroku) using free dyno 
 - Deploy to AWS EC2 (comming soon)
+- Deploy to Digital Ocean (comming soon)
 - Deploy to GCP (comming soon)
 - Deploy to Azure (comming soon)
 
