@@ -23,7 +23,7 @@ class Command(BaseCommand):
     help = "Watch notebook"
 
     def add_arguments(self, parser):
-        parser.add_argument("notebook_path", help="Path to notebook")
+        parser.add_argument("notebook_path", help="Path to the notebook")
 
     def handle(self, *args, **options):
         try:
@@ -40,6 +40,7 @@ class Command(BaseCommand):
                 sys.executable,
                 sys.argv[0],
                 "runserver",
+                "--noreload"
             ]
             server = subprocess.Popen(server_command)
 

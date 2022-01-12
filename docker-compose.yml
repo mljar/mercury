@@ -21,7 +21,7 @@ services:
             dockerfile: ./docker/mercury/Dockerfile
         entrypoint: /app/docker/mercury/entrypoint.sh
         volumes:
-            - ${NOTEBOOKS}:/app/notebooks
+            - ${NOTEBOOKS_PATH}:/app/notebooks
             - static_volume:/app/mercury/django_static
             - media_volume:/app/mercury/media
         expose:

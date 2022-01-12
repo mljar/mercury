@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 # DEBUG=False
 # SERVE_STATIC=True
 # SECRET_KEY=django-insecure-)$12ir6-s6vbcufpva*va7bf$s$$(76ue$twwz9noath0&e91h
-load_dotenv()
+load_dotenv(".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
