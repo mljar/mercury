@@ -24,8 +24,11 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
 
-    if "watch" not in sys.argv:
+    if "--nomigrate" not in sys.argv:
         execute_from_command_line(["mercury.py", "migrate"])
+    else:
+        sys.argv.remove("--nomigrate")
+
 
     superuser_username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
     if (

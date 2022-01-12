@@ -40,7 +40,8 @@ class Command(BaseCommand):
                 sys.executable,
                 sys.argv[0],
                 "runserver",
-                "--noreload"
+                "--noreload",
+                "--nomigrate"
             ]
             server = subprocess.Popen(server_command)
 
