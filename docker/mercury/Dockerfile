@@ -1,8 +1,4 @@
-# FROM python:3.8.3-alpine
 FROM ubuntu:20.04
-
-# RUN apk update
-# RUN apk add make automake gcc g++ subversion python3-dev
 
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
@@ -21,6 +17,5 @@ ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
 ADD ./mercury/manage.py /app/mercury/
 ADD ./docker /app/docker
-# ADD ./notebooks /app/notebooks
 
 RUN chmod +x /app/docker/mercury/entrypoint.sh
