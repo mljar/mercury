@@ -54,7 +54,7 @@ export default function MainView({
             </div>
           )}
 
-          {errorMsg === "" && (
+          {errorMsg === "" && loadingState !== "loading" && (
             <iframe
               width="100%"
               height={height - 58}
