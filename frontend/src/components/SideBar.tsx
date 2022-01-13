@@ -122,7 +122,7 @@ export default function SideBar({
     }
   }
 
-  const handleDownload = (url:string, filename:string) => {
+  const handleDownload = (url: string, filename: string) => {
     axios
       .get(url, {
         responseType: "blob",
@@ -147,7 +147,7 @@ export default function SideBar({
               <button
                 type="button"
                 className="btn btn-success"
-                style={{ marginRight: "10px" }}
+                style={{ marginRight: "10px", width: "47%"  }}
                 onClick={() => dispatch(executeNotebook(notebookId))}
                 disabled={waiting}
               >
@@ -155,6 +155,7 @@ export default function SideBar({
               </button>
 
               <button
+                style={{ width: "47%", float: "right" }}
                 type="button"
                 className="btn btn-primary"
                 disabled={waiting}
