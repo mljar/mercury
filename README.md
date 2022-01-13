@@ -2,7 +2,7 @@
 <p align="center">
   <img 
     alt="Mercury convert notebook to web app"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook.png" width="600px" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="700px" />  
 </p>
 
 # Mercury
@@ -17,13 +17,38 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 - You can decide to show or hide your code.
 - Easily deploy to the server.
 
+## Example
+
+#### Notebook with YAML config
+
+The YAML config is added as a first raw cell in the notebook.
+
+<p align="center">
+  <img 
+    alt="notebook with YAML config"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_greetings_3.png" width="600px" />  
+</p>
+
+#### Web Application from Notebook
+
+The web app generated from the notebook. Code is hidden. User can change parameters, execute notebook with `Run` button, and save results with `Download` button.
+
+<p align="center">
+  <img 
+    alt="Web App from Notebook"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_app_greetings_2.png" width="600px" />  
+</p>
+
+
 ### Check our demo
 
-The demo with several example notebooks is running at [http://mercury.mljar.com](http://mercury.mljar.com). No need to register.
+The demo with several example notebooks is running at [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance). No need to register.
+
+The demo running at Heroku free dyno [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (with several notebooks-apps).
 
 ### Share mutliple notebooks
 
-You can share as many notebooks as you want. In the main view of the Mercury there is gallery with notebooks. You can select any notebook by clicking `Open` button.
+You can share as many notebooks as you want. There is gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking `Open` button.
 
 <p align="center">
   <a href="http://mercury.mljar.com" target="_blank">
@@ -271,15 +296,21 @@ You can install Mercury directly from PyPi repository with `pip` command:
 pip install mljar-mercury
 ```
 
+Installation from GitHub:
+
+```
+pip install -q -U git+https://github.com/mljar/mercury.git@master
+```
+
 ## Running locally
 
 To run Mercury locally just run:
 
 ```
-mercury runserver
+mercury runserver --runworker
 ```
 
-This will show you Mercury website at `http://127.0.0.1:8000`. It won't display any notebooks because we didn't add any. Please stop the Mercury server for a moment (Ctrl+C).
+The above command will run server and worker. It will serve Mercury website at `http://127.0.0.1:8000`. It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
 
 Execute the following command to add notebook to Mercury database:
 
@@ -287,15 +318,15 @@ Execute the following command to add notebook to Mercury database:
 mercury add <path_to_notebook>
 ```
 
-If you would like to add all notebooks in the directory you can use a wildcard:
-
-```
-mercury add <directory_with_notebooks>/*.ipynb
-```
 
 Please start the Mercury server to see your apps (created from notebooks).
 
-## Notebook development
+```
+mercury runserver --runworker
+```
+
+
+## Notebook development with automatic refresh
 
 The Mercury `watch` command is perfect when you are creating a new notebook and would like to see how it will look like as web app with live changes.
 
@@ -318,7 +349,41 @@ Running in production is easy. We provide several tutorials how it can be done.
 - Deploy to GCP (comming soon)
 - Deploy to Azure (comming soon)
 
-## Development
+## Running with `docker-compose`
+
+The `docker-compose` must be run from the Mercury main directory.
+
+Please copy `.env.example` file and name it `.env` file. Please point the `NOTEBOOKS_PATH` to the directory with your notebooks. All notebooks from that path will be added to the Mercury before server start. If the `requirements.txt` file is available in `NOTEBOOKS_PATH` all packages from there will be installed.
+
+Please remember to change the `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD`.
+
+To generate new `SECRET_KEY` (recommended) you can use:
+
+```
+python -c 'from django.core.management.utils import get_random_secret_key; \
+            print(get_random_secret_key())'
+```
+
+Please leave `SERVE_STATIC=False` because in the `docker-compose` configuration static files are served with nginx.
+
+The `docker-compose` will automatically read environment variables from `.env` file. To start the Mercury please run:
+
+```
+docker-compose up --build
+```
+
+To run in detached mode (you can close the terminal) please run:
+```
+docker-compose up --build -d
+```
+
+To stop the containers:
+
+```
+docker-compose down
+```
+
+## Mercury development
 
 The Mercury consists of three elements:
 
