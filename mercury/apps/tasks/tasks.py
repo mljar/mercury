@@ -67,12 +67,8 @@ def task_execute(self, job_params):
                             .replace("e", "", 1)
                             .isdigit()
                         )
-                        and (
-                            task_value >= widgets_params[k].get("min", 0)
-                        )
-                        and (
-                            task_value <= widgets_params[k].get("max", 100)
-                        )
+                        and (task_value >= widgets_params[k].get("min", 0))
+                        and (task_value <= widgets_params[k].get("max", 100))
                     ):
                         inject_code += f"{k} = {task_value}\n"
                         use_default = False
@@ -108,12 +104,8 @@ def task_execute(self, job_params):
                             .replace("e", "", 1)
                             .isdigit()
                         )
-                        and (
-                            task_value >= widgets_params[k].get("min", 0)
-                        )
-                        and (
-                            task_value <= widgets_params[k].get("max", 100)
-                        )
+                        and (task_value >= widgets_params[k].get("min", 0))
+                        and (task_value <= widgets_params[k].get("max", 100))
                     ):
                         inject_code += f"{k} = {task_value}\n"
                         use_default = False
@@ -138,18 +130,10 @@ def task_execute(self, job_params):
                             .replace("e", "", 1)
                             .isdigit()
                         )
-                        and (
-                            task_value[0] >= widgets_params[k].get("min", 0)
-                        )
-                        and (
-                            task_value[0] <= widgets_params[k].get("max", 100)
-                        )
-                        and (
-                            task_value[1] >= widgets_params[k].get("min", 0)
-                        )
-                        and (
-                            task_value[1] <= widgets_params[k].get("max", 100)
-                        )
+                        and (task_value[0] >= widgets_params[k].get("min", 0))
+                        and (task_value[0] <= widgets_params[k].get("max", 100))
+                        and (task_value[1] >= widgets_params[k].get("min", 0))
+                        and (task_value[1] <= widgets_params[k].get("max", 100))
                     ):
                         inject_code += f"{k} = {task_value}\n"
                         use_default = False

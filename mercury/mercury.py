@@ -58,7 +58,11 @@ def main():
                 execute_from_command_line(["mercury.py", "add", nb])
 
         worker = None
-        if os.environ.get("RUN_WORKER", "False") == "True" or "runworker" in sys.argv:
+        if (
+            os.environ.get("RUN_WORKER", "False") == "True"
+            or "runworker" in sys.argv
+            or "--runworker" in sys.argv
+        ):
             worker_command = [
                 "celery",
                 "-A",
@@ -72,6 +76,10 @@ def main():
                 "-E",
             ]
             worker = subprocess.Popen(worker_command)
+
+            if "--runworker" in sys.argv:
+                sys.argv.remove("--runworker")
+
             if "runworker" in sys.argv:
                 worker.wait()
     else:

@@ -72,7 +72,7 @@ def task_init_notebook(
         params = {
             "title": "Please provide title",
             "author": "Please provide author",
-            "description": "Please provide description"
+            "description": "Please provide description",
         }
         nb = None
         update_notebook = False
@@ -100,9 +100,10 @@ def task_init_notebook(
                         nb["metadata"]["kernelspec"]["name"] = new_kernel_name
                         update_notebook = True
                     else:
-                        print("Sorry, cant automatically update the kernel name in the notebook.")
+                        print(
+                            "Sorry, cant automatically update the kernel name in the notebook."
+                        )
                         return
-                    
 
         if update_notebook and nb is not None:
             with open(notebook_path, "w") as f:
