@@ -85,6 +85,7 @@ function App() {
             waiting={waitForTask()}
             widgetsParams={notebook?.params?.params}
             watchMode={isWatchMode()}
+            notebookPath={notebookPath}
           />
 
           <MainView

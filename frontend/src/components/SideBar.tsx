@@ -2,12 +2,15 @@
 import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import { executeNotebook } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
 import SelectWidget from "./Widgets/Select";
 import SliderWidget from "./Widgets/Slider";
+
+import fileDownload from "js-file-download";
 
 import {
   isCheckboxWidget,
@@ -26,6 +29,7 @@ type SideBarProps = {
   waiting: boolean;
   widgetsParams: Array<IWidget>;
   watchMode: boolean;
+  notebookPath: string;
 };
 
 export default function SideBar({
@@ -35,6 +39,7 @@ export default function SideBar({
   waiting,
   widgetsParams,
   watchMode,
+  notebookPath,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -117,6 +122,16 @@ export default function SideBar({
     }
   }
 
+  const handleDownload = (url:string, filename:string) => {
+    axios
+      .get(url, {
+        responseType: "blob",
+      })
+      .then((res) => {
+        fileDownload(res.data, filename);
+      });
+  };
+
   return (
     <nav
       id="sidebarMenu"
@@ -139,13 +154,19 @@ export default function SideBar({
                 <i className="fa fa-play" aria-hidden="true"></i> Run
               </button>
 
-              {/* <button
+              <button
                 type="button"
                 className="btn btn-primary"
                 disabled={waiting}
+                onClick={() =>
+                  handleDownload(
+                    `${axios.defaults.baseURL}${notebookPath}`,
+                    `${notebookTitle}.html`
+                  )
+                }
               >
                 <i className="fa fa-download" aria-hidden="true"></i> Download
-              </button> */}
+              </button>
             </div>
             {notebookTitle === "Please provide title" && (
               <div className="alert alert-warning mb-3" role="alert">
@@ -153,15 +174,21 @@ export default function SideBar({
                   className="fa fa-exclamation-triangle"
                   aria-hidden="true"
                 ></i>{" "}
-                <b>Please add YAML config to your notebook as a first raw cell.</b>
-                <br /><br />
+                <b>
+                  Please add YAML config to your notebook as a first raw cell.
+                </b>
+                <br />
+                <br />
                 Example:
                 <pre>
                   ---
                   <br />
-                  title: Report title<br/>
-                  author: Your name<br/>
-                  description: My amazing report<br/>
+                  title: Report title
+                  <br />
+                  author: Your name
+                  <br />
+                  description: My amazing report
+                  <br />
                   ---
                 </pre>
                 <button

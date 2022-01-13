@@ -4,7 +4,6 @@ import axios from "axios";
 import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
-import { error } from "console";
 
 
 type MainViewProps = {
