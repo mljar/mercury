@@ -31,7 +31,7 @@ The YAML config is added as a first raw cell in the notebook.
 
 #### Web Application from Notebook
 
-The web app generated from the notebook. Code is hidden. User can change parameters, execute notebook with `Run` button, and save results with `Download` button.
+The web app generated from the notebook. Code is hidden (optional). User can change parameters, execute notebook with `Run` button, and save result with `Download` button.
 
 <p align="center">
   <img 
