@@ -17,6 +17,13 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 - You can decide to show or hide your code.
 - Easily deploy to the server.
 
+Mercury is a perfect tool to share your Python notebooks with non-programmers. 
+- You can turn your notebook into web app. Sharing is as easy as sending them the URL to your server.
+- You can add interactive input to your notebook by defining the YAML header. Your users can change the input and execute the notebook.
+- You can hide your code to not scare your (non-coding) collaborators.
+- Users can interact with notebook and save they results.
+- You can share notebook as a web app with multiple users - they dont ovewrite original notebook.
+
 ## Example
 
 #### Notebook with YAML config
