@@ -13,7 +13,7 @@ Easily convert your Python notebooks into interactive web apps by adding paramet
 
 - Simply add YAML with description of parameters needed in the notebook. 
 - Share notebook with others. 
-- Allow them to execute notebook with selected parameters. 
+- Allow them to execute the notebook with selected parameters. 
 - You can decide to show or hide your code.
 - Easily deploy to the server.
 
@@ -22,7 +22,7 @@ Mercury is a perfect tool to share your Python notebooks with non-programmers.
 - You can add interactive input to your notebook by defining the YAML header. Your users can change the input and execute the notebook.
 - You can hide your code to not scare your (non-coding) collaborators.
 - Users can interact with notebook and save they results.
-- You can share notebook as a web app with multiple users - they dont ovewrite original notebook.
+- You can share notebook as a web app with multiple users - they don't ovewrite original notebook.
 
 ## Example
 
@@ -38,7 +38,7 @@ The YAML config is added as a first raw cell in the notebook.
 
 #### Web Application from Notebook
 
-The web app generated from the notebook. Code is hidden (optional). User can change parameters, execute notebook with `Run` button, and save result with `Download` button.
+The web app generated from the notebook. Code is hidden (optional). User can change parameters, execute notebook with the `Run` button, and save results with the `Download` button.
 
 <p align="center">
   <img 
@@ -55,7 +55,7 @@ The demo running at Heroku free dyno [http://mercury-demo-1.herokuapp.com](http:
 
 ### Share mutliple notebooks
 
-You can share as many notebooks as you want. There is gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking `Open` button.
+You can share as many notebooks as you want. There is gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking the `Open` button.
 
 <p align="center">
   <a href="http://mercury.mljar.com" target="_blank">
@@ -87,7 +87,7 @@ Allowed parameters in YAML config:
 - `description` - string describing the content of the notebook. It is used in the gallery view.
 - `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
 - `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` the prompt information will be displayed for each cell in the notebook.
-- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the side bar. Each parameter should have unique name that correspont to the variable name used in the code.
+- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the side bar. Each parameter should have a unique name that corresponds to the variable name used in the code.
 
 ## Define widget with YAML
 
@@ -110,7 +110,7 @@ You can set a default widget by setting the `value`. The format of the `value` d
 - for `checkbox` a `value` should be a boolean (`True` or `False`), example: `value: True`,
 - for `numeric` a `value` should be a number, example: `value: 10.2`.
 
-The rest of parameters depends on widget input type.
+The rest of the parameters depend on widget input type.
 
 #### Slider
 
@@ -165,7 +165,7 @@ params:
 
 Additional parameters:
 
-- `multi` - a boolean value that decides if user can select several options (default is set to `False`).
+- `multi` - a boolean value that decides if the user can select several options (default is set to `False`).
 - `choices` - a list with available choices.
 
 Example YAML:
@@ -282,9 +282,9 @@ Widgets rendered from above YAML config:
 
 ### Use variables in the code
 
-To use variables in the code simply define the variable with the same name as widget name. You can also assign the same value as defined in YAML. Please define all variables in the one cell (it can be below the cell with YAML config).
+To use variables in the code simply define the variable with the same name as the widget name. You can also assign the same value as defined in YAML. Please define all variables in the one cell (it can be below the cell with YAML config).
 
-When the user will interact with widgets and click the `Run` button, the code with variables will be updated with user selected values.
+When the user interacts with widgets and clicks the `Run` button, the code with variables will be updated with user selected values.
 
 Example:
 
@@ -392,7 +392,7 @@ docker-compose down
 
 ## Mercury development
 
-The Mercury consists of three elements:
+The Mercury project consists of three elements:
 
 - Frontend written in TypeScript with React+Redux
 - Server written in Python with Django
