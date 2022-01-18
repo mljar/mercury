@@ -136,6 +136,7 @@ export default function SideBar({
     <nav
       id="sidebarMenu"
       className="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse"
+      style={{overflowY: "auto"}}
     >
       <div className="position-sticky p-3">
         <h4>{notebookTitle}</h4>
@@ -147,7 +148,7 @@ export default function SideBar({
               <button
                 type="button"
                 className="btn btn-success"
-                style={{ marginRight: "10px", width: "47%"  }}
+                style={{ marginRight: "10px", width: "47%" }}
                 onClick={() => dispatch(executeNotebook(notebookId))}
                 disabled={waiting}
               >
