@@ -14,6 +14,7 @@ import fileDownload from "js-file-download";
 
 import {
   isCheckboxWidget,
+  isFileWidget,
   isNumericWidget,
   isRangeWidget,
   isSelectWidget,
@@ -21,6 +22,7 @@ import {
   IWidget,
 } from "./Widgets/Types";
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+import FileWidget from "./Widgets/File";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -118,7 +120,19 @@ export default function SideBar({
             key={key}
           />
         );
+      } else if (isFileWidget(widgetParams)) {
+        widgets.push(
+          <FileWidget
+            widgetKey={key}
+            disabled={waiting}
+            label={widgetParams?.label}
+            value={widgetsValues[key] as string}
+            maxFileSize={widgetParams?.maxFileSize}
+            key={key}
+          />
+        );
       }
+
     }
   }
 

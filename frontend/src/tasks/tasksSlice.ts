@@ -55,7 +55,7 @@ export const fetchCurrentTask =
                 dispatch(setCurrentTask(data))
 
             } catch (error) {
-                console.clear();
+                // console.clear();
                 dispatch(setCurrentTask({} as ITask));
             }
 
