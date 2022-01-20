@@ -32,7 +32,6 @@ export default function FileWidget({
   if(maxFileSize) {
     fileSizeLimit = maxFileSize;
   }
-  console.log(maxFileSize, fileSizeLimit)
   return (
     <div className="form-group mb-3">
       <label htmlFor={`file-${label}`}>{label}</label>
