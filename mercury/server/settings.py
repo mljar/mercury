@@ -19,8 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_BUILD_DIR = BASE_DIR / "frontend-dist"
 FRONTEND_STATIC_DIR = BASE_DIR / "frontend-dist" / "static"
 
-DJANGO_DRF_FILEPOND_UPLOAD_TMP = BASE_DIR / "uploads-temp"
-DJANGO_DRF_FILEPOND_FILE_STORE_PATH = BASE_DIR / "uploads"
+DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
+DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
 
 #  celery -A server worker --loglevel=info -P gevent --concurrency 2 -E
 CELERY_BROKER_URL = "sqla+sqlite:///celery.sqlite"

@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
-// import { setWidgetValue } from "./widgetsSlice";
+import axios from "axios";
+import { setWidgetValue } from "./widgetsSlice";
 
-import { FilePond, registerPlugin } from 'react-filepond'
-// import { FilePond as IFilePond, File as FilePondFile } from 'react-filepond'
+import { FilePond, registerPlugin } from 'react-filepond';
+import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
 
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation'
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
-
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginFileValidateSize,
+);
 
 type FileProps = {
   widgetKey: string;
   label: string | null;
-  value: string | null;
   maxFileSize: string | null;
   disabled: boolean;
 };
@@ -21,31 +24,42 @@ type FileProps = {
 export default function FileWidget({
   widgetKey,
   label,
-  value,
   maxFileSize,
   disabled,
 }: FileProps) {
   const dispatch = useDispatch();
-  const [files, setFiles] = useState([])
-
+  let fileSizeLimit = "100MB";
+  if(maxFileSize) {
+    fileSizeLimit = maxFileSize;
+  }
+  console.log(maxFileSize, fileSizeLimit)
   return (
     <div className="form-group mb-3">
       <label htmlFor={`file-${label}`}>{label}</label>
-
-      <div
-        style={{
-          paddingTop: "12px"
-        }}
-      >
-
+      <div>
         <FilePond
-          files={files}
-          onupdatefiles={(fileItems) => {console.log(fileItems[0].file)} }
-          allowMultiple={false}
-          // server="/api"
-          // name="files" {/* sets the file input name, it's filepond by default */}
+          maxFileSize={fileSizeLimit}
+          onprocessfile={(error, file) => {
+            dispatch(setWidgetValue({ key: widgetKey, value: file.serverId }));
+          }}
+          server={{
+            url: `${axios.defaults.baseURL}/api/v1/fp`,
+            process: '/process/',
+            revert: async (uniqueFileId, load, error) => {
+              try {
+                const response = await axios.delete(`${axios.defaults.baseURL}/api/v1/fp/revert`, {
+                  data: uniqueFileId
+                });
+                dispatch(setWidgetValue({ key: widgetKey, value: [] }));
+                // Should call the load method when done, no parameters required
+                load();
+              } catch (e) {
+                // Can call the error method if something is wrong, should exit after
+                error('Problem with uploaded file removal');
+              }
+            },
+          }}
           labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
-          
         />
       </div>
     </div>

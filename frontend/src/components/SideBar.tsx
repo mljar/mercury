@@ -49,12 +49,17 @@ export default function SideBar({
   useEffect(() => {
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
-        dispatch(setWidgetValue({ key, value: widgetParams.value }));
+        if (widgetParams.input === "file") {
+          dispatch(setWidgetValue({ key, value: [] as string[] }));
+        } else {
+          dispatch(setWidgetValue({ key, value: widgetParams.value }));
+        }
       }
     }
   }, [dispatch, widgetsParams]);
 
   let widgets = [];
+  let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
   if (widgetsParams) {
     for (let [key, widgetParams] of Object.entries(widgetsParams)) {
       if (isSelectWidget(widgetParams)) {
@@ -126,14 +131,31 @@ export default function SideBar({
             widgetKey={key}
             disabled={waiting}
             label={widgetParams?.label}
-            value={widgetsValues[key] as string}
             maxFileSize={widgetParams?.maxFileSize}
             key={key}
           />
         );
+        fileKeys.push(key);
       }
 
     }
+  }
+
+  const allFilesUploaded = () => {
+    if (fileKeys.length === 0) {
+      // no files at all, so OK
+      return true;
+    }
+    for (const key of fileKeys) {
+      if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
+        return false;
+      }
+      let files = widgetsValues[key] as string[];
+      if (files.length === 0) {
+        return false;
+      }
+    }
+    return true;
   }
 
   const handleDownload = (url: string, filename: string) => {
@@ -150,7 +172,7 @@ export default function SideBar({
     <nav
       id="sidebarMenu"
       className="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse"
-      style={{overflowY: "auto"}}
+      style={{ overflowY: "auto" }}
     >
       <div className="position-sticky p-3">
         <h4>{notebookTitle}</h4>
@@ -164,7 +186,7 @@ export default function SideBar({
                 className="btn btn-success"
                 style={{ marginRight: "10px", width: "47%" }}
                 onClick={() => dispatch(executeNotebook(notebookId))}
-                disabled={waiting}
+                disabled={waiting || !allFilesUploaded()}
               >
                 <i className="fa fa-play" aria-hidden="true"></i> Run
               </button>
@@ -184,6 +206,13 @@ export default function SideBar({
                 <i className="fa fa-download" aria-hidden="true"></i> Download
               </button>
             </div>
+
+            {fileKeys && !allFilesUploaded() && (
+              <div className="alert alert-danger mb-3" role="alert">
+                <i className="fa fa-file" aria-hidden="true"></i> Please upload all required files.
+              </div>
+            )}
+
             {notebookTitle === "Please provide title" && (
               <div className="alert alert-warning mb-3" role="alert">
                 <i

@@ -16,7 +16,7 @@ urlpatterns = [
         "api/v1/version",
         VersionInfo.as_view(),
     ),
-    re_path(r'^fp/', include('django_drf_filepond.urls')),
+    re_path(r'^api/v1/fp/', include('django_drf_filepond.urls')),
 ]
 
 urlpatterns += tasks_urlpatterns

@@ -1,3 +1,9 @@
+/* file upload widget */
+
+.filepond--credits {
+  display: none;
+}
+
 /* Loading Bullet in BlockUI */
 
 .loading-bullet {
