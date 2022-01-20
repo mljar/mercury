@@ -65,14 +65,15 @@ def task_execute(self, job_params):
                     # Get the temporary upload record
                     tu = TemporaryUpload.objects.get(upload_id=file_server_id)
 
-                    input_file = os.path.join(os.path.dirname(notebook.path), 
-                                    f"{task.id}_{tu.upload_name}")
-                    copyfile(tu.get_file_path(), input_file)
+                    input_file = f"{task.id}_{tu.upload_name}"
+                    input_path = os.path.join(os.path.dirname(notebook.path), 
+                                    input_file)
+                    copyfile(tu.get_file_path(), input_path)
 
-                    inject_code += f'{k} = "{tu.upload_name}"\n'
+                    inject_code += f'{k} = "{input_file}"\n'
                     use_default = False
 
-                    remove_after_execution += [input_file]
+                    remove_after_execution += [input_path]
 
                     # DO NOT Delete the temporary upload record and the temporary directory
                     # the file is kept in the UI, maybe user want to reuse it one more time
