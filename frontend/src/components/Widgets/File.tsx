@@ -37,6 +37,7 @@ export default function FileWidget({
       <label htmlFor={`file-${label}`}>{label}</label>
       <div>
         <FilePond
+          disabled={disabled}
           maxFileSize={fileSizeLimit}
           onprocessfile={(error, file) => {
             dispatch(setWidgetValue({ key: widgetKey, value: file.serverId }));
