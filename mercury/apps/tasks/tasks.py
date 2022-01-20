@@ -54,6 +54,7 @@ def task_execute(self, job_params):
         # validate input data
         inject_code = ""
         all_variables = []
+        remove_after_execution = []
         for k, v in widgets_params.items():
             all_variables += [k]
             use_default = True
@@ -64,11 +65,14 @@ def task_execute(self, job_params):
                     # Get the temporary upload record
                     tu = TemporaryUpload.objects.get(upload_id=file_server_id)
 
-                    copyfile(tu.get_file_path(), 
-                        os.path.join(os.path.dirname(notebook.path), tu.upload_name))
+                    input_file = os.path.join(os.path.dirname(notebook.path), 
+                                    f"{task.id}_{tu.upload_name}")
+                    copyfile(tu.get_file_path(), input_file)
 
                     inject_code += f'{k} = "{tu.upload_name}"\n'
                     use_default = False
+
+                    remove_after_execution += [input_file]
 
                     # DO NOT Delete the temporary upload record and the temporary directory
                     # the file is kept in the UI, maybe user want to reuse it one more time
@@ -271,8 +275,6 @@ def task_execute(self, job_params):
             task.result = error_msg
             task.state = "ERROR"
         task.save()
-
-        clean_service()
     except Exception as e:
         task.result = str(e)
         task.state = "ERROR"
@@ -284,3 +286,9 @@ def task_execute(self, job_params):
         if wrk_input_nb_path is not None:
             if os.path.isfile(wrk_input_nb_path):
                 os.remove(wrk_input_nb_path)
+        # remove copied files from temporary uploads        
+        for f in remove_after_execution:
+            if os.path.exists(f):
+                os.remove(f)
+        # remove old file
+        clean_service()
