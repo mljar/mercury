@@ -4,14 +4,16 @@ import json
 import time
 import shutil
 import traceback
+from shutil import copyfile
 from subprocess import Popen, PIPE
 from django.conf import settings
 from apps.notebooks.tasks import get_jupyter_bin_path
 from celery import shared_task
 from apps.tasks.models import Task
 from apps.notebooks.models import Notebook
+from django_drf_filepond.models import TemporaryUpload
+from apps.tasks.clean_service import clean_service
 import nbformat
-
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
@@ -56,7 +58,23 @@ def task_execute(self, job_params):
             all_variables += [k]
             use_default = True
             if k in task_params:
-                if v["input"] == "numeric":
+                if v["input"] == "file":
+                    
+                    file_server_id = task_params[k]
+                    # Get the temporary upload record
+                    tu = TemporaryUpload.objects.get(upload_id=file_server_id)
+
+                    copyfile(tu.get_file_path(), 
+                        os.path.join(os.path.dirname(notebook.path), tu.upload_name))
+
+                    inject_code += f'{k} = "{tu.upload_name}"\n'
+                    use_default = False
+
+                    # DO NOT Delete the temporary upload record and the temporary directory
+                    # the file is kept in the UI, maybe user want to reuse it one more time
+                    # it will be removed later by cleaning service
+                    # DO NOT tu.delete()
+                elif v["input"] == "numeric":
                     task_value = task_params[k]
                     if (
                         (
@@ -253,6 +271,8 @@ def task_execute(self, job_params):
             task.result = error_msg
             task.state = "ERROR"
         task.save()
+
+        clean_service()
     except Exception as e:
         task.result = str(e)
         task.state = "ERROR"
