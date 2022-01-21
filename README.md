@@ -22,7 +22,7 @@ Mercury is a perfect tool to share your Python notebooks with non-programmers.
 - You can add interactive input to your notebook by defining the YAML header. Your users can change the input and execute the notebook.
 - You can hide your code to not scare your (non-coding) collaborators.
 - Users can interact with notebook and save they results.
-- You can share notebook as a web app with multiple users - they don't ovewrite original notebook.
+- You can share notebook as a web app with multiple users - they don't overwrite original notebook.
 
 ## Example
 
