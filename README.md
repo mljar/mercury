@@ -95,7 +95,7 @@ Allowed parameters in YAML config:
 Definition of the widget (in `params`) starts with the widget name. It will correspond to the variable in the code. The name should be a valid Python variable. 
 
 #### Widget input type
-The next thing is to select the input type. It can be: `slider`, `range`, `select`, `checkbox`, `numeric`. 
+The next thing is to select the input type. It can be: `text`, `slider`, `range`, `select`, `checkbox`, `numeric`, `file`. 
 
 #### Widget label
 For each input we need to define a `label`. It will be a text displayed above (or near) the widget.
@@ -103,14 +103,40 @@ For each input we need to define a `label`. It will be a text displayed above (o
 #### Widget default value
 You can set a default widget by setting the `value`. The format of the `value` depends on the input type:
 
+- for `text` a `value` should be a string, example `value: example text`,
 - for `slider` a `value` should be a number, example: `value: 5`,
 - for `range` a `value` should be a list with two numbers, example `value: [3,6]`,
 - for `select` with `mutli: False` a `value` should be a string, example `value: hey`,
 - for `select` with `multi: True` a `value` should be a list of strings, example `value: [cześć, hi, hello]`,
 - for `checkbox` a `value` should be a boolean (`True` or `False`), example: `value: True`,
 - for `numeric` a `value` should be a number, example: `value: 10.2`.
+- for `file` a `value` is not needed.
 
 The rest of the parameters depend on widget input type.
+
+#### Text
+
+Additional parameters:
+
+- `rows` - the number of rows in the text area (default is set to 1),
+
+Example YAML:
+
+```yaml
+params:
+    my_variable:
+        input: text
+        label: This is text label
+        value: some text
+        rows: 2
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury Text"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_text_input_2.png" width="35%" />
+</p>
+
 
 #### Slider
 
@@ -230,6 +256,28 @@ params:
     alt="Mercury Numeric"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_numeric.png" width="35%" />
 </p>
+
+#### File
+
+Additional parameters:
+
+- `maxFileSize` - a maximum allowed file size (default set to 100MB). The file size should be defined as string with MB or KB at the end.
+
+```yaml
+params:
+    filename:
+        label: This is file label
+        input: file
+        maxFileSize: 1MB
+```
+
+<p align="left" >
+  <img 
+    alt="Mercury File"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_file_input.png" width="35%" />
+</p>
+
+The uploaded file name will be passed to the notebook as a string. The uploaded file will be copied to the same directory as the notebook. After notebook execution the uploaded file will be removed.
 
 ### Full example YAML
 
