@@ -14,6 +14,7 @@ from apps.notebooks.models import Notebook
 from django_drf_filepond.models import TemporaryUpload
 from apps.tasks.clean_service import clean_service
 import nbformat
+from re import sub
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
@@ -32,6 +33,8 @@ def get_parameters_cell_index(cells, all_variables):
 
     return max_index
 
+def sanitize_string(str):
+    return sub("[^a-z0-9\.,_\-\s]", "", str)
 
 @shared_task(bind=True)
 def task_execute(self, job_params):
@@ -59,7 +62,12 @@ def task_execute(self, job_params):
             all_variables += [k]
             use_default = True
             if k in task_params:
-                if v["input"] == "file":
+                if v["input"] == "text":
+                    task_value = task_params[k]
+                    inject_code += f'{k} = "{sanitize_string(task_value)}"\n'
+                    use_default = False
+
+                elif v["input"] == "file":
                     
                     file_server_id = task_params[k]
                     # Get the temporary upload record
@@ -163,7 +171,10 @@ def task_execute(self, job_params):
 
             if use_default:
                 if widgets_params[k].get("value") is not None:
-                    inject_code += f'{k} = {widgets_params[k]["value"]}\n'
+                    if v["input"] in ["text", "file", "select"]:
+                        inject_code += f'{k} = "{widgets_params[k].get("value", "")}"\n'
+                    else:
+                        inject_code += f'{k} = {widgets_params[k].get("value")}\n'
 
         new_cell = {
             "cell_type": "code",

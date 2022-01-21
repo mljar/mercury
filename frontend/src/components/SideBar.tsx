@@ -53,6 +53,8 @@ export default function SideBar({
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
         if (widgetParams.input === "file") {
           dispatch(setWidgetValue({ key, value: [] as string[] }));
+        } else if (widgetParams.input === "text") {
+          dispatch(setWidgetValue({ key, value: widgetParams.value ? widgetParams.value : "" }));
         } else {
           dispatch(setWidgetValue({ key, value: widgetParams.value }));
         }

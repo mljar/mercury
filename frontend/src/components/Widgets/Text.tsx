@@ -21,8 +21,7 @@ export default function TextWidget({
   let rowsValue: number = (rows) ? rows : 1;
 
   const sanitizeString = (str: string) => {
-    str = str.replace(/[^a-z0-9\.,_-\s]/gim, "");
-    return str;
+    return str.replace(/[^a-z0-9\.,_\-\s]/gim, "");
   }
 
   return (
