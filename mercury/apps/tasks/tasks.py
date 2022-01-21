@@ -4,14 +4,17 @@ import json
 import time
 import shutil
 import traceback
+from shutil import copyfile
 from subprocess import Popen, PIPE
 from django.conf import settings
 from apps.notebooks.tasks import get_jupyter_bin_path
 from celery import shared_task
 from apps.tasks.models import Task
 from apps.notebooks.models import Notebook
+from django_drf_filepond.models import TemporaryUpload
+from apps.tasks.clean_service import clean_service
 import nbformat
-
+from re import sub
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
@@ -30,6 +33,8 @@ def get_parameters_cell_index(cells, all_variables):
 
     return max_index
 
+def sanitize_string(str):
+    return sub("[^a-z0-9\.,_\-\s!?]gim", "", str)
 
 @shared_task(bind=True)
 def task_execute(self, job_params):
@@ -52,11 +57,37 @@ def task_execute(self, job_params):
         # validate input data
         inject_code = ""
         all_variables = []
+        remove_after_execution = []
         for k, v in widgets_params.items():
             all_variables += [k]
             use_default = True
             if k in task_params:
-                if v["input"] == "numeric":
+                if v["input"] == "text":
+                    task_value = task_params[k]
+                    inject_code += f'{k} = "{sanitize_string(task_value)}"\n'
+                    use_default = False
+
+                elif v["input"] == "file":
+                    
+                    file_server_id = task_params[k]
+                    # Get the temporary upload record
+                    tu = TemporaryUpload.objects.get(upload_id=file_server_id)
+
+                    input_file = f"{task.id}_{tu.upload_name}"
+                    input_path = os.path.join(os.path.dirname(notebook.path), 
+                                    input_file)
+                    copyfile(tu.get_file_path(), input_path)
+
+                    inject_code += f'{k} = "{input_file}"\n'
+                    use_default = False
+
+                    remove_after_execution += [input_path]
+
+                    # DO NOT Delete the temporary upload record and the temporary directory
+                    # the file is kept in the UI, maybe user want to reuse it one more time
+                    # it will be removed later by cleaning service
+                    # DO NOT tu.delete()
+                elif v["input"] == "numeric":
                     task_value = task_params[k]
                     if (
                         (
@@ -140,7 +171,10 @@ def task_execute(self, job_params):
 
             if use_default:
                 if widgets_params[k].get("value") is not None:
-                    inject_code += f'{k} = {widgets_params[k]["value"]}\n'
+                    if v["input"] in ["text", "file", "select"]:
+                        inject_code += f'{k} = "{widgets_params[k].get("value", "")}"\n'
+                    else:
+                        inject_code += f'{k} = {widgets_params[k].get("value")}\n'
 
         new_cell = {
             "cell_type": "code",
@@ -264,3 +298,9 @@ def task_execute(self, job_params):
         if wrk_input_nb_path is not None:
             if os.path.isfile(wrk_input_nb_path):
                 os.remove(wrk_input_nb_path)
+        # remove copied files from temporary uploads        
+        for f in remove_after_execution:
+            if os.path.exists(f):
+                os.remove(f)
+        # remove old file
+        clean_service()

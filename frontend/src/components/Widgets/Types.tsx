@@ -41,12 +41,28 @@ export interface IRangeWidget {
   step: number | null;
 }
 
+export interface IFileWidget {
+  label: string | null;
+  value: string | null;
+  input: string;
+  maxFileSize: string | null;
+}
+
+export interface ITextWidget {
+  label: string | null;
+  value: string | undefined;
+  input: string;
+  rows: number | null;
+}
+
 export type IWidget =
   | ISelectWidget
   | ICheckboxWidget
   | INumericWidget
   | ISliderWidget
-  | IRangeWidget;
+  | IRangeWidget
+  | IFileWidget
+  | ITextWidget;
 
 export function isSelectWidget(widget: IWidget): widget is ISelectWidget {
   return (widget as ISelectWidget).input === "select";
@@ -63,6 +79,15 @@ export function isNumericWidget(widget: IWidget): widget is INumericWidget {
 export function isSliderWidget(widget: IWidget): widget is ISliderWidget {
   return (widget as ISliderWidget).input === "slider";
 }
+
 export function isRangeWidget(widget: IWidget): widget is IRangeWidget {
   return (widget as IRangeWidget).input === "range";
+}
+
+export function isFileWidget(widget: IWidget): widget is IFileWidget {
+  return (widget as IFileWidget).input === "file";
+}
+
+export function isTextWidget(widget: IWidget): widget is ITextWidget {
+  return (widget as ITextWidget).input === "text";
 }

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.shortcuts import render
 from django.conf.urls.static import static
 
@@ -16,6 +16,7 @@ urlpatterns = [
         "api/v1/version",
         VersionInfo.as_view(),
     ),
+    re_path(r'^api/v1/fp/', include('django_drf_filepond.urls')),
 ]
 
 urlpatterns += tasks_urlpatterns

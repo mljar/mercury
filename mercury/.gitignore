@@ -10,3 +10,5 @@ frontend-dist/
 static/
 dist/
 django_static/
+uploads-temp/
+uploads/

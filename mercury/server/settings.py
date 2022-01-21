@@ -19,6 +19,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_BUILD_DIR = BASE_DIR / "frontend-dist"
 FRONTEND_STATIC_DIR = BASE_DIR / "frontend-dist" / "static"
 
+DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
+DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
+
 #  celery -A server worker --loglevel=info -P gevent --concurrency 2 -E
 CELERY_BROKER_URL = "sqla+sqlite:///celery.sqlite"
 CELERY_RESULT_BACKEND = "db+sqlite:///celery.sqlite"
@@ -59,6 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "django_drf_filepond",
     "apps.tasks",
     "apps.notebooks",
 ]
