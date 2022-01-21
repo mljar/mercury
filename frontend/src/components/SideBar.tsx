@@ -19,10 +19,12 @@ import {
   isRangeWidget,
   isSelectWidget,
   isSliderWidget,
+  isTextWidget,
   IWidget,
 } from "./Widgets/Types";
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
+import TextWidget from "./Widgets/Text";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -136,6 +138,17 @@ export default function SideBar({
           />
         );
         fileKeys.push(key);
+      } else if (isTextWidget(widgetParams)) {
+        widgets.push(
+          <TextWidget
+            widgetKey={key}
+            disabled={waiting}
+            label={widgetParams?.label}
+            value={widgetsValues[key] as string}
+            rows={widgetParams?.rows}
+            key={key}
+          />
+        );
       }
 
     }
