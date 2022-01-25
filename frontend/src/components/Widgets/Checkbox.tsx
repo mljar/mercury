@@ -25,7 +25,6 @@ export default function CheckboxWidget({
         id={`checkbox-${label}`}
         disabled={disabled}
         onChange={() => {
-          console.log("change");
           dispatch(setWidgetValue({ key: widgetKey, value: !value }));
         }}
         checked={ value != null ? value : false}

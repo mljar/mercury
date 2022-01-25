@@ -84,8 +84,6 @@ export const getWatchModeCounter = (state: RootState) => state.notebooks.watchMo
 export const fetchNotebooks =
   () =>
     async (dispatch: Dispatch<AnyAction>) => {
-      console.log("fetch notebooks")
-
       try {
         dispatch(setLoadingState("loading"))
         const url = '/api/v1/notebooks';
