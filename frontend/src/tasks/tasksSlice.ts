@@ -68,18 +68,13 @@ export const executeNotebook =
             const { widgets } = getState().widgets;
             const sessionId = getSessionId();
 
-            console.log("run notebook");
-
-
             try {
                 const task = {
                     session_id: sessionId,
                     params: JSON.stringify(widgets),
                 }
-                console.log(task)
                 const url = `/api/v1/execute/${notebookId}`;
                 const { data } = await axios.post(url, task);
-                console.log(data)
                 dispatch(setCurrentTask(data))
 
             } catch (error) {

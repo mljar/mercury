@@ -71,23 +71,18 @@ export default function SelectWidget({
         options={options}
         isMulti={multi}
         onChange={(e) => {
-          console.log(e);
 
           if (e) {
             if (isSingleOption(e)) {
-              console.log("single");
               dispatch(setWidgetValue({ key: widgetKey, value: e.value }));
             } else {
-              console.log("multi");
-              console.log({ msg: "values", values: e.values() });
+              // console.log({ msg: "values", values: e.values() });
               const vs = Array.from(e.values()).filter(
                 (i) => i !== undefined
               ) as { label: string; value: string }[];
-              console.log(vs);
-              // console.log(vs.map((i) => i.value));
-              console.log({
-                key: widgetKey,
-              });
+              // console.log({
+              //   key: widgetKey,
+              // });
               dispatch(
                 setWidgetValue({
                   key: widgetKey,
