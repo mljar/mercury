@@ -35,6 +35,7 @@ class Command(BaseCommand):
             notebook_id = task_init_notebook(
                 options["notebook_path"], is_watch_mode=True
             )
+            self.stdout.write(self.style.SUCCESS(f"http://127.0.0.1:8000/app/{notebook_id}"))
 
             server_command = [
                 sys.executable,

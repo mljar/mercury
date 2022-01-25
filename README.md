@@ -420,6 +420,7 @@ python -c 'from django.core.management.utils import get_random_secret_key; \
 ```
 
 Please leave `SERVE_STATIC=False` because in the `docker-compose` configuration static files are served with nginx.
+If running on local you have to add localhost to allowed_hosts like this :`ALLOWED_HOSTS=localhost`.
 
 The `docker-compose` will automatically read environment variables from `.env` file. To start the Mercury please run:
 
