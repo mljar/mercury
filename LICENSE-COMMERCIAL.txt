@@ -30,6 +30,7 @@ MLJAR - MLJAR sp. z o.o., based in Łapy 18100, Poland with tax identification n
 
 —-----------------------------------------------------------------------------
 
+
 1. License Grant
 —---------------
 
@@ -38,6 +39,7 @@ This Agreement grants You a non-exclusive, non-transferable, limited license to 
 
 2. License Types
 —---------------
+
 Software and license documentation shall be available electronically after purchasing one of the available licenses. Software shall be deemed delivered upon granting access.
 By purchasing a license, we provide You access to the source code so that You can create Modifications to the original software.
 While you retain all rights to any original work authored by you as part of the Modifications, We continue to own all copyright and other intellectual property rights in the Software.
@@ -92,60 +94,99 @@ MLJAR shall have the right to terminate this Agreement and the license granted h
 
 Upon termination of this Agreement, You must cease all use of the Software. If prior to your breach of this Agreement, You delivered Products incorporating the Software to Your End Users, those End Users’ licenses shall survive termination.
 
+
 6. Disclaimer of Warranties
-—-----------------------------------------
+—--------------------------
+
 You Use the Mercury at Your own risk, and the entire risk as to the satisfactory quality, performance, and accuracy are with You.
 The Mercury and accompanying documentation are provided on an “as is” and “as available” basis without warranty - express or implied - of any kind, and MLJAR specifically disclaims the warranty of fitness for a particular purpose. No oral or written advice given by MLJAR, its dealers, distributors, agents, or employees shall create a warranty or in any way increase the scope of this warranty, and You may not rely upon such information or advice.
 TO THE EXTENT PERMITTED BY LAW, MLJAR DISCLAIMS ALL WARRANTIES AND CONDITIONS, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT, WITH REGARD TO THE SOFTWARE. WE DO NOT GUARANTEE THAT THE SOFTWARE OPERATION OR YOUR APPLICATION WILL BE UNINTERRUPTED OR ERROR-FREE, AND YOU ACKNOWLEDGE THAT IT IS NOT TECHNICALLY PRACTICABLE FOR US TO DO SO.
+
+
 7. Limitation of Liabilities
-—-------------------------------------------
+—---------------------------
+
 TO THE EXTENT PERMITTED BY LAW, IN NO EVENT SHALL MLJAR BE LIABLE UNDER ANY LEGAL OR EQUITABLE THEORY FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LAW) ARISING OUT OF THE USE OF OR INABILITY TO USE THE MERCURY OR THE CODE IT PRODUCES OR ANY OTHER SUBJECT MATTER RELATING TO THIS AGREEMENT, EVEN IF MLJAR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+
 8. Indemnification
 —-----------------
+
 While redistributing the Software or Modifications thereof as part of Your Product, You may choose to offer acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this Agreement. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, and not on MLJAR’s behalf.
 While distributing MERCURY to your end-users, You can offer them support for MERCURY, but only on your own behalf and your own responsibility.
 You agree to indemnify, hold harmless, and defend MLJAR and its owners, officers, agents, and affiliates from and against any and all claims, lawsuits, and proceedings (collectively “Claims”), and all expenses, costs (including attorney's fees), judgments, damages and other liabilities resulting from such Claims, that arise or result from: (i) Your use of the Software in violation of this Agreement; (ii) the use or distribution of Your Product, except to the extent such claim is based solely on the inclusion of the Software therein; (iii) Your Modification of the Software’s source code; or (iv) Your accepting support, warranty, indemnity, or additional liability.
 If someone sues MLJAR due to your use of MERCURY, You are responsible for any resulting cost to MLJAR.
 YOU AGREE TO DEFEND, INDEMNIFY, AND HOLD HARMLESS MLJAR FROM AND AGAINST ANY LAWSUITS, CLAIMS, LOSSES, DAMAGES, FINES, AND EXPENSES (INCLUDING ATTORNEYS' FEES AND COSTS) ARISING OUT OF YOUR USE OF THE SOFTWARE OR BREACH OF THIS AGREEMENT.
+
+
 9. Payment and Taxes
-—------------------------------
+—-------------------
+
 The Software license fees will be due and payable in full as outlined in the applicable invoice or at the time of purchase.
 Each party shall be responsible for all taxes (including, but not limited to, taxes based upon its income) or levies imposed on it under applicable laws, regulations, and tax treaties as a result of this Agreement and any payments made hereunder (including those required to be withheld or deducted from payments); provided that You shall be responsible for any value-added tax, use tax, sales tax, or similar tax, and shall pay or reimburse MLJAR for the same upon invoice. Each party shall furnish evidence of such paid taxes as is sufficient to enable the other party to obtain any credits available to it, including original tax withholding certificates.
+
+
 10. Refund
-—---------------
+—---------
+
 The License fee is refundable only if the refund request is made within thirty (30) days from the purchase date and You haven't requested support.
 To ask for a refund, You can contact MLJAR at contact@mljar.com. As soon as the request is received, MLJAR will evaluate refund validity. If You are eligible for a refund, MLJAR will initiate a full refund of the purchase within fifteen (15) business days.
 Once MLJAR initiates the refund, You will get a confirmation email, and this agreement is terminated. You shall remove, delete or otherwise destroy any material You have received, copied, or otherwise obtained.
+
+
 11. Maintenance and Support
 —--------------------------
+
 During the term of this agreement, You have access to the Software's online support services via email. You will get answers to technical questions within a few business days (depending on chosen license).
 Support shall refer only to Software's source code, integration questions related to the Software's API, and documentation clarification. Support doesn't include customization, installation, and questions related to other programming languages, libraries, or frameworks.
 Under no circumstances is MLJAR required to fix Software bugs, perform custom development, or write code for You.
+
+
 12. Miscellaneous
-—--------------------------
+—----------------
+
 12.1 Software Updates and Upgrades
+
 The license granted herein applies only to the version of the Software available when purchased in connection with the terms of this Agreement and any updates and/or upgrades to which You may be entitled. Any previous or subsequent license granted to You for the use of the Software shall be governed by the terms and conditions of the agreement entered in connection with the purchase or download of that version of the Software.
 This license applies to all versions of MERCURY.
+
 12.2 Survival
+
 The provisions of sections 4 through 9 will survive termination of this Agreement.
+
 12.3 Compliance with Applicable Laws
+
 You agree that You will comply with all applicable laws and regulations with respect to the Software, including without limitation all export control laws and regulations.
+
 12.4 Marketing
+
 You agree to MLJAR’s use of Your name, trade name, and trademark in MLJAR marketing materials and its website solely to identify you as a customer of MLJAR.
 You agree that we can use your name and logo for marketing purposes.
+
 12.5 Assignment
+
 This Agreement may be assigned by MLJAR in whole or in part and will inure to benefit MLJAR’s successors and assigns. You may not assign or transfer this Agreement without MLJAR’s prior written consent. Notwithstanding the foregoing, however, if You transfer ownership of a Product to a customer for which it was developed, You may assign this Agreement to that customer (the “Assignee”) provided: (i) You provide written notice to MLJAR prior to the effective date of such assignment; and (ii) there is a written agreement, wherein the Assignee accepts the terms of this Agreement.
 You may assign this license to a customer, or another company or organization, so long as you get our written permission.
+
 12.6 Entire Agreement
+
 The terms and conditions stated herein set forth the parties’ entire agreement and replace and supersede all other contracts, agreements, and understandings, written or oral, relating to the subject matter hereof.
+
 12.7 Severability
+
 If any portion of this Agreement is held to be unenforceable, such portions shall not limit or otherwise modify or affect any other portion of this Agreement.
 If there is a problem with any part of this agreement, the rest of the agreement will remain in place.
+
 12.8 Modification; Waiver
+
 This Agreement can't be amended except by a written instrument executed by each of the parties. The failure of either party to enforce any provision of this Agreement may not be deemed a waiver of that or any other provision of this Agreement.
 There will be no changes to this Agreement unless we confirm it in writing. All of these terms remain enforceable even if we don't enforce them at every opportunity.
+
 12.9 Governing Law
+
 This EULA shall be governed by and construed under the laws of Poland, excluding its conflicts of law rules.
 Any dispute between MLJAR and You shall exclusively be submitted to the competent court in Bialystok, Poland.
+
 12.10 Government Use
+
 If the Software or any related documentation is licensed to the U.S. Government or any agency thereof, it will be considered to be “commercial computer software” or “commercial computer software documentation,” as those terms are used in 48 CFR § 12.212 or 48 CFR § 227.7202, and is being licensed with only those rights as are granted to all other licensees as outlined in this Agreement.
