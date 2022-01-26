@@ -11,24 +11,24 @@
 
 Easily convert your Python notebooks into interactive web apps by adding parameters in YAML.
 
-- Simply add YAML with description of parameters needed in the notebook. 
-- Share notebook with others. 
+- Simply add YAML with a description of the parameters needed in the notebook. 
+- Share a notebook with others. 
 - Allow them to execute the notebook with selected parameters. 
 - You can decide to show or hide your code.
 - Easily deploy to the server.
 
 Mercury is a perfect tool to share your Python notebooks with non-programmers. 
-- You can turn your notebook into web app. Sharing is as easy as sending them the URL to your server.
+- You can turn your notebook into a web app. Sharing is as easy as sending them the URL to your server.
 - You can add interactive input to your notebook by defining the YAML header. Your users can change the input and execute the notebook.
 - You can hide your code to not scare your (non-coding) collaborators.
-- Users can interact with notebook and save they results.
-- You can share notebook as a web app with multiple users - they don't overwrite original notebook.
+- Users can interact with notebook and save results.
+- You can share a notebook as a web app with multiple users - they don't overwrite the original notebook.
 
 ## Example
 
 #### Notebook with YAML config
 
-The YAML config is added as a first raw cell in the notebook.
+The YAML config is added as the first raw cell in the notebook.
 
 <p align="center">
   <img 
@@ -38,7 +38,7 @@ The YAML config is added as a first raw cell in the notebook.
 
 #### Web Application from Notebook
 
-The web app generated from the notebook. Code is hidden (optional). User can change parameters, execute notebook with the `Run` button, and save results with the `Download` button.
+The web app is generated from the notebook. Code is hidden (optional). User can change parameters, execute notebook with the `Run` button, and save results with the `Download` button.
 
 <p align="center">
   <img 
@@ -51,11 +51,11 @@ The web app generated from the notebook. Code is hidden (optional). User can cha
 
 The demo with several example notebooks is running at [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance). No need to register.
 
-The demo running at Heroku free dyno [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (with several notebooks-apps). No need to register. (if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
+The demo is running at Heroku free dyno [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (with several notebooks-apps). No need to register. (if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
 
 ### Share mutliple notebooks
 
-You can share as many notebooks as you want. There is gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking the `Open` button.
+You can share as many notebooks as you want. There is a gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking the `Open` button.
 
 <p align="center">
   <a href="http://mercury.mljar.com" target="_blank">
@@ -67,7 +67,7 @@ You can share as many notebooks as you want. There is gallery with notebooks in 
 
 ## Convert Notebook to web app with YAML
 
-You need to add YAML at the beginning of the notebook to be able to run it as web application in the Mercury. The YAML configuration should be added in the notebook as **Raw** cell. It should start and end with a line containing "---". Below examples how it should look like in the Jupyter Notebook and Jupyter Lab:
+You need to add YAML at the beginning of the notebook to be able to run it as a web application in the Mercury. The YAML configuration should be added as a **Raw** cell in the notebook. It should start and end with a line containing "---". Below examples of how it should look like in the Jupyter Notebook and Jupyter Lab:
 
 <p align="center" >
   <img 
@@ -82,12 +82,12 @@ You need to add YAML at the beginning of the notebook to be able to run it as we
 
 Allowed parameters in YAML config:
 
-- `title` - string with a title of the notebook. It is used in the app side bar and in the gallery view.
+- `title` - string with a title of the notebook. It is used in the app sidebar and the gallery view.
 - `author` - string with a author name (optional).
 - `description` - string describing the content of the notebook. It is used in the gallery view.
 - `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
-- `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` the prompt information will be displayed for each cell in the notebook.
-- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the side bar. Each parameter should have a unique name that corresponds to the variable name used in the code.
+- `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` prompt information will be displayed for each cell in the notebook.
+- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the sidebar. Each parameter should have a unique name that corresponds to the variable name used in the code.
 
 ## Define widget with YAML
 
@@ -112,7 +112,7 @@ You can set a default widget by setting the `value`. The format of the `value` d
 - for `numeric` a `value` should be a number, example: `value: 10.2`.
 - for `file` a `value` is not needed.
 
-The rest of the parameters depend on widget input type.
+The rest of the parameters depend on the widget input type.
 
 #### Text
 
@@ -142,8 +142,8 @@ params:
 
 Additional parameters:
 
-- `min` - the minimum value for slider (default is set to 0),
-- `max` - the maximum value for slider (default is set to 100).
+- `min` - the minimum value for the slider (default is set to 0),
+- `max` - the maximum value for the slider (default is set to 100).
 
 Example YAML:
 
@@ -167,8 +167,8 @@ params:
 
 Additional parameters:
 
-- `min` - the minimum value for slider (default is set to 0),
-- `max` - the maximum value for slider (default is set to 100).
+- `min` - the minimum value for the slider (default is set to 0),
+- `max` - the maximum value for the slider (default is set to 100).
 
 Example YAML:
 
@@ -261,7 +261,7 @@ params:
 
 Additional parameters:
 
-- `maxFileSize` - a maximum allowed file size (default set to 100MB). The file size should be defined as string with MB or KB at the end.
+- `maxFileSize` - a maximum allowed file size (default set to 100MB). The file size should be defined as a string with MB or KB at the end.
 
 ```yaml
 params:
@@ -277,7 +277,7 @@ params:
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_file_input.png" width="35%" />
 </p>
 
-The uploaded file name will be passed to the notebook as a string. The uploaded file will be copied to the same directory as the notebook. After notebook execution the uploaded file will be removed.
+The uploaded file name will be passed to the notebook as a string. The uploaded file will be copied to the same directory as the notebook. After notebook execution, the uploaded file will be removed.
 
 ### Full example YAML
 
@@ -330,7 +330,7 @@ Widgets rendered from above YAML config:
 
 ### Use variables in the code
 
-To use variables in the code simply define the variable with the same name as the widget name. You can also assign the same value as defined in YAML. Please define all variables in the one cell (it can be below the cell with YAML config).
+To use variables in the code simply define the variable with the same name as the widget name. You can also assign the same value as defined in YAML. Please define all variables in one cell (it can be below the cell with YAML config).
 
 When the user interacts with widgets and clicks the `Run` button, the code with variables will be updated with user selected values.
 
@@ -367,7 +367,7 @@ mercury runserver --runworker
 
 The above command will run server and worker. It will serve Mercury website at `http://127.0.0.1:8000`. It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
 
-Execute the following command to add notebook to Mercury database:
+Execute the following command to add a notebook to Mercury database:
 
 ```
 mercury add <path_to_notebook>
@@ -383,7 +383,7 @@ mercury runserver --runworker
 
 ## Notebook development with automatic refresh
 
-The Mercury `watch` command is perfect when you are creating a new notebook and would like to see how it will look like as web app with live changes.
+The Mercury `watch` command is perfect when you create a new notebook and want to see what it will look like as a web app with live changes.
 
 Please run the following command:
 
@@ -391,12 +391,12 @@ Please run the following command:
 mercury watch <path_to_your_notebook>
 ```
 
-You can now open the web browser at `http://127.0.0.1:8000` and find your notebook. When you change something in the notebook code, markdown or YAML configuration and save the notebook, then it will be automatically refreshed in the web browser. You can track your changes without manual refreshing of the web app.
+You can now open the web browser at `http://127.0.0.1:8000` and find your notebook. When you change something in the notebook code, markdown, or YAML configuration and save the notebook, then it will be automatically refreshed in the web browser. You can track your changes without manual refreshing of the web app.
 
 
 ## Running in production
 
-Running in production is easy. We provide several tutorials how it can be done.
+Running in production is easy. We provide several tutorials on how it can be done.
 
 - [Deploy to Heroku](https://github.com/mljar/mercury/wiki/Deploy-to-Heroku) using free dyno 
 - [Deploy to AWS EC2](https://github.com/mljar/mercury/wiki/Deploy-to-AWS-EC2) using t2.micro 
@@ -408,11 +408,11 @@ Running in production is easy. We provide several tutorials how it can be done.
 
 The `docker-compose` must be run from the Mercury main directory.
 
-Please copy `.env.example` file and name it `.env` file. Please point the `NOTEBOOKS_PATH` to the directory with your notebooks. All notebooks from that path will be added to the Mercury before server start. If the `requirements.txt` file is available in `NOTEBOOKS_PATH` all packages from there will be installed.
+Please copy `.env.example` file and name it `.env` file. Please point the `NOTEBOOKS_PATH` to the directory with your notebooks. All notebooks from that path will be added to the Mercury before the server start. If the `requirements.txt` file is available in `NOTEBOOKS_PATH` all packages from there will be installed.
 
 Please remember to change the `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD`.
 
-To generate new `SECRET_KEY` (recommended) you can use:
+To generate new `SECRET_KEY` (recommended), you can use:
 
 ```
 python -c 'from django.core.management.utils import get_random_secret_key; \
@@ -421,7 +421,7 @@ python -c 'from django.core.management.utils import get_random_secret_key; \
 
 Please leave `SERVE_STATIC=False` because in the `docker-compose` configuration static files are served with nginx.
 
-The `docker-compose` will automatically read environment variables from `.env` file. To start the Mercury please run:
+The `docker-compose` will automatically read environment variables from `.env` file. To start the Mercury, please run:
 
 ```
 docker-compose up --build
@@ -442,9 +442,9 @@ docker-compose down
 
 The Mercury project consists of three elements:
 
-- Frontend written in TypeScript with React+Redux
-- Server written in Python with Django
-- Worker written in Python with Celery
+- Frontend is written in TypeScript with React+Redux
+- Server is written in Python with Django
+- Worker is written in Python with Celery
 
 Each element needs a separate terminal during development.
 
@@ -490,7 +490,7 @@ The server is running at `http://127.0.0.1:8000`.
 
 ### Worker
 
-The worker code is in the `mercury` directory (in the `apps/notebooks/tasks.py` and `apps/tasks/tasks.py` files). Please activate first the virtual environment (it is using the same virtual environment as server):
+The worker code is in the `mercury` directory (in the `apps/notebooks/tasks.py` and `apps/tasks/tasks.py` files). Please activate first the virtual environment (it is using the same virtual environment as a server):
 
 ```
 source menv/bin/activate
@@ -503,7 +503,7 @@ celery -A server worker --loglevel=info -P gevent --concurrency 1 -E
 
 ## Mercury Pro
 
-Looking for dedicated support, commercial friendly license and more features? The Mercury Pro is for you. Please see the details at [our website](https://mljar.com/pricing).
+Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at [our website](https://mljar.com/pricing).
 
 
 <p align="center">
