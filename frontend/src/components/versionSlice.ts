@@ -12,6 +12,7 @@ import { RootState } from '../store';
 
 const initialState = {
   isPro: false,
+  welcome: ""
 };
 
 const versionSlice = createSlice({
@@ -22,6 +23,9 @@ const versionSlice = createSlice({
       const { isPro } = action.payload;
       state.isPro = isPro;
     },
+    setWelcome(state, action: PayloadAction<string>) {
+      state.welcome = action.payload;
+    }
   },
 });
 
@@ -29,9 +33,11 @@ export default versionSlice.reducer;
 
 export const {
   setVersion,
+  setWelcome,
 } = versionSlice.actions;
 
 export const getIsPro = (state: RootState) => state.version.isPro;
+export const getWelcome = (state: RootState) => state.version.welcome;
 
 export const fetchVersion =
   () =>
@@ -42,7 +48,22 @@ export const fetchVersion =
         const { data } = await axios.get(url);
         dispatch(setVersion(data));
       } catch (error) {
-        console.error(`Problem during loading Mercury version. ${error}`);
+        console.log(`Problem during loading Mercury version. ${error}`);
+      }
+
+    };
+
+
+export const fetchWelcome =
+  () =>
+    async (dispatch: Dispatch<AnyAction>) => {
+
+      try {
+        const url = '/api/v1/welcome/';
+        const { data } = await axios.get(url);
+        dispatch(setWelcome(data.msg));
+      } catch (error) {
+        console.log(`Problem during loading Mercury welcome message. ${error}`);
       }
 
     };
