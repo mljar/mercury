@@ -9,14 +9,22 @@ import {
   getLoadingState,
   getNotebooks,
 } from "../components/Notebooks/notebooksSlice";
+import { fetchWelcome, getWelcome } from "../components/versionSlice";
+
+import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
+import emoji from "remark-emoji";
 
 export default withRouter(function HomeView() {
   const dispatch = useDispatch();
   const notebooks = useSelector(getNotebooks);
   const loadingState = useSelector(getLoadingState);
+  const welcome = useSelector(getWelcome);
 
   useEffect(() => {
     dispatch(fetchNotebooks());
+    dispatch(fetchWelcome());
   }, [dispatch]);
 
   const notebookItems = notebooks.map((notebook, index) => {
@@ -61,7 +69,19 @@ export default withRouter(function HomeView() {
     <div className="App">
       <HomeNavBar />
       <div className="container" style={{ paddingBottom: "50px" }}>
-        <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
+        {
+          welcome === "" &&
+          <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
+        }
+        {
+          welcome !== "" &&
+          <div style={{ paddingTop: "20px", paddingBottom: "10px" }}>
+            <ReactMarkdown rehypePlugins={[remarkGfm, rehypeHighlight, emoji]}>
+              {welcome}
+            </ReactMarkdown>
+          </div>
+        }
+
         <div className="row">
           {loadingState === "loading" && (
             <p>Loading notebooks. Please wait ...</p>
@@ -135,6 +155,6 @@ export default withRouter(function HomeView() {
           </span>
         </div>
       </footer>
-    </div>
+    </div >
   );
 });

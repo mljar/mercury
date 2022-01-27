@@ -16,6 +16,7 @@ from apps.tasks.clean_service import clean_service
 import nbformat
 from re import sub
 
+
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
     for i in range(min(len(cells), 10)):
@@ -33,8 +34,10 @@ def get_parameters_cell_index(cells, all_variables):
 
     return max_index
 
+
 def sanitize_string(str):
     return sub("[^a-z0-9\.,_\-\s!?]gim", "", str)
+
 
 @shared_task(bind=True)
 def task_execute(self, job_params):
@@ -68,14 +71,15 @@ def task_execute(self, job_params):
                     use_default = False
 
                 elif v["input"] == "file":
-                    
+
                     file_server_id = task_params[k]
                     # Get the temporary upload record
                     tu = TemporaryUpload.objects.get(upload_id=file_server_id)
 
                     input_file = f"{task.id}_{tu.upload_name}"
-                    input_path = os.path.join(os.path.dirname(notebook.path), 
-                                    input_file)
+                    input_path = os.path.join(
+                        os.path.dirname(notebook.path), input_file
+                    )
                     copyfile(tu.get_file_path(), input_path)
 
                     inject_code += f'{k} = "{input_file}"\n'
@@ -298,7 +302,7 @@ def task_execute(self, job_params):
         if wrk_input_nb_path is not None:
             if os.path.isfile(wrk_input_nb_path):
                 os.remove(wrk_input_nb_path)
-        # remove copied files from temporary uploads        
+        # remove copied files from temporary uploads
         for f in remove_after_execution:
             if os.path.exists(f):
                 os.remove(f)
