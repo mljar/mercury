@@ -43,7 +43,7 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 SERVE_STATIC = os.environ.get("SERVE_STATIC", "False") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "mercury.mljar.com"]
+ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "localhost", "mercury.mljar.com"]
 
 if os.environ.get("ALLOWED_HOSTS") is not None:
     try:
