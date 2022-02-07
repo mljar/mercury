@@ -29,12 +29,30 @@ class Command(BaseCommand):
         try:
 
             self.stdout.write(
-                self.style.HTTP_INFO(f'Watch notebook {options["notebook_path"]}')
+                self.style.HTTP_INFO(f'Watching notebook {options["notebook_path"]}')
             )
 
             notebook_id = task_init_notebook(
                 options["notebook_path"], is_watch_mode=True
             )
+
+                                           
+            logo = """                                                                                  
+     _ __ ___   ___ _ __ ___ _   _ _ __ _   _ 
+    | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
+    | | | | | |  __/ | | (__| |_| | |  | |_| |
+    |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
+                                         __/ |
+                                        |___/ 
+            """
+
+            self.stdout.write(self.style.SUCCESS("-"*53))
+            self.stdout.write(self.style.SUCCESS(logo))
+            self.stdout.write(self.style.SUCCESS("-"*53))
+            self.stdout.write(self.style.SUCCESS(f"Please open the following address in your web browser"))
+            self.stdout.write(self.style.SUCCESS(f"--> http://127.0.0.1:8000/app/{notebook_id}"))
+            self.stdout.write(self.style.SUCCESS("-"*53))
+
 
             server_command = [
                 sys.executable,
