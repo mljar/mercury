@@ -407,6 +407,37 @@ mercury watch <path_to_your_notebook>
 
 You can now open the web browser at `http://127.0.0.1:8000` and find your notebook. When you change something in the notebook code, markdown, or YAML configuration and save the notebook, then it will be automatically refreshed in the web browser. You can track your changes without manual refreshing of the web app.
 
+## Mercury commands
+
+### Add
+
+Please use `add` command to add a notebook to the Mercury. It needs a notebook paath as an argument. 
+
+Example:
+
+```
+mercury add notebook.ipynb
+```
+
+### Delete
+
+Please use `delete` command to remove notebook from the Mercury. It needs a notebook path as an argument.
+
+Example:
+
+```
+mercury delete notebook.ipynb
+```
+
+### List
+
+Please use `list` command to display all notebooks in the Mercury.
+
+Example:
+
+```
+mercury list
+```
 
 ## Running in production
 
