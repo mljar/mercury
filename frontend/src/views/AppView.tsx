@@ -15,6 +15,9 @@ import {
 } from "../components/Notebooks/notebooksSlice";
 import { fetchCurrentTask, getCurrentTask } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
+import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
+import { fetchOutputFiles, getView } from "./appSlice";
+import FilesView from "../components/FilesView";
 
 function App() {
   const dispatch = useDispatch();
@@ -24,7 +27,7 @@ function App() {
   const loadingState = useSelector(getLoadingStateSelected);
   // const watchModeCounter = useSelector(getWatchModeCounter);
   const task = useSelector(getCurrentTask);
-
+  const appView = useSelector(getView);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -63,6 +66,13 @@ function App() {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [dispatch, notebook, watchModeCounter]);
 
+  useEffect(() => {
+    if (appView === "files" && task.id) {
+      console.log(" get files " + task.id);
+      dispatch(fetchOutputFiles(task.id));
+    }
+  }, [dispatch, appView])
+
   let notebookPath = notebook.default_view_path;
   if (task.state && task.state === "DONE" && task.result) {
     notebookPath = task.result;
@@ -72,9 +82,21 @@ function App() {
     errorMsg = task.result;
   }
 
+  const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
+    if (widgetsParams) {
+      for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+        if (isOutputFilesWidget(widgetParams)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  console.log(appView)
   return (
     <div className="App">
-      <NavBar />
+      <NavBar showFiles={areOutputFilesAvailable(notebook?.params?.params)} />
       <div className="container-fluid">
         <div className="row">
           <WatchModeComponent />
@@ -88,13 +110,14 @@ function App() {
             notebookPath={notebookPath}
           />
 
-          <MainView
+          {appView === "app" && <MainView
             loadingState={loadingState}
             notebookPath={notebookPath}
             errorMsg={errorMsg}
             waiting={waitForTask()}
             watchMode={isWatchMode()}
-          />
+          />}
+          {appView === "files" && <FilesView />}
         </div>
       </div>
     </div>

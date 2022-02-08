@@ -55,6 +55,12 @@ export interface ITextWidget {
   rows: number | null;
 }
 
+export interface IOutputFilesWidget {
+  output: string;
+  input: null;
+  value: null;
+}
+
 export type IWidget =
   | ISelectWidget
   | ICheckboxWidget
@@ -62,7 +68,8 @@ export type IWidget =
   | ISliderWidget
   | IRangeWidget
   | IFileWidget
-  | ITextWidget;
+  | ITextWidget
+  | IOutputFilesWidget;
 
 export function isSelectWidget(widget: IWidget): widget is ISelectWidget {
   return (widget as ISelectWidget).input === "select";
@@ -90,4 +97,8 @@ export function isFileWidget(widget: IWidget): widget is IFileWidget {
 
 export function isTextWidget(widget: IWidget): widget is ITextWidget {
   return (widget as ITextWidget).input === "text";
+}
+
+export function isOutputFilesWidget(widget: IWidget): widget is IOutputFilesWidget {
+  return (widget as IOutputFilesWidget).output === "dir";
 }
