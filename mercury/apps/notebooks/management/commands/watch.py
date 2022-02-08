@@ -36,7 +36,6 @@ class Command(BaseCommand):
                 options["notebook_path"], is_watch_mode=True
             )
 
-                                           
             logo = """                                                                                  
      _ __ ___   ___ _ __ ___ _   _ _ __ _   _ 
     | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
@@ -46,13 +45,18 @@ class Command(BaseCommand):
                                         |___/ 
             """
 
-            self.stdout.write(self.style.SUCCESS("-"*53))
+            self.stdout.write(self.style.SUCCESS("-" * 53))
             self.stdout.write(self.style.SUCCESS(logo))
-            self.stdout.write(self.style.SUCCESS("-"*53))
-            self.stdout.write(self.style.SUCCESS(f"Please open the following address in your web browser"))
-            self.stdout.write(self.style.SUCCESS(f"--> http://127.0.0.1:8000/app/{notebook_id}"))
-            self.stdout.write(self.style.SUCCESS("-"*53))
-
+            self.stdout.write(self.style.SUCCESS("-" * 53))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Please open the following address in your web browser"
+                )
+            )
+            self.stdout.write(
+                self.style.SUCCESS(f"--> http://127.0.0.1:8000/app/{notebook_id}")
+            )
+            self.stdout.write(self.style.SUCCESS("-" * 53))
 
             server_command = [
                 sys.executable,
@@ -91,7 +95,7 @@ class Command(BaseCommand):
             except SystemExit:
                 os._exit(0)
         except Exception as e:
-            print("Notebook watch error.", str(e))
+            print("Mercury watch error.", str(e))
 
     def delete_notebook(self, id):
         Notebook.objects.filter(pk=id).delete()

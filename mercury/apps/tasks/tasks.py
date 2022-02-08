@@ -7,7 +7,7 @@ import traceback
 from shutil import copyfile
 from subprocess import Popen, PIPE
 from django.conf import settings
-from apps.notebooks.tasks import get_jupyter_bin_path
+from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
 from celery import shared_task
 from apps.tasks.models import Task
 from apps.notebooks.models import Notebook
@@ -250,25 +250,7 @@ def task_execute(self, job_params):
             # print(proc.stderr.read())
             error_msg = proc.stderr.read()
 
-        known_warnings = [
-            "warn(",
-            "UserWarning",
-            "FutureWarning",
-            "[NbConvertApp] Converting notebook",
-            "[NbConvertApp] Writing",
-        ]
-        error_lines = []
-        for e in error_msg.decode("utf-8").split("\n"):
-            if e == "":
-                continue
-            known_warning = False
-            for w in known_warnings:
-                if w in e:
-                    known_warning = True
-                    break
-            if not known_warning and e != "":
-                error_lines += [e]
-        error_msg = "\n".join(error_lines)
+        error_msg = process_nbconvert_errors(error_msg)
 
         if error_msg == "":
             if "--no-input" in command:

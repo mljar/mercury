@@ -100,7 +100,7 @@ def main():
         except SystemExit:
             os._exit(0)
     except Exception as e:
-        print("Notebook watch error.", str(e))
+        print("Mercury error.", str(e))
 
 
 if __name__ == "__main__":

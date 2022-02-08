@@ -16,6 +16,27 @@ import yaml
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 
+def process_nbconvert_errors(error_msg):
+    known_warnings = [
+        "warn(",
+        "UserWarning",
+        "FutureWarning",
+        "[NbConvertApp] Converting notebook",
+        "[NbConvertApp] Writing",
+    ]
+    error_lines = []
+    for e in error_msg.decode("utf-8").split("\n"):
+        if e == "":
+            continue
+        known_warning = False
+        for w in known_warnings:
+            if w in e:
+                known_warning = True
+                break
+        if not known_warning and e != "":
+            error_lines += [e]
+    return "\n".join(error_lines)
+
 
 def get_hash():
     h = uuid.uuid4().hex.replace("-", "")
@@ -137,8 +158,16 @@ def task_init_notebook(
             if "show-prompt" in params and not params["show-prompt"]:
                 command += ["--no-prompt"]
 
-            p = subprocess.Popen(command)
-            p.wait()
+            error_msg = ""
+            with Popen(command, stdout=PIPE, stderr=PIPE) as proc:
+                # print(proc.stdout.read())
+                # print(proc.stderr.read())
+                error_msg = proc.stderr.read()
+
+            error_msg = process_nbconvert_errors(error_msg)
+            if error_msg != "":
+                print(error_msg)
+
 
             if "--no-input" in command:
                 with open(
