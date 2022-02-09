@@ -18,37 +18,49 @@ export default function TextWidget({
   disabled,
 }: TextProps) {
   const dispatch = useDispatch();
-  let rowsValue: number = (rows) ? rows : 1;
+  let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (str: string) => {
-    return str.replace(/[^a-z0-9\.,_\-\s!?=><]/gim, "");
-  }
+    return str.replace(/[^a-z0-9.,_\-\s!?=><]/gim, "");
+  };
 
   return (
     <div className="form-group mb-3">
       <label htmlFor={`textarea-${label}`}>{label}</label>
-      {rowsValue == 1 &&
+      {rowsValue === 1 && (
         <input
           className="form-control"
           type="text"
           id={`text-${label}`}
           value={value}
           onChange={(e) => {
-            dispatch(setWidgetValue({ key: widgetKey, value: sanitizeString(e.target.value) }))
+            dispatch(
+              setWidgetValue({
+                key: widgetKey,
+                value: sanitizeString(e.target.value),
+              })
+            );
           }}
-          disabled={disabled} />
-      }
-      {rowsValue > 1 &&
-        <textarea className="form-control"
+          disabled={disabled}
+        />
+      )}
+      {rowsValue > 1 && (
+        <textarea
+          className="form-control"
           id={`text-area-${label}`}
           rows={rowsValue}
           value={value}
           onChange={(e) => {
-            dispatch(setWidgetValue({ key: widgetKey, value: sanitizeString(e.target.value) }))
+            dispatch(
+              setWidgetValue({
+                key: widgetKey,
+                value: sanitizeString(e.target.value),
+              })
+            );
           }}
           disabled={disabled}
         />
-      }
+      )}
     </div>
   );
 }

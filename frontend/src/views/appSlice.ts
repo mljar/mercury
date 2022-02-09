@@ -8,12 +8,13 @@ import {
 import axios from 'axios';
 
 import { RootState } from '../store';
+import { getSessionId } from '../utils';
 
 
 const initialState = {
   view: "app",
   files: [] as string[],
-  filesState: "loading",
+  filesState: "unknown",
 };
 
 const appSlice = createSlice({
@@ -41,7 +42,8 @@ export const {
 } = appSlice.actions;
 
 export const getView = (state: RootState) => state.app.view;
-
+export const getOutputFilesState = (state: RootState) => state.app.filesState;
+export const getOutputFiles = (state: RootState) => state.app.files;
 
 export const fetchOutputFiles =
   (taskId: number) =>
@@ -49,7 +51,8 @@ export const fetchOutputFiles =
       try {
         dispatch(setFilesState("loading"))
         dispatch(setFiles([]));
-        const url = `/api/v1/output_files/${taskId}`;
+        const sessionId = getSessionId();
+        const url = `/api/v1/output_files/${sessionId}/${taskId}`;
         const { data } = await axios.get(url);
         dispatch(setFiles(data));
         dispatch(setFilesState("loaded"))

@@ -3,15 +3,15 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setWidgetValue } from "./widgetsSlice";
 
-import { FilePond, registerPlugin } from 'react-filepond';
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+import { FilePond, registerPlugin } from "react-filepond";
+import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 
 registerPlugin(
   FilePondPluginImageExifOrientation,
   FilePondPluginImagePreview,
-  FilePondPluginFileValidateSize,
+  FilePondPluginFileValidateSize
 );
 
 type FileProps = {
@@ -29,7 +29,7 @@ export default function FileWidget({
 }: FileProps) {
   const dispatch = useDispatch();
   let fileSizeLimit = "100MB";
-  if(maxFileSize) {
+  if (maxFileSize) {
     fileSizeLimit = maxFileSize;
   }
   return (
@@ -44,18 +44,21 @@ export default function FileWidget({
           }}
           server={{
             url: `${axios.defaults.baseURL}/api/v1/fp`,
-            process: '/process/',
+            process: "/process/",
             revert: async (uniqueFileId, load, error) => {
               try {
-                const response = await axios.delete(`${axios.defaults.baseURL}/api/v1/fp/revert`, {
-                  data: uniqueFileId
-                });
+                await axios.delete(
+                  `${axios.defaults.baseURL}/api/v1/fp/revert`,
+                  {
+                    data: uniqueFileId,
+                  }
+                );
                 dispatch(setWidgetValue({ key: widgetKey, value: [] }));
                 // Should call the load method when done, no parameters required
                 load();
               } catch (e) {
                 // Can call the error method if something is wrong, should exit after
-                error('Problem with uploaded file removal');
+                error("Problem with uploaded file removal");
               }
             },
           }}

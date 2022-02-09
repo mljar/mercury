@@ -16,7 +16,12 @@ import {
 import { fetchCurrentTask, getCurrentTask } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
-import { fetchOutputFiles, getView } from "./appSlice";
+import {
+  fetchOutputFiles,
+  getOutputFiles,
+  getOutputFilesState,
+  getView,
+} from "./appSlice";
 import FilesView from "../components/FilesView";
 
 function App() {
@@ -28,6 +33,8 @@ function App() {
   // const watchModeCounter = useSelector(getWatchModeCounter);
   const task = useSelector(getCurrentTask);
   const appView = useSelector(getView);
+  const outputFiles = useSelector(getOutputFiles);
+  const outputFilesState = useSelector(getOutputFilesState);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -67,11 +74,16 @@ function App() {
   // }, [dispatch, notebook, watchModeCounter]);
 
   useEffect(() => {
-    if (appView === "files" && task.id) {
-      console.log(" get files " + task.id);
+    if (
+      appView === "files" &&
+      task.id &&
+      task.state &&
+      task.state === "DONE" &&
+      task.result
+    ) {
       dispatch(fetchOutputFiles(task.id));
     }
-  }, [dispatch, appView])
+  }, [dispatch, appView, task.id, task.state, task.result]);
 
   let notebookPath = notebook.default_view_path;
   if (task.state && task.state === "DONE" && task.result) {
@@ -84,16 +96,15 @@ function App() {
 
   const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
     if (widgetsParams) {
-      for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+      for (let [, widgetParams] of Object.entries(widgetsParams)) {
         if (isOutputFilesWidget(widgetParams)) {
           return true;
         }
       }
     }
     return false;
-  }
+  };
 
-  console.log(appView)
   return (
     <div className="App">
       <NavBar showFiles={areOutputFilesAvailable(notebook?.params?.params)} />
@@ -110,14 +121,22 @@ function App() {
             notebookPath={notebookPath}
           />
 
-          {appView === "app" && <MainView
-            loadingState={loadingState}
-            notebookPath={notebookPath}
-            errorMsg={errorMsg}
-            waiting={waitForTask()}
-            watchMode={isWatchMode()}
-          />}
-          {appView === "files" && <FilesView />}
+          {appView === "app" && (
+            <MainView
+              loadingState={loadingState}
+              notebookPath={notebookPath}
+              errorMsg={errorMsg}
+              waiting={waitForTask()}
+              watchMode={isWatchMode()}
+            />
+          )}
+          {appView === "files" && (
+            <FilesView
+              files={outputFiles}
+              filesState={outputFilesState}
+              waiting={waitForTask()}
+            />
+          )}
         </div>
       </div>
     </div>

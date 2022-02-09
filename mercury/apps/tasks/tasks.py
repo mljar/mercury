@@ -57,7 +57,7 @@ def task_execute(self, job_params):
         notebook_params = json.loads(notebook.params)
         widgets_params = notebook_params.get("params", {})
 
-        # validate input data
+        # validate input variables
         inject_code = ""
         all_variables = []
         remove_after_execution = []
@@ -180,6 +180,29 @@ def task_execute(self, job_params):
                     else:
                         inject_code += f'{k} = {widgets_params[k].get("value")}\n'
 
+
+        # create output directory for notebook output
+        wrk_dir = settings.MEDIA_ROOT / task.session_id
+        if not os.path.exists(wrk_dir):
+            try:
+                os.mkdir(wrk_dir)
+            except Exception as e:
+                raise Exception(f"Cant create {wrk_dir}")
+
+        # validate output variables
+        for k, v in widgets_params.items():
+            if v.get("output") is not None and v.get("output") == "dir":
+                # create output directory for files created in the notebook
+                output_dir = settings.MEDIA_ROOT / task.session_id / f"output_{task.id}"
+                if not os.path.exists(output_dir):
+                    try:
+                        os.mkdir(output_dir)
+                    except Exception as e:
+                        raise Exception(f"Cant create {output_dir}")
+                # pass path to directory into the notebook's code
+                inject_code += f'{k} = "{str(output_dir)}"\n'
+                
+
         new_cell = {
             "cell_type": "code",
             "execution_count": None,
@@ -189,12 +212,7 @@ def task_execute(self, job_params):
             "source": inject_code,
         }
 
-        wrk_dir = settings.MEDIA_ROOT / task.session_id
-        if not os.path.exists(wrk_dir):
-            try:
-                os.mkdir(wrk_dir)
-            except Exception as e:
-                raise Exception(f"Cant create {wrk_dir}")
+        
 
         # update input notebook with params from the task
         # the input notebook path should be the same as original notebook
