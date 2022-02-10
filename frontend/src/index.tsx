@@ -4,12 +4,14 @@ import axios from "axios";
 import Root from "./Root";
 import { history, configuredStore } from "./store";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "bootstrap/dist/css/bootstrap.css";
 import "font-awesome/css/font-awesome.min.css";
 import "react-block-ui/style.css";
-import 'filepond/dist/filepond.min.css'
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "./index.css";
 
 const store = configuredStore();
@@ -21,11 +23,18 @@ if (window.location.origin === "http://localhost:3000") {
   axios.defaults.baseURL = window.location.origin;
 }
 
-
 document.addEventListener("DOMContentLoaded", () =>
   render(
     <div>
       <Root store={store} history={history} />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnHover
+      />
     </div>,
     document.getElementById("root")
   )

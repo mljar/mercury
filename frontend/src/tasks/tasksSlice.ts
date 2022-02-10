@@ -7,7 +7,7 @@ import {
 } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '../store';
-
+import { toast } from "react-toastify";
 import { getSessionId } from '../utils';
 
 export interface ITask {
@@ -83,3 +83,17 @@ export const executeNotebook =
 
         };
 
+
+export const clearTasks =
+    (notebookId: Number) =>
+        async (dispatch: Dispatch<AnyAction>) => {
+            try {
+                const sessionId = getSessionId();
+                const url = `/api/v1/clear_tasks/${notebookId}/${sessionId}`;
+                await axios.post(url);
+                dispatch(setCurrentTask({} as ITask));
+                toast.success("All previous tasks deleted. The default view of the app is displayed.")
+            } catch (error) {
+                toast.error(`Trying to clear previous tasks. The error occured. ${error}`)
+            }
+        };

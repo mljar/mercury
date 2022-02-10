@@ -1,4 +1,5 @@
 import os
+import shutil
 from django.db import transaction
 from django.http import Http404
 from django.conf import settings
@@ -8,6 +9,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
@@ -62,3 +64,30 @@ class ListOutputFilesView(APIView):
             print("Exception occured", str(e))
         return Response(files_urls)
 
+
+class ClearTasksView(APIView):
+    def post(self, request, notebook_id, session_id, format=None):
+        
+        try:
+            tasks = Task.objects.filter(notebook_id=notebook_id, session_id=session_id)
+
+            for task in tasks:
+                output_file = os.path.join(settings.MEDIA_ROOT, session_id, f"output_{task.id}.html")
+                output_dir = os.path.join(settings.MEDIA_ROOT, session_id, f"output_{task.id}")
+                
+                try:
+                    if os.path.isfile(output_file):
+                        os.remove(output_file)
+                    if os.path.isdir(output_dir):
+                        shutil.rmtree(output_dir)
+                except Exception as e:
+                    print(f"Trying to delete {output_file} and {output_dir}")
+                    print(str(e))
+            
+            tasks.delete()
+            
+        except Exception as e:
+            print(f"Trying to clear tasks for notebook_id {notebook_id} and session_id {session_id}")
+            print("Exception occured", str(e))
+        
+        return Response(status.HTTP_204_NO_CONTENT)

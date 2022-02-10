@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useCallback, useLayoutEffect } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { executeNotebook } from "../tasks/tasksSlice";
+import { clearTasks, executeNotebook } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -25,6 +25,7 @@ import {
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
+import { current } from "@reduxjs/toolkit";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -54,7 +55,12 @@ export default function SideBar({
         if (widgetParams.input === "file") {
           dispatch(setWidgetValue({ key, value: [] as string[] }));
         } else if (widgetParams.input === "text") {
-          dispatch(setWidgetValue({ key, value: widgetParams.value ? widgetParams.value : "" }));
+          dispatch(
+            setWidgetValue({
+              key,
+              value: widgetParams.value ? widgetParams.value : "",
+            })
+          );
         } else {
           dispatch(setWidgetValue({ key, value: widgetParams.value }));
         }
@@ -152,7 +158,6 @@ export default function SideBar({
           />
         );
       }
-
     }
   }
 
@@ -171,7 +176,7 @@ export default function SideBar({
       }
     }
     return true;
-  }
+  };
 
   const handleDownload = (url: string, filename: string) => {
     axios
@@ -224,7 +229,8 @@ export default function SideBar({
 
             {fileKeys && !allFilesUploaded() && (
               <div className="alert alert-danger mb-3" role="alert">
-                <i className="fa fa-file" aria-hidden="true"></i> Please upload all required files.
+                <i className="fa fa-file" aria-hidden="true"></i> Please upload
+                all required files.
               </div>
             )}
 
@@ -280,6 +286,21 @@ export default function SideBar({
               </div>
             )}
           </form>
+        </div>
+        <hr style={{ marginTop: "50px", marginBottom: "10px" }} />
+        <div>
+          <button
+            className="btn btn-sm btn-outline-danger"
+            onClick={() => {
+              dispatch(clearTasks(notebookId));
+            }}
+            style={{ border: "none" }}
+            disabled={waiting}
+            title="Click to clear all previous runs of the notebook"
+          >
+            <i className="fa fa-times-circle" aria-hidden="true"></i> Clear
+            tasks
+          </button>
         </div>
       </div>
     </nav>
