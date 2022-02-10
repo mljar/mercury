@@ -83,6 +83,8 @@ Allowed parameters in YAML config:
 
 ## Define widget with YAML
 
+![Mercury widgets](https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury-widgets-v1.png)
+
 #### Widget name is a variable name
 Definition of the widget (in `params`) starts with the widget name. It will correspond to the variable in the code. The name should be a valid Python variable. 
 
