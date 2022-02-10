@@ -400,11 +400,6 @@ You can install Mercury directly from PyPi repository with `pip` command:
 pip install mljar-mercury
 ```
 
-Installation from GitHub:
-
-```
-pip install -q -U git+https://github.com/mljar/mercury.git@master
-```
 
 ## Running locally
 
