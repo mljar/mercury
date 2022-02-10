@@ -1,28 +1,20 @@
+# Mercury - share your notebooks with others
+
+[![PyPI version](https://badge.fury.io/py/mljar-mercury.svg)](https://badge.fury.io/py/mljar-mercury)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/mljar-mercury.svg)](https://pypi.python.org/pypi/mljar-mercury/)
 
 <p align="center">
   <img 
     alt="Mercury convert notebook to web app"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="700px" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
 </p>
 
-# Mercury
-
-## Share your Python notebooks with others
-
-Easily convert your Python notebooks into interactive web apps by adding parameters in YAML.
-
-- Simply add YAML with a description of the parameters needed in the notebook. 
-- Share a notebook with others. 
-- Allow them to execute the notebook with selected parameters. 
-- You can decide to show or hide your code.
-- Easily deploy to the server.
-
 Mercury is a perfect tool to share your Python notebooks with non-programmers. 
-- You can turn your notebook into a web app. Sharing is as easy as sending them the URL to your server.
-- You can add interactive input to your notebook by defining the YAML header. Your users can change the input and execute the notebook.
+
+- You can add interactive widgets to your notebook by defining the YAML header. 
+- Your users can change the input, execute the notebook and save results.
 - You can hide your code to not scare your (non-coding) collaborators.
-- Users can interact with notebook and save results.
-- You can share a notebook as a web app with multiple users - they don't overwrite the original notebook.
+- Easily deploy to any server.
 
 ## Example
 
