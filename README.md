@@ -1,4 +1,4 @@
-# Mercury - share your notebooks with others
+# Mercury - convert your notebook to web app
 
 [![PyPI version](https://badge.fury.io/py/mljar-mercury.svg)](https://badge.fury.io/py/mljar-mercury)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/mljar-mercury.svg)](https://pypi.python.org/pypi/mljar-mercury/)
@@ -9,7 +9,7 @@
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
 </p>
 
-Mercury is a perfect tool to share your Python notebooks with non-programmers. 
+Mercury is a perfect tool to convert Python notebook to web app and share with non-programmers. 
 
 - You can add interactive widgets to your notebook by defining the YAML header. 
 - Your users can change the input, execute the notebook and save results.
