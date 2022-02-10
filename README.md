@@ -41,9 +41,9 @@ The web app is generated from the notebook. Code is hidden (optional). User can 
 
 ### Check our demo
 
-The demo with several example notebooks is running at [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance). No need to register.
-
-The demo is running at Heroku free dyno [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (with several notebooks-apps). No need to register. (if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
+The demos with several example notebooks is running at: 
+- [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance)
+- [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (running on Heroku, if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
 
 ### Share mutliple notebooks
 
