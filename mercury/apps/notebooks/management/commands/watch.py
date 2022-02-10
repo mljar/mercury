@@ -58,9 +58,15 @@ class Command(BaseCommand):
             )
             self.stdout.write(self.style.SUCCESS("-" * 53))
 
+            mercury_bin = sys.argv[0]
+            # check if we are on Windows machines and 
+            # need to extend the mercury bin with .exe
+            if sys.executable.endswith(".exe") and not mercury_bin.endswith(".exe"):
+                mercury_bin += ".exe"
+
             server_command = [
                 sys.executable,
-                sys.argv[0],
+                mercury_bin,
                 "runserver",
                 "--noreload",
                 "--noadditional",
