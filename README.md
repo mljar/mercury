@@ -47,7 +47,7 @@ The demos with several example notebooks is running at:
 
 ### Share mutliple notebooks
 
-You can share as many notebooks as you want. There is a gallery with notebooks in the home view of the Mercury. You can select any notebook by clicking the `Open` button.
+You can share as many notebooks as you want. There is a gallery with notebooks in the home view of the Mercury.
 
 <p align="center">
   <a href="http://mercury.mljar.com" target="_blank">
