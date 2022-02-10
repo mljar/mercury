@@ -107,9 +107,7 @@ You can read more about widgets in our [wiki page](https://github.com/mljar/merc
 
 ## Output files
 
-You can easily create files in your notebook and allow your users to download them.
-
-You need to define an `output` directory in YAML header and in variables add variable with output directory name.
+You can easily create files in your notebook and allow your users to download them. 
 
 The example notebook:
 
@@ -122,7 +120,7 @@ params:
         output: dir
 ```
 
-2. The next cell should have a variable containing the directory name. The variable should be exactly the same as in YAML. This variable will have assigned a new directory name that will be created for your user during notebook execution. Please remember to define all variables that are interactive in Mercury in one cell, just after the YAML header (that's the only requirement to make it work, but very important).
+2. The next cell should have a variable containing the directory name. The variable should be exactly the same as in YAML. This variable will have assigned a new directory name that will be created for your user during notebook execution. Please remember to define all variables that are interactive in Mercury in one cell, just after the YAML header (that's the only requirement to make it work, but is very important).
 
 ```py
 output_dir = "example_output_directory"
