@@ -270,7 +270,10 @@ def task_execute(self, job_params):
 
         error_msg = process_nbconvert_errors(error_msg)
 
-        if error_msg == "":
+        # check if output file exists
+        output_html_path = os.path.join(str(wrk_dir), wrk_output_nb_file)
+
+        if os.path.isfile(output_html_path):
             if "--no-input" in command:
                 with open(wrk_dir / wrk_output_nb_file, "a") as fout:
                     fout.write(
@@ -288,7 +291,7 @@ def task_execute(self, job_params):
             task.result = f"{settings.MEDIA_URL}{task.session_id}/{wrk_output_nb_file}"
             task.state = "DONE"
         else:
-            task.result = error_msg
+            task.result = error_msg if error_msg != "" else "Problem with executing the notebook"
             task.state = "ERROR"
         task.save()
     except Exception as e:
