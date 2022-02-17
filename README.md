@@ -1,7 +1,10 @@
 # Mercury - convert your notebook to web app
 
 [![PyPI version](https://badge.fury.io/py/mljar-mercury.svg)](https://badge.fury.io/py/mljar-mercury)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/mljar-mercury.svg)](https://pypi.python.org/pypi/mljar-mercury/)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/platforms.svg)](https://anaconda.org/conda-forge/mljar-mercury)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
 <p align="center">
   <img 
@@ -44,6 +47,9 @@ The web app is generated from the notebook. Code is hidden (optional). User can 
 The demos with several example notebooks are running at: 
 - [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance)
 - [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (running on Heroku, if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
+- [https://sketch-app-mercury.herokuapp.com/](https://sketch-app-mercury.herokuapp.com/) - sketch app for converting photos to sketches with [code](https://github.com/pplonski/artistic-sketches-jupyter-mercury)
+
+![](https://github.com/pplonski/artistic-sketches-jupyter-mercury/blob/main/media/mercury_demo.gif)
 
 ### Share mutliple notebooks
 
@@ -159,6 +165,12 @@ You can install Mercury directly from PyPi repository with `pip` command:
 
 ```
 pip install mljar-mercury
+```
+
+Install with conda:
+
+```
+conda install -c conda-forge mljar-mercury
 ```
 
 
