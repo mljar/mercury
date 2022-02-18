@@ -6,6 +6,7 @@ import django
 import json
 import subprocess
 from glob import glob
+from django.core.management.utils import get_random_secret_key
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "mercury")
@@ -34,6 +35,8 @@ def main():
             os.environ["NOTEBOOKS"] = "*.ipynb"
         if os.environ.get("WELCOME") is None:
             os.environ["WELCOME"] = "welcome.md"
+        if os.environ.get("SECRET_KEY") is None:
+            os.environ["SECRET_KEY"] = get_random_secret_key()
         i = sys.argv.index("run")
         sys.argv[i] = "runserver"
         sys.argv.append("--runworker")
