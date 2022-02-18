@@ -19,6 +19,22 @@ Mercury is a perfect tool to convert Python notebook to web app and share with n
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
 
+## Installation
+
+*Compatible with Python 3.6 and higher.*
+
+Install with `pip`:
+
+```
+pip install mljar-mercury
+```
+
+Or with `conda`:
+
+```
+conda install -c conda-forge mljar-mercury
+```
+
 ## Example
 
 #### Notebook with YAML config
@@ -157,21 +173,6 @@ There is an option to set a custom welcome message. Like in the example screensh
 The custom welcome message can be set as Markdown text (with GitHub flavour). To set custom message please create a `welcome.md` file and include your Markdown text there. When deploying please set the `WELCOME` environment variable pointing to your file. For example, in Heroku it will be `WELCOME=welcome.md`. The example repository with welcome message is [here](https://github.com/pplonski/data-science-portfolio). The example demo showing a Data Science Portfolio is [here](http://piotr-data-science-portfolio.herokuapp.com/).
 
 If you don't set the welcome message a simple `Welcome!` will be displayed. We belive that setting welcome message will give you a great opportunity for customization.
-
-
-## Installation
-
-You can install Mercury directly from PyPi repository with `pip` command:
-
-```
-pip install mljar-mercury
-```
-
-Install with conda:
-
-```
-conda install -c conda-forge mljar-mercury
-```
 
 
 ## Running locally
