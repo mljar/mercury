@@ -8,6 +8,8 @@ import subprocess
 from glob import glob
 from django.core.management.utils import get_random_secret_key
 
+from demo import create_demo_notebook
+
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "mercury")
 sys.path.insert(0, BACKEND_DIR)
@@ -50,10 +52,15 @@ def main():
         """
         print(logo)
         
-
-        for l in sys.argv:
-            if l.endswith(".ipynb"):
-                run_add_notebook = l
+        
+        if "demo" in sys.argv:
+            create_demo_notebook("demo.ipynb")
+            sys.argv.remove("demo")
+            run_add_notebook = "demo.ipynb"
+        else:
+            for l in sys.argv:
+                if l.endswith(".ipynb"):
+                    run_add_notebook = l
 
     if "--noadditional" not in sys.argv:
         execute_from_command_line(["mercury.py", "migrate"])
@@ -76,7 +83,7 @@ def main():
                 print(str(e))
         if os.environ.get("SERVE_STATIC") is not None:
             execute_from_command_line(["mercury.py", "collectstatic", "--noinput"])
-        if os.environ.get("NOTEBOOKS") is not None:
+        if os.environ.get("NOTEBOOKS") is not None and run_add_notebook is None:
             notebooks_str = os.environ.get("NOTEBOOKS")
             notebooks = []
             if "[" in notebooks_str or "{" in notebooks_str:
@@ -90,7 +97,8 @@ def main():
 
         if run_add_notebook is not None:
             execute_from_command_line(["mercury.py", "add", run_add_notebook])
-            sys.argv.remove(run_add_notebook)
+            if run_add_notebook in sys.argv:
+                sys.argv.remove(run_add_notebook)
 
         worker = None
         if (
