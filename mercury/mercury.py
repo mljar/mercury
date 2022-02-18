@@ -24,6 +24,34 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
 
+    run_add_notebook = None
+    if "run" in sys.argv:
+        if os.environ.get("ALLOWED_HOSTS") is None:
+            os.environ["ALLOWED_HOSTS"] = "*"
+        if os.environ.get("SERVE_STATIC") is None:
+            os.environ["SERVE_STATIC"] = "True"
+        if os.environ.get("NOTEBOOKS")is None:
+            os.environ["NOTEBOOKS"] = "*.ipynb"
+        if os.environ.get("WELCOME") is None:
+            os.environ["WELCOME"] = "welcome.md"
+        i = sys.argv.index("run")
+        sys.argv[i] = "runserver"
+        sys.argv.append("--runworker")
+        logo = """                                                                                  
+     _ __ ___   ___ _ __ ___ _   _ _ __ _   _ 
+    | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
+    | | | | | |  __/ | | (__| |_| | |  | |_| |
+    |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
+                                         __/ |
+                                        |___/ 
+        """
+        print(logo)
+        
+
+        for l in sys.argv:
+            if l.endswith(".ipynb"):
+                run_add_notebook = l
+
     if "--noadditional" not in sys.argv:
         execute_from_command_line(["mercury.py", "migrate"])
 
@@ -56,6 +84,10 @@ def main():
                 notebooks = [notebooks_str]
             for nb in notebooks:
                 execute_from_command_line(["mercury.py", "add", nb])
+
+        if run_add_notebook is not None:
+            execute_from_command_line(["mercury.py", "add", run_add_notebook])
+            sys.argv.remove(run_add_notebook)
 
         worker = None
         if (

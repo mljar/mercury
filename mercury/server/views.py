@@ -21,7 +21,6 @@ class WelcomeMessage(APIView):
                     with open(welcome_file) as fin:
                         welcome_msg = fin.read()
                 else:
-                    print(f"Cant find {welcome_file}")
                     return Response({"msg": ""})
             if welcome_msg is not None:
                 return Response({"msg": welcome_msg})    
