@@ -35,6 +35,29 @@ Or with `conda`:
 conda install -c conda-forge mljar-mercury
 ```
 
+## Getting started
+
+#### Demo notebook
+
+To start with demo notebook please run:
+
+```
+mercury run demo
+```
+
+It will create for you `demo.ipynb` notebook and run it with Mercury. Please open [127.0.0.1:8000](http://127.0.0.1:8000) to check the app running.
+
+
+#### Your notebook
+
+To run Mercury with your notebook please execute:
+
+```
+mercury watch my_notebook.ipynb
+```
+
+The `watch` command will monitor your notebook for changes and will automatically reload them in the Mercury web app.
+
 ## Example
 
 #### Notebook with YAML config
