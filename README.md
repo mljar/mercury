@@ -194,10 +194,10 @@ If you don't set the welcome message a simple `Welcome!` will be displayed. We b
 To run Mercury locally just run:
 
 ```
-mercury runserver --runworker
+mercury run
 ```
 
-The above command will run server and worker. It will serve Mercury website at `http://127.0.0.1:8000`. It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
+The above command will run server and worker. It will serve Mercury website at [http://127.0.0.1:8000](http://127.0.0.1:8000). It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
 
 Execute the following command to add a notebook to Mercury database:
 
@@ -209,7 +209,7 @@ mercury add <path_to_notebook>
 Please start the Mercury server to see your apps (created from notebooks).
 
 ```
-mercury runserver --runworker
+mercury run
 ```
 
 
