@@ -20,6 +20,8 @@ Mercury is a perfect tool to convert Python notebook to web app and share with n
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
 
+Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
+
 ## Installation
 
 *Compatible with Python 3.6 and higher.*
@@ -59,7 +61,7 @@ mercury watch my_notebook.ipynb
 
 The `watch` command will monitor your notebook for changes and will automatically reload them in the Mercury web app.
 
-## Example
+## YAML Example
 
 #### Notebook with YAML config
 
@@ -82,7 +84,7 @@ The web app is generated from the notebook. Code is hidden (optional). User can 
 </p>
 
 
-### Check our demo
+## 💻 Demo
 
 The demos with several example notebooks are running at: 
 - [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance)
@@ -91,19 +93,7 @@ The demos with several example notebooks are running at:
 
 ![](https://github.com/pplonski/artistic-sketches-jupyter-mercury/blob/main/media/mercury_demo.gif)
 
-### Share mutliple notebooks
-
-You can share as many notebooks as you want. There is a gallery with notebooks in the home view of the Mercury.
-
-<p align="center">
-  <a href="http://mercury.mljar.com" target="_blank">
-    <img 
-      alt="Mercury share multiple notebooks"
-      src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_share_multiple_notebooks.png" width="90%" />
-  </a>  
-</p>
-
-## Convert Notebook to web app with YAML
+## 🛠️ Convert Notebook to web app with YAML
 
 You need to add YAML at the beginning of the notebook to be able to run it as a web application in the Mercury. The YAML configuration should be added as a **Raw** cell in the notebook. It should start and end with a line containing "---". Below examples of how it should look like in the Jupyter Notebook and Jupyter Lab:
 
