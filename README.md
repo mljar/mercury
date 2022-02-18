@@ -1,16 +1,17 @@
 # Mercury - convert your notebook to web app
 
+<p align="center">
+  <img 
+    alt="Mercury convert notebook to web app"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
+</p>
+
 [![PyPI version](https://badge.fury.io/py/mljar-mercury.svg)](https://badge.fury.io/py/mljar-mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/mljar-mercury.svg)](https://pypi.python.org/pypi/mljar-mercury/)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/platforms.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
-<p align="center">
-  <img 
-    alt="Mercury convert notebook to web app"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
-</p>
 
 Mercury is a perfect tool to convert Python notebook to web app and share with non-programmers. 
 
