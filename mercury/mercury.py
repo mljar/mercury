@@ -8,12 +8,11 @@ import subprocess
 from glob import glob
 from django.core.management.utils import get_random_secret_key
 
-from demo import create_demo_notebook
-
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "mercury")
 sys.path.insert(0, BACKEND_DIR)
 
+from demo import create_demo_notebook
 
 def main():
     """Run administrative tasks."""
