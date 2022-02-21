@@ -191,25 +191,36 @@ If you don't set the welcome message a simple `Welcome!` will be displayed. We b
 
 ## Running locally
 
-To run Mercury locally just run:
+### Serve all notebooks (first option)
+
+To run Mercury with all notebooks in the current directory please just run:
 
 ```
 mercury run
 ```
 
-The above command will run server and worker. It will serve Mercury website at [http://127.0.0.1:8000](http://127.0.0.1:8000). It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
+It will serve Mercury website at [http://127.0.0.1:8000](http://127.0.0.1:8000) with all notebooks.
 
-Execute the following command to add a notebook to Mercury database:
+### Manually add notebooks (second option)
+
+To run Mercury locally just run:
+
+```
+mercury runserver --runworker
+```
+
+The above command will run server and worker (without any notebooks). It will serve Mercury website at [http://127.0.0.1:8000](http://127.0.0.1:8000). It won't display any notebooks because we didn't add any. Please stop the Mercury server (and worker) for a moment with (Ctrl+C).
+
+Execute the following command to add a notebook to the Mercury database:
 
 ```
 mercury add <path_to_notebook>
 ```
 
-
 Please start the Mercury server to see your apps (created from notebooks).
 
 ```
-mercury run
+mercury runserver --runworker
 ```
 
 
