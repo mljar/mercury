@@ -17,7 +17,7 @@ export default function NavBar({
       <a className="navbar-brand col-md-3 col-lg-3 me-0 px-3" href="/">
         <img
           alt="Mercury"
-          src={process.env.PUBLIC_URL + process.env.REACT_APP_LOCAL_URL + "/mercury_red.svg"}
+          src={process.env.PUBLIC_URL + process.env.REACT_APP_LOCAL_URL + "/mercury_logo.svg"}
           style={{ height: "24px" }}
         />
       </a>
