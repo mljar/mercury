@@ -272,8 +272,8 @@ mercury list
 
 Running in production is easy. We provide several tutorials on how it can be done.
 
-- [Deploy to Heroku](https://github.com/mljar/mercury/wiki/Deploy-to-Heroku) using free dyno 
-- [Deploy to AWS EC2](https://github.com/mljar/mercury/wiki/Deploy-to-AWS-EC2) using t2.micro 
+- [Deploy to Heroku](https://github.com/mljar/mercury/wiki/Deploy-to-Heroku) (using free dyno) 
+- [Deploy to AWS EC2](https://github.com/mljar/mercury/wiki/Deploy-to-AWS-EC2) (using t2.micro) 
 - Deploy to Digital Ocean (comming soon)
 - Deploy to GCP (comming soon)
 - Deploy to Azure (comming soon)
