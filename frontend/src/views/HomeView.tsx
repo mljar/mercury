@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
 import HomeNavBar from "../components/HomeNavBar";
+import Footer from "../components/Footer";
 import {
   fetchNotebooks,
   getLoadingState,
@@ -120,41 +121,7 @@ export default withRouter(function HomeView() {
           {notebookItems}
         </div>
       </div>
-      <footer
-        className="footer"
-        style={{
-          position: "absolute",
-          bottom: "0",
-          width: "100%",
-          height: "40px",
-          lineHeight: "40px",
-          backgroundColor: "#f5f5f5",
-        }}
-      >
-        <div className="container">
-          <span className="text-muted">
-            Mercury ©{" "}
-            <a
-              style={{ textDecoration: "none" }}
-              href="https://mljar.com"
-              target="_blank"
-              rel="noreferrer"
-            >
-              MLJAR Sp. z o.o.
-            </a>
-          </span>
-          <span className="text-muted" style={{ float: "right" }}>
-            <a
-              style={{ textDecoration: "none" }}
-              href="https://mljar.com/pricing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Check Mercury Pro
-            </a>
-          </span>
-        </div>
-      </footer>
+      <Footer />
     </div >
   );
 });
