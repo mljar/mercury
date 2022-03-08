@@ -11,6 +11,8 @@ from apps.notebooks.urls import notebooks_urlpatterns
 from server.views import VersionInfo
 from server.views import WelcomeMessage
 
+from server.settings import is_pro 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     url(
@@ -26,6 +28,10 @@ urlpatterns = [
 
 urlpatterns += tasks_urlpatterns
 urlpatterns += notebooks_urlpatterns
+
+if is_pro:
+    from pro.accounts.urls import auth_urlpatterns
+    urlpatterns += auth_urlpatterns
 
 if settings.DEBUG or settings.SERVE_STATIC:
     # serve static file for development only!

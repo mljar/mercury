@@ -13,6 +13,20 @@ from dotenv import load_dotenv
 # SECRET_KEY=django-insecure-)$12ir6-s6vbcufpva*va7bf$s$$(76ue$twwz9noath0&e91h
 load_dotenv(".env")
 
+
+is_pro = False
+try:
+    # try to import the Mercury pro features
+    # it is available only for commercial users
+    # you can check available license at https://mljar.com/pricing
+    import pro
+    is_pro = True
+except ImportError:
+    pass
+
+if is_pro:
+    print("*** Running Mercury Pro ***")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -66,6 +80,20 @@ INSTALLED_APPS = [
     "apps.tasks",
     "apps.notebooks",
 ]
+
+if is_pro:
+    # setup pro features
+    INSTALLED_APPS += [
+        "rest_framework.authtoken",
+        "pro.accounts",
+    ]
+    ACCOUNT_AUTHENTICATION_METHOD = "username"
+    REST_FRAMEWORK = {
+        "DEFAULT_AUTHENTICATION_CLASSES" : (
+            "rest_framework.authentication.TokenAuthentication", 
+        )
+    }
+
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
