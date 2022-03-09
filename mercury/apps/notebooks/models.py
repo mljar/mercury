@@ -7,6 +7,7 @@ class Notebook(models.Model):
     title = models.CharField(max_length=512, blank=False)
     slug = models.CharField(max_length=512, blank=True)
     path = models.CharField(max_length=1024, blank=False)
+    share = models.TextField(blank=True)
     params = models.TextField(blank=True)
     state = models.CharField(max_length=128, blank=True)
     default_view_path = models.CharField(max_length=1024, blank=True)

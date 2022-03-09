@@ -22,10 +22,10 @@ export interface INotebook {
   id: number;
   created_at: Date;
   file_updated_at: Date;
-  cellUID: string;
   title: string;
   slug: string;
   path: string;
+  share: string;
   params: INotebookParams;
   state: string;
   default_view_path: string;

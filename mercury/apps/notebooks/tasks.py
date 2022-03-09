@@ -96,6 +96,7 @@ def task_init_notebook(
             "title": "Please provide title",
             "author": "Please provide author",
             "description": "Please provide description",
+            "share": "public",
         }
         nb = None
         update_notebook = False
@@ -136,6 +137,7 @@ def task_init_notebook(
             params["date"] = str(params["date"])
 
         notebook_title = params.get("title", "")
+        notebook_share = params.get("share", "public")
         notebook_slug = slugify(notebook_title)
         notebook_output_file = notebook_slug
         if notebook_id is not None:
@@ -186,12 +188,14 @@ def task_init_notebook(
 }
 </style>"""
                     )
+
         if notebook_id is None:
             notebook = Notebook(
                 title=notebook_title,
                 slug=notebook_slug,
                 path=os.path.abspath(notebook_path),
                 state="WATCH_READY" if is_watch_mode else "READY",
+                share=notebook_share,
                 params=json.dumps(params),
                 default_view_path=os.path.join(
                     settings.MEDIA_URL, f"{notebook_output_file}.html"
@@ -207,6 +211,7 @@ def task_init_notebook(
             notebook.slug = notebook_slug
             notebook.path = os.path.abspath(notebook_path)
             notebook.state = "WATCH_READY" if is_watch_mode else "READY"
+            notebook.share = notebook_share
             notebook.params = json.dumps(params)
             # remove old default view
             if os.path.exists(notebook.default_view_path):
