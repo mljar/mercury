@@ -1,8 +1,9 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch

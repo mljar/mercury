@@ -1,4 +1,5 @@
 from django.db import models
+
 from apps.notebooks.models import Notebook
 
 

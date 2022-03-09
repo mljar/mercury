@@ -1,5 +1,6 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter
+
 from apps.notebooks.views import NotebookListView
 
 router = DefaultRouter()

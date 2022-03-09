@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from apps.notebooks.models import Notebook
 
 

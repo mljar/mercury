@@ -1,20 +1,18 @@
 import os
 import shutil
+
+from django.conf import settings
 from django.db import transaction
 from django.http import Http404
-from django.conf import settings
-
-from rest_framework.generics import CreateAPIView
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.exceptions import APIException
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import APIException
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
-
 from apps.tasks.tasks import task_execute
 
 
@@ -55,26 +53,36 @@ class ListOutputFilesView(APIView):
     def get(self, request, session_id, task_id, format=None):
         files_urls = []
         try:
-            output_dir = os.path.join(settings.MEDIA_ROOT, session_id, f"output_{task_id}")
+            output_dir = os.path.join(
+                settings.MEDIA_ROOT, session_id, f"output_{task_id}"
+            )
             for f in os.listdir(output_dir):
                 if os.path.isfile(os.path.join(output_dir, f)):
-                    files_urls += [f'{settings.MEDIA_URL}/{session_id}/output_{task_id}/{f}']
+                    files_urls += [
+                        f"{settings.MEDIA_URL}/{session_id}/output_{task_id}/{f}"
+                    ]
         except Exception as e:
-            print(f"Trying to list files for session_id {session_id} and task_id {task_id}")
+            print(
+                f"Trying to list files for session_id {session_id} and task_id {task_id}"
+            )
             print("Exception occured", str(e))
         return Response(files_urls)
 
 
 class ClearTasksView(APIView):
     def post(self, request, notebook_id, session_id, format=None):
-        
+
         try:
             tasks = Task.objects.filter(notebook_id=notebook_id, session_id=session_id)
 
             for task in tasks:
-                output_file = os.path.join(settings.MEDIA_ROOT, session_id, f"output_{task.id}.html")
-                output_dir = os.path.join(settings.MEDIA_ROOT, session_id, f"output_{task.id}")
-                
+                output_file = os.path.join(
+                    settings.MEDIA_ROOT, session_id, f"output_{task.id}.html"
+                )
+                output_dir = os.path.join(
+                    settings.MEDIA_ROOT, session_id, f"output_{task.id}"
+                )
+
                 try:
                     if os.path.isfile(output_file):
                         os.remove(output_file)
@@ -83,11 +91,13 @@ class ClearTasksView(APIView):
                 except Exception as e:
                     print(f"Trying to delete {output_file} and {output_dir}")
                     print(str(e))
-            
+
             tasks.delete()
-            
+
         except Exception as e:
-            print(f"Trying to clear tasks for notebook_id {notebook_id} and session_id {session_id}")
+            print(
+                f"Trying to clear tasks for notebook_id {notebook_id} and session_id {session_id}"
+            )
             print("Exception occured", str(e))
-        
+
         return Response(status.HTTP_204_NO_CONTENT)

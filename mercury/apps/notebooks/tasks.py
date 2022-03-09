@@ -1,20 +1,22 @@
+import json
 import os
+import subprocess
 import sys
 import uuid
-import json
 from datetime import datetime
-import subprocess
 from shutil import which
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
+
+import nbformat
+import yaml
+from celery import shared_task
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
-from celery import shared_task
-import nbformat
-import yaml
 
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
+
 
 def process_nbconvert_errors(error_msg):
     known_warnings = [
@@ -167,7 +169,6 @@ def task_init_notebook(
             error_msg = process_nbconvert_errors(error_msg)
             if error_msg != "":
                 print(error_msg)
-
 
             if "--no-input" in command:
                 with open(

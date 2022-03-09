@@ -1,7 +1,9 @@
 import os
 import tempfile
+
 import nbformat as nbf
 from django.test import TestCase
+
 from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 

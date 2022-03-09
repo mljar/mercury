@@ -1,10 +1,11 @@
 import os
+
 from django.test import TestCase
+
 from apps.notebooks.models import Notebook
+from apps.notebooks.tasks import task_init_notebook
 from apps.tasks.models import Task
 from apps.tasks.tasks import task_execute
-
-from apps.notebooks.tasks import task_init_notebook
 
 # python manage.py test apps.tasks.tests -v 2
 

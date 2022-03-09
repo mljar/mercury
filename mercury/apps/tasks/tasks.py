@@ -1,20 +1,22 @@
-import os
-import sys
 import json
-import time
+import os
 import shutil
+import sys
+import time
 import traceback
-from shutil import copyfile
-from subprocess import Popen, PIPE
-from django.conf import settings
-from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
-from celery import shared_task
-from apps.tasks.models import Task
-from apps.notebooks.models import Notebook
-from django_drf_filepond.models import TemporaryUpload
-from apps.tasks.clean_service import clean_service
-import nbformat
 from re import sub
+from shutil import copyfile
+from subprocess import PIPE, Popen
+
+import nbformat
+from celery import shared_task
+from django.conf import settings
+from django_drf_filepond.models import TemporaryUpload
+
+from apps.notebooks.models import Notebook
+from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
+from apps.tasks.clean_service import clean_service
+from apps.tasks.models import Task
 
 
 def get_parameters_cell_index(cells, all_variables):
@@ -180,7 +182,6 @@ def task_execute(self, job_params):
                     else:
                         inject_code += f'{k} = {widgets_params[k].get("value")}\n'
 
-
         # create output directory for notebook output
         wrk_dir = settings.MEDIA_ROOT / task.session_id
         if not os.path.exists(wrk_dir):
@@ -201,7 +202,6 @@ def task_execute(self, job_params):
                         raise Exception(f"Cant create {output_dir}")
                 # pass path to directory into the notebook's code
                 inject_code += f'{k} = "{str(output_dir)}"\n'
-                
 
         new_cell = {
             "cell_type": "code",
@@ -211,8 +211,6 @@ def task_execute(self, job_params):
             "outputs": [],
             "source": inject_code,
         }
-
-        
 
         # update input notebook with params from the task
         # the input notebook path should be the same as original notebook
@@ -291,7 +289,9 @@ def task_execute(self, job_params):
             task.result = f"{settings.MEDIA_URL}{task.session_id}/{wrk_output_nb_file}"
             task.state = "DONE"
         else:
-            task.result = error_msg if error_msg != "" else "Problem with executing the notebook"
+            task.result = (
+                error_msg if error_msg != "" else "Problem with executing the notebook"
+            )
             task.state = "ERROR"
         task.save()
     except Exception as e:

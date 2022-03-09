@@ -1,12 +1,13 @@
 import os
+import subprocess
 import sys
 import time
-import subprocess
-from django.core.management.base import BaseCommand, CommandError
-from apps.notebooks.models import Notebook
-from apps.notebooks.tasks import task_init_notebook
 
 import psutil
+from django.core.management.base import BaseCommand, CommandError
+
+from apps.notebooks.models import Notebook
+from apps.notebooks.tasks import task_init_notebook
 
 
 def kill(proc_pid):
@@ -59,7 +60,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("-" * 53))
 
             mercury_bin = sys.argv[0]
-            # check if we are on Windows machines and 
+            # check if we are on Windows machines and
             # need to extend the mercury bin with .exe
             if sys.executable.endswith(".exe") and not mercury_bin.endswith(".exe"):
                 mercury_bin += ".exe"

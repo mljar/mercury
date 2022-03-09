@@ -1,5 +1,7 @@
 import os
+
 from django.core.management.base import BaseCommand, CommandError
+
 from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 

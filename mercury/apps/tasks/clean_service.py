@@ -1,7 +1,7 @@
-from datetime import datetime
-from datetime import timedelta
-from django_drf_filepond.models import TemporaryUpload
+from datetime import datetime, timedelta
+
 from django.utils.timezone import make_aware
+from django_drf_filepond.models import TemporaryUpload
 
 
 def clean_service():
