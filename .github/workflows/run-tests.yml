@@ -1,0 +1,29 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          python -m pip install --upgrade pip
+          ./scripts/pack_mercury.sh
+          pip install --upgrade setuptools
+          cd mercury
+          pip install -U -r requirements.txt
+      - name: Test with pytest
+        run: |
+          python manage.py tests apps
