@@ -6,6 +6,7 @@
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
 </p>
 
+[![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
 [![PyPI version](https://badge.fury.io/py/mljar-mercury.svg)](https://badge.fury.io/py/mljar-mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/installer/conda.svg)](https://conda.anaconda.org/conda-forge)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/mljar-mercury.svg)](https://pypi.python.org/pypi/mljar-mercury/)
