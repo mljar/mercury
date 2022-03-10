@@ -49,12 +49,12 @@ export default withRouter(function LoginView() {
         <div className="div-signin text-center">
           <form className="form-signin">
             <h3 className="h3 mb-3 font-weight-normal">Please sign in</h3>
-            <label className="sr-only">Email address</label>
+            <label className="sr-only">Username</label>
             <input
               type="email"
               id="inputEmail"
               className="form-control"
-              placeholder="Email address"
+              placeholder="Username"
               required
             />
             <label className="sr-only">Password</label>
@@ -65,11 +65,15 @@ export default withRouter(function LoginView() {
               placeholder="Password"
               required
             />
-
-            <button className="btn btn-lg btn-primary btn-block" type="submit">
+            <button
+              className="btn btn-lg btn-primary btn-block"
+              type="submit"
+              style={{ margin: "5px" }}
+            >
               <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
             </button>
           </form>
+          {/* <p className="text-muted">No account? Please contact the service administrator to create account.</p> */}
         </div>
       )}
       <Footer />
