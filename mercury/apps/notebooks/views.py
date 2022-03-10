@@ -11,16 +11,15 @@ from apps.notebooks.tasks import task_init_notebook, task_watch
 from server.settings import is_pro
 
 if is_pro:
-    from pro.accounts.models import Membership, MercuryGroup
+    from pro.accounts.models import Membership
 
 
 class NotebookListView(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = NotebookSerializer
 
-    def has_access(share, user):
-        if share == "public":
-            return True
+    def in_commas(self, word):
+        return "," + word + ","
 
     def get_queryset(self):
         if not is_pro:
@@ -28,14 +27,16 @@ class NotebookListView(viewsets.ReadOnlyModelViewSet):
 
         user = self.request.user
         if user.is_anonymous:
-            return Notebook.objects.filter(share="public")
+            return Notebook.objects.filter(share=self.in_commas("public"))
 
         q_list = (
-            Q(share="public") | Q(share="private") | Q(share__icontains=user.username)
+            Q(share=self.in_commas("public"))
+            | Q(share=self.in_commas("private"))
+            | Q(share__icontains=self.in_commas(user.username))
         )
 
         for m in Membership.objects.filter(user=user):
-            q_list |= Q(share__icontains=m.group.name)
+            q_list |= Q(share__icontains=self.in_commas(m.group.name))
 
         return Notebook.objects.filter(q_list)
 

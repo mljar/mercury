@@ -138,6 +138,12 @@ def task_init_notebook(
 
         notebook_title = params.get("title", "")
         notebook_share = params.get("share", "public")
+
+        # make sure that there are commas and no spaces between commas
+        notebook_share = (
+            "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
+        )
+
         notebook_slug = slugify(notebook_title)
         notebook_output_file = notebook_slug
         if notebook_id is not None:

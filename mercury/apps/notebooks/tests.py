@@ -231,3 +231,68 @@ share: {group.name}
         response = self.client.get("/api/v1/notebooks/", **headers3)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 0)
+
+    def test_get_single_notebook(self):
+        # create user and login
+        user = {
+            "username": "piotrek",
+            "password": "verysecret",
+        }
+        User.objects.create_user(username=user["username"], password=user["password"])
+        response = self.client.post(
+            reverse("rest_login"), user, content_type="application/json"
+        )
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+
+        # create second user
+        user2 = {
+            "username": "piotrek2",
+            "password": "verysecret2",
+        }
+        user_obj2 = User.objects.create_user(
+            username=user2["username"], password=user2["password"]
+        )
+        response = self.client.post(
+            reverse("rest_login"), user2, content_type="application/json"
+        )
+        token2 = response.json()["key"]
+        headers2 = {"HTTP_AUTHORIZATION": "Token " + token2}
+
+        self.assertEqual(Notebook.objects.all().count(), 0)
+
+        yaml = f"""---
+share: {user2["username"]}
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        yaml = f"""---
+share: private
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        # first user should see see 1 notebook
+        response = self.client.get("/api/v1/notebooks/", **headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+        # second user should see see 2 notebooks
+        response = self.client.get("/api/v1/notebooks/", **headers2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+
+        # first user can not get first notebook
+        response = self.client.get("/api/v1/notebooks/1/", **headers)
+        self.assertEqual(response.status_code, 404)
+        # first user can get first notebook
+        response = self.client.get("/api/v1/notebooks/2/", **headers)
+        self.assertEqual(response.status_code, 200)
+
+        # second user can access both notebooks
+        for i in [1, 2]:
+            response = self.client.get(f"/api/v1/notebooks/{i}/", **headers2)
+            self.assertEqual(response.status_code, 200)
