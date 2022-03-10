@@ -2,19 +2,15 @@ import os
 import tempfile
 
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from django.test import TestCase
-from pro.accounts.models import Membership, MercuryGroup
 from rest_framework.reverse import reverse
 
-from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 from apps.notebooks.tests import create_notebook_with_yaml
 from apps.tasks.models import Task
 from apps.tasks.tasks import task_execute
 
 # python manage.py test apps.tasks.tests -v 2
-
 
 
 class ExecuteNotebookTestCase(TestCase):
