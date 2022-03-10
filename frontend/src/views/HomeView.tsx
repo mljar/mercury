@@ -10,7 +10,7 @@ import {
   getLoadingState,
   getNotebooks,
 } from "../components/Notebooks/notebooksSlice";
-import { fetchWelcome, getWelcome } from "../components/versionSlice";
+import { fetchWelcome, getIsPro, getWelcome } from "../components/versionSlice";
 
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -22,6 +22,7 @@ export default withRouter(function HomeView() {
   const notebooks = useSelector(getNotebooks);
   const loadingState = useSelector(getLoadingState);
   const welcome = useSelector(getWelcome);
+  const isPro = useSelector(getIsPro);
 
   useEffect(() => {
     dispatch(fetchNotebooks());
@@ -68,20 +69,18 @@ export default withRouter(function HomeView() {
 
   return (
     <div className="App">
-      <HomeNavBar />
+      <HomeNavBar isPro={isPro} />
       <div className="container" style={{ paddingBottom: "50px" }}>
-        {
-          welcome === "" &&
+        {welcome === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
-        }
-        {
-          welcome !== "" &&
+        )}
+        {welcome !== "" && (
           <div style={{ paddingTop: "20px", paddingBottom: "10px" }}>
             <ReactMarkdown rehypePlugins={[remarkGfm, rehypeHighlight, emoji]}>
               {welcome}
             </ReactMarkdown>
           </div>
-        }
+        )}
 
         <div className="row">
           {loadingState === "loading" && (
@@ -122,6 +121,6 @@ export default withRouter(function HomeView() {
         </div>
       </div>
       <Footer />
-    </div >
+    </div>
   );
 });
