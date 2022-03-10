@@ -24,6 +24,13 @@ jobs:
           pip install --upgrade setuptools
           cd mercury
           pip install -U -r requirements.txt
+      - name: Set SSH key to install pro package
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install Pro package
+        run: |
+          pip install -e git+ssh://git@github.com/mljar/mercury-pro.git@main#egg=pro
       - name: Test backend
         run: |
           cd mercury
