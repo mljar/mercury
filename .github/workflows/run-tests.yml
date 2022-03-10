@@ -27,4 +27,4 @@ jobs:
       - name: Test backend
         run: |
           cd mercury
-          python manage.py tests apps
+          python manage.py test apps
