@@ -24,6 +24,7 @@ jobs:
           pip install --upgrade setuptools
           cd mercury
           pip install -U -r requirements.txt
-      - name: Test with pytest
+      - name: Test backend
         run: |
+          cd mercury
           python manage.py tests apps
