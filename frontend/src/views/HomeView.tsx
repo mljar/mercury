@@ -16,6 +16,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
+import { getUsername } from "../components/authSlice";
 
 export default withRouter(function HomeView() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default withRouter(function HomeView() {
   const loadingState = useSelector(getLoadingState);
   const welcome = useSelector(getWelcome);
   const isPro = useSelector(getIsPro);
+  const username = useSelector(getUsername);
 
   useEffect(() => {
     dispatch(fetchNotebooks());
@@ -67,9 +69,11 @@ export default withRouter(function HomeView() {
     );
   });
 
+  document.body.style.backgroundColor = "white";
+
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} />
+      <HomeNavBar isPro={isPro} username={username} />
       <div className="container" style={{ paddingBottom: "50px" }}>
         {welcome === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>

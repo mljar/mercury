@@ -1,60 +1,45 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { withRouter } from "react-router-dom";
+import { fetchToken } from "../components/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
-import { getIsPro } from "../components/versionSlice";
+import { getFetchingIsPro, getIsPro } from "../components/versionSlice";
+import { useHistory } from "react-router-dom";
+import ProFeatureAlert from "../components/ProFeatureAlert";
 
 export default withRouter(function LoginView() {
+  let history = useHistory();
   const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const isPro = useSelector(getIsPro);
+  const fetchingIsPro = useSelector(getFetchingIsPro);
 
   document.body.style.backgroundColor = "#f5f5f5";
 
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} />
-      {!isPro && (
-        <div style={{ padding: "40px" }}>
-          <div className="alert alert-primary mb-3" role="alert">
-            <h5>
-              <i className="fa fa-info-circle" aria-hidden="true"></i> The
-              authentication is a Pro feature{" "}
-            </h5>
-            You are using an open-source version of the Mercury framework. The
-            authentication is a Pro feature available for commercial users only.
-            Please consider purchasing the Mercury commercial license. It is
-            perpetual and comes with additional features, dedicated support, and
-            allows white-labeling. You can learn more about available licenses
-            on our{" "}
-            <a
-              href="https://mljar.com/pricing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              website
-            </a>
-            .
-            <br />
-            <br />
-            <br />
-            <a href="/">
-              <i className="fa fa-home" aria-hidden="true" /> Back to home
-            </a>
-          </div>
-        </div>
+      <HomeNavBar isPro={isPro} username={""} />
+
+      {!isPro && !fetchingIsPro && (
+        <ProFeatureAlert featureName={"authentication"} />
       )}
       {isPro && (
         <div className="div-signin text-center">
-          <form className="form-signin">
+          <div className="form-signin">
             <h3 className="h3 mb-3 font-weight-normal">Please sign in</h3>
             <label className="sr-only">Username</label>
             <input
-              type="email"
-              id="inputEmail"
+              type="username"
+              id="inputUsername"
               className="form-control"
               placeholder="Username"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+              }}
               required
             />
             <label className="sr-only">Password</label>
@@ -63,16 +48,24 @@ export default withRouter(function LoginView() {
               id="inputPassword"
               className="form-control"
               placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
               required
             />
             <button
               className="btn btn-lg btn-primary btn-block"
-              type="submit"
+              // type="submit"
               style={{ margin: "5px" }}
+              onClick={() => {
+                dispatch(fetchToken(username, password, history));
+              }}
+              disabled={username === "" || password === ""}
             >
               <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
             </button>
-          </form>
+          </div>
           {/* <p className="text-muted">No account? Please contact the service administrator to create account.</p> */}
         </div>
       )}

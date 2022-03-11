@@ -11,6 +11,7 @@ import { RootState } from '../store';
 
 
 const initialState = {
+  fetchingIsPro: true,
   isPro: false,
   welcome: ""
 };
@@ -19,9 +20,10 @@ const versionSlice = createSlice({
   name: 'version',
   initialState,
   reducers: {
-    setVersion(state, action: PayloadAction<{ isPro: boolean }>) {
+    setVersion(state, action: PayloadAction<{isPro: boolean }>) {
       const { isPro } = action.payload;
       state.isPro = isPro;
+      state.fetchingIsPro = false;
     },
     setWelcome(state, action: PayloadAction<string>) {
       state.welcome = action.payload;
@@ -37,6 +39,7 @@ export const {
 } = versionSlice.actions;
 
 export const getIsPro = (state: RootState) => state.version.isPro;
+export const getFetchingIsPro = (state: RootState) => state.version.fetchingIsPro;
 export const getWelcome = (state: RootState) => state.version.welcome;
 
 export const fetchVersion =

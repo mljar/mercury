@@ -16,7 +16,6 @@ import "./index.css";
 
 const store = configuredStore();
 
-// new code
 if (window.location.origin === "http://localhost:3000") {
   axios.defaults.baseURL = "http://127.0.0.1:8000";
 } else {
@@ -28,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () =>
     <div>
       <Root store={store} history={history} />
       <ToastContainer
-        position="bottom-right"
+        position="top-right"
         autoClose={3000}
         hideProgressBar={true}
         newestOnTop={true}

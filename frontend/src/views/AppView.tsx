@@ -23,6 +23,8 @@ import {
   getView,
 } from "./appSlice";
 import FilesView from "../components/FilesView";
+import { getUsername } from "../components/authSlice";
+import { getIsPro } from "../components/versionSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +37,8 @@ function App() {
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
   const outputFilesState = useSelector(getOutputFilesState);
+  const isPro = useSelector(getIsPro);
+  const username = useSelector(getUsername);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -107,7 +111,11 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar showFiles={areOutputFilesAvailable(notebook?.params?.params)} />
+      <NavBar
+        showFiles={areOutputFilesAvailable(notebook?.params?.params)}
+        isPro={isPro}
+        username={username}
+      />
       <div className="container-fluid">
         <div className="row">
           <WatchModeComponent />

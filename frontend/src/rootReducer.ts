@@ -6,6 +6,7 @@ import tasksReducer from './tasks/tasksSlice';
 import widgetsReducer from './components/Widgets/widgetsSlice';
 import versionReducer from './components/versionSlice';
 import appReducer from './views/appSlice';
+import authReducer from "./components/authSlice";
 
 export default function createRootReducer(history: History) {
     return combineReducers({
@@ -14,5 +15,6 @@ export default function createRootReducer(history: History) {
         widgets: widgetsReducer,
         version: versionReducer,
         app: appReducer,
+        auth: authReducer,
     });
 }

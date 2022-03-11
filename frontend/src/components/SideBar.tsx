@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useCallback, useLayoutEffect } from "react";
+import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -25,7 +25,6 @@ import {
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
-import { current } from "@reduxjs/toolkit";
 
 type SideBarProps = {
   notebookTitle: string;

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
 
 export const getSessionId = () => {
     var sessionId = sessionStorage.getItem("sessionId");
@@ -8,3 +9,13 @@ export const getSessionId = () => {
     }
     return sessionId;
 }
+
+export const setAxiosAuthToken = (token: string | null) => {
+    if (typeof token !== "undefined" && token) {
+        // Apply for every request
+        axios.defaults.headers.common["Authorization"] = "Token " + token;
+    } else {
+        // Delete auth header
+        delete axios.defaults.headers.common["Authorization"];
+    }
+};
