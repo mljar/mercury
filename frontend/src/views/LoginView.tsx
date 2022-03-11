@@ -28,7 +28,14 @@ export default withRouter(function LoginView() {
       )}
       {isPro && (
         <div className="div-signin text-center">
-          <div className="form-signin">
+          <form
+            className="form-signin"
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              dispatch(fetchToken(username, password, history));
+            }}
+          >
             <h3 className="h3 mb-3 font-weight-normal">Please sign in</h3>
             <label className="sr-only">Username</label>
             <input
@@ -56,17 +63,22 @@ export default withRouter(function LoginView() {
             />
             <button
               className="btn btn-lg btn-primary btn-block"
-              // type="submit"
+              type="submit"
               style={{ margin: "5px" }}
-              onClick={() => {
-                dispatch(fetchToken(username, password, history));
-              }}
               disabled={username === "" || password === ""}
             >
               <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
             </button>
+          </form>
+          <div
+            className="mx-auto"
+            style={{ width: "400px", marginTop: "40px" }}
+          >
+            <p className="text-muted">
+              No account? Please contact the service administrator to create the
+              account for you.
+            </p>
           </div>
-          {/* <p className="text-muted">No account? Please contact the service administrator to create account.</p> */}
         </div>
       )}
       <Footer />
