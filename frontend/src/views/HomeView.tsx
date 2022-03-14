@@ -17,6 +17,7 @@ import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import { getUsername } from "../components/authSlice";
+import LoginButton from "../components/LoginButton";
 
 export default withRouter(function HomeView() {
   const dispatch = useDispatch();
@@ -89,6 +90,24 @@ export default withRouter(function HomeView() {
         <div className="row">
           {loadingState === "loading" && (
             <p>Loading notebooks. Please wait ...</p>
+          )}
+
+          {loadingState === "loaded" && isPro && notebooks.length === 0 && (
+            <div>
+              <div className="alert alert-success" role="alert">
+                <h5>
+                  <i className="fa fa-key" aria-hidden="true"></i> You are using
+                  Pro version
+                </h5>
+                <p>
+                  Please login with your credentials to check private notebooks.
+                </p>
+
+                <a href="/login" className="btn btn-primary btn-sm ">
+                  <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
+                </a>
+              </div>
+            </div>
           )}
           {loadingState === "loaded" && notebooks.length === 0 && (
             <div>
