@@ -6,11 +6,14 @@ if [[ $# -ne 1 ]]; then
 fi
 
 echo "Set domain to $1 in docker/init-letsencrypt.sh" 
-sed "s/{{your_domain}}/$1/g" docker/init-letsencrypt.sh > docker/init-letsencrypt.sh
+sed -i "s/{{your_domain}}/$1/g" docker/init-letsencrypt.sh
 
 echo "Set domain to $1 in docker/nginx/pro/default.conf" 
-sed "s/{{your_domain}}/$1/g" docker/nginx/pro/default.conf > docker/nginx/pro/default.conf
+sed -i "s/{{your_domain}}/$1/g" docker/nginx/pro/default.conf
 
-echo "Please run:"
-echo "./docker/init-letsencrypt.sh"
-echo "docker-compose -f docker-compose-pro.yml up --build -d"
+echo "[Done] Domain set"
+echo "---------------------------------------------------------"
+mv docker/init-letsencrypt.sh init-letsencrypt.sh
+echo "Please run following commands:"
+echo "sudo ./init-letsencrypt.sh"
+echo "sudo docker-compose -f docker-compose-pro.yml up --build -d"
