@@ -8,13 +8,24 @@ services:
             dockerfile: ./docker/nginx/Dockerfile
         ports:
             - 80:80
+            - 443:443
         volumes:
             - static_volume:/app/mercury/django_static
             - media_volume:/app/mercury/media
-            - ./docker/nginx:/etc/nginx/conf.d
+            - ./docker/nginx/pro:/etc/nginx/conf.d
+            - ./docker/nginx/certbot/conf:/etc/letsencrypt
+            - ./docker/nginx/certbot/www:/var/www/certbot
         depends_on: 
             - mercury
-        command: "/bin/sh -c 'nginx -g \"daemon off;\"'"
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    certbot:
+        image: certbot/certbot
+        restart: unless-stopped
+        volumes:
+            - ./docker/nginx/certbot/conf:/etc/letsencrypt
+            - ./docker/nginx/certbot/www:/var/www/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"       
+
     mercury:
         restart: unless-stopped
         build:
