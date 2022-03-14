@@ -16,8 +16,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
-import { getUsername } from "../components/authSlice";
-import LoginButton from "../components/LoginButton";
+import { getToken, getUsername } from "../components/authSlice";
 
 export default withRouter(function HomeView() {
   const dispatch = useDispatch();
@@ -26,11 +25,14 @@ export default withRouter(function HomeView() {
   const welcome = useSelector(getWelcome);
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
+  const token = useSelector(getToken);
 
   useEffect(() => {
     dispatch(fetchNotebooks());
     dispatch(fetchWelcome());
-  }, [dispatch]);
+    // fetchNotebooks depends on token
+    // if token is set then private notebooks are returned
+  }, [dispatch, token]);
 
   const notebookItems = notebooks.map((notebook, index) => {
     return (

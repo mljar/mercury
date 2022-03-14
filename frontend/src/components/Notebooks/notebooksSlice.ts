@@ -86,7 +86,7 @@ export const fetchNotebooks =
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         dispatch(setLoadingState("loading"))
-        const url = '/api/v1/notebooks';
+        const url = '/api/v1/notebooks/';
         const { data } = await axios.get(url);
         const parsedNotebooks = data.map((notebook: any) => {
           const parsedParams = JSON.parse(notebook.params)
@@ -112,7 +112,7 @@ export const fetchNotebook =
         if (!silent) {
           dispatch(setLoadingStateSelected("loading"))
         }
-        const url = `/api/v1/notebooks/${id}`;
+        const url = `/api/v1/notebooks/${id}/`;
         const { data } = await axios.get(url);
         const parsedParams = JSON.parse(data.params)
         dispatch(setSelectedNotebook(

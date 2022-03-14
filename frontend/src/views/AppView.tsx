@@ -23,7 +23,7 @@ import {
   getView,
 } from "./appSlice";
 import FilesView from "../components/FilesView";
-import { getUsername } from "../components/authSlice";
+import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
 
 function App() {
@@ -39,6 +39,7 @@ function App() {
   const outputFilesState = useSelector(getOutputFilesState);
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
+  const token = useSelector(getToken);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -57,7 +58,7 @@ function App() {
   useEffect(() => {
     dispatch(fetchNotebook(notebookId));
     dispatch(fetchCurrentTask(notebookId));
-  }, [dispatch, notebookId]);
+  }, [dispatch, notebookId, token]);
 
   useEffect(() => {
     if (waitForTask()) {

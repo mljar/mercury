@@ -11,6 +11,12 @@ import { toast } from 'react-toastify';
 import { RootState } from '../store';
 import { setAxiosAuthToken } from '../utils';
 
+let initToken = null;
+if (localStorage.getItem("token")) {
+  initToken = localStorage.getItem("token");
+  setAxiosAuthToken(initToken);
+}
+
 type UserType = {
   pk: number;
   username: string;
@@ -18,8 +24,9 @@ type UserType = {
   last_name: string;
   email: string;
 }
+
 const initialState = {
-  token: "" as string | null,
+  token: initToken as string | null,
   username: "" as string,
   user: {
     pk: 0,
