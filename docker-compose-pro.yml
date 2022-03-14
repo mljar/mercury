@@ -31,6 +31,8 @@ services:
         build:
             context: .
             dockerfile: ./docker/mercury/Dockerfile
+            args:
+                GITHUB_TOKEN: ${GITHUB_TOKEN}
         entrypoint: /app/docker/mercury/entrypoint.sh
         volumes:
             - ${NOTEBOOKS_PATH}:/app/notebooks
