@@ -5,13 +5,15 @@ import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
 
-
 type MainViewProps = {
   loadingState: string;
   notebookPath: string;
   waiting: boolean;
   errorMsg: string;
   watchMode: boolean;
+  displayEmbed: boolean;
+  isPro: boolean;
+  username: string;
 };
 
 export default function MainView({
@@ -20,8 +22,13 @@ export default function MainView({
   waiting,
   errorMsg,
   watchMode,
+  displayEmbed,
+  isPro,
+  username,
 }: MainViewProps) {
   const { height } = useWindowDimensions();
+
+  const iframeHeight = displayEmbed ? height - 10 : height - 58;
 
   return (
     <main
@@ -33,8 +40,24 @@ export default function MainView({
           {loadingState === "loading" && !watchMode && (
             <p>Loading notebook. Please wait ...</p>
           )}
-          {loadingState === "error" && (
-            <p>
+          {loadingState === "error" && !isPro && (
+            <p style={{margin: "20px"}}>
+              Problem while loading notebook. Please try again later or contact
+              Mercury administrator.
+            </p>
+          )}
+
+          {loadingState === "error" && isPro && username === "" && (
+            <p style={{margin: "20px"}}>
+              <h5>Please log in to see the notebook</h5>
+              <a href="/login" className="btn btn-primary btn-sm ">
+                <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
+              </a>
+            </p>
+          )}
+
+          {loadingState === "error" && isPro && username !== "" && (
+            <p style={{margin: "20px"}}>
               Problem while loading notebook. Please try again later or contact
               Mercury administrator.
             </p>
@@ -56,7 +79,7 @@ export default function MainView({
           {errorMsg === "" && loadingState !== "loading" && (
             <iframe
               width="100%"
-              height={height - 58}
+              height={iframeHeight}
               key={notebookPath}
               src={`${axios.defaults.baseURL}${notebookPath}`}
               title="display"

@@ -32,7 +32,7 @@ export default function TextWidget({
           className="form-control"
           type="text"
           id={`text-${label}`}
-          value={value}
+          value={value? value: ""}
           onChange={(e) => {
             dispatch(
               setWidgetValue({
@@ -49,7 +49,7 @@ export default function TextWidget({
           className="form-control"
           id={`text-area-${label}`}
           rows={rowsValue}
-          value={value}
+          value={value? value: ""}
           onChange={(e) => {
             dispatch(
               setWidgetValue({

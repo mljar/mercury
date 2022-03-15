@@ -25,6 +25,7 @@ import {
 import FilesView from "../components/FilesView";
 import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
+import MadeWithDiv from "../components/MadeWithDiv";
 
 function App() {
   const dispatch = useDispatch();
@@ -40,6 +41,9 @@ function App() {
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
+
+  const { embed } = useParams<{ embed: string }>();
+  let displayEmbed = !!(embed && embed === "embed");
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -112,11 +116,14 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar
-        showFiles={areOutputFilesAvailable(notebook?.params?.params)}
-        isPro={isPro}
-        username={username}
-      />
+      {!displayEmbed && (
+        <NavBar
+          showFiles={areOutputFilesAvailable(notebook?.params?.params)}
+          isPro={isPro}
+          username={username}
+        />
+      )}
+
       <div className="container-fluid">
         <div className="row">
           <WatchModeComponent />
@@ -128,6 +135,7 @@ function App() {
             widgetsParams={notebook?.params?.params}
             watchMode={isWatchMode()}
             notebookPath={notebookPath}
+            displayEmbed={displayEmbed}
           />
 
           {appView === "app" && (
@@ -137,6 +145,9 @@ function App() {
               errorMsg={errorMsg}
               waiting={waitForTask()}
               watchMode={isWatchMode()}
+              displayEmbed={displayEmbed}
+              isPro={isPro}
+              username={username}
             />
           )}
           {appView === "files" && (
@@ -148,6 +159,8 @@ function App() {
           )}
         </div>
       </div>
+
+      {displayEmbed && <MadeWithDiv />}
     </div>
   );
 }

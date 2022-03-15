@@ -102,7 +102,8 @@ export default withRouter(function HomeView() {
                   Pro version
                 </h5>
                 <p>
-                  There are no public notebooks shared. Please login with your credentials to check private notebooks.
+                  There are no public notebooks shared. Please login with your
+                  credentials to check private notebooks.
                 </p>
 
                 <a href="/login" className="btn btn-primary btn-sm ">

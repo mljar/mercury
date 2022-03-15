@@ -162,3 +162,10 @@ div[role="slider"]:focus,
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.poweredby {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  border: 1px solid #e5e5e5;
+}

@@ -34,6 +34,7 @@ type SideBarProps = {
   widgetsParams: Array<IWidget>;
   watchMode: boolean;
   notebookPath: string;
+  displayEmbed: boolean;
 };
 
 export default function SideBar({
@@ -44,6 +45,7 @@ export default function SideBar({
   widgetsParams,
   watchMode,
   notebookPath,
+  displayEmbed,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -187,11 +189,16 @@ export default function SideBar({
       });
   };
 
+  let additionalStyle = {};
+  if (displayEmbed) {
+    additionalStyle = { padding: "0px" };
+  }
+
   return (
     <nav
       id="sidebarMenu"
       className="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse"
-      style={{ overflowY: "auto" }}
+      style={{ ...additionalStyle, overflowY: "auto" }}
     >
       <div className="position-sticky p-3">
         <h4>{notebookTitle}</h4>

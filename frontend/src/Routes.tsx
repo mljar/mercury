@@ -39,7 +39,7 @@ export default function Routes() {
     <App>
       <Switch>
         <Route exact path="/" component={HomeView} />
-        <Route exact path="/app/:notebook_id/" component={AppView} />
+        <Route exact path="/app/:notebook_id/:embed?" component={AppView} />
         <Route exact path="/login" component={LoginView} />
         <Route exact path="/account" component={AccountView} />
         
