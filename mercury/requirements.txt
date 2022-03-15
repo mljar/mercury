@@ -14,3 +14,4 @@ psutil==5.8.0
 whitenoise==5.3.0
 python-dotenv==0.19.2
 django-drf-filepond==0.4.1
+ipython_genutils
