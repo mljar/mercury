@@ -100,7 +100,7 @@ def task_init_notebook(
         }
         nb = None
         update_notebook = False
-        with open(notebook_path) as f:
+        with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
             if "cells" in nb and len(nb["cells"]) > 0:
                 first_cell = nb["cells"][0]["source"]

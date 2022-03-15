@@ -221,7 +221,7 @@ def task_execute(self, job_params):
         wrk_output_nb_file = f"output_{task.id}.html"
 
         if all_variables:
-            with open(notebook.path) as f:
+            with open(notebook.path, encoding="utf-8", errors="ignore") as f:
                 nb = nbformat.read(f, as_version=4)
                 if "cells" in nb and len(nb["cells"]) > 0:
 
