@@ -1,4 +1,4 @@
-# Installation
+<h1> Installation </h1>
 
 *Compatible with Python 3.6 and higher.*
 
