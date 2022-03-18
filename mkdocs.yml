@@ -1,0 +1,5 @@
+site_name: Mercury Docs
+theme: readthedocs
+nav:
+  - Get started: index.md
+    
