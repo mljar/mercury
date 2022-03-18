@@ -1,5 +1,19 @@
 site_name: Mercury Docs
 theme: readthedocs
 nav:
-  - Get started: index.md
-    
+  - Home: index.md
+  - Installation: installation.md
+  - Get started: get-started.md
+  - YAML parameters: yaml-parameters.md
+  - Widgets: widgets.md
+  - Output Files: output-files.md
+  - Welcome Message: welcome.md
+  - Deploy: 
+    - Deploy on Heroku: deploy/heroku.md
+    - Deploy on AWS: deploy/aws.md
+  - Embedding: embedding.md
+  - Authentication: authentication.md
+  - Tutorials: tutorials.md
+  - Articles: articles.md
+  - FAQ: faq.md
+  - Commercial License: pro.md
