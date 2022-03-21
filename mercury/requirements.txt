@@ -5,8 +5,9 @@ markdown==3.3.6
 celery==5.1.2
 sqlalchemy==1.4.27
 gevent==21.12.0
-nbconvert==6.3.0
+nbconvert==6.4.3
 ipython_genutils
+nbconvert==6.4.3
 pyyaml==6.0
 django-cors-headers==3.10.1
 ipython==7.30.1
