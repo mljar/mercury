@@ -18,11 +18,3 @@ Or with `conda`:
 ```
 conda install -c conda-forge mljar-mercury
 ```
-
-### Install from GitHub
-
-Install directly from GitHub:
-
-```
-pip install -q -U git+https://github.com/mljar/mercury.git@master
-```

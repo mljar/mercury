@@ -6,6 +6,7 @@ celery==5.1.2
 sqlalchemy==1.4.27
 gevent==21.12.0
 nbconvert==6.3.0
+ipython_genutils
 pyyaml==6.0
 django-cors-headers==3.10.1
 ipython==7.30.1
@@ -14,4 +15,3 @@ psutil==5.8.0
 whitenoise==5.3.0
 python-dotenv==0.19.2
 django-drf-filepond==0.4.1
-ipython_genutils
