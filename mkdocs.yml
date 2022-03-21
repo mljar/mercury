@@ -17,3 +17,5 @@ nav:
   - Deploy: 
     - Deploy on Heroku: deploy/heroku.md
     - Deploy on AWS: deploy/aws.md
+markdown_extensions:
+  - markdown.extensions.admonition
