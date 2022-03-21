@@ -1,6 +1,6 @@
 <h1> Installation </h1>
 
-*Compatible with Python 3.6 and higher.*
+Mercury is compatible with Python 3.6 and higher.
 
 ### Install with pip
 
