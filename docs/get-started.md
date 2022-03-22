@@ -6,14 +6,19 @@ In this section we will create a notebook and will share it as a web app.
 
 Let's create a simple notebook that will print `Hello Earth!`.
 
-![](../media/create_notebook.png)
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Create a notebook"
+    src="../media/create_notebook.png" width="100%" />
 
 #### Define YAML header
 
 Let's add a **RAW** cell at the beginning of the notebook. Please add YAML header there.
 
-![](../media/notebook_with_yaml.png)
-
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Notebook with YAML"
+    src="../media/notebook_with_yaml.png" width="100%" />
 
 The YAML config:
 
@@ -48,6 +53,9 @@ mercury run greetings.ipynb
 
 Please open the web browser with address `http://127.0.0.1`.
 
-![](../media/app_running_locally.png)
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Run app locally"
+    src="../media/app_running_locally.png" width="100%" />
 
 There are many ways in which the app can be deployed to the cloud. Please check the [Deployment](/deploy/deployment) section.

@@ -5,6 +5,14 @@
 <h3> Widget name is a variable name </h3>
 Definition of the widget (in `params`) starts with the widget name. It should correspond to the variable in the code (in the notebook). The name should be a valid Python variable. 
 
+In the below example, the `variable_name` is the name of variable in the code and it is a widget name:
+```yaml
+params:
+    variable_name:
+        input: text
+        label: Please provide the text
+```
+
 <h3> Widget input type </h3>
 The widget is selected by `input` type. It can be: `text`, `slider`, `range`, `select`, `checkbox`, `numeric`, `file`. 
 
@@ -25,7 +33,7 @@ You can set a default value of the widget by setting the `value`. The format of 
 
 The rest of the parameters depend on the widget input type.
 
-# Wdgets
+# Widgets
 
 ### Text
 
@@ -284,7 +292,7 @@ Widgets rendered from above YAML config:
 </p>
 
 
-## Widgets to variables
+## Widgets to variables   
 
 To use widgets as variables in the code simply define the variable with the same name as the widget name. You can also assign the same default value as defined in the YAML. Please define all variables in one cell (it can be below the cell with YAML config).
 
