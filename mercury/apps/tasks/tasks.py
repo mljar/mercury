@@ -37,8 +37,8 @@ def get_parameters_cell_index(cells, all_variables):
     return max_index
 
 
-def sanitize_string(str):
-    return sub("[^a-z0-9\.,_\-\s!?=><]gim", "", str)
+def sanitize_string(input_string):
+    return sub("""[\"\'(){}\[\]\`\^\:]""", "", input_string)
 
 
 @shared_task(bind=True)

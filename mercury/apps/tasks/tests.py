@@ -8,9 +8,26 @@ from rest_framework.reverse import reverse
 from apps.notebooks.tasks import task_init_notebook
 from apps.notebooks.tests import create_notebook_with_yaml
 from apps.tasks.models import Task
-from apps.tasks.tasks import task_execute
+from apps.tasks.tasks import task_execute, sanitize_string
 
 # python manage.py test apps.tasks.tests -v 2
+
+class SanitizeTestCase(TestCase):
+    
+
+    def test_CJK(self):
+
+        input_string = """テスト(){}
+                        asdfasdf"()"[]''{}:"""
+
+        output_string = sanitize_string(input_string)
+
+        self.assertTrue("(" not in output_string)
+        self.assertTrue("[" not in output_string)
+        self.assertTrue(":" not in output_string)
+        self.assertTrue(output_string.startswith("テスト"))
+        self.assertTrue(output_string.endswith("asdfasdf"))
+
 
 
 class ExecuteNotebookTestCase(TestCase):

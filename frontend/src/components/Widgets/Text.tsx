@@ -20,8 +20,8 @@ export default function TextWidget({
   const dispatch = useDispatch();
   let rowsValue: number = rows ? rows : 1;
 
-  const sanitizeString = (str: string) => {
-    return str.replace(/[^a-z0-9.,_\-\s!?=><]/gim, "");
+  const sanitizeString = (input_string: string) => {
+    return input_string.replace(/["'(){}[\]`^:]/gim, "");
   };
 
   return (
