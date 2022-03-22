@@ -2,16 +2,16 @@
 
 ## Define widget with YAML
 
-### Widget name is a variable name
+<h3> Widget name is a variable name </h3>
 Definition of the widget (in `params`) starts with the widget name. It should correspond to the variable in the code (in the notebook). The name should be a valid Python variable. 
 
-### Widget input type
+<h3> Widget input type </h3>
 The widget is selected by `input` type. It can be: `text`, `slider`, `range`, `select`, `checkbox`, `numeric`, `file`. 
 
-### Widget label
+<h3> Widget label </h3>
 For each widget we need to define a `label`. It will be a text displayed above (or near) the widget.
 
-### Widget default value
+<h3> Widget default value </h3>
 You can set a default value of the widget by setting the `value`. The format of the `value` depends on the input type:
 
 - for `text` a `value` should be a string, example `value: example text`,
@@ -25,7 +25,7 @@ You can set a default value of the widget by setting the `value`. The format of 
 
 The rest of the parameters depend on the widget input type.
 
-## Available widgets
+# Wdgets
 
 ### Text
 

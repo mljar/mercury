@@ -21,3 +21,5 @@ nav:
     - Deploy on AWS: deploy/aws.md
 markdown_extensions:
   - markdown.extensions.admonition
+  - toc:
+      permalink: True
