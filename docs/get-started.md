@@ -30,9 +30,9 @@ params:
 ---
 ```
 
-We define `title` and `description` - those values are used when displaying information about app in the app gallery. Additionally, the `title` is used in the side bar above the widgets.
+We define `title` and `description` - those values are used when displaying information about the app in the app-gallery. Additionally, the `title` is used in the side bar above the widgets.
 
-In the `params` we define a single widget with the name `planet`. We set it's type to select widget (`input: select`). The text in the label above the widget is set with `label`. The default that is displayed by widget is `value: Earth`. The values in the select widgets are set with `choices`.
+In the `params` we define a single widget with the name `planet`. We set it's type to a select widget (`input: select`). The text in the label above the widget is set with `label`. The default value displayed by widget is `value: Earth`. The values in the select are set with `choices`.
 
 !!! note "Widgets names are variables names" 
 
@@ -50,7 +50,4 @@ Please open the web browser with address `http://127.0.0.1`.
 
 ![](../media/app_running_locally.png)
 
-#### Deploy to the cloud
-
-
-#### Share URL link  with non-technical users
+There are many ways in which the app can be deployed to the cloud. Please check the [Deployment](/deploy/deployment) section.

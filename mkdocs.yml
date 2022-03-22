@@ -10,11 +10,13 @@ nav:
   - Welcome Message: welcome.md
   - Embedding: embedding.md
   - Authentication: authentication.md
+  - Admin Panel: admin-panel.md
   - Tutorials: tutorials.md
   - Articles: articles.md
   - FAQ: faq.md
   - Commercial License: pro.md
   - Deploy: 
+    - deploy/deployment.md
     - Deploy on Heroku: deploy/heroku.md
     - Deploy on AWS: deploy/aws.md
 markdown_extensions:
