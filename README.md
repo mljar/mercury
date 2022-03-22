@@ -116,6 +116,7 @@ Allowed parameters in YAML config:
 - `description` - string describing the content of the notebook. It is used in the gallery view.
 - `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
 - `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` prompt information will be displayed for each cell in the notebook.
+- `share` - the comma separated list of users that can see the notebook. Default is set to `public` which means that all users can see the notebook. It can be set to `private` which means that only authenticated users can see the notebook. It can be set to the list of users, for example `username1, username2, username3`, which means that only users with username on the list can see the notebook. The last option is list the groups of users that can see the notebook, for example `group1, group2` - all users in the `group1` and `group2` will be able to see the notebook. You can mix group names and user names in the `share` parameter. The users and groups should be created in the Admin Panel. The sharing feature is only available to commercial users. 
 - `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the sidebar. Each parameter should have an unique name that corresponds to the variable name used in the code. Read more about available widgets in `params` in the [documentation](https://github.com/mljar/mercury/wiki/Widgets).
 
 ## Define widget with YAML
