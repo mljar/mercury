@@ -25,7 +25,7 @@ Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly l
 
 ## Installation
 
-*Compatible with Python 3.6 and higher.*
+*Compatible with Python 3.7 and higher.*
 
 Install with `pip`:
 
