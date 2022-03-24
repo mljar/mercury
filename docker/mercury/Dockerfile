@@ -19,7 +19,7 @@ RUN if [ -z "${GITHUB_TOKEN}" ] ; then \
         echo "Please visit https://mljar.com/pricing for Pro features details." ; \
     else \
         echo "Install Pro features ..." && \
-        pip install -e git+https://git@github.com/mljar/mercury-pro.git@main#egg=pro ; \
+        pip install -e git+https://${GITHUB_TOKEN}@github.com/mljar/mercury-pro.git@main#egg=pro ; \
     fi
 
 ADD ./mercury/apps /app/mercury/apps
