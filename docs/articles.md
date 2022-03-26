@@ -11,3 +11,5 @@ Articles about Mercury:
 - [Build Computer Vision Web App with Python, OpenCV and Mercury](https://mljar.com/blog/computer-vision-app-python-opencv-mercury/) on MLJAR Blog by Piotr & Aleksandra
 
 - [Mercury — Convert Jupyter Notebook to a web app by adding YAML header](https://medium.com/@MLJARofficial/mercury-convert-jupyter-notebook-to-a-web-app-by-adding-yaml-header-872ce4e53676) on Medium by Piotr Płoński
+
+If you created an article about Mercury please let us know by email (contact@mljar.com) we will add it to the list. Thanks!
