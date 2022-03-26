@@ -1,9 +1,15 @@
+<h1> Admin Panel </h1>
 
+Admin Panel is the place where you can manage all things that are logged to the Mercury's database:
 
+- add/delete/upade notebooks
+- access to all tasks executed 
+- add/delete/update users (only for Pro)
+- add/detele/update groups (only for Pro)
 
-## Admin Panel
+### Set up Admin Panel
 
-To access the Admin Panel in the Mercury you need to define three more variables in `.env` file:
+You need to define three environment variables during the deployment to access the Admin Panel. You can do this by adding them in `.env` file if you are using `docker-compose` method for [deployment](/deploy/deployment):
 
 ```
 DJANGO_SUPERUSER_USERNAME=your_user_name
@@ -11,24 +17,18 @@ DJANGO_SUPERUSER_PASSWORD=your_secret_password
 DJANGO_SUPERUSER_EMAIL=your_email
 ```
 
-Please add the above to the `.env` and to the Heroku with `heroku config:set` command.
-
-## Django SECRET_KEY
-
-For better security please set your own SECRET_KEY in `.env` file and apply changes to Heroku.
-
-My example `.env` file:
-```
-SERVE_STATIC=False
-DJANGO_SUPERUSER_USERNAME=piotr
-DJANGO_SUPERUSER_PASSWORD=secret
-DJANGO_SUPERUSER_EMAIL=piotr@piotr.pl
-SECRET_KEY="x3%q8fs(-q3i(m&=e1g%9xtvcn*q!c%i@v0*ha4@ow2crdktpw"
-```
-
-You can generate `SECRET_KEY` with the following command:
+If you are not using `docker-compose` for deployment, then the process of setting environment variables depends on the cloud provider where you deploy the Mercury. For example in Heroku, you can set them with command line:
 
 ```
-python -c 'from django.core.management.utils import get_random_secret_key; \
-            print(get_random_secret_key())'
+heroku config:set DJANGO_SUPERUSER_USERNAME=your_user_name
+heroku config:set DJANGO_SUPERUSER_PASSWORD=your_secret_password
+heroku config:set DJANGO_SUPERUSER_EMAIL=your_email
 ```
+
+!!! note "Admin Panel locally"
+
+    You can set Admin Panel when running Mercury locally. Please run the command `mercury createsuperuser` and follow the instructions on the terminal.
+    
+## Log in to Admin Panel
+
+Please add `/admin` to your URL 
