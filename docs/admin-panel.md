@@ -77,19 +77,68 @@ The
 
 ## Users
 
-Please click `Users` to see your users.
+Please click `Users` to see your users. You will see the view like in the screenshot below:
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel users"
+    src="../media/admin_users.png" width="100%" />    
+
+To add a new user please click `ADD USER` button in the top right corner. You will see the view asking for username and password:
 
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel add user"
     src="../media/admin_add_user.png" width="100%" />    
 
+Please click `SAVE` you will be asked for personal information: first name, last name and email address.
+
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel user personal info"
     src="../media/admin_personal_info.png" width="100%" />    
 
+Please scroll down and fill the `Last login` time (click `Today` and `Now`). Please click `SAVE` button to have user account created. 
+
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel add user save"
     src="../media/admin_add_user_save.png" width="100%" />    
+
+## Mercury Groups
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel group"
+    src="../media/admin_groups.png" width="100%" />    
+
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel add group"
+    src="../media/admin_add_group.png" width="100%" />    
+
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel group"
+    src="../media/admin_group_added.png" width="100%" />    
+
+## Mercury Membership
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel Memberships"
+    src="../media/admin_memberships.png" width="100%" />    
+
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel add membership"
+    src="../media/admin_add_membership.png" width="100%" />    
+
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel membership added"
+    src="../media/admin_membership_added.png" width="100%" />    
