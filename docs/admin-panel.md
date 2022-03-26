@@ -31,4 +31,65 @@ heroku config:set DJANGO_SUPERUSER_EMAIL=your_email
     
 ## Log in to Admin Panel
 
-Please add `/admin` to your URL 
+Please add `/admin` to your server URL. For example, the mercury is running at: `https://mercury.mljar.com` then the Admin Panel address is `https://mercury.mljar.com/admin`. You should see the log in view:
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Log in view to Admin Panel"
+    src="../media/admin_login.png" width="100%" />
+
+Please provide the username and password used in setup and click `Log in` button.
+
+!!! note "Running Mercury without domain"
+
+    You can run Mercury without domain. You will enter the IP address to see the Mercury service. To view the Admin Panel you need to extend the IP address with `/admin`. For example, your Mercury instance is running at `54.30.24.211` then the Admin Panel is available at `54.30.24.211/admin`.
+
+## Admin Panel view
+
+After successful log in you will see the Admin Panel. Below is the view of Admin Panel in the open-source version and in the Pro version (available in [commercial license](https://mljar.com/pricing))
+
+The open-source Admin Panel view:
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel"
+    src="../media/admin_panel.png" width="100%" />
+
+
+The Pro Admin Panel view:
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel Pro"
+    src="../media/admin_panel_pro.png" width="100%" />    
+
+## Notebooks
+
+Please click `Notebooks` to see your notebooks available in the Mercury.
+
+- To delete the notebook please select the notebook and select the action at the top of the list. 
+- To update the notebook please click in the notebook id. The edit view will be available.
+- There is option to add a notebook in the Admin Panel, but it is not recommended. Please use `mercury add` command to add notebooks to the Mercury.
+
+The 
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel Notebooks"
+    src="../media/admin_notebooks.png" width="100%" />    
+
+## Users
+
+Please click `Users` to see your users.
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel add user"
+    src="../media/admin_add_user.png" width="100%" />    
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel user personal info"
+    src="../media/admin_personal_info.png" width="100%" />    
+
+<img 
+    style="border: 1px solid #e1e4e5"
+    alt="Admin Panel add user save"
+    src="../media/admin_add_user_save.png" width="100%" />    
