@@ -105,39 +105,45 @@ Please scroll down and fill the `Last login` time (click `Today` and `Now`). Ple
     alt="Admin Panel add user save"
     src="../media/admin_add_user_save.png" width="100%" />    
 
-## Mercury Groups
+## Groups
 
+Mercury groups can be used to share a notebook with selected group of users. The first step is to create a group. Then users need to be added to the group by creating the membership.
+
+The empty list of Merucry groups:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel group"
     src="../media/admin_groups.png" width="100%" />    
 
-
+Please click `ADD MERCURY GROUP` and fill the form:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel add group"
     src="../media/admin_add_group.png" width="100%" />    
 
-
+The view after adding a first group:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel group"
     src="../media/admin_group_added.png" width="100%" />    
 
-## Mercury Membership
+## Membership
 
+To add users in the group please create a Mercury membership.
+
+The empty list of memberships:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel Memberships"
     src="../media/admin_memberships.png" width="100%" />    
 
-
+Please click `ADD MEMBERSHIP` and select user and group:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel add membership"
     src="../media/admin_add_membership.png" width="100%" />    
 
-
+The view after successfull creation of the membership:
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Admin Panel membership added"
