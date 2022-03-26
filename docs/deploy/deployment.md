@@ -16,7 +16,11 @@ In Heroku you need to add `Procfile` file with the command instruction for `web`
 web: mercury run 0.0.0.0:$PORT
 ```
 
-Please remember to add the above `Procfile` to the GitHub repository.
+Please remember to add the above `Procfile` to the GitHub repository. 
+
+!!! important "Required packages"
+
+    Before deployement, you need to add `requrements.txt` file with needed packages to the repository.
 
 ## Deploy with `docker-compose`
 
