@@ -69,7 +69,7 @@ def task_execute(self, job_params):
             if k in task_params:
                 if v["input"] == "text":
                     task_value = task_params[k]
-                    inject_code += f'{k} = "{sanitize_string(task_value)}"\n'
+                    inject_code += f'{k} = """{sanitize_string(task_value)}"""\n'
                     use_default = False
 
                 elif v["input"] == "file":
