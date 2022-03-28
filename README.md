@@ -23,7 +23,9 @@ Mercury is a perfect tool to convert Python notebook to web app and share with n
 
 Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
 
-📚 [Mercury documentation](https://mercury-docs.readthedocs.io)
+## Documentation
+
+📚 [Mercury documentation](https://mercury-docs.readthedocs.io) :books:
 
 ## Installation
 
@@ -119,7 +121,7 @@ Allowed parameters in YAML config:
 - `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
 - `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` prompt information will be displayed for each cell in the notebook.
 - `share` - the comma separated list of users that can see the notebook. Default is set to `public` which means that all users can see the notebook. It can be set to `private` which means that only authenticated users can see the notebook. It can be set to the list of users, for example `username1, username2, username3`, which means that only users with username on the list can see the notebook. The last option is list the groups of users that can see the notebook, for example `group1, group2` - all users in the `group1` and `group2` will be able to see the notebook. You can mix group names and user names in the `share` parameter. The users and groups should be created in the Admin Panel. The sharing feature is only available to commercial users. 
-- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the sidebar. Each parameter should have an unique name that corresponds to the variable name used in the code. Read more about available widgets in `params` in the [documentation](https://github.com/mljar/mercury/wiki/Widgets).
+- `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the sidebar. Each parameter should have an unique name that corresponds to the variable name used in the code. Read more about available widgets in `params` in the [documentation](https://mercury-docs.readthedocs.io/en/latest/widgets/).
 
 ## Define widget with YAML
 
@@ -141,9 +143,9 @@ To define the widget you need to select the input type. It can be: `text`, `slid
 
 For each input we need to define a `label`. It will be a text displayed above (or near) the widget.
 
-#### Widgets documentation
+#### Widgets documentation 🧰 
 
-You can read more about widgets in our [wiki page](https://github.com/mljar/mercury/wiki/Widgets).
+You can read more about widgets in our [documentation](https://mercury-docs.readthedocs.io/en/latest/widgets/).
 
 ## Output files
 
@@ -274,13 +276,12 @@ mercury list
 
 ## Running in production
 
-Running in production is easy. We provide several tutorials on how it can be done.
+Running in production is easy. There are two ways it can be done:
 
-- [Deploy to Heroku](https://github.com/mljar/mercury/wiki/Deploy-to-Heroku) (using free dyno) 
-- [Deploy to AWS EC2](https://github.com/mljar/mercury/wiki/Deploy-to-AWS-EC2) (using t2.micro) 
-- Deploy to Digital Ocean (comming soon)
-- Deploy to GCP (comming soon)
-- Deploy to Azure (comming soon)
+- deploy with `mercury run` command,
+- deploy with `docker-compose`
+
+Please check our [documentation](https://mercury-docs.readthedocs.io/en/latest/deploy/deployment/) for details.
 
 ## Running with `docker-compose`
 
