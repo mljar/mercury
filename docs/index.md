@@ -23,3 +23,4 @@ Mercury is a perfect tool to convert Python notebook into a web app and share wi
 
 Mercury is dual-licensed. The main features are available in the open-source version. It is perfect for quick demos, educational purposes, sharing notebooks with friends. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
 
+The Mercury repository is at [https://github.com/mljar/mercury](https://github.com/mljar/mercury).
