@@ -48,15 +48,15 @@ The `docker-compose` version is using `nginx` server.
 
 ## Deploy with `docker-compose` with Pro features
 
-Please specify your GitHub personal access token in `.env` file to enable Pro features.
+Please specify your GitHub personal access token in the `.env` file to enable Pro features.
 
-To build the containers:
+To build containers:
 
 ```
 docker-compose -f docker-compose-pro.yml build
 ```
 
-To run containers in detached mode:
+To run containers in the detached mode:
 
 ```
 docker-compose -f docker-compose-pro.yml up -d
