@@ -92,9 +92,9 @@ The web app is generated from the notebook. Code is hidden (optional). User can 
 ## 💻 Demo
 
 The demos with several example notebooks are running at: 
-- [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance)
-- [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (running on Heroku, if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little)
-- [https://sketch-app-mercury.herokuapp.com/](https://sketch-app-mercury.herokuapp.com/) - sketch app for converting photos to sketches with [code](https://github.com/pplonski/artistic-sketches-jupyter-mercury)
+- [![Open in Mercury](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/open_in_mercury.svg)](http://mercury.mljar.com) [http://mercury.mljar.com](http://mercury.mljar.com) (running on AWS EC2 t3a.small instance) 
+- [![Open in Mercury](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/open_in_mercury.svg)](http://mercury-demo-1.herokuapp.com) [http://mercury-demo-1.herokuapp.com](http://mercury-demo-1.herokuapp.com) (running on Heroku, if dyno is sleeping and notebooks are not loaded, please refresh it and wait a little) 
+- [![Open in Mercury](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/open_in_mercury.svg)](https://sketch-app-mercury.herokuapp.com/) [https://sketch-app-mercury.herokuapp.com/](https://sketch-app-mercury.herokuapp.com/) - sketch app for converting photos to sketches with [code](https://github.com/pplonski/artistic-sketches-jupyter-mercury) 
 
 ![](https://github.com/pplonski/artistic-sketches-jupyter-mercury/blob/main/media/mercury_demo.gif)
 
