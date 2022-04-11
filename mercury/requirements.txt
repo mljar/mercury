@@ -5,7 +5,7 @@ markdown==3.3.6
 celery==5.1.2
 sqlalchemy==1.4.27
 gevent==21.12.0
-nbconvert==6.4.3
+nbconvert>=6.5.0
 ipython_genutils
 nbconvert==6.4.3
 pyyaml==6.0
