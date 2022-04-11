@@ -7,7 +7,6 @@ sqlalchemy==1.4.27
 gevent==21.12.0
 nbconvert>=6.5.0
 ipython_genutils
-nbconvert==6.4.3
 pyyaml==6.0
 django-cors-headers==3.10.1
 ipython==7.30.1
