@@ -27,13 +27,16 @@ import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 
-function App() {
+type AppProps = {
+  isSingleApp: boolean;
+  notebookId: number;
+  displayEmbed: boolean;
+};
+
+function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const dispatch = useDispatch();
-  const { notebook_id } = useParams<{ notebook_id: string }>();
-  const notebookId = Number(notebook_id);
   const notebook = useSelector(getSelectedNotebook);
   const loadingState = useSelector(getLoadingStateSelected);
-  // const watchModeCounter = useSelector(getWatchModeCounter);
   const task = useSelector(getCurrentTask);
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
@@ -41,9 +44,6 @@ function App() {
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
-
-  const { embed } = useParams<{ embed: string }>();
-  let displayEmbed = !!(embed && embed === "embed");
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -126,10 +126,10 @@ function App() {
 
       <div className="container-fluid">
         <div className="row">
-          <WatchModeComponent />
+          <WatchModeComponent notebookId={notebookId} />
           <SideBar
             notebookTitle={notebook.title}
-            notebookId={Number(notebook_id)}
+            notebookId={notebookId}
             loadingState={loadingState}
             waiting={waitForTask()}
             widgetsParams={notebook?.params?.params}
@@ -165,5 +165,5 @@ function App() {
   );
 }
 
-const AppView = withRouter(App);
+const AppView = App;
 export default AppView;

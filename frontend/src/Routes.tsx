@@ -5,9 +5,9 @@ import { Switch, Route } from "react-router-dom";
 import { setToken, setUsername } from "./components/authSlice";
 import { fetchVersion } from "./components/versionSlice";
 import { getSessionId } from "./utils";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppMultiView from "./views/AppMultiView";
 import AccountView from "./views/AccountView";
-
-import AppView from "./views/AppView";
 import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
 type Props = {
@@ -31,19 +31,24 @@ export default function Routes() {
     if (localStorage.getItem("username")) {
       dispatch(setUsername(localStorage.getItem("username")));
     }
-    
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <App>
-      <Switch>
-        <Route exact path="/" component={HomeView} />
-        <Route exact path="/app/:notebook_id/:embed?" component={AppView} />
-        <Route exact path="/login" component={LoginView} />
-        <Route exact path="/account" component={AccountView} />
-        
-      </Switch>
-    </App>
+    <Router>
+      <App>
+        <Switch>
+          <Route exact path="/" component={HomeView} />
+          <Route
+            exact
+            path="/app/:notebook_id/:embed?"
+            component={AppMultiView}
+          />
+          <Route exact path="/login" component={LoginView} />
+          <Route exact path="/account" component={AccountView} />
+        </Switch>
+      </App>
+    </Router>
   );
 }

@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { withRouter } from "react-router-dom";
-import { useParams } from "react-router-dom";
 import { fetchCurrentTask } from "../tasks/tasksSlice";
 
 import {
@@ -10,10 +8,12 @@ import {
   getWatchModeCounter,
 } from "./Notebooks/notebooksSlice";
 
-function WatchMode() {
+type Props = {
+  notebookId: number;
+};
+
+function WatchMode({ notebookId }: Props) {
   const dispatch = useDispatch();
-  const { notebook_id } = useParams<{ notebook_id: string }>();
-  const notebookId = Number(notebook_id);
   const notebook = useSelector(getSelectedNotebook);
   const watchModeCounter = useSelector(getWatchModeCounter);
 
@@ -33,5 +33,5 @@ function WatchMode() {
   return <div></div>;
 }
 
-const WatchModeComponent = withRouter(WatchMode);
+const WatchModeComponent = WatchMode;
 export default WatchModeComponent;

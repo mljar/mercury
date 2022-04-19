@@ -21,6 +21,9 @@ if (window.location.origin === "http://localhost:3000") {
 } else {
   axios.defaults.baseURL = window.location.origin;
 }
+if (window.location.origin === "https://hf.space") {
+  axios.defaults.baseURL = window.location.href;
+}
 
 document.addEventListener("DOMContentLoaded", () =>
   render(
