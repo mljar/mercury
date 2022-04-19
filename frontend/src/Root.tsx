@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import { History } from "history";
 import { Store } from "./store";
 import Routes from "./Routes";
+import SingleRoute from "./SingleRoute";
 
 type Props = {
   store: Store;
