@@ -6,6 +6,7 @@ media/
 venv/
 menv/
 frontend-dist/
+frontend-single-site-dist/
 *.egg-info*
 static/
 dist/
