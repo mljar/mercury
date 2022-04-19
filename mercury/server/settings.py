@@ -30,8 +30,35 @@ if is_pro:
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-FRONTEND_BUILD_DIR = BASE_DIR / "frontend-dist"
-FRONTEND_STATIC_DIR = BASE_DIR / "frontend-dist" / "static"
+# if HF_SPACE is defined we will use single notebook frontend
+HF_SPACE = os.environ.get("HF_SPACE")
+if HF_SPACE is None:
+    FRONTEND_BUILD_DIR = BASE_DIR / "frontend-dist"
+    FRONTEND_STATIC_DIR = BASE_DIR / "frontend-dist" / "static"
+else:
+    FRONTEND_BUILD_DIR = BASE_DIR / "frontend-single-site-dist"
+    FRONTEND_STATIC_DIR = BASE_DIR / "frontend-single-site-dist" / "static"
+
+    for d in [FRONTEND_BUILD_DIR, FRONTEND_BUILD_DIR / "static" / "css", FRONTEND_BUILD_DIR / "static" / "js"]:
+        for f in os.listdir(d):
+
+            fpath = os.path.join(d, f)
+            if not os.path.isfile(fpath):
+                continue
+            if fpath.endswith(".ico"):
+                continue
+
+            content = ""
+            with open(fpath, "r") as fin:
+                content = fin.read() 
+            if HF_SPACE == "local":
+                content = content.replace("http://mydomain.com/example/to/replace/", "")
+            else:
+                content = content.replace("example/to/replace", HF_SPACE)
+
+            with open(fpath, "w") as fout:
+                fout.write(content) 
+
 
 DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
 DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")

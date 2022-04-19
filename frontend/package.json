@@ -50,6 +50,7 @@
     "start": "REACT_APP_LOCAL_URL=\"\" react-scripts start",
     "build": "REACT_APP_LOCAL_URL=\"\" react-scripts build",
     "local-build": "REACT_APP_LOCAL_URL=\"/static\" react-scripts build && mv build/ ../mercury/frontend-dist",
+    "local-single-site-build": "REACT_APP_LOCAL_URL=\"/static\" react-scripts build && mv build/ ../mercury/frontend-single-site-dist",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
