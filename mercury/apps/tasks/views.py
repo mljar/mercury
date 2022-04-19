@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from requests import request
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
@@ -12,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.notebooks.models import Notebook
-from apps.notebooks.views import NotebookListView
+from apps.notebooks.views import notebooks_queryset
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
 from apps.tasks.tasks import task_execute
@@ -24,9 +25,8 @@ class TaskCreateView(CreateAPIView):
     queryset = Task.objects.all()
 
     def perform_create(self, serializer):
-        list_view = NotebookListView(request=self.request)
         notebook = get_object_or_404(
-            list_view.get_queryset(), pk=self.kwargs["notebook_id"]
+            notebooks_queryset(self.request), pk=self.kwargs["notebook_id"]
         )
         try:
             with transaction.atomic():

@@ -1,3 +1,4 @@
+from django.http import HttpResponse, JsonResponse
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -13,37 +14,40 @@ from server.settings import is_pro
 if is_pro:
     from pro.accounts.models import Membership
 
+def in_commas(word):
+    return "," + word + ","
 
-class NotebookListView(viewsets.ReadOnlyModelViewSet):
+def notebooks_queryset(request):
+    if not is_pro:
+        return Notebook.objects.all()
 
-    serializer_class = NotebookSerializer
+    user = request.user
+    if user.is_anonymous:
+        return Notebook.objects.filter(share=in_commas("public"))
 
-    def in_commas(self, word):
-        return "," + word + ","
+    q_list = (
+        Q(share=in_commas("public"))
+        | Q(share=in_commas("private"))
+        | Q(share__icontains=in_commas(user.username))
+    )
 
-    def get_queryset(self):
-        if not is_pro:
-            return Notebook.objects.all()
+    for m in Membership.objects.filter(user=user):
+        q_list |= Q(share__icontains=in_commas(m.group.name))
 
-        user = self.request.user
-        if user.is_anonymous:
-            return Notebook.objects.filter(share=self.in_commas("public"))
+    return Notebook.objects.filter(q_list)
 
-        q_list = (
-            Q(share=self.in_commas("public"))
-            | Q(share=self.in_commas("private"))
-            | Q(share__icontains=self.in_commas(user.username))
-        )
+class ListNotebooks(APIView):
+    def get(self, request, format=None):
+        notebooks = notebooks_queryset(request)
+        serializer = NotebookSerializer(notebooks, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
-        for m in Membership.objects.filter(user=user):
-            q_list |= Q(share__icontains=self.in_commas(m.group.name))
-
-        return Notebook.objects.filter(q_list)
-
-    def retrieve(self, request, pk=None):
-        notebook = get_object_or_404(self.get_queryset(), pk=pk)
+class RetrieveNotebook(APIView):
+    def get(self, request, notebook_id, format=None):
+        pk = int(notebook_id.replace("/", ""))
+        notebook = get_object_or_404(notebooks_queryset(request), pk=pk)
         serializer = NotebookSerializer(notebook)
         if notebook.state.startswith("WATCH"):
             task_watch.delay(notebook.id)
 
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)

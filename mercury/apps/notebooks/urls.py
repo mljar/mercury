@@ -1,8 +1,12 @@
-from django.conf.urls import include, url
-from rest_framework.routers import DefaultRouter
+from django.conf.urls import url
 
-from apps.notebooks.views import NotebookListView
 
-router = DefaultRouter()
-router.register("notebooks", NotebookListView, basename="notebooks")
-notebooks_urlpatterns = [url("api/v1/", include(router.urls))]
+from apps.notebooks.views import (
+    ListNotebooks,
+    RetrieveNotebook
+)
+
+notebooks_urlpatterns = [
+    url("api/v1/notebooks/(?P<notebook_id>.+)", RetrieveNotebook.as_view()),
+    url("api/v1/notebooks", ListNotebooks.as_view()),
+]
