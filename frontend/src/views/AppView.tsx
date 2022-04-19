@@ -4,8 +4,6 @@ import "./App.css";
 import NavBar from "../components/NavBar";
 import SideBar from "../components/SideBar";
 import MainView from "../components/MainView";
-import { withRouter } from "react-router-dom";
-import { useParams } from "react-router-dom";
 
 import {
   fetchNotebook,
