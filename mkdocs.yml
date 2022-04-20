@@ -17,6 +17,7 @@ nav:
   - Deploy: 
     - deploy/deployment.md
     - Deploy on Heroku: deploy/heroku.md
+    - Deploy on Hugging Face: deploy/hugging-face-spaces.md
     - Deploy on AWS: deploy/aws.md
     - HTTPS Support: deploy/https-support.md
     
