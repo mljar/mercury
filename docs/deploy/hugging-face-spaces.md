@@ -57,6 +57,13 @@ The file `app.py` can be added at HF Space website (`Add file` -> `Create a new 
 
 Please upload the notebook with Mercury YAML configuration in the first RAM cell. It can be done with `Add file` -> `Upload file`. The file that I upload is called `demo.ipynb` and is simple notebook that display greetings.
 
+<p>
+  <img 
+    style="border: 1px solid #e1e4e5"
+    alt="Greetings Notebook with YAML config"
+    src="../../media/greetings-notebook.png" width="100%" />
+</p>
+
 ## Running the app
 
 Please wait a while till the Space in built. After successfull build you should be able to click `App` on the top left corner. The application should be ready to use.
