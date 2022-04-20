@@ -74,7 +74,7 @@ The interesting thing is that you can run standalone web app from HF. Just need 
 My space link is: [https://huggingface.co/spaces/pplonski/deploy-mercury](https://huggingface.co/spaces/pplonski/deploy-mercury) based on my username (`pplonski`) and Space name (`deploy-mercury`) I construct the link: [https://hf.space/embed/pplonski/deploy-mercury](https://hf.space/embed/pplonski/deploy-mercury). This link can be used for example for embedding notebooks on the website like below:
 
 
-<iframe src="https://hf.space/embed/pplonski/deploy-mercury" height="700px" width="900px" style="border: 1px solid #aaa"/>
+<iframe src="https://hf.space/embed/pplonski/deploy-mercury" height="700px" width="1200px" style="border: 1px solid #aaa"/>
 
 
 The code to create embedded notebook:
