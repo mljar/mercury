@@ -16,10 +16,7 @@ You can enter slides navigation by pressing `Esc` key. You can select any slide 
 
 ### Example
 
-You can check the demo slides running at HuggingFace Spaces at [https://huggingface.co/spaces/pplonski/interactive-presentation](https://huggingface.co/spaces/pplonski/interactive-presentation).
-
-
-The example YAML configuration:
+The example YAML configuration for creating interactive slides:
 
 ```yaml
 title: My app
@@ -27,6 +24,9 @@ description: My amazing app
 output: slides
 # ... the rest of the config ...
 ```
+
+
+You can check the demo slides running at HuggingFace Spaces at [https://huggingface.co/spaces/pplonski/interactive-presentation](https://huggingface.co/spaces/pplonski/interactive-presentation).
 
 <img 
     style="border: 1px solid #e1e4e5"
