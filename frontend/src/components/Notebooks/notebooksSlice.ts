@@ -6,7 +6,6 @@ import {
   Dispatch,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { createDispatchHook } from 'react-redux';
 
 import { RootState } from '../../store';
 import { IWidget } from '../Widgets/Types';

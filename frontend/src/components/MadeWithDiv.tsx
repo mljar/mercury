@@ -4,7 +4,7 @@ export default function MadeWithDiv() {
   return (
     <a href="https://mljar.com/mercury" target="_blank" rel="noreferrer">
       <div className="poweredby">
-        <div className="text-muted text-center"> Made with </div>
+        {/* <div className="text-muted text-center"> Made with </div> */}
         <div>
           <img
             alt="Mercury"
@@ -13,7 +13,7 @@ export default function MadeWithDiv() {
               process.env.REACT_APP_LOCAL_URL +
               "/mercury_logo.svg"
             }
-            style={{ height: "30px" }}
+            style={{ height: "20px" }}
           />
         </div>
       </div>

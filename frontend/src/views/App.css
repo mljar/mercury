@@ -166,7 +166,8 @@ div[role="slider"]:focus,
 
 .poweredby {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  border: 1px solid #e5e5e5;
+  /* bottom: 10px; */
+  top: 5px;
+  right: 5px;
+  /* border: 1px solid #e5e5e5; */
 }
