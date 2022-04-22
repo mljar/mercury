@@ -97,6 +97,7 @@ def task_init_notebook(
             "author": "Please provide author",
             "description": "Please provide description",
             "share": "public",
+            "output": "app",
         }
         nb = None
         update_notebook = False
@@ -138,6 +139,7 @@ def task_init_notebook(
 
         notebook_title = params.get("title", "")
         notebook_share = params.get("share", "public")
+        notebook_output = params.get("output", "app")
 
         # make sure that there are commas and no spaces between commas
         notebook_share = (
@@ -160,7 +162,7 @@ def task_init_notebook(
                 "--output-dir",
                 settings.MEDIA_ROOT,
                 "--to",
-                "html",
+                "slides" if notebook_output == "slides" else "html",
                 "--Application.log_level=40",  # 30 is default, 40 is ERROR, 50 is Critical
             ]
             if "show-code" in params and not params["show-code"]:
@@ -177,6 +179,13 @@ def task_init_notebook(
             error_msg = process_nbconvert_errors(error_msg)
             if error_msg != "":
                 print(error_msg)
+
+            # change file name if needed 
+            if notebook_output == "slides":
+                expected_fpath = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html")
+                slides_fpath = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.slides.html")
+                if os.path.exists(slides_fpath):
+                    os.rename(slides_fpath, expected_fpath)
 
             if "--no-input" in command:
                 with open(
@@ -209,6 +218,7 @@ def task_init_notebook(
                 file_updated_at=make_aware(
                     datetime.fromtimestamp(os.path.getmtime(notebook_path))
                 ),
+                output=notebook_output,
             )
         else:
 
@@ -228,6 +238,7 @@ def task_init_notebook(
             notebook.file_updated_at = make_aware(
                 datetime.fromtimestamp(os.path.getmtime(notebook_path))
             )
+            notebook.output = notebook_output
 
         notebook.save()
         return notebook.id

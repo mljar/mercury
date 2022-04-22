@@ -228,7 +228,8 @@ def task_execute(self, job_params):
                     old_parameters_index = get_parameters_cell_index(
                         nb["cells"], all_variables
                     )
-                    if old_parameters_index != -1:
+                    if old_parameters_index != -1 and old_parameters_index < len(nb["cells"]):
+                        new_cell["metadata"] = nb["cells"][old_parameters_index].get("metadata", {})
                         del nb["cells"][old_parameters_index]
                         nb["cells"].insert(
                             old_parameters_index, nbformat.from_dict(new_cell)
@@ -253,7 +254,7 @@ def task_execute(self, job_params):
             "--output-dir",
             str(wrk_dir),
             "--to",
-            "html",
+            "slides" if notebook.output == "slides" else "html",
         ]
         if "show-code" in notebook_params and not notebook_params["show-code"]:
             command += ["--no-input"]
@@ -270,6 +271,13 @@ def task_execute(self, job_params):
 
         # check if output file exists
         output_html_path = os.path.join(str(wrk_dir), wrk_output_nb_file)
+        
+        # change file name if needed 
+        if notebook.output == "slides":
+            slides_fpath = os.path.join(str(wrk_dir), f"{wrk_output_nb_file}.slides.html")
+            if os.path.exists(slides_fpath):
+                os.rename(slides_fpath, output_html_path)
+
 
         if os.path.isfile(output_html_path):
             if "--no-input" in command:

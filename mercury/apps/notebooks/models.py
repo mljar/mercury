@@ -11,3 +11,4 @@ class Notebook(models.Model):
     params = models.TextField(blank=True)
     state = models.CharField(max_length=128, blank=True)
     default_view_path = models.CharField(max_length=1024, blank=True)
+    output = models.CharField(max_length=128, blank=True)

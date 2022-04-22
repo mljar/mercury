@@ -18,4 +18,5 @@ class NotebookSerializer(serializers.ModelSerializer):
             "params",
             "state",
             "default_view_path",
+            "output",
         )

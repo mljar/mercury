@@ -29,6 +29,7 @@ export interface INotebook {
   params: INotebookParams;
   state: string;
   default_view_path: string;
+  output: string;
 }
 
 const initialState = {
