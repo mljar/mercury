@@ -9,6 +9,7 @@ import axios from 'axios';
 import { RootState } from '../store';
 import { toast } from "react-toastify";
 import { getSessionId } from '../utils';
+import { setSlidesHash } from '../components/Notebooks/notebooksSlice';
 
 export interface ITask {
     id: number;
@@ -61,6 +62,17 @@ export const fetchCurrentTask =
 
         };
 
+const scrapeSlidesHash = () => {
+    try {
+        const iframeElement = (document.getElementById("main-iframe") as HTMLIFrameElement)
+        const hash = iframeElement?.contentWindow?.location?.hash;
+        if(hash) {
+            return hash;
+        }
+    } catch(error) { }
+    return "";
+}
+
 
 export const executeNotebook =
     (notebookId: Number) =>
@@ -68,6 +80,9 @@ export const executeNotebook =
             const { widgets } = getState().widgets;
             const sessionId = getSessionId();
 
+            const slidesHash = scrapeSlidesHash();
+            dispatch(setSlidesHash(slidesHash));
+            
             try {
                 const task = {
                     session_id: sessionId,

@@ -14,6 +14,7 @@ type MainViewProps = {
   displayEmbed: boolean;
   isPro: boolean;
   username: string;
+  slidesHash: string;
 };
 
 export default function MainView({
@@ -25,6 +26,7 @@ export default function MainView({
   displayEmbed,
   isPro,
   username,
+  slidesHash,
 }: MainViewProps) {
   const { height } = useWindowDimensions();
 
@@ -81,8 +83,9 @@ export default function MainView({
               width="100%"
               height={iframeHeight}
               key={notebookPath}
-              src={`${axios.defaults.baseURL}${notebookPath}`}
+              src={`${axios.defaults.baseURL}${notebookPath}${slidesHash}`}
               title="display"
+              id="main-iframe"
             ></iframe>
           )}
         </div>

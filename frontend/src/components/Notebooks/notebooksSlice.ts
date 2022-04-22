@@ -6,6 +6,7 @@ import {
   Dispatch,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { createDispatchHook } from 'react-redux';
 
 import { RootState } from '../../store';
 import { IWidget } from '../Widgets/Types';
@@ -30,6 +31,7 @@ export interface INotebook {
   state: string;
   default_view_path: string;
   output: string;
+  slidesHash: string;
 }
 
 const initialState = {
@@ -37,7 +39,8 @@ const initialState = {
   loadingState: "loading",
   selectedNotebook: {} as INotebook,
   loadingStateSelected: "loading",
-  watchModeCounter: 0
+  watchModeCounter: 0,
+  slidesHash: "",
 };
 
 const notebooksSlice = createSlice({
@@ -64,6 +67,9 @@ const notebooksSlice = createSlice({
     setLoadingStateSelected(state, action: PayloadAction<string>) {
       state.loadingStateSelected = action.payload;
     },
+    setSlidesHash(state, action: PayloadAction<string>) {
+      state.slidesHash = action.payload;
+    },
   },
 });
 
@@ -74,6 +80,7 @@ export const {
   setLoadingState,
   setSelectedNotebook,
   setLoadingStateSelected,
+  setSlidesHash,
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;
@@ -81,11 +88,13 @@ export const getLoadingState = (state: RootState) => state.notebooks.loadingStat
 export const getSelectedNotebook = (state: RootState) => state.notebooks.selectedNotebook;
 export const getLoadingStateSelected = (state: RootState) => state.notebooks.loadingStateSelected;
 export const getWatchModeCounter = (state: RootState) => state.notebooks.watchModeCounter;
+export const getSlidesHash = (state: RootState) => state.notebooks.slidesHash;
 
 export const fetchNotebooks =
   () =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
+        dispatch(setSlidesHash(""));
         dispatch(setLoadingState("loading"))
         const url = '/api/v1/notebooks/';
         const { data } = await axios.get(url);
@@ -110,6 +119,7 @@ export const fetchNotebook =
   (id: number, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
+        dispatch(setSlidesHash(""));
         if (!silent) {
           dispatch(setLoadingStateSelected("loading"))
         }

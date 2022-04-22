@@ -9,6 +9,7 @@ import {
   fetchNotebook,
   getLoadingStateSelected,
   getSelectedNotebook,
+  getSlidesHash,
   // getWatchModeCounter,
 } from "../components/Notebooks/notebooksSlice";
 import { fetchCurrentTask, getCurrentTask } from "../tasks/tasksSlice";
@@ -42,6 +43,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
+  const slidesHash = useSelector(getSlidesHash);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -146,6 +148,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               displayEmbed={displayEmbed}
               isPro={isPro}
               username={username}
+              slidesHash={slidesHash}
             />
           )}
           {appView === "files" && (
