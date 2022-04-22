@@ -18,6 +18,16 @@ You can enter slides navigation by pressing `Esc` key. You can select any slide 
 
 You can check the demo slides running at HuggingFace Spaces at [https://huggingface.co/spaces/pplonski/interactive-presentation](https://huggingface.co/spaces/pplonski/interactive-presentation).
 
+
+The example YAML configuration:
+
+```yaml
+title: My app
+description: My amazing app
+output: slides
+# ... the rest of the config ...
+```
+
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Interactive slides in Mercury"
