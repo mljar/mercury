@@ -98,6 +98,13 @@ The demos with several example notebooks are running at:
 
 ![](https://github.com/pplonski/artistic-sketches-jupyter-mercury/blob/main/media/mercury_demo.gif)
 
+## Interactive slides
+
+You can easily do interactive slides from the notebook and serve them with Mercury. Please check the [docs](https://mercury-docs.readthedocs.io/en/latest/interactive-slides/). Below is example demo:
+
+![Interactive Slides](https://mercury-docs.readthedocs.io/en/latest/media/interactive-slides-mercury-demo.gif)
+
+
 ## 🛠️ Convert Notebook to web app with YAML
 
 You need to add YAML at the beginning of the notebook to be able to run it as a web application in the Mercury. The YAML configuration should be added as a **Raw** cell in the notebook. It should start and end with a line containing "---". Below examples of how it should look like in the Jupyter Notebook and Jupyter Lab:
@@ -112,6 +119,7 @@ You need to add YAML at the beginning of the notebook to be able to run it as a 
     
 </p>
 
+### YAML configuration
 
 Allowed parameters in YAML config:
 
@@ -121,6 +129,7 @@ Allowed parameters in YAML config:
 - `show-code` - can be `True` or `False`. Default is set to `True`. It decides if the notebook's code will be displayed or not.
 - `show-prompt` - can be `True` or `False`. Default is set to `True`. If set to `True` prompt information will be displayed for each cell in the notebook.
 - `share` - the comma separated list of users that can see the notebook. Default is set to `public` which means that all users can see the notebook. It can be set to `private` which means that only authenticated users can see the notebook. It can be set to the list of users, for example `username1, username2, username3`, which means that only users with username on the list can see the notebook. The last option is list the groups of users that can see the notebook, for example `group1, group2` - all users in the `group1` and `group2` will be able to see the notebook. You can mix group names and user names in the `share` parameter. The users and groups should be created in the Admin Panel. The sharing feature is only available to commercial users. 
+- `output` - the type of the resulting notebook. It can be `app` or `slides`. The default is set to `app`.
 - `params` - the parameters that will be used in the notebook. They will be displayed as interactive widgets in the sidebar. Each parameter should have an unique name that corresponds to the variable name used in the code. Read more about available widgets in `params` in the [documentation](https://mercury-docs.readthedocs.io/en/latest/widgets/).
 
 ## Define widget with YAML
