@@ -20,6 +20,7 @@ try:
     # it is available only for commercial users
     # you can check available license at https://mljar.com/pricing
     import pro
+
     is_pro = True
 except ImportError:
     pass
@@ -39,7 +40,11 @@ else:
     FRONTEND_BUILD_DIR = BASE_DIR / "frontend-single-site-dist"
     FRONTEND_STATIC_DIR = BASE_DIR / "frontend-single-site-dist" / "static"
 
-    for d in [FRONTEND_BUILD_DIR, FRONTEND_BUILD_DIR / "static" / "css", FRONTEND_BUILD_DIR / "static" / "js"]:
+    for d in [
+        FRONTEND_BUILD_DIR,
+        FRONTEND_BUILD_DIR / "static" / "css",
+        FRONTEND_BUILD_DIR / "static" / "js",
+    ]:
         for f in os.listdir(d):
 
             fpath = os.path.join(d, f)
@@ -50,14 +55,14 @@ else:
 
             content = ""
             with open(fpath, "r", encoding="utf-8", errors="ignore") as fin:
-                content = fin.read() 
+                content = fin.read()
             if HF_SPACE == "local":
                 content = content.replace("http://mydomain.com/example/to/replace/", "")
             else:
                 content = content.replace("example/to/replace", HF_SPACE)
 
             with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
-                fout.write(content) 
+                fout.write(content)
 
 
 DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
@@ -116,8 +121,8 @@ if is_pro:
     ]
     ACCOUNT_AUTHENTICATION_METHOD = "username"
     REST_FRAMEWORK = {
-        "DEFAULT_AUTHENTICATION_CLASSES" : (
-            "rest_framework.authentication.TokenAuthentication", 
+        "DEFAULT_AUTHENTICATION_CLASSES": (
+            "rest_framework.authentication.TokenAuthentication",
         )
     }
 

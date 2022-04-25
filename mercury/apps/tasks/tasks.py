@@ -228,8 +228,12 @@ def task_execute(self, job_params):
                     old_parameters_index = get_parameters_cell_index(
                         nb["cells"], all_variables
                     )
-                    if old_parameters_index != -1 and old_parameters_index < len(nb["cells"]):
-                        new_cell["metadata"] = nb["cells"][old_parameters_index].get("metadata", {})
+                    if old_parameters_index != -1 and old_parameters_index < len(
+                        nb["cells"]
+                    ):
+                        new_cell["metadata"] = nb["cells"][old_parameters_index].get(
+                            "metadata", {}
+                        )
                         del nb["cells"][old_parameters_index]
                         nb["cells"].insert(
                             old_parameters_index, nbformat.from_dict(new_cell)
@@ -237,7 +241,9 @@ def task_execute(self, job_params):
                     else:
                         nb["cells"].insert(0, nbformat.from_dict(new_cell))
 
-                    with open(wrk_input_nb_path, "w", encoding="utf-8", errors="ignore") as f:
+                    with open(
+                        wrk_input_nb_path, "w", encoding="utf-8", errors="ignore"
+                    ) as f:
                         nbformat.write(nb, f)
         else:
             shutil.copyfile(notebook.path, wrk_input_nb_path)
@@ -271,17 +277,20 @@ def task_execute(self, job_params):
 
         # check if output file exists
         output_html_path = os.path.join(str(wrk_dir), wrk_output_nb_file)
-        
-        # change file name if needed 
+
+        # change file name if needed
         if notebook.output == "slides":
-            slides_fpath = os.path.join(str(wrk_dir), f"{wrk_output_nb_file}.slides.html")
+            slides_fpath = os.path.join(
+                str(wrk_dir), f"{wrk_output_nb_file}.slides.html"
+            )
             if os.path.exists(slides_fpath):
                 os.rename(slides_fpath, output_html_path)
 
-
         if os.path.isfile(output_html_path):
             if "--no-input" in command:
-                with open(wrk_dir / wrk_output_nb_file, "a", encoding="utf-8", errors="ignore") as fout:
+                with open(
+                    wrk_dir / wrk_output_nb_file, "a", encoding="utf-8", errors="ignore"
+                ) as fout:
                     fout.write(
                         """\n<style type="text/css">
 .jp-mod-noOutputs {

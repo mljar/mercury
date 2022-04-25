@@ -11,7 +11,7 @@ from apps.notebooks.urls import notebooks_urlpatterns
 from server.views import VersionInfo
 from server.views import WelcomeMessage
 
-from server.settings import is_pro 
+from server.settings import is_pro
 
 urlpatterns = []
 
@@ -43,6 +43,7 @@ urlpatterns += notebooks_urlpatterns
 
 if is_pro:
     from pro.accounts.urls import auth_urlpatterns
+
     urlpatterns += auth_urlpatterns
 
 

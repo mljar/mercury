@@ -1,8 +1,12 @@
 from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter
 
-from apps.tasks.views import (ClearTasksView, GetLastTaskView,
-                              ListOutputFilesView, TaskCreateView)
+from apps.tasks.views import (
+    ClearTasksView,
+    GetLastTaskView,
+    ListOutputFilesView,
+    TaskCreateView,
+)
 
 tasks_urlpatterns = [
     url("api/v1/execute/(?P<notebook_id>.+)", TaskCreateView.as_view()),

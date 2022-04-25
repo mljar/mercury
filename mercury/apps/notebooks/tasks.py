@@ -180,10 +180,14 @@ def task_init_notebook(
             if error_msg != "":
                 print(error_msg)
 
-            # change file name if needed 
+            # change file name if needed
             if notebook_output == "slides":
-                expected_fpath = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html")
-                slides_fpath = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.slides.html")
+                expected_fpath = os.path.join(
+                    settings.MEDIA_ROOT, f"{notebook_output_file}.html"
+                )
+                slides_fpath = os.path.join(
+                    settings.MEDIA_ROOT, f"{notebook_output_file}.slides.html"
+                )
                 if os.path.exists(slides_fpath):
                     os.rename(slides_fpath, expected_fpath)
 
@@ -191,8 +195,8 @@ def task_init_notebook(
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     "a",
-                    encoding="utf-8", 
-                    errors="ignore"
+                    encoding="utf-8",
+                    errors="ignore",
                 ) as fout:
                     fout.write(
                         """\n<style type="text/css">

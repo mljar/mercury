@@ -4,12 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from server.settings import is_pro
 
+
 class VersionInfo(APIView):
     def get(self, request, format=None):
         return Response({"isPro": is_pro})
 
+
 # it will be used as really simple cache
 welcome_msg = None
+
 
 class WelcomeMessage(APIView):
     def get(self, request, format=None):
@@ -23,5 +26,5 @@ class WelcomeMessage(APIView):
                 else:
                     return Response({"msg": ""})
             if welcome_msg is not None:
-                return Response({"msg": welcome_msg})    
+                return Response({"msg": welcome_msg})
         return Response({"msg": ""})

@@ -14,8 +14,10 @@ from server.settings import is_pro
 if is_pro:
     from pro.accounts.models import Membership
 
+
 def in_commas(word):
     return "," + word + ","
+
 
 def notebooks_queryset(request):
     if not is_pro:
@@ -36,11 +38,13 @@ def notebooks_queryset(request):
 
     return Notebook.objects.filter(q_list)
 
+
 class ListNotebooks(APIView):
     def get(self, request, format=None):
         notebooks = notebooks_queryset(request)
         serializer = NotebookSerializer(notebooks, many=True)
         return JsonResponse(serializer.data, safe=False)
+
 
 class RetrieveNotebook(APIView):
     def get(self, request, notebook_id, format=None):
