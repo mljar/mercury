@@ -67,20 +67,6 @@ export default function NavBar({ showFiles, isPro, username }: NavBarProps) {
       {isPro && username === "" && <LoginButton />}
       {isPro && username !== "" && <UserButton username={username} />}
 
-      <button
-        className="navbar-toggler position-absolute d-md-none collapsed"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#sidebarMenu"
-        aria-controls="sidebarMenu"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span
-          className="navbar-toggler-icon"
-          style={{ height: "15px", width: "15px" }}
-        ></span>
-      </button>
     </header>
   );
 }

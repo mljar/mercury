@@ -25,6 +25,7 @@ import {
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
+import { setShowSideBar } from "../views/appSlice";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -197,11 +198,28 @@ export default function SideBar({
   return (
     <nav
       id="sidebarMenu"
-      className="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse"
+      className="col-lg-3 d-md-block bg-light sidebar"
       style={{ ...additionalStyle, overflowY: "auto" }}
     >
       <div className="position-sticky p-3">
-        <h4>{notebookTitle}</h4>
+        <h4>
+          {notebookTitle}
+          <button
+            className="btn btn-sm  btn-outline-primary"
+            type="button"
+            style={{
+              float: "right",
+              zIndex: "101",
+            }}
+            onClick={() => dispatch(setShowSideBar(false))}
+            data-toggle="tooltip"
+            data-placement="right"
+            title="Hide sidebar"
+          >
+            <i className="fa fa-chevron-left" aria-hidden="true" />
+          </button>
+        </h4>
+
         <div style={{ padding: "0px" }}>
           <form>
             {widgets}

@@ -8,7 +8,9 @@ import {
 import axios from 'axios';
 
 import { RootState } from '../../store';
+import { setShowSideBar } from '../../views/appSlice';
 import { IWidget } from '../Widgets/Types';
+import { getWindowDimensions } from '../WindowDimensions';
 
 export interface INotebookParams {
   title: string | null;
@@ -114,11 +116,16 @@ export const fetchNotebooks =
 
     };
 
+
 export const fetchNotebook =
   (id: number, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         dispatch(setSlidesHash(""));
+
+        const { width } = getWindowDimensions();
+        dispatch(setShowSideBar(width > 992));
+
         if (!silent) {
           dispatch(setLoadingStateSelected("loading"))
         }

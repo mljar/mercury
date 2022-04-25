@@ -19,7 +19,9 @@ import {
   fetchOutputFiles,
   getOutputFiles,
   getOutputFilesState,
+  getShowSideBar,
   getView,
+  setShowSideBar,
 } from "./appSlice";
 import FilesView from "../components/FilesView";
 import { getToken, getUsername } from "../components/authSlice";
@@ -44,6 +46,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const slidesHash = useSelector(getSlidesHash);
+  const showSideBar = useSelector(getShowSideBar);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -127,17 +130,39 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
       <div className="container-fluid">
         <div className="row">
           <WatchModeComponent notebookId={notebookId} />
-          <SideBar
-            notebookTitle={notebook.title}
-            notebookId={notebookId}
-            loadingState={loadingState}
-            waiting={waitForTask()}
-            widgetsParams={notebook?.params?.params}
-            watchMode={isWatchMode()}
-            notebookPath={notebookPath}
-            displayEmbed={displayEmbed}
-          />
+          {showSideBar && (
+            <SideBar
+              notebookTitle={notebook.title}
+              notebookId={notebookId}
+              loadingState={loadingState}
+              waiting={waitForTask()}
+              widgetsParams={notebook?.params?.params}
+              watchMode={isWatchMode()}
+              notebookPath={notebookPath}
+              displayEmbed={displayEmbed}
+            />
+          )}
 
+          {!showSideBar && (
+            <div>
+              <button
+                className="btn btn-sm  btn-outline-primary"
+                type="button"
+                style={{
+                  position: "absolute",
+                  top: displayEmbed ? "5px" : "45px",
+                  left: "5px",
+                  zIndex: "100",
+                }}
+                onClick={() => dispatch(setShowSideBar(true))}
+                data-toggle="tooltip"
+                data-placement="right"
+                title="Show sidebar"
+              >
+                <i className="fa fa-chevron-right" aria-hidden="true" />
+              </button>
+            </div>
+          )}
           {appView === "app" && (
             <MainView
               loadingState={loadingState}
@@ -149,6 +174,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               isPro={isPro}
               username={username}
               slidesHash={slidesHash}
+              columnsWidth={showSideBar ? 9 : 12}
             />
           )}
           {appView === "files" && (

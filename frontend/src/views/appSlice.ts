@@ -15,6 +15,7 @@ const initialState = {
   view: "app",
   files: [] as string[],
   filesState: "unknown",
+  showSideBar: true,
 };
 
 const appSlice = createSlice({
@@ -29,7 +30,13 @@ const appSlice = createSlice({
     },
     setFiles(state, action: PayloadAction<string []>) {
       state.files = action.payload;
-    }
+    },
+    setShowSideBar(state, action: PayloadAction<boolean>) {
+      state.showSideBar = action.payload;
+    },
+    toggleShowSideBar(state) {
+      state.showSideBar = !state.showSideBar;
+    },
   },
 });
 
@@ -39,11 +46,14 @@ export const {
   setView,
   setFilesState,
   setFiles,
+  setShowSideBar,
+  toggleShowSideBar,
 } = appSlice.actions;
 
 export const getView = (state: RootState) => state.app.view;
 export const getOutputFilesState = (state: RootState) => state.app.filesState;
 export const getOutputFiles = (state: RootState) => state.app.files;
+export const getShowSideBar = (state: RootState) => state.app.showSideBar;
 
 export const fetchOutputFiles =
   (taskId: number) =>

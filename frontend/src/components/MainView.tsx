@@ -15,6 +15,7 @@ type MainViewProps = {
   isPro: boolean;
   username: string;
   slidesHash: string;
+  columnsWidth: number;
 };
 
 export default function MainView({
@@ -27,6 +28,7 @@ export default function MainView({
   isPro,
   username,
   slidesHash,
+  columnsWidth,
 }: MainViewProps) {
   const { height } = useWindowDimensions();
 
@@ -34,7 +36,7 @@ export default function MainView({
 
   return (
     <main
-      className="col-md-9 ms-sm-auto col-lg-9"
+      className={`ms-sm-auto col-lg-${columnsWidth}`}
       style={{ paddingTop: "0px", paddingRight: "0px", paddingLeft: "0px" }}
     >
       <BlockUi tag="div" blocking={waiting}>
@@ -43,14 +45,14 @@ export default function MainView({
             <p>Loading notebook. Please wait ...</p>
           )}
           {loadingState === "error" && !isPro && (
-            <p style={{margin: "20px"}}>
+            <p style={{ margin: "20px" }}>
               Problem while loading notebook. Please try again later or contact
               Mercury administrator.
             </p>
           )}
 
           {loadingState === "error" && isPro && username === "" && (
-            <p style={{margin: "20px"}}>
+            <p style={{ margin: "20px" }}>
               <h5>Please log in to see the notebook</h5>
               <a href="/login" className="btn btn-primary btn-sm ">
                 <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
@@ -59,7 +61,7 @@ export default function MainView({
           )}
 
           {loadingState === "error" && isPro && username !== "" && (
-            <p style={{margin: "20px"}}>
+            <p style={{ margin: "20px" }}>
               Problem while loading notebook. Please try again later or contact
               Mercury administrator.
             </p>
