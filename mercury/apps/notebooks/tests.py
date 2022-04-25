@@ -53,6 +53,20 @@ class InitNotebookTestCase(TestCase):
             )
         )
 
+    def test_init_notebook_with_empty_title(self):
+
+        with tempfile.NamedTemporaryFile() as tmp:
+            yaml = """---
+title:
+---"""
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+            # in the case of missing YAML
+            # notebook title should be 'Please provide title'
+            nb = Notebook.objects.get(pk=1)
+            self.assertEqual(nb.title, "Please provide title")
+
 
 class ShareNotebookTestCase(TestCase):
     def test_share_public(self):

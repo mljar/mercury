@@ -137,7 +137,9 @@ def task_init_notebook(
         if "date" in params:
             params["date"] = str(params["date"])
 
-        notebook_title = params.get("title", "")
+        notebook_title = params.get("title", "Please provide title")
+        if notebook_title is None or notebook_title == "":
+            notebook_title = "Please provide title"
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
 
