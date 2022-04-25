@@ -1,9 +1,9 @@
-# Mercury - convert your notebook to web app
+# Share your notebook as web app / slides / dashboard / report / REST API
 
 <p align="center">
   <img 
     alt="Mercury convert notebook to web app"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury_convert_notebook_3.png" width="800px" />  
+    src="https://github.com/mljar/visual-identity/raw/main/mercury/mercury-new-way-to-share-python-notebook.png" width="100%" />  
 </p>
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
