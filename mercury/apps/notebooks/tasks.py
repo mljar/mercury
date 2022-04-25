@@ -131,7 +131,7 @@ def task_init_notebook(
                         return
 
         if update_notebook and nb is not None:
-            with open(notebook_path, "w") as f:
+            with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
                 nbformat.write(nb, f)
 
         if "date" in params:
@@ -191,6 +191,8 @@ def task_init_notebook(
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     "a",
+                    encoding="utf-8", 
+                    errors="ignore"
                 ) as fout:
                     fout.write(
                         """\n<style type="text/css">

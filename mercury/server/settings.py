@@ -49,14 +49,14 @@ else:
                 continue
 
             content = ""
-            with open(fpath, "r") as fin:
+            with open(fpath, "r", encoding="utf-8", errors="ignore") as fin:
                 content = fin.read() 
             if HF_SPACE == "local":
                 content = content.replace("http://mydomain.com/example/to/replace/", "")
             else:
                 content = content.replace("example/to/replace", HF_SPACE)
 
-            with open(fpath, "w") as fout:
+            with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(content) 
 
 

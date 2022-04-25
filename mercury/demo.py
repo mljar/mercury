@@ -34,7 +34,7 @@ name = "Piotr"'''
         nbf.v4.new_code_cell(variables), 
         nbf.v4.new_code_cell(code)
     ]
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8", errors="ignore") as f:
         nbf.write(nb, f)
 
 

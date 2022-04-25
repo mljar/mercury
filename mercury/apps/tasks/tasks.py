@@ -237,7 +237,7 @@ def task_execute(self, job_params):
                     else:
                         nb["cells"].insert(0, nbformat.from_dict(new_cell))
 
-                    with open(wrk_input_nb_path, "w") as f:
+                    with open(wrk_input_nb_path, "w", encoding="utf-8", errors="ignore") as f:
                         nbformat.write(nb, f)
         else:
             shutil.copyfile(notebook.path, wrk_input_nb_path)
@@ -281,7 +281,7 @@ def task_execute(self, job_params):
 
         if os.path.isfile(output_html_path):
             if "--no-input" in command:
-                with open(wrk_dir / wrk_output_nb_file, "a") as fout:
+                with open(wrk_dir / wrk_output_nb_file, "a", encoding="utf-8", errors="ignore") as fout:
                     fout.write(
                         """\n<style type="text/css">
 .jp-mod-noOutputs {

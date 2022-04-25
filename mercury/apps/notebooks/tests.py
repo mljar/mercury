@@ -17,7 +17,7 @@ def create_notebook_without_yaml(filename, text="# Title", code="print(1)"):
     nb = nbf.v4.new_notebook()
 
     nb["cells"] = [nbf.v4.new_markdown_cell(text), nbf.v4.new_code_cell(code)]
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8", errors="ignore") as f:
         nbf.write(nb, f)
 
 
@@ -29,7 +29,7 @@ def create_notebook_with_yaml(filename, yaml="", text="# Title in md", code="pri
         nbf.v4.new_markdown_cell(text),
         nbf.v4.new_code_cell(code),
     ]
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8", errors="ignore") as f:
         nbf.write(nb, f)
 
 
