@@ -21,6 +21,15 @@ Mercury is a perfect tool to convert Python notebook to web app and share with n
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
 
+Mercury can convert your notebook to:
+
+- interactive web app
+- interactive slides
+- data dashboard
+- beautiful report
+- REST API (coming soon)
+
+
 Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
 
 ## Documentation
