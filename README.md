@@ -14,12 +14,21 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
 
-Mercury is a perfect tool to convert Python notebook to web app and share with non-programmers. 
+Mercury is a perfect tool to convert Python notebook to interactive **web app** / **slides** / **dashboard** / **report** / **REST API** and share with non-programmers. 
 
 - You define interactive widgets for your notebook with the YAML header. 
 - Your users can change the widgets values, execute the notebook and save result (as html file).
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
+
+Mercury can convert your notebook to:
+
+- interactive web app
+- interactive slides
+- data dashboard
+- beautiful report
+- REST API (coming soon)
+
 
 Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
 
