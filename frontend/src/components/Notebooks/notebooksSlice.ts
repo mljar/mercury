@@ -32,6 +32,7 @@ export interface INotebook {
   state: string;
   default_view_path: string;
   output: string;
+  format: string;
   slidesHash: string;
 }
 

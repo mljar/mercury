@@ -16,7 +16,7 @@ from django.utils.timezone import make_aware
 
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
-
+from apps.notebooks.slides_themes import SlidesThemes
 
 def process_nbconvert_errors(error_msg):
     known_warnings = [
@@ -98,6 +98,7 @@ def task_init_notebook(
             "description": "Please provide description",
             "share": "public",
             "output": "app",
+            "format": {}
         }
         nb = None
         update_notebook = False
@@ -142,6 +143,7 @@ def task_init_notebook(
             notebook_title = "Please provide title"
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
+        notebook_format = params.get("format", {})
 
         # make sure that there are commas and no spaces between commas
         notebook_share = (
@@ -171,6 +173,9 @@ def task_init_notebook(
                 command += ["--no-input"]
             if "show-prompt" in params and not params["show-prompt"]:
                 command += ["--no-prompt"]
+
+            if notebook_output == "slides":
+                command += SlidesThemes.nbconvert_options(notebook_format)
 
             error_msg = ""
             with Popen(command, stdout=PIPE, stderr=PIPE) as proc:
@@ -211,6 +216,16 @@ def task_init_notebook(
 }
 </style>"""
                     )
+            
+            if notebook_output == "slides":
+                with open(
+                    os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
+                    "a",
+                    encoding="utf-8",
+                    errors="ignore",
+                ) as fout:
+                    fout.write(SlidesThemes.additional_css(notebook_format))
+
 
         if notebook_id is None:
             notebook = Notebook(
@@ -227,6 +242,7 @@ def task_init_notebook(
                     datetime.fromtimestamp(os.path.getmtime(notebook_path))
                 ),
                 output=notebook_output,
+                format=json.dumps(notebook_format),
             )
         else:
 
@@ -247,6 +263,7 @@ def task_init_notebook(
                 datetime.fromtimestamp(os.path.getmtime(notebook_path))
             )
             notebook.output = notebook_output
+            notebook.format = json.dumps(notebook_format)
 
         notebook.save()
         return notebook.id

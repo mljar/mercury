@@ -150,7 +150,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 type="button"
                 style={{
                   position: "absolute",
-                  top: displayEmbed ? "5px" : "45px",
+                  top: displayEmbed ? "5px" : "50px",
                   left: "5px",
                   zIndex: "100",
                 }}
