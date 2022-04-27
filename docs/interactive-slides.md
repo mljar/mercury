@@ -32,3 +32,47 @@ You can check the demo slides running at HuggingFace Spaces at [https://huggingf
     style="border: 1px solid #e1e4e5"
     alt="Interactive slides in Mercury"
     src="../media/interactive-slides-mercury-demo.gif" width="100%" />
+
+
+### Themes
+
+You can style apps with available themes.
+
+#### Light themes:
+
+- white (default)
+- sky
+- beige
+- simple
+- serif
+- solarized
+
+#### Dark themes: 
+
+- black
+- league
+- blood
+- night
+- moon
+
+To use the theme in the Mercury YAML configuration you need to define `format`. The example below:
+
+```yaml
+title: My app
+output: slides
+format:
+    theme: night
+# the rest of YAML ...
+```
+
+You can check slides themes online in [the app](https://slides-themes.herokuapp.com/).
+
+### Themes gallery
+
+![](https://github.com/mljar/mercury-slides-themes/raw/main/media/slides-themes-list.gif)
+
+### Themes demo
+
+![](https://github.com/mljar/mercury-slides-themes/raw/main/media/mercury-slides-themes.gif)
+
+
