@@ -25,6 +25,7 @@ import {
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
+import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar } from "../views/appSlice";
 
 type SideBarProps = {
@@ -317,6 +318,7 @@ export default function SideBar({
             className="btn btn-sm btn-outline-danger"
             onClick={() => {
               dispatch(clearTasks(notebookId));
+              dispatch(fetchNotebook(notebookId));
             }}
             style={{ border: "none" }}
             disabled={waiting}

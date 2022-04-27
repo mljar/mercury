@@ -17,7 +17,7 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
 from apps.tasks.clean_service import clean_service
 from apps.tasks.models import Task
-
+from apps.notebooks.slides_themes import SlidesThemes
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
@@ -267,6 +267,9 @@ def task_execute(self, job_params):
         if "show-prompt" in notebook_params and not notebook_params["show-prompt"]:
             command += ["--no-prompt"]
 
+        if notebook.output == "slides":
+            command += SlidesThemes.nbconvert_options(json.loads(notebook.format))
+
         error_msg = ""
         with Popen(command, stdout=PIPE, stderr=PIPE) as proc:
             # print(proc.stdout.read())
@@ -302,6 +305,12 @@ def task_execute(self, job_params):
 }
 </style>"""
                     )
+
+            if notebook.output == "slides":
+                with open(
+                    wrk_dir / wrk_output_nb_file, "a", encoding="utf-8", errors="ignore"
+                ) as fout:
+                    fout.write(SlidesThemes.additional_css(json.loads(notebook.format)))
 
             task.result = f"{settings.MEDIA_URL}{task.session_id}/{wrk_output_nb_file}"
             task.state = "DONE"
