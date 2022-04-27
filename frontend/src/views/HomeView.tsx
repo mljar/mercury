@@ -16,6 +16,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
+import rehypeRaw from 'rehype-raw'
 import { getToken, getUsername } from "../components/authSlice";
 
 export default withRouter(function HomeView() {
@@ -83,7 +84,7 @@ export default withRouter(function HomeView() {
         )}
         {welcome !== "" && (
           <div style={{ paddingTop: "20px", paddingBottom: "10px" }}>
-            <ReactMarkdown rehypePlugins={[remarkGfm, rehypeHighlight, emoji]}>
+            <ReactMarkdown rehypePlugins={[remarkGfm, rehypeHighlight, emoji, rehypeRaw]}>
               {welcome}
             </ReactMarkdown>
           </div>
