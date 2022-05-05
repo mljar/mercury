@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 
 from django.contrib.auth.models import User
@@ -76,6 +77,28 @@ share: private
         params = {"session_id": "some_session_id", "params": {}}
         response = self.client.post("/api/v1/execute/1", params, **headers)
         self.assertEqual(response.status_code, 201)
+
+        task = Task.objects.get(pk=1)
+        self.assertEqual(task.notebook.id, 1)
+
+
+
+class RunNotebookRestAPITestCase(TestCase):
+    def test_run(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        # execute the notebook 
+        params = {"session_id": "test", "params": json.dumps({"a": "b", "c": "d"})}
+        response = self.client.post("/run/test1", params)
+        self.assertEqual(response.status_code, 201)
+        print(response, response.json())
 
         task = Task.objects.get(pk=1)
         self.assertEqual(task.notebook.id, 1)

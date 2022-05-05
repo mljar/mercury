@@ -1,11 +1,13 @@
 import os
 import shutil
+import uuid 
 
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from requests import request
+
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
@@ -107,3 +109,40 @@ class ClearTasksView(APIView):
             print("Exception occured", str(e))
 
         return Response(status.HTTP_204_NO_CONTENT)
+
+
+class CreateRestAPITask(CreateAPIView):
+
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+    def perform_create(self, serializer):
+        try:
+            notebook = notebooks_queryset(self.request).filter(slug=self.kwargs["notebook_slug"]).latest('id')
+        except Task.DoesNotExist:
+            raise Http404()
+        try:
+            with transaction.atomic():
+                instance = serializer.save(
+                    session_id=uuid.uuid4().hex,
+                    state="CREATED",
+                    notebook=notebook,
+                )
+                job_params = {"db_id": instance.id}
+                transaction.on_commit(lambda: task_execute.delay(job_params))
+        except Exception as e:
+            raise APIException(str(e))
+
+
+class GetRestAPITask(RetrieveAPIView):
+
+    serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+    def get_object(self):
+        try:
+            Task.objects.filter(
+                session_id=self.kwargs["session_id"],
+            ).latest("id")
+        except Task.DoesNotExist:
+            raise Http404()

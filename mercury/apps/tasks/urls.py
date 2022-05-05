@@ -3,7 +3,9 @@ from rest_framework.routers import DefaultRouter
 
 from apps.tasks.views import (
     ClearTasksView,
+    CreateRestAPITask,
     GetLastTaskView,
+    GetRestAPITask,
     ListOutputFilesView,
     TaskCreateView,
 )
@@ -22,4 +24,8 @@ tasks_urlpatterns = [
         "api/v1/clear_tasks/(?P<notebook_id>.+)/(?P<session_id>.+)",
         ClearTasksView.as_view(),
     ),
+    # used by notebook as REST API
+    url("run/(?P<notebook_slug>.+)", CreateRestAPITask.as_view()),
+    url("get/(?P<session_id>.+)", GetRestAPITask.as_view()),
+
 ]

@@ -150,7 +150,7 @@ def task_init_notebook(
             "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
         )
 
-        notebook_slug = slugify(notebook_title)
+        notebook_slug = params.get("slug", slugify(notebook_title))
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
