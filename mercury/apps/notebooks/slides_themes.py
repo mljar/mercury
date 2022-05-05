@@ -1,6 +1,4 @@
-
 class SlidesThemes:
-
     @staticmethod
     def nbconvert_options(format):
         theme = format.get("theme", "white")
@@ -122,7 +120,7 @@ class SlidesThemes:
     color: rgb(238, 238, 238);
     font-family: Ubuntu, "sans-serif";  
 }
-</style>"""        
+</style>"""
         elif theme == "night":
             return """\n<style type="text/css">
 .reveal * {

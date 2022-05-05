@@ -1,6 +1,7 @@
 import os
+import json
 import shutil
-import uuid 
+import uuid
 
 from django.conf import settings
 from django.db import transaction
@@ -111,38 +112,55 @@ class ClearTasksView(APIView):
         return Response(status.HTTP_204_NO_CONTENT)
 
 
-class CreateRestAPITask(CreateAPIView):
-
-    serializer_class = TaskSerializer
-    queryset = Task.objects.all()
-
-    def perform_create(self, serializer):
+class CreateRestAPITask(APIView):
+    def post(self, request, notebook_slug):
         try:
-            notebook = notebooks_queryset(self.request).filter(slug=self.kwargs["notebook_slug"]).latest('id')
-        except Task.DoesNotExist:
+            notebook = (
+                notebooks_queryset(request).filter(slug=notebook_slug).latest("id")
+            )
+        except Notebook.DoesNotExist:
             raise Http404()
         try:
             with transaction.atomic():
-                instance = serializer.save(
+                task = Task(
                     session_id=uuid.uuid4().hex,
                     state="CREATED",
                     notebook=notebook,
+                    params=json.dumps(request.data),
                 )
-                job_params = {"db_id": instance.id}
+                task.save()
+                job_params = {"db_id": task.id}
                 transaction.on_commit(lambda: task_execute.delay(job_params))
+            return Response({"id": task.session_id}, status=status.HTTP_201_CREATED)
         except Exception as e:
             raise APIException(str(e))
 
 
-class GetRestAPITask(RetrieveAPIView):
-
-    serializer_class = TaskSerializer
-    queryset = Task.objects.all()
-
-    def get_object(self):
+class GetRestAPITask(APIView):
+    def get(self, requset, session_id):
         try:
-            Task.objects.filter(
-                session_id=self.kwargs["session_id"],
+            task = Task.objects.filter(
+                session_id=session_id,
             ).latest("id")
+
+            if task.state == "DONE":
+                response = {}
+                try:
+                    fname = os.path.join(
+                        settings.MEDIA_ROOT, task.session_id, "response.json"
+                    )
+                    if os.path.exists(fname):
+                        with open(fname) as fin:
+                            response = json.loads(fin.read())
+                except Exception as e:
+                    return Response(
+                        str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                return Response(response, status=status.HTTP_200_OK)
+            if task.state == "ERROR":
+                return Response(
+                    task.result, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            return Response({"state": "running"}, status=status.HTTP_202_ACCEPTED)
         except Task.DoesNotExist:
             raise Http404()

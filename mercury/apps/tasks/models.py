@@ -14,7 +14,7 @@ class Task(models.Model):
         on_delete=models.CASCADE,
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    # state of execution, can be:
+    # state of execution, can be: CREATED, RECEIVED, DONE, ERROR
     state = models.CharField(max_length=128, blank=True)
     # input params for task
     params = models.TextField(blank=True)

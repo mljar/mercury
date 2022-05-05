@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 
 from apps.notebooks.tasks import task_init_notebook
 from apps.notebooks.tests import create_notebook_with_yaml
+from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.tasks.tasks import task_execute, sanitize_string
 
@@ -82,7 +83,6 @@ share: private
         self.assertEqual(task.notebook.id, 1)
 
 
-
 class RunNotebookRestAPITestCase(TestCase):
     def test_run(self):
         yaml = """---
@@ -94,11 +94,154 @@ slug: test1
             create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
             task_init_notebook(tmp.name + ".ipynb")
 
-        # execute the notebook 
-        params = {"session_id": "test", "params": json.dumps({"a": "b", "c": "d"})}
-        response = self.client.post("/run/test1", params)
+        # execute the notebook
+        params = {"a": "b", "c": "d"}
+        response = self.client.post(
+            "/run/test1", params, content_type="application/json"
+        )
         self.assertEqual(response.status_code, 201)
-        print(response, response.json())
 
         task = Task.objects.get(pk=1)
         self.assertEqual(task.notebook.id, 1)
+
+    def test_run_wrong_slug(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        # execute the notebook
+        params = {"a": "b", "c": "d"}
+        response = self.client.post(
+            "/run/test123", params, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_run_not_authenticated(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+share: private
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        # execute the notebook
+        params = {"a": "b", "c": "d"}
+        response = self.client.post(
+            "/run/test1", params, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_run_authenticated(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+share: private
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        # create user and login
+        user = {
+            "username": "piotrek",
+            "password": "verysecret",
+        }
+        User.objects.create_user(username=user["username"], password=user["password"])
+        response = self.client.post(
+            reverse("rest_login"), user, content_type="application/json"
+        )
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+
+        # execute the notebook
+        params = {"a": "b", "c": "d"}
+        response = self.client.post(
+            "/run/test1", params, content_type="application/json", **headers
+        )
+        self.assertEqual(response.status_code, 201)
+
+
+class GetTaskRestAPITestCase(TestCase):
+    def test_get(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        session_id = "my_session_id"
+        Task.objects.create(
+            state="CREATED", session_id=session_id, notebook=Notebook.objects.get(pk=1)
+        )
+
+        response = self.client.get(f"/get/{session_id}")
+        self.assertEqual(response.status_code, 202)
+
+    def test_get_wrong_session_id(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+---"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(tmp.name + ".ipynb", yaml=yaml)
+            task_init_notebook(tmp.name + ".ipynb")
+
+        session_id = "my_session_id"
+        Task.objects.create(session_id=session_id, notebook=Notebook.objects.get(pk=1))
+
+        response = self.client.get(f"/get/{session_id}-wrong-id")
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_and_run(self):
+        yaml = """---
+title: test2
+output: rest api
+slug: test1
+params:
+    rest_response:
+        output: response
+---"""
+        code = "rest_response = 'example.json'"
+
+        code2 = """
+import os
+with open(rest_response, "w") as fout:
+    fout.write('{"hello": "world"}')        
+"""
+        with tempfile.NamedTemporaryFile() as tmp:
+            create_notebook_with_yaml(
+                tmp.name + ".ipynb", yaml=yaml, code=code, code2=code2
+            )
+            task_init_notebook(tmp.name + ".ipynb")
+
+        params = {"a": "b", "c": "d"}
+        response = self.client.post(
+            "/run/test1", params, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 201)
+
+        task = Task.objects.get(pk=1)
+        self.assertEqual(task.notebook.id, 1)
+
+        response = self.client.get(f"/get/{task.session_id}")
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.json()["state"], "running")
+
+        task_execute(job_params={"db_id": 1})
+
+        response = self.client.get(f"/get/{task.session_id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"hello": "world"})

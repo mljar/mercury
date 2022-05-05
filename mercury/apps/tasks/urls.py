@@ -27,5 +27,4 @@ tasks_urlpatterns = [
     # used by notebook as REST API
     url("run/(?P<notebook_slug>.+)", CreateRestAPITask.as_view()),
     url("get/(?P<session_id>.+)", GetRestAPITask.as_view()),
-
 ]

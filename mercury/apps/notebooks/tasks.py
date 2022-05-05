@@ -18,6 +18,7 @@ from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
 
+
 def process_nbconvert_errors(error_msg):
     known_warnings = [
         "warn(",
@@ -98,7 +99,7 @@ def task_init_notebook(
             "description": "Please provide description",
             "share": "public",
             "output": "app",
-            "format": {}
+            "format": {},
         }
         nb = None
         update_notebook = False
@@ -216,7 +217,7 @@ def task_init_notebook(
 }
 </style>"""
                     )
-            
+
             if notebook_output == "slides":
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
@@ -225,7 +226,6 @@ def task_init_notebook(
                     errors="ignore",
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
-
 
         if notebook_id is None:
             notebook = Notebook(

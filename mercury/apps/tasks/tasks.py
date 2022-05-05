@@ -19,6 +19,7 @@ from apps.tasks.clean_service import clean_service
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
 
+
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
     for i in range(min(len(cells), 10)):
@@ -202,6 +203,19 @@ def task_execute(self, job_params):
                         raise Exception(f"Cant create {output_dir}")
                 # pass path to directory into the notebook's code
                 inject_code += f'{k} = "{str(output_dir)}"\n'
+
+            if v.get("output") is not None and v.get("output") == "response":
+                # create output directory for REST response created in the notebook
+                output_dir = settings.MEDIA_ROOT / task.session_id
+                if not os.path.exists(output_dir):
+                    try:
+                        os.mkdir(output_dir)
+                    except Exception as e:
+                        raise Exception(f"Cant create {output_dir}")
+                # pass path to directory into the notebook's code
+                output_dir = output_dir / "response.json"
+                inject_code += f'{k} = "{str(output_dir)}"\n'
+                print(inject_code)
 
         new_cell = {
             "cell_type": "code",
