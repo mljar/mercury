@@ -9,6 +9,7 @@ nav:
   - Output Files: output-files.md
   - Welcome Message: welcome.md
   - Interactive Slides: interactive-slides.md
+  - REST API: notebook-as-rest-api.md
   - Embedding: embedding.md
   - Authentication: authentication.md
   - Admin Panel: admin-panel.md
