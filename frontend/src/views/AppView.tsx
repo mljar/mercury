@@ -27,6 +27,7 @@ import FilesView from "../components/FilesView";
 import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
+import RestAPIView from "../components/RestAPIView";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -117,6 +118,11 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     return false;
   };
 
+  let showRestApi = false;
+  if (notebook.output && notebook.output.toLowerCase().startsWith("rest")) {
+    showRestApi = true;
+  }
+
   return (
     <div className="App">
       {!displayEmbed && (
@@ -163,6 +169,15 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               </button>
             </div>
           )}
+
+          {showRestApi && (
+            <RestAPIView
+              slug={notebook.slug}
+              widgetsParams={notebook?.params?.params}
+              notebookPath={notebookPath}
+              columnsWidth={showSideBar ? 9 : 12}
+              taskSessionId={task.session_id} />)
+          }
           {appView === "app" && (
             <MainView
               loadingState={loadingState}
