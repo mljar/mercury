@@ -1,0 +1,30 @@
+name: Run on Windows
+
+on: 
+  schedule:
+    - cron:  '0 8 * * 1'
+  # run workflow manually
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: test
+          auto-update-conda: false
+          python-version: ${{ matrix.python-version }}
+      - name: Activate conda and check versions
+        run: |
+          conda activate test
+          conda --version
+          python --version
+      - name: Install Mercury
+        run: conda install -c conda-forge mljar-mercury
+      - name: Run Mercury server
+        run: mercury run
