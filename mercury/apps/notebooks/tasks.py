@@ -100,6 +100,7 @@ def task_init_notebook(
             "share": "public",
             "output": "app",
             "format": {},
+            "schedule": "",
         }
         nb = None
         update_notebook = False
@@ -145,6 +146,8 @@ def task_init_notebook(
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
+        notebook_schedule = params.get("schedule", "")
+
 
         # make sure that there are commas and no spaces between commas
         notebook_share = (
@@ -243,6 +246,7 @@ def task_init_notebook(
                 ),
                 output=notebook_output,
                 format=json.dumps(notebook_format),
+                schedule=notebook_schedule,
             )
         else:
 
@@ -264,6 +268,7 @@ def task_init_notebook(
             )
             notebook.output = notebook_output
             notebook.format = json.dumps(notebook_format)
+            notebook.schedule = notebook_schedule
 
         notebook.save()
         return notebook.id
