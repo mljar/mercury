@@ -1,9 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import useWindowDimensions from "./WindowDimensions";
-
-import BlockUi from "react-block-ui";
 import { IWidget } from "./Widgets/Types";
 import { useSelector } from "react-redux";
 import { getWidgetsValues } from "./Widgets/widgetsSlice";
@@ -25,7 +22,6 @@ export default function RestAPIView({
 }: Props) {
   const [response, setResponse] = useState(JSON.stringify({ "msg": "Example output" }))
   const widgetsValues = useSelector(getWidgetsValues);
-  let responsePath = notebookPath.substring(0, notebookPath.lastIndexOf("/"));
 
   let examplePostData = {} as Record<string, string | number | null | undefined | boolean | [number, number] | string[]>;
   for (let [key, widgetParams] of Object.entries(widgetsParams)) {
@@ -36,7 +32,6 @@ export default function RestAPIView({
 
   async function fetchResponse() {
     try {
-      const url = ``;
       const { data } = await axios.get(`get/${taskSessionId}`);
       setResponse(JSON.stringify(data));
     } catch (error) { }
@@ -46,6 +41,7 @@ export default function RestAPIView({
     if (taskSessionId) {
       fetchResponse();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskSessionId, notebookPath]);
 
   let sessionId = "id-with-some-random-string";
