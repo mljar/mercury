@@ -119,6 +119,18 @@ def main():
             ]
             worker = subprocess.Popen(worker_command)
 
+            # celery worker beat for periodic tasks
+            beat_command = [
+                "celery",
+                "-A",
+                "mercury.server" if sys.argv[0].endswith("mercury") else "server",
+                "beat",
+                "--loglevel=error",
+                "--max-interval",
+                "60", # sleep 60 seconds
+            ]
+            subprocess.Popen(beat_command)
+
             if "--runworker" in sys.argv:
                 sys.argv.remove("--runworker")
 

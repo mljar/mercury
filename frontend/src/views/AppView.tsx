@@ -28,6 +28,7 @@ import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
+import AutoRefresh from "../components/AutoRefresh";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -136,10 +137,15 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
       <div className="container-fluid">
         <div className="row">
           <WatchModeComponent notebookId={notebookId} />
+
+          {notebook.schedule !== "" && <AutoRefresh notebookId={notebookId} />}
+
           {showSideBar && (
             <SideBar
               notebookTitle={notebook.title}
               notebookId={notebookId}
+              notebookSchedule={notebook.schedule}
+              taskCreatedAt={task.created_at}
               loadingState={loadingState}
               waiting={waitForTask()}
               widgetsParams={notebook?.params?.params}
@@ -176,8 +182,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               widgetsParams={notebook?.params?.params}
               notebookPath={notebookPath}
               columnsWidth={showSideBar ? 9 : 12}
-              taskSessionId={task.session_id} />)
-          }
+              taskSessionId={task.session_id}
+            />
+          )}
           {appView === "app" && (
             <MainView
               loadingState={loadingState}

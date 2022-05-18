@@ -31,6 +31,8 @@ import { setShowSideBar } from "../views/appSlice";
 type SideBarProps = {
   notebookTitle: string;
   notebookId: number;
+  notebookSchedule: string;
+  taskCreatedAt: Date;
   loadingState: string;
   waiting: boolean;
   widgetsParams: Array<IWidget>;
@@ -42,6 +44,8 @@ type SideBarProps = {
 export default function SideBar({
   notebookTitle,
   notebookId,
+  notebookSchedule,
+  taskCreatedAt,
   loadingState,
   waiting,
   widgetsParams,
@@ -294,6 +298,14 @@ export default function SideBar({
                 >
                   <i className="fa fa-book" aria-hidden="true"></i> Read more
                 </button>
+              </div>
+            )}
+
+            {notebookSchedule !== "" && (
+              <div className="alert alert-success mb-3" role="alert">
+                <i className="fa fa-clock-o" aria-hidden="true"></i> Scheduled
+                notebook at '{notebookSchedule}'. Automatic refresh every minute.
+                {taskCreatedAt && <p>Last execution at {taskCreatedAt}.</p>}
               </div>
             )}
 

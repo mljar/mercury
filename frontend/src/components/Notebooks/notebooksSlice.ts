@@ -34,6 +34,7 @@ export interface INotebook {
   output: string;
   format: string;
   slidesHash: string;
+  schedule: string;
 }
 
 const initialState = {

@@ -35,6 +35,8 @@ python manage.py createsuperuser --noinput
 
 celery -A server worker --loglevel=error -P gevent --concurrency 4 -E &
 
+celery -A server beat --loglevel=error --max-interval 60 &
+
 gunicorn server.wsgi --bind 0.0.0.0:8000 --workers 4 --threads 4
 
 # for debug

@@ -20,4 +20,5 @@ class NotebookSerializer(serializers.ModelSerializer):
             "default_view_path",
             "output",
             "format",
+            "schedule",
         )

@@ -49,11 +49,20 @@ class GetLastTaskView(RetrieveAPIView):
     queryset = Task.objects.all()
 
     def get_object(self):
+        notebook = get_object_or_404(
+            notebooks_queryset(self.request), pk=self.kwargs["notebook_id"]
+        )
         try:
-            return Task.objects.filter(
-                notebook_id=self.kwargs["notebook_id"],
-                session_id=self.kwargs["session_id"],
-            ).latest("id")
+            if notebook.schedule is None or notebook.schedule == "":
+                return Task.objects.filter(
+                    notebook_id=self.kwargs["notebook_id"],
+                    session_id=self.kwargs["session_id"],
+                ).latest("id")
+            else:
+                return Task.objects.filter(
+                    notebook_id=self.kwargs["notebook_id"]
+                ).latest("id")
+
         except Task.DoesNotExist:
             raise Http404()
 

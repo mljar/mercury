@@ -148,7 +148,6 @@ def task_init_notebook(
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
 
-
         # make sure that there are commas and no spaces between commas
         notebook_share = (
             "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
