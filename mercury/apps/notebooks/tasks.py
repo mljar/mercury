@@ -18,6 +18,8 @@ from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
 
+from croniter import croniter
+
 
 def process_nbconvert_errors(error_msg):
     known_warnings = [
@@ -147,6 +149,14 @@ def task_init_notebook(
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
+
+        if notebook_schedule != "":
+            try:
+                croniter.is_valid(notebook_schedule)
+            except Exception as e:
+                raise Exception(
+                    f"The schedule ({notebook_schedule}) is not valid. {str(e)} Please check schedule at https://crontab.guru"
+                )
 
         # make sure that there are commas and no spaces between commas
         notebook_share = (

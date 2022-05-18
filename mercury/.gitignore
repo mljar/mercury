@@ -1,4 +1,5 @@
 *.sqlite3
+celerybeat-schedule
 *.sqlite
 *.pyc
 *__pycache__*
