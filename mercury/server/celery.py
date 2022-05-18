@@ -8,13 +8,6 @@ from celery.schedules import crontab
 from django.db import transaction
 from django.conf import settings
 
-import django
-
-django.setup()
-
-from apps.notebooks.models import Notebook
-from apps.tasks.models import Task
-from apps.tasks.tasks import task_execute
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, CURRENT_DIR)
@@ -38,6 +31,10 @@ app.autodiscover_tasks()
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     try:
+        import django
+        django.setup()
+        from apps.notebooks.models import Notebook
+
         # get all notebooks with not empty schedule
         notebooks = Notebook.objects.exclude(schedule__isnull=True).exclude(
             schedule__exact=""
@@ -70,6 +67,13 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task
 def execute_notebook(notebook_id):
+    
+    import django
+    django.setup()
+    from apps.notebooks.models import Notebook
+    from apps.tasks.models import Task
+    from apps.tasks.tasks import task_execute
+
     with transaction.atomic():
         task = Task(
             session_id=uuid.uuid4().hex,
