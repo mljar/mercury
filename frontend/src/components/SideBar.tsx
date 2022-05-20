@@ -3,7 +3,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, executeNotebook } from "../tasks/tasksSlice";
+import { clearTasks, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -27,6 +27,7 @@ import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar } from "../views/appSlice";
+import { toast } from "react-toastify";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -277,7 +278,15 @@ export default function SideBar({
                     <hr className="dropdown-divider" />
                   </li>
                   <li>
-                    <button className="dropdown-item">
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        dispatch(
+                          exportToPDF(notebookId, notebookPath, notebookTitle)
+                        );
+                      }}
+                    >
                       <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
                       Download as PDF
                     </button>

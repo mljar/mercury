@@ -66,10 +66,10 @@ const scrapeSlidesHash = () => {
     try {
         const iframeElement = (document.getElementById("main-iframe") as HTMLIFrameElement)
         const hash = iframeElement?.contentWindow?.location?.hash;
-        if(hash) {
+        if (hash) {
             return hash;
         }
-    } catch(error) { }
+    } catch (error) { }
     return "";
 }
 
@@ -82,7 +82,7 @@ export const executeNotebook =
 
             const slidesHash = scrapeSlidesHash();
             dispatch(setSlidesHash(slidesHash));
-            
+
             try {
                 const task = {
                     session_id: sessionId,
@@ -110,5 +110,30 @@ export const clearTasks =
                 toast.success("All previous tasks deleted. The default view of the app is displayed.")
             } catch (error) {
                 toast.error(`Trying to clear previous tasks. The error occured. ${error}`)
+            }
+        };
+
+
+export const exportToPDF =
+    (notebookId: Number, notebookPath: String, notebookTitle: String) =>
+        async (dispatch: Dispatch<AnyAction>) => {
+            try {
+
+                toast.info("The PDF export has been started. The file download will start automatically. Please wait ...", {autoClose: 10000});
+
+                const sessionId = getSessionId();
+                const url = `/api/v1/export_pdf/`;
+                const data = {
+                    session_id: sessionId,
+                    notebook_id: notebookId,
+                    notebook_path: notebookPath,
+                    notebook_title: notebookTitle,
+                }
+                await axios.post(url, data);
+
+                
+
+            } catch (error) {
+                toast.error(`The error occured during PDF export. ${error}`)
             }
         };
