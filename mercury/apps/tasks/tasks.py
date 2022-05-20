@@ -351,3 +351,10 @@ def task_execute(self, job_params):
                 os.remove(f)
         # remove old file
         clean_service()
+
+
+
+@shared_task(bind=True)
+def export_to_pdf(self, job_params):
+    print(job_params)
+    print("Export to PDF")

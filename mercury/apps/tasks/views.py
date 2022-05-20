@@ -8,6 +8,7 @@ from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from requests import request
+from celery.result import AsyncResult
 
 from rest_framework import status
 from rest_framework.exceptions import APIException
@@ -19,7 +20,7 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.views import notebooks_queryset
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
-from apps.tasks.tasks import task_execute
+from apps.tasks.tasks import task_execute, export_to_pdf
 
 
 class TaskCreateView(CreateAPIView):
@@ -173,3 +174,27 @@ class GetRestAPITask(APIView):
             return Response({"state": "running"}, status=status.HTTP_202_ACCEPTED)
         except Task.DoesNotExist:
             raise Http404()
+
+
+class ExportPDF(APIView):
+    def post(self, request):
+        try:
+            notebook = (
+                notebooks_queryset(request).get(pk=request.data["notebook_id"])
+            )
+        except Notebook.DoesNotExist:
+            raise Http404()
+        try:
+            celery_job = export_to_pdf.delay(request.data)
+            return Response({"job_id": celery_job.id}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            raise APIException(str(e))
+
+
+class GetPDFAddress(APIView):
+    def get(self, request, job_id):
+        print("print get address", job_id)
+
+        res = AsyncResult(job_id)
+        
+        return Response({"msg": res.ready()})

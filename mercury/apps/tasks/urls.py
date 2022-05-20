@@ -4,10 +4,12 @@ from rest_framework.routers import DefaultRouter
 from apps.tasks.views import (
     ClearTasksView,
     CreateRestAPITask,
+    GetPDFAddress,
     GetLastTaskView,
     GetRestAPITask,
     ListOutputFilesView,
     TaskCreateView,
+    ExportPDF,
 )
 
 tasks_urlpatterns = [
@@ -27,4 +29,6 @@ tasks_urlpatterns = [
     # used by notebook as REST API
     url("run/(?P<notebook_slug>.+)", CreateRestAPITask.as_view()),
     url("get/(?P<session_id>.+)", GetRestAPITask.as_view()),
+    url("export_pdf", ExportPDF.as_view()),
+    url("get_pdf/(?P<job_id>.+)", GetPDFAddress.as_view()),
 ]

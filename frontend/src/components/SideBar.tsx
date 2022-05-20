@@ -283,7 +283,7 @@ export default function SideBar({
                       className="dropdown-item"
                       onClick={() => {
                         dispatch(
-                          exportToPDF(notebookId, notebookPath, notebookTitle)
+                          exportToPDF(notebookId, notebookPath)
                         );
                       }}
                     >

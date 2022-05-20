@@ -115,23 +115,25 @@ export const clearTasks =
 
 
 export const exportToPDF =
-    (notebookId: Number, notebookPath: String, notebookTitle: String) =>
+    (notebookId: Number, notebookPath: String) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
 
-                toast.info("The PDF export has been started. The file download will start automatically. Please wait ...", {autoClose: 10000});
+                toast.info("The PDF export has been started. The file download will start automatically. Please wait ...", { autoClose: 10000 });
 
                 const sessionId = getSessionId();
                 const url = `/api/v1/export_pdf/`;
-                const data = {
+                const params = {
                     session_id: sessionId,
                     notebook_id: notebookId,
                     notebook_path: notebookPath,
-                    notebook_title: notebookTitle,
                 }
-                await axios.post(url, data);
+                const { data } = await axios.post(url, params);
+                console.log(data)
 
-                
+                const response = await axios.get(`/api/v1/get_pdf/${data.job_id}`)
+                console.log(response.data)
+
 
             } catch (error) {
                 toast.error(`The error occured during PDF export. ${error}`)
