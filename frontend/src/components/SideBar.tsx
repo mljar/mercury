@@ -240,20 +240,50 @@ export default function SideBar({
                 <i className="fa fa-play" aria-hidden="true"></i> Run
               </button>
 
-              <button
+              <div
+                className="dropdown"
                 style={{ width: "47%", float: "right" }}
-                type="button"
-                className="btn btn-primary"
-                disabled={waiting}
-                onClick={() =>
-                  handleDownload(
-                    `${axios.defaults.baseURL}${notebookPath}`,
-                    `${notebookTitle}.html`
-                  )
-                }
               >
-                <i className="fa fa-download" aria-hidden="true"></i> Download
-              </button>
+                <button
+                  className="btn btn-primary dropdown-toggle"
+                  style={{ margin: "0px", width: "100%" }}
+                  type="button"
+                  id="dropdownMenuLink"
+                  data-bs-toggle="dropdown"
+                  disabled={waiting}
+                >
+                  Download
+                </button>
+
+                <ul
+                  className="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="dropdownMenuLink"
+                >
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() =>
+                        handleDownload(
+                          `${axios.defaults.baseURL}${notebookPath}`,
+                          `${notebookTitle}.html`
+                        )
+                      }
+                    >
+                      <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
+                      Download as HTML
+                    </button>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button className="dropdown-item">
+                      <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
+                      Download as PDF
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {fileKeys && !allFilesUploaded() && (
@@ -304,7 +334,8 @@ export default function SideBar({
             {notebookSchedule !== "" && (
               <div className="alert alert-success mb-3" role="alert">
                 <i className="fa fa-clock-o" aria-hidden="true"></i> Scheduled
-                notebook at '{notebookSchedule}'. Automatic refresh every minute.
+                notebook at '{notebookSchedule}'. Automatic refresh every
+                minute.
                 {taskCreatedAt && <p>Last execution at {taskCreatedAt}.</p>}
               </div>
             )}
