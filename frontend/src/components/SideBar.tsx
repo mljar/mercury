@@ -10,7 +10,6 @@ import RangeWidget from "./Widgets/Range";
 import SelectWidget from "./Widgets/Select";
 import SliderWidget from "./Widgets/Slider";
 
-import fileDownload from "js-file-download";
 
 import {
   isCheckboxWidget,
@@ -27,7 +26,7 @@ import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar } from "../views/appSlice";
-import { toast } from "react-toastify";
+import { handleDownload } from "../utils";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -186,15 +185,7 @@ export default function SideBar({
     return true;
   };
 
-  const handleDownload = (url: string, filename: string) => {
-    axios
-      .get(url, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        fileDownload(res.data, filename);
-      });
-  };
+
 
   let additionalStyle = {};
   if (displayEmbed) {
@@ -249,7 +240,6 @@ export default function SideBar({
                   className="btn btn-primary dropdown-toggle"
                   style={{ margin: "0px", width: "100%" }}
                   type="button"
-                  id="dropdownMenuLink"
                   data-bs-toggle="dropdown"
                   disabled={waiting}
                 >
@@ -258,21 +248,23 @@ export default function SideBar({
 
                 <ul
                   className="dropdown-menu dropdown-menu-end"
-                  aria-labelledby="dropdownMenuLink"
                 >
                   <li>
-                    <button
+                    <a
+                      style={{ cursor: "pointer" }}
                       className="dropdown-item"
-                      onClick={() =>
+                      onClick={() => {
                         handleDownload(
                           `${axios.defaults.baseURL}${notebookPath}`,
                           `${notebookTitle}.html`
                         )
                       }
+                      }
                     >
                       <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
                       Download as HTML
-                    </button>
+                    </a>
+
                   </li>
                   <li>
                     <hr className="dropdown-divider" />

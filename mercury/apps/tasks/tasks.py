@@ -18,7 +18,7 @@ from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
 from apps.tasks.clean_service import clean_service
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
-
+from apps.tasks.export_pdf import to_pdf
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1
@@ -356,8 +356,30 @@ def task_execute(self, job_params):
 
 @shared_task(bind=True)
 def export_to_pdf(self, job_params):
-    print(job_params)
-    print("Export to PDF")
-    import time
-    time.sleep(3)
-    return "my-url", "my-title"
+    notebook_id = job_params.get("notebook_id")
+    notebook_path = job_params.get("notebook_path")
+
+    if notebook_id is None or notebook_path is None:
+        raise Exception("PDF export params validation error. Wrong notebook information.")
+
+    # try to build platform independent path
+    notebook_os_path = os.path.join(*([os.path.abspath(os.getcwd())] + notebook_path.split("/")))
+
+    if not os.path.exists(notebook_os_path):
+        raise Exception(f"PDF export notebook error. The notebook in HTML format does not exist.")
+
+    notebook = Notebook.objects.get(pk=notebook_id)
+
+    slides_postfix = ""
+    if notebook.output == "slides":
+        slides_postfix = "?print-pdf"
+
+    pdf_os_path = notebook_os_path.replace(".html", ".pdf")
+
+    to_pdf(notebook_os_path + slides_postfix, pdf_os_path)
+
+    title = notebook.slug + ".pdf"
+
+    pdf_url = notebook_path.replace(".html", ".pdf")
+
+    return pdf_url, title

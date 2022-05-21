@@ -47,6 +47,11 @@ const tasksSlice = createSlice({
         increaseExportToPDFCounter(state) {
             state.exportToPDFCounter += 1;
         },
+        stopPDFExport(state) {
+            state.exportingToPDF = false;
+            state.exportToPDFJobId = "";
+            state.exportToPDFCounter = 0;
+        }
 
     },
 });
@@ -59,6 +64,7 @@ export const {
     setExportToPDFJobId,
     resetExportToPDFCounter,
     increaseExportToPDFCounter,
+    stopPDFExport,
 } = tasksSlice.actions;
 
 export const getCurrentTask = (state: RootState) => state.tasks.currentTask;
@@ -155,7 +161,8 @@ export const exportToPDF =
                 const { data } = await axios.post(url, params);
                 dispatch(setExportToPDFJobId(data.job_id))
             } catch (error) {
-                toast.error(`The error occured during PDF export. ${error}`)
+                toast.error(`The error occured during PDF export. ${error}`);
+                dispatch(stopPDFExport());
             }
         };
 
@@ -163,21 +170,23 @@ export const getPDF =
     (jobId: String) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
-
                 const url = `/api/v1/get_pdf/${jobId}`;
-
                 const { data } = await axios.get(url);
-                console.log(data);
                 if (data.ready) {
-                    // handleDownload(
-                    //     `${axios.defaults.baseURL}${notebookPath}`,
-                    //     `${notebookTitle}.pdf`
-                    //   )
-                    dispatch(setExportingToPDF(false));
-                    dispatch(resetExportToPDFCounter());
-                    dispatch(setExportToPDFJobId(""));
+                    dispatch(stopPDFExport());
+                    if (data.error !== "") {
+                        toast.error(data.error);
+                    } else {
+                        handleDownload(
+                            `${axios.defaults.baseURL}${data.url}`,
+                            `${data.title}`
+                        )
+                    }
+                } else {
+                    dispatch(increaseExportToPDFCounter());
                 }
             } catch (error) {
-                toast.error(`The error occured during PDF export. ${error}`)
+                toast.error(`The error occured during PDF export. ${error}`);
+                dispatch(stopPDFExport());
             }
         };

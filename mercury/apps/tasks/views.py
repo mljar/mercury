@@ -179,6 +179,7 @@ class GetRestAPITask(APIView):
 class ExportPDF(APIView):
     def post(self, request):
         try:
+            # check if user can access the notebook
             notebook = (
                 notebooks_queryset(request).get(pk=request.data["notebook_id"])
             )
@@ -193,10 +194,12 @@ class ExportPDF(APIView):
 
 class GetPDFAddress(APIView):
     def get(self, request, job_id):
-        print("print get address", job_id)
-
         res = AsyncResult(job_id)
-        fileUrl, title = "", ""
+        fileUrl, title, error = "", "", ""
         if res.ready():
-            fileUrl, title = res.result
-        return Response({"ready": res.ready(), "url": fileUrl, "title": title})
+            if res.state == "FAILURE":
+                error = str(res.result)
+            elif res.state == "SUCCESS":
+                fileUrl, title = res.result
+        return Response({"ready": res.ready(), "url": fileUrl, "title": title, "error": error})
+
