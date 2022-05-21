@@ -358,3 +358,6 @@ def task_execute(self, job_params):
 def export_to_pdf(self, job_params):
     print(job_params)
     print("Export to PDF")
+    import time
+    time.sleep(3)
+    return "my-url", "my-title"

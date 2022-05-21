@@ -12,7 +12,7 @@ import {
   getSlidesHash,
   // getWatchModeCounter,
 } from "../components/Notebooks/notebooksSlice";
-import { fetchCurrentTask, getCurrentTask } from "../tasks/tasksSlice";
+import { fetchCurrentTask, getCurrentTask, getExportingToPDF } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
@@ -29,6 +29,8 @@ import { getIsPro } from "../components/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
+import BlockUi from "react-block-ui";
+import WaitPDFExport from "../components/WaitPDFExport";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -49,6 +51,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const token = useSelector(getToken);
   const slidesHash = useSelector(getSlidesHash);
   const showSideBar = useSelector(getShowSideBar);
+  const exportingToPDF = useSelector(getExportingToPDF);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -133,84 +136,86 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
           username={username}
         />
       )}
+      <BlockUi blocking={exportingToPDF} message="Exporting to PDF. Please wait ...">
+        {exportingToPDF && <WaitPDFExport />}
+        <div className="container-fluid">
+          <div className="row">
+            <WatchModeComponent notebookId={notebookId} />
 
-      <div className="container-fluid">
-        <div className="row">
-          <WatchModeComponent notebookId={notebookId} />
+            {notebook.schedule !== "" && <AutoRefresh notebookId={notebookId} />}
 
-          {notebook.schedule !== "" && <AutoRefresh notebookId={notebookId} />}
+            {showSideBar && (
+              <SideBar
+                notebookTitle={notebook.title}
+                notebookId={notebookId}
+                notebookSchedule={notebook.schedule}
+                taskCreatedAt={task.created_at}
+                loadingState={loadingState}
+                waiting={waitForTask()}
+                widgetsParams={notebook?.params?.params}
+                watchMode={isWatchMode()}
+                notebookPath={notebookPath}
+                displayEmbed={displayEmbed}
+              />
+            )}
 
-          {showSideBar && (
-            <SideBar
-              notebookTitle={notebook.title}
-              notebookId={notebookId}
-              notebookSchedule={notebook.schedule}
-              taskCreatedAt={task.created_at}
-              loadingState={loadingState}
-              waiting={waitForTask()}
-              widgetsParams={notebook?.params?.params}
-              watchMode={isWatchMode()}
-              notebookPath={notebookPath}
-              displayEmbed={displayEmbed}
-            />
-          )}
+            {!showSideBar && (
+              <div>
+                <button
+                  className="btn btn-sm  btn-outline-primary"
+                  type="button"
+                  style={{
+                    position: "absolute",
+                    top: displayEmbed ? "5px" : "50px",
+                    left: "5px",
+                    zIndex: "100",
+                  }}
+                  onClick={() => dispatch(setShowSideBar(true))}
+                  data-toggle="tooltip"
+                  data-placement="right"
+                  title="Show sidebar"
+                >
+                  <i className="fa fa-chevron-right" aria-hidden="true" />
+                </button>
+              </div>
+            )}
 
-          {!showSideBar && (
-            <div>
-              <button
-                className="btn btn-sm  btn-outline-primary"
-                type="button"
-                style={{
-                  position: "absolute",
-                  top: displayEmbed ? "5px" : "50px",
-                  left: "5px",
-                  zIndex: "100",
-                }}
-                onClick={() => dispatch(setShowSideBar(true))}
-                data-toggle="tooltip"
-                data-placement="right"
-                title="Show sidebar"
-              >
-                <i className="fa fa-chevron-right" aria-hidden="true" />
-              </button>
-            </div>
-          )}
-
-          {showRestApi && (
-            <RestAPIView
-              slug={notebook.slug}
-              widgetsParams={notebook?.params?.params}
-              notebookPath={notebookPath}
-              columnsWidth={showSideBar ? 9 : 12}
-              taskSessionId={task.session_id}
-            />
-          )}
-          {appView === "app" && (
-            <MainView
-              loadingState={loadingState}
-              notebookPath={notebookPath}
-              errorMsg={errorMsg}
-              waiting={waitForTask()}
-              watchMode={isWatchMode()}
-              displayEmbed={displayEmbed}
-              isPro={isPro}
-              username={username}
-              slidesHash={slidesHash}
-              columnsWidth={showSideBar ? 9 : 12}
-            />
-          )}
-          {appView === "files" && (
-            <FilesView
-              files={outputFiles}
-              filesState={outputFilesState}
-              waiting={waitForTask()}
-            />
-          )}
+            {showRestApi && (
+              <RestAPIView
+                slug={notebook.slug}
+                widgetsParams={notebook?.params?.params}
+                notebookPath={notebookPath}
+                columnsWidth={showSideBar ? 9 : 12}
+                taskSessionId={task.session_id}
+              />
+            )}
+            {appView === "app" && (
+              <MainView
+                loadingState={loadingState}
+                notebookPath={notebookPath}
+                errorMsg={errorMsg}
+                waiting={waitForTask()}
+                watchMode={isWatchMode()}
+                displayEmbed={displayEmbed}
+                isPro={isPro}
+                username={username}
+                slidesHash={slidesHash}
+                columnsWidth={showSideBar ? 9 : 12}
+              />
+            )}
+            {appView === "files" && (
+              <FilesView
+                files={outputFiles}
+                filesState={outputFilesState}
+                waiting={waitForTask()}
+              />
+            )}
+          </div>
         </div>
-      </div>
-
+      </BlockUi >
       {displayEmbed && <MadeWithDiv />}
     </div>
+
   );
 }
 

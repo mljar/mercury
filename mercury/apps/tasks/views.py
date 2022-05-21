@@ -196,5 +196,7 @@ class GetPDFAddress(APIView):
         print("print get address", job_id)
 
         res = AsyncResult(job_id)
-        
-        return Response({"msg": res.ready()})
+        fileUrl, title = "", ""
+        if res.ready():
+            fileUrl, title = res.result
+        return Response({"ready": res.ready(), "url": fileUrl, "title": title})

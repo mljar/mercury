@@ -8,7 +8,7 @@ import {
 import axios from 'axios';
 import { RootState } from '../store';
 import { toast } from "react-toastify";
-import { getSessionId } from '../utils';
+import { getSessionId, handleDownload } from '../utils';
 import { setSlidesHash } from '../components/Notebooks/notebooksSlice';
 
 export interface ITask {
@@ -23,6 +23,9 @@ export interface ITask {
 
 const initialState = {
     currentTask: {} as ITask,
+    exportingToPDF: false,
+    exportToPDFJobId: '',
+    exportToPDFCounter: 0,
 };
 
 const tasksSlice = createSlice({
@@ -32,17 +35,36 @@ const tasksSlice = createSlice({
         setCurrentTask(state, action: PayloadAction<ITask>) {
             state.currentTask = action.payload;
         },
+        setExportingToPDF(state, action: PayloadAction<boolean>) {
+            state.exportingToPDF = action.payload;
+        },
+        setExportToPDFJobId(state, action: PayloadAction<string>) {
+            state.exportToPDFJobId = action.payload;
+        },
+        resetExportToPDFCounter(state) {
+            state.exportToPDFCounter = 0;
+        },
+        increaseExportToPDFCounter(state) {
+            state.exportToPDFCounter += 1;
+        },
+
     },
 });
 
 export default tasksSlice.reducer;
 
 export const {
-    setCurrentTask
+    setCurrentTask,
+    setExportingToPDF,
+    setExportToPDFJobId,
+    resetExportToPDFCounter,
+    increaseExportToPDFCounter,
 } = tasksSlice.actions;
 
 export const getCurrentTask = (state: RootState) => state.tasks.currentTask;
-
+export const getExportingToPDF = (state: RootState) => state.tasks.exportingToPDF;
+export const getExportToPDFJobId = (state: RootState) => state.tasks.exportToPDFJobId;
+export const getExportToPDFCounter = (state: RootState) => state.tasks.exportToPDFCounter;
 
 export const fetchCurrentTask =
     (notebookId: Number) =>
@@ -118,23 +140,43 @@ export const exportToPDF =
     (notebookId: Number, notebookPath: String) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
-
-                toast.info("The PDF export has been started. The file download will start automatically. Please wait ...", { autoClose: 10000 });
+                dispatch(setExportingToPDF(true));
+                dispatch(resetExportToPDFCounter());
+                dispatch(setExportToPDFJobId(""));
 
                 const sessionId = getSessionId();
                 const url = `/api/v1/export_pdf/`;
+                // convert from JS camel case to Python undescore variables
                 const params = {
                     session_id: sessionId,
                     notebook_id: notebookId,
                     notebook_path: notebookPath,
                 }
                 const { data } = await axios.post(url, params);
-                console.log(data)
+                dispatch(setExportToPDFJobId(data.job_id))
+            } catch (error) {
+                toast.error(`The error occured during PDF export. ${error}`)
+            }
+        };
 
-                const response = await axios.get(`/api/v1/get_pdf/${data.job_id}`)
-                console.log(response.data)
+export const getPDF =
+    (jobId: String) =>
+        async (dispatch: Dispatch<AnyAction>) => {
+            try {
 
+                const url = `/api/v1/get_pdf/${jobId}`;
 
+                const { data } = await axios.get(url);
+                console.log(data);
+                if (data.ready) {
+                    // handleDownload(
+                    //     `${axios.defaults.baseURL}${notebookPath}`,
+                    //     `${notebookTitle}.pdf`
+                    //   )
+                    dispatch(setExportingToPDF(false));
+                    dispatch(resetExportToPDFCounter());
+                    dispatch(setExportToPDFJobId(""));
+                }
             } catch (error) {
                 toast.error(`The error occured during PDF export. ${error}`)
             }
