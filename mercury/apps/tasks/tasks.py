@@ -363,7 +363,10 @@ def export_to_pdf(self, job_params):
         raise Exception("PDF export params validation error. Wrong notebook information.")
 
     # try to build platform independent path
-    notebook_os_path = os.path.join(*([os.path.abspath(os.getcwd())] + notebook_path.split("/")))
+    
+    notebook_os_path = os.path.join(*(
+        [settings.MEDIA_ROOT] + notebook_path.replace(settings.MEDIA_URL, "", 1).split("/")))
+
 
     if not os.path.exists(notebook_os_path):
         raise Exception(f"PDF export notebook error. The notebook in HTML format does not exist.")
