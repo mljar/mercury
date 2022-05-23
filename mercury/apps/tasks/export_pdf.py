@@ -10,8 +10,14 @@ import concurrent.futures
 
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
-    browser = await launch({'headless': True, 'args': ['--no-sandbox']})
-    
+    browser = await launch(
+        handleSIGINT=False,
+        handleSIGTERM=False,
+        handleSIGHUP=False,
+        headless=True,
+        args=["--no-sandbox"],
+    )
+
     page = await browser.newPage()
     await page.setViewport(dict(width=994, height=768))
     await page.emulateMedia("screen")
@@ -116,7 +122,7 @@ def install_chromium():
 def to_pdf(html_input_file, pdf_output_file):
 
     # make sure chromium is installed
-    install_chromium()
+    # install_chromium()
 
     # convert notebook to PDF
     pool = concurrent.futures.ThreadPoolExecutor()
