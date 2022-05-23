@@ -7,6 +7,7 @@ from pyppeteer import launch
 
 import concurrent.futures
 
+
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
     browser = await launch(
@@ -108,15 +109,16 @@ async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
 
     await browser.close()
 
+
 def install_chromium():
     command = ["pyppeteer-install"]
     with Popen(command, stdout=PIPE, stderr=PIPE) as proc:
         print(proc.stdout.read())
         print(proc.stderr.read())
-            
+
 
 def to_pdf(html_input_file, pdf_output_file):
-    
+
     # make sure chromium is installed
     install_chromium()
 
@@ -125,8 +127,8 @@ def to_pdf(html_input_file, pdf_output_file):
     pool.submit(
         asyncio.run,
         html_to_pdf(
-            html_input_file, pdf_output_file
-            #"slides2.slides.html?print-pdf", "slides-my.pdf"
+            html_input_file,
+            pdf_output_file
+            # "slides2.slides.html?print-pdf", "slides-my.pdf"
         ),
     ).result()
-    

@@ -180,9 +180,7 @@ class ExportPDF(APIView):
     def post(self, request):
         try:
             # check if user can access the notebook
-            notebook = (
-                notebooks_queryset(request).get(pk=request.data["notebook_id"])
-            )
+            notebook = notebooks_queryset(request).get(pk=request.data["notebook_id"])
         except Notebook.DoesNotExist:
             raise Http404()
         try:
@@ -201,5 +199,6 @@ class GetPDFAddress(APIView):
                 error = str(res.result)
             elif res.state == "SUCCESS":
                 fileUrl, title = res.result
-        return Response({"ready": res.ready(), "url": fileUrl, "title": title, "error": error})
-
+        return Response(
+            {"ready": res.ready(), "url": fileUrl, "title": title, "error": error}
+        )
