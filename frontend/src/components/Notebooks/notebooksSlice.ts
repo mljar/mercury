@@ -123,7 +123,9 @@ export const fetchNotebook =
   (id: number, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
-        dispatch(setSlidesHash(""));
+        if(!silent) {
+          dispatch(setSlidesHash(""));
+        }
 
         const { width } = getWindowDimensions();
         dispatch(setShowSideBar(width > 992));

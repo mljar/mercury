@@ -12,7 +12,11 @@ import {
   getSlidesHash,
   // getWatchModeCounter,
 } from "../components/Notebooks/notebooksSlice";
-import { fetchCurrentTask, getCurrentTask, getExportingToPDF } from "../tasks/tasksSlice";
+import {
+  fetchCurrentTask,
+  getCurrentTask,
+  getExportingToPDF,
+} from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
@@ -136,13 +140,18 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
           username={username}
         />
       )}
-      <BlockUi blocking={exportingToPDF} message="Exporting to PDF. Please wait ...">
+      <BlockUi
+        blocking={exportingToPDF}
+        message="Exporting to PDF. Please wait ..."
+      >
         {exportingToPDF && <WaitPDFExport />}
         <div className="container-fluid">
           <div className="row">
             <WatchModeComponent notebookId={notebookId} />
 
-            {notebook.schedule !== "" && <AutoRefresh notebookId={notebookId} />}
+            {notebook.schedule !== undefined && notebook.schedule !== "" && (
+              <AutoRefresh notebookId={notebookId} />
+            )}
 
             {showSideBar && (
               <SideBar
@@ -212,10 +221,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
             )}
           </div>
         </div>
-      </BlockUi >
+      </BlockUi>
       {displayEmbed && <MadeWithDiv />}
     </div>
-
   );
 }
 
