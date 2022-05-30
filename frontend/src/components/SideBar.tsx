@@ -39,6 +39,7 @@ type SideBarProps = {
   notebookPath: string;
   displayEmbed: boolean;
   showFiles: boolean;
+  isPresentation: boolean;
 };
 
 export default function SideBar({
@@ -53,6 +54,7 @@ export default function SideBar({
   notebookPath,
   displayEmbed,
   showFiles,
+  isPresentation,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -347,6 +349,17 @@ export default function SideBar({
                 visible in Mercury.
               </div>
             )}
+
+            {isPresentation && (
+              <div className="alert alert-primary mb-3" role="alert">
+                <i className="fa fa-television" aria-hidden="true"></i> {' '}
+                Click on presentation and press <b>F</b> for full screen. Press <b>Esc</b> to quit.
+                <br/><br/>
+                <i className="fa fa-arrows" aria-hidden="true"></i> {' '}Click on presentation and press <b>Esc</b> to navigate slides.
+
+              </div>
+            )}
+
           </form>
         </div>
 
