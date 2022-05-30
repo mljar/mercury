@@ -44,7 +44,7 @@ with open(os.path.join(output_dir, "my_file.txt"), "w") as fout:
 
 ### Step 4 - Output files in the web app
 
-In the Mercury application, there will be additional menu in the side bar with `Output files` button. Please click there to see your files. Each file in the directory can be downloaded.
+In the Mercury application, there will be additional menu in the sidebar with `Output files` button. Please click there to see your files. Each file in the directory can be downloaded.
 
 <img 
     style="border: 1px solid #e1e4e5"
