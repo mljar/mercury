@@ -19,7 +19,7 @@ from apps.tasks.clean_service import clean_service
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.export_pdf import to_pdf
-
+from apps.tasks.notify import notify
 
 def get_parameters_cell_index(cells, all_variables):
     max_cnt, max_index = 0, -1

@@ -103,6 +103,7 @@ def task_init_notebook(
             "output": "app",
             "format": {},
             "schedule": "",
+            "notify": {},
         }
         nb = None
         update_notebook = False
@@ -149,6 +150,7 @@ def task_init_notebook(
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
+        notebook_notify = params.get("notify", {})
 
         if notebook_schedule != "":
             try:
@@ -256,6 +258,7 @@ def task_init_notebook(
                 output=notebook_output,
                 format=json.dumps(notebook_format),
                 schedule=notebook_schedule,
+                notify=json.dumps(notebook_notify),
             )
         else:
 
@@ -278,6 +281,7 @@ def task_init_notebook(
             notebook.output = notebook_output
             notebook.format = json.dumps(notebook_format)
             notebook.schedule = notebook_schedule
+            notebook.notify=json.dumps(notebook_notify),
 
         notebook.save()
         return notebook.id

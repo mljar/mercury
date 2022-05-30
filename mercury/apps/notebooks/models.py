@@ -14,3 +14,4 @@ class Notebook(models.Model):
     output = models.CharField(max_length=128, blank=True)
     format = models.CharField(max_length=1024, blank=True)
     schedule = models.CharField(max_length=128, blank=True)
+    notify = models.TextField(blank=True)

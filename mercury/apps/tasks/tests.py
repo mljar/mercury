@@ -4,6 +4,7 @@ import tempfile
 
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.core import mail
 from rest_framework.reverse import reverse
 
 from apps.notebooks.tasks import task_init_notebook
@@ -11,6 +12,7 @@ from apps.notebooks.tests import create_notebook_with_yaml
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.tasks.tasks import task_execute, sanitize_string
+from apps.tasks.notify import notify
 
 # python manage.py test apps.tasks.tests -v 2
 
@@ -245,3 +247,14 @@ with open(rest_response, "w") as fout:
         response = self.client.get(f"/get/{task.session_id}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"hello": "world"})
+
+
+class NotifyTestCase(TestCase):
+    def test_notify(self):
+        notify()
+
+        # Test that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the subject of the first message is correct.
+        self.assertEqual(mail.outbox[0].subject, 'Subject here')
