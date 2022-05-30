@@ -135,7 +135,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     <div className="App">
       {!displayEmbed && (
         <NavBar
-          showFiles={areOutputFilesAvailable(notebook?.params?.params)}
           isPro={isPro}
           username={username}
         />
@@ -165,6 +164,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 watchMode={isWatchMode()}
                 notebookPath={notebookPath}
                 displayEmbed={displayEmbed}
+                showFiles={areOutputFilesAvailable(notebook?.params?.params)}
               />
             )}
 

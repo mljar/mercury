@@ -62,7 +62,7 @@ export default function FilesView({
     <main className="col-md-9 ms-sm-auto col-lg-9" style={{ padding: "20px" }}>
       <div className="col-8">
         <h3 style={{ paddingBottom: "10px" }}>
-          <i className="fa fa-folder-open-o" aria-hidden="true"></i> Files view
+          <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output Files
         </h3>
         <BlockUi tag="div" blocking={waiting}>
           <div>

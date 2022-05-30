@@ -10,7 +10,6 @@ import RangeWidget from "./Widgets/Range";
 import SelectWidget from "./Widgets/Select";
 import SliderWidget from "./Widgets/Slider";
 
-
 import {
   isCheckboxWidget,
   isFileWidget,
@@ -25,7 +24,7 @@ import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
-import { setShowSideBar } from "../views/appSlice";
+import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
 
 type SideBarProps = {
@@ -39,6 +38,7 @@ type SideBarProps = {
   watchMode: boolean;
   notebookPath: string;
   displayEmbed: boolean;
+  showFiles: boolean;
 };
 
 export default function SideBar({
@@ -52,6 +52,7 @@ export default function SideBar({
   watchMode,
   notebookPath,
   displayEmbed,
+  showFiles,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -185,8 +186,6 @@ export default function SideBar({
     return true;
   };
 
-
-
   let additionalStyle = {};
   if (displayEmbed) {
     additionalStyle = { padding: "0px" };
@@ -246,9 +245,7 @@ export default function SideBar({
                   Download
                 </button>
 
-                <ul
-                  className="dropdown-menu dropdown-menu-end"
-                >
+                <ul className="dropdown-menu dropdown-menu-end">
                   <li>
                     <a
                       style={{ cursor: "pointer" }}
@@ -257,14 +254,12 @@ export default function SideBar({
                         handleDownload(
                           `${axios.defaults.baseURL}${notebookPath}`,
                           `${notebookTitle}.html`
-                        )
-                      }
-                      }
+                        );
+                      }}
                     >
                       <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
                       Download as HTML
                     </a>
-
                   </li>
                   <li>
                     <hr className="dropdown-divider" />
@@ -274,9 +269,7 @@ export default function SideBar({
                       type="button"
                       className="dropdown-item"
                       onClick={() => {
-                        dispatch(
-                          exportToPDF(notebookId, notebookPath)
-                        );
+                        dispatch(exportToPDF(notebookId, notebookPath));
                       }}
                     >
                       <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
@@ -356,7 +349,8 @@ export default function SideBar({
             )}
           </form>
         </div>
-        <hr style={{ marginTop: "50px", marginBottom: "10px" }} />
+
+        <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
         <div>
           <button
             className="btn btn-sm btn-outline-danger"
@@ -372,6 +366,37 @@ export default function SideBar({
             tasks
           </button>
         </div>
+        {showFiles && (
+          <div>
+            <hr />
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              style={{
+                border: "none",
+                //fontWeight: 500,
+              }}
+              onClick={() => {
+                dispatch(setView("app"));
+              }}
+            >
+              <i className="fa fa-laptop" aria-hidden="true"></i> App
+            </button>
+
+            <button
+              className="btn btn-sm btn-outline-secondary"
+              style={{
+                border: "none",
+                //fontWeight: 500,
+              }}
+              onClick={() => {
+                dispatch(setView("files"));
+              }}
+            >
+              <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output
+              Files
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
