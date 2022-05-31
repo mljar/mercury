@@ -264,7 +264,6 @@ notify:
 ---"""
 
         with tempfile.NamedTemporaryFile() as tmp:
-            
 
             create_notebook_with_yaml(
                 tmp.name + ".ipynb", yaml=config, code="print('hello')"
@@ -278,10 +277,10 @@ notify:
             notebook = Notebook.objects.get(pk=1)
             task = Task.objects.get(pk=1)
 
-            #notify(json.loads(notebook.notify), True, "", notebook.id, task.result)
+            # notify(json.loads(notebook.notify), True, "", notebook.id, task.result)
 
         print(mail.outbox[0].subject)
-        #print(mail.outbox[1].subject)
+        # print(mail.outbox[1].subject)
         # Test that one message has been sent.
         self.assertEqual(len(mail.outbox), 1)
 

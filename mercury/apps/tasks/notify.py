@@ -1,8 +1,9 @@
 import os
 from django.conf import settings
-from django.core.mail import (send_mail, EmailMessage)
+from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 from apps.tasks.tasks_export import export_to_pdf
+from apps.notebooks.models import Notebook
 
 
 def valid_notify(config):
@@ -52,20 +53,11 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url):
 
     on_success, on_failure, attachment = parse_config(config)
 
-    notebook_html_path = os.path.join(
-        *(
-            [settings.MEDIA_ROOT]
-            + notebook_url.replace(settings.MEDIA_URL, "", 1).split("/")
-        )
-    )
-    notebook_pdf_path = ""
-    if "pdf" in attachment:
-        export_to_pdf({"notebook_id": notebook_id, "notebook_path": notebook_url})
-        notebook_pdf_path = notebook_html_path.replace(".html", ".pdf")
+    notebook = Notebook.objects.get(pk=notebook_id)
 
     email = None
     if on_success and is_success:
-        msg = """Your notebook executed successfully"""
+        msg = f"""Notebook '{notebook.title}' executed successfully."""
         email = EmailMessage(
             "Notebook executed successfully",
             msg,
@@ -73,7 +65,7 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url):
             on_success,
         )
     if on_failure and not is_success:
-        msg = """Your Notebook failed to execute"""
+        msg = f"""Notebook '{notebook.title}' failed to execute. {error_msg}"""
         email = EmailMessage(
             "Notebook failed to execute",
             msg,
@@ -81,9 +73,20 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url):
             on_failure,
         )
     if email is not None:
-        if "html" in attachment:
-            email.attach_file(notebook_html_path)
-        if "pdf" in attachment:
-            email.attach_file(notebook_pdf_path)
-        email.send(fail_silently=True)
 
+        notebook_html_path = os.path.join(
+            *(
+                [settings.MEDIA_ROOT]
+                + notebook_url.replace(settings.MEDIA_URL, "", 1).split("/")
+            )
+        )
+
+        if "html" in attachment:
+            if os.path.exists(notebook_html_path):
+                email.attach_file(notebook_html_path)
+        if "pdf" in attachment and os.path.exists(notebook_html_path):
+            export_to_pdf({"notebook_id": notebook_id, "notebook_path": notebook_url})
+            notebook_pdf_path = notebook_html_path.replace(".html", ".pdf")
+            email.attach_file(notebook_pdf_path)
+
+        email.send(fail_silently=True)
