@@ -110,7 +110,7 @@ def main():
                 "-A",
                 "mercury.server" if sys.argv[0].endswith("mercury") else "server",
                 "worker",
-                "--loglevel=info", # error", 
+                "--loglevel=error", 
                 "-P",
                 "gevent",
                 "--concurrency",

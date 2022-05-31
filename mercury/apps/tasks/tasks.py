@@ -353,7 +353,7 @@ def task_execute(self, job_params):
                 is_success=task.state == "DONE",
                 error_msg="" if task.state == "DONE" else task.result,
                 notebook_id=notebook.id,
-                notebook_url_path=task.result,
+                notebook_url=task.result,
             )
 
         # remove input notebook
