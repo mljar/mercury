@@ -1,5 +1,6 @@
 import os
 import json
+import yaml
 import tempfile
 
 from django.contrib.auth.models import User
@@ -251,10 +252,20 @@ with open(rest_response, "w") as fout:
 
 class NotifyTestCase(TestCase):
     def test_notify(self):
-        notify()
+        User.objects.create_user(
+            username="username1", password="password", email="contact@example.com"
+        )
+
+        config = """
+notify:
+    on_success: username1, contact@example.com
+    attachment: html        
+"""
+
+        notify(yaml.safe_load(config)["notify"], True, "", 1, "")
 
         # Test that one message has been sent.
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the subject of the first message is correct.
-        self.assertEqual(mail.outbox[0].subject, 'Subject here')
+        self.assertTrue("success" in mail.outbox[0].subject)

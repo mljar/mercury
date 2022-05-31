@@ -20,7 +20,8 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.views import notebooks_queryset
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
-from apps.tasks.tasks import task_execute, export_to_pdf
+from apps.tasks.tasks import task_execute
+from apps.tasks.tasks_export import export_to_pdf
 
 
 class TaskCreateView(CreateAPIView):

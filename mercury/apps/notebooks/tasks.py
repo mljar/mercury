@@ -281,7 +281,7 @@ def task_init_notebook(
             notebook.output = notebook_output
             notebook.format = json.dumps(notebook_format)
             notebook.schedule = notebook_schedule
-            notebook.notify=json.dumps(notebook_notify),
+            notebook.notify = json.dumps(notebook_notify)
 
         notebook.save()
         return notebook.id
