@@ -2,9 +2,7 @@ import os
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
-from apps.notebooks.models import Notebook
-
-# from apps.tasks.tasks_export import export_to_pdf
+from apps.tasks.tasks_export import export_to_pdf
 
 
 def valid_notify(config):
@@ -15,6 +13,7 @@ def username_to_email(username):
     users = User.objects.filter(username=username)
     if not users:
         return ""
+    # not worry about duplicates in username
     return users[0].email
 
 
@@ -47,8 +46,6 @@ def parse_config(config):
 
 def notify(config, is_success, error_msg, notebook_id, notebook_url_path):
 
-    print("Config", config)
-
     if not config:
         # no config provided, skip notify step
         return
@@ -65,8 +62,7 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url_path):
     )
     notebook_os_path_pdf = ""
     if "pdf" in attachment:
-        # export_to_pdf({"notebook_id": notebook_id,
-        #                "notebook_path": notebook_os_path})
+        export_to_pdf({"notebook_id": notebook_id, "notebook_path": notebook_url_path})
         notebook_os_path_pdf = notebook_os_path.replace(".html", ".pdf")
 
     print(notebook_os_path)
