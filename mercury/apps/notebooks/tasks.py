@@ -3,12 +3,13 @@ import os
 import subprocess
 import sys
 import uuid
+import nbformat
+import yaml
+
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
-
-import nbformat
-import yaml
+from croniter import croniter
 from celery import shared_task
 from django.conf import settings
 from django.template.defaultfilters import slugify
@@ -17,8 +18,7 @@ from django.utils.timezone import make_aware
 from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
-
-from croniter import croniter
+from apps.tasks.notify import validate_notify
 
 
 def process_nbconvert_errors(error_msg):
@@ -241,6 +241,9 @@ def task_init_notebook(
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
 
+
+        parse_errors = validate_notify(notebook_notify)
+
         if notebook_id is None:
             notebook = Notebook(
                 title=notebook_title,
@@ -259,6 +262,7 @@ def task_init_notebook(
                 format=json.dumps(notebook_format),
                 schedule=notebook_schedule,
                 notify=json.dumps(notebook_notify),
+                errors = parse_errors
             )
         else:
 
@@ -282,6 +286,7 @@ def task_init_notebook(
             notebook.format = json.dumps(notebook_format)
             notebook.schedule = notebook_schedule
             notebook.notify = json.dumps(notebook_notify)
+            notebook.errors = parse_errors
 
         notebook.save()
         return notebook.id

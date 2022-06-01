@@ -21,4 +21,5 @@ class NotebookSerializer(serializers.ModelSerializer):
             "output",
             "format",
             "schedule",
+            "errors",
         )

@@ -166,6 +166,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 displayEmbed={displayEmbed}
                 showFiles={areOutputFilesAvailable(notebook?.params?.params)}
                 isPresentation={notebook.output !== undefined && notebook.output === "slides"}
+                notebookParseErrors={notebook.errors}
               />
             )}
 

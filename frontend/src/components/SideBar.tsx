@@ -40,6 +40,7 @@ type SideBarProps = {
   displayEmbed: boolean;
   showFiles: boolean;
   isPresentation: boolean;
+  notebookParseErrors: string;
 };
 
 export default function SideBar({
@@ -55,6 +56,7 @@ export default function SideBar({
   displayEmbed,
   showFiles,
   isPresentation,
+  notebookParseErrors,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -329,10 +331,22 @@ export default function SideBar({
 
             {notebookSchedule !== "" && (
               <div className="alert alert-success mb-3" role="alert">
-                <i className="fa fa-clock-o" aria-hidden="true"></i> Scheduled
-                notebook at '{notebookSchedule}'. Automatic refresh every
-                minute.
-                {taskCreatedAt && <p>Last execution at {taskCreatedAt}.</p>}
+                <p>
+                  <i className="fa fa-clock-o" aria-hidden="true"></i> Scheduled
+                  notebook at '{notebookSchedule}'.
+                </p>
+
+                {taskCreatedAt && (
+                  <p>
+                    {" "}
+                    <i className="fa fa-calendar" aria-hidden="true"></i> Last
+                    execution at {taskCreatedAt}.
+                  </p>
+                )}
+                <div>
+                  <i className="fa fa-refresh" aria-hidden="true"></i> Website
+                  refresh every minute.
+                </div>
               </div>
             )}
 
@@ -352,14 +366,24 @@ export default function SideBar({
 
             {isPresentation && (
               <div className="alert alert-primary mb-3" role="alert">
-                <i className="fa fa-television" aria-hidden="true"></i> {' '}
-                Click on presentation and press <b>F</b> for full screen. Press <b>Esc</b> to quit.
-                <br/><br/>
-                <i className="fa fa-arrows" aria-hidden="true"></i> {' '}Click on presentation and press <b>Esc</b> to navigate slides.
-
+                <i className="fa fa-television" aria-hidden="true"></i> Click on
+                presentation and press <b>F</b> for full screen. Press{" "}
+                <b>Esc</b> to quit.
+                <br />
+                <br />
+                <i className="fa fa-arrows" aria-hidden="true"></i> Click on
+                presentation and press <b>Esc</b> to navigate slides.
               </div>
             )}
 
+            {notebookParseErrors && (
+              <div className="alert alert-danger mb-3" role="alert">
+                <i className="fa fa-exclamation-circle" aria-hidden="true"></i>{" "}
+                <b>Errors in the YAML</b>
+                <br />
+                {notebookParseErrors}
+              </div>
+            )}
           </form>
         </div>
 

@@ -15,3 +15,4 @@ class Notebook(models.Model):
     format = models.CharField(max_length=1024, blank=True)
     schedule = models.CharField(max_length=128, blank=True)
     notify = models.TextField(blank=True)
+    errors = models.TextField(blank=True)
