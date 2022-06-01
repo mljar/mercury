@@ -225,6 +225,12 @@ mercury run
 
 It will serve Mercury website at [http://127.0.0.1:8000](http://127.0.0.1:8000) with all notebooks.
 
+You can change the default `8000` PORT when running the `mercury`:
+
+```
+mercury run 127.0.0.1:<your-port-here>
+```
+
 ### Manually add notebooks (second option)
 
 To run Mercury locally just run:

@@ -51,11 +51,17 @@ To run app locally please use the command:
 mercury run greetings.ipynb
 ```
 
-Please open the web browser with address `http://127.0.0.1`.
+Please open the web browser with address `http://127.0.0.1:8000`.
 
 <img 
     style="border: 1px solid #e1e4e5"
     alt="Run app locally"
     src="../media/app_running_locally.png" width="100%" />
+
+If you would like to run a `mercury` locally on different port please specify it in the `run` command:
+
+```
+mercury run greetings.ipynb 127.0.0.1:<your-port>
+```
 
 There are many ways in which the app can be deployed to the cloud. Please check the [Deployment](/deploy/deployment) section.
