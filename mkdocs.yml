@@ -11,6 +11,8 @@ nav:
   - Interactive Slides: interactive-slides.md
   - REST API: notebook-as-rest-api.md
   - Embedding: embedding.md
+  - Schedule: schedule.md
+  - Export to PDF or HTML: export-pdf-html.md
   - Authentication: authentication.md
   - Admin Panel: admin-panel.md
   - Articles: articles.md
