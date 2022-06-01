@@ -14,6 +14,7 @@ nav:
   - Schedule: schedule.md
   - Export to PDF or HTML: export-pdf-html.md
   - Authentication: authentication.md
+  - Configuration: configuration.md
   - Admin Panel: admin-panel.md
   - Articles: articles.md
   - FAQ: faq.md
