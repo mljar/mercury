@@ -48,6 +48,7 @@ services:
             DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
             SECRET_KEY: ${SECRET_KEY}
             ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+            WELCOME: ${WELCOME}
 
 volumes:
     static_volume: {}
