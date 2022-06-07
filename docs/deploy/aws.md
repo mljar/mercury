@@ -4,17 +4,29 @@ During instance creation please remember to add a Rule for port 80 forwarding HT
 
 ## Install docker
 
-Please install docker following the [official docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+Please install docker following the [official docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
+
+
+On Ubuntu machine the following commands will work:
+
+```
+sudo apt-get update
+sudo apt install docker.io
+sudo docker --version
+```
 
 ## Install docker-compose
 
 Please install docker-compose following the [official docs](https://docs.docker.com/compose/install/#install-compose-on-linux-systems)
 
-You should be able to run:
+On Linux machine the following commands will install `docker-compose`:
 
 ```
-sudo docker --version
-sudo docker-compose --version
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+sudo docker-compose version
 ```
 
 ## Provide notebooks
