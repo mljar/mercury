@@ -17,7 +17,7 @@
 Mercury is a perfect tool to convert Python notebook to interactive **web app** / **slides** / **dashboard** / **report** / **REST API** and share with non-programmers. 
 
 - You define interactive widgets for your notebook with the YAML header. 
-- Your users can change the widgets values, execute the notebook and save result (as html file).
+- Your users can change the widgets values, execute the notebook and save result (as PDF or html file).
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
 
