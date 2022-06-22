@@ -44,6 +44,7 @@ You need to setup the email settings to make notification works. It requires qui
 You need to set following environment values:
 
 ```
+EMAIL_HOST
 EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD 
 EMAIL_PORT
@@ -54,9 +55,10 @@ DEFAULT_FROM_EMAIL
 Example:
 
 ```
+EMAIL_HOST=smtp.gmail.com
 EMAIL_HOST_USER=my-email@gmail.com
 EMAIL_HOST_PASSWORD=secret-password
-EMAIL_PORT=465
+EMAIL_PORT=587
 DEFAULT_FROM_EMAIL=my-email@gmail.com
 ```
 

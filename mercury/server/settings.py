@@ -237,13 +237,13 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # email setup, used in notification
-EMAIL_HOST = os.environ.get("EMAIL_HOST_USER") 
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com") # default set to gmail smtp
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER") 
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD") 
-EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
 EMAIL_USE_TLS = True # use TLS by default
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-if EMAIL_HOST is not None:
+if EMAIL_HOST_USER is not None:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
