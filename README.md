@@ -1,9 +1,9 @@
-# Share your notebook as web app / slides / dashboard / report / REST API
+
 
 <p align="center">
   <img 
     alt="Mercury convert notebook to web app"
-    src="https://github.com/mljar/visual-identity/raw/main/mercury/mercury-new-way-to-share-python-notebook.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/turn-notebook-to-web-app.png" width="100%" />  
 </p>
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
@@ -13,22 +13,14 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/platforms.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
+# Share your Python notebook as web application
 
-Mercury is a perfect tool to convert Python notebook to interactive **web app** / **slides** / **dashboard** / **report** / **REST API** and share with non-programmers. 
+Mercury is a perfect tool to convert Python notebook to interactive web application and share with non-programmers. 
 
 - You define interactive widgets for your notebook with the YAML header. 
 - Your users can change the widgets values, execute the notebook and save result (as PDF or html file).
 - You can hide your code to not scare your (non-coding) collaborators.
 - Easily deploy to any server.
-
-Mercury can convert your notebook to:
-
-- interactive web app
-- interactive slides
-- data dashboard
-- beautiful report
-- REST API (coming soon)
-
 
 Mercury is dual-licensed. Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at our [website](https://mljar.com/pricing).
 
