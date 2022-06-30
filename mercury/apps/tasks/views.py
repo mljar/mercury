@@ -120,7 +120,7 @@ class ClearTasksView(APIView):
             )
             print("Exception occured", str(e))
 
-        return Response(status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CreateRestAPITask(APIView):
