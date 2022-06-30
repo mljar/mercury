@@ -23,7 +23,7 @@ export default function RestAPIView({
   const [response, setResponse] = useState(JSON.stringify({ "msg": "Example output" }))
   const widgetsValues = useSelector(getWidgetsValues);
 
-  let examplePostData = {} as Record<string, string | number | null | undefined | boolean | [number, number] | string[]>;
+  let examplePostData = {} as Record<string, string | number | null | undefined | boolean | [number, number] | string[] | unknown>;
   for (let [key, widgetParams] of Object.entries(widgetsParams)) {
     if (widgetParams.input) {
       examplePostData[key] = widgetsValues[key];

@@ -241,7 +241,6 @@ def task_init_notebook(
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
 
-
         parse_errors = validate_notify(notebook_notify)
 
         if notebook_id is None:
@@ -262,7 +261,7 @@ def task_init_notebook(
                 format=json.dumps(notebook_format),
                 schedule=notebook_schedule,
                 notify=json.dumps(notebook_notify),
-                errors = parse_errors
+                errors=parse_errors,
             )
         else:
 

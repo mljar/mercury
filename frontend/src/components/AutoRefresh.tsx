@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurrentTask } from "../tasks/tasksSlice";
+import { fetchCurrentTask, fetchExecutionHistory } from "../tasks/tasksSlice";
 
 import { fetchNotebook, getSelectedNotebook } from "./Notebooks/notebooksSlice";
 
@@ -16,6 +16,7 @@ export default function AutoRefresh({ notebookId }: Props) {
     setTimeout(() => {
       dispatch(fetchNotebook(notebookId, true));
       dispatch(fetchCurrentTask(notebookId));
+      dispatch(fetchExecutionHistory(notebookId));
     }, 60000); // every 1 minute
   }, [dispatch, notebookId, notebook]);
 

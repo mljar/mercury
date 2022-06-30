@@ -76,7 +76,7 @@ def execute_notebook(notebook_id):
 
     with transaction.atomic():
         task = Task(
-            session_id=uuid.uuid4().hex,
+            session_id=f"scheduled-{uuid.uuid4().hex[:8]}",
             state="CREATED",
             notebook=Notebook.objects.get(pk=notebook_id),
             params="{}",

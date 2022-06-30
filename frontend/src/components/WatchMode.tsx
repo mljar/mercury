@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCurrentTask } from "../tasks/tasksSlice";
+import { fetchCurrentTask, fetchExecutionHistory } from "../tasks/tasksSlice";
 
 import {
   fetchNotebook,
@@ -26,6 +26,7 @@ function WatchMode({ notebookId }: Props) {
       setTimeout(() => {
         dispatch(fetchNotebook(notebookId, true));
         dispatch(fetchCurrentTask(notebookId));
+        dispatch(fetchExecutionHistory(notebookId));
       }, 2000);
     }
   }, [dispatch, notebook, notebookId, watchModeCounter]);

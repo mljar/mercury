@@ -8,6 +8,7 @@ import {
 import axios from 'axios';
 
 import { RootState } from '../../store';
+import { clearExecutionHistory, fetchExecutionHistory } from '../../tasks/tasksSlice';
 import { setShowSideBar } from '../../views/appSlice';
 import { IWidget } from '../Widgets/Types';
 import { getWindowDimensions } from '../WindowDimensions';
@@ -99,7 +100,8 @@ export const fetchNotebooks =
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         dispatch(setSlidesHash(""));
-        dispatch(setLoadingState("loading"))
+        dispatch(setLoadingState("loading"));
+        dispatch(clearExecutionHistory());
         const url = '/api/v1/notebooks/';
         const { data } = await axios.get(url);
         const parsedNotebooks = data.map((notebook: any) => {
@@ -124,19 +126,20 @@ export const fetchNotebook =
   (id: number, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
-        if(!silent) {
+        if (!silent) {
           dispatch(setSlidesHash(""));
+          dispatch(clearExecutionHistory());
         }
 
         const { width } = getWindowDimensions();
         dispatch(setShowSideBar(width > 992));
 
         if (!silent) {
-          dispatch(setLoadingStateSelected("loading"))
+          dispatch(setLoadingStateSelected("loading"));
         }
         const url = `/api/v1/notebooks/${id}/`;
         const { data } = await axios.get(url);
-        const parsedParams = JSON.parse(data.params)
+        const parsedParams = JSON.parse(data.params);
         dispatch(setSelectedNotebook(
           {
             ...data,
@@ -144,11 +147,11 @@ export const fetchNotebook =
           }
         ));
         if (!silent) {
-          dispatch(setLoadingStateSelected("loaded"))
+          dispatch(setLoadingStateSelected("loaded"));
         }
       } catch (error) {
         if (!silent) {
-          dispatch(setLoadingStateSelected("error"))
+          dispatch(setLoadingStateSelected("error"));
         }
         console.error(`Problem during loading selected notebook (${id}). ${error}`);
       }

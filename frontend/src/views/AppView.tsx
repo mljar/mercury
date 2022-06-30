@@ -14,8 +14,10 @@ import {
 } from "../components/Notebooks/notebooksSlice";
 import {
   fetchCurrentTask,
+  fetchExecutionHistory,
   getCurrentTask,
   getExportingToPDF,
+  getHistoricTask,
 } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
@@ -47,6 +49,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const notebook = useSelector(getSelectedNotebook);
   const loadingState = useSelector(getLoadingStateSelected);
   const task = useSelector(getCurrentTask);
+  const historicTask = useSelector(getHistoricTask);
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
   const outputFilesState = useSelector(getOutputFilesState);
@@ -74,12 +77,17 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   useEffect(() => {
     dispatch(fetchNotebook(notebookId));
     dispatch(fetchCurrentTask(notebookId));
+
+    dispatch(fetchExecutionHistory(notebookId));
+
   }, [dispatch, notebookId, token]);
 
   useEffect(() => {
     if (waitForTask()) {
       setTimeout(() => {
         dispatch(fetchCurrentTask(notebookId));
+
+        dispatch(fetchExecutionHistory(notebookId));
       }, 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,6 +122,15 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   if (task.state && task.result && task.state === "ERROR") {
     errorMsg = task.result;
   }
+
+  // set historic task to display if available
+  if(historicTask.state && historicTask.state === "DONE" && historicTask.result) {
+    notebookPath = historicTask.result;
+  }
+  if (historicTask.state && historicTask.result && historicTask.state === "ERROR") {
+    errorMsg = historicTask.result;
+  }
+
 
   const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
     if (widgetsParams) {

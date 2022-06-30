@@ -23,9 +23,11 @@ export interface ITask {
 
 const initialState = {
     currentTask: {} as ITask,
+    historicTask: {} as ITask,
     exportingToPDF: false,
     exportToPDFJobId: '',
     exportToPDFCounter: 0,
+    executionHistory: [] as ITask[],
 };
 
 const tasksSlice = createSlice({
@@ -34,6 +36,9 @@ const tasksSlice = createSlice({
     reducers: {
         setCurrentTask(state, action: PayloadAction<ITask>) {
             state.currentTask = action.payload;
+        },
+        setHistoricTask(state, action: PayloadAction<ITask>) {
+            state.historicTask = action.payload;
         },
         setExportingToPDF(state, action: PayloadAction<boolean>) {
             state.exportingToPDF = action.payload;
@@ -51,8 +56,13 @@ const tasksSlice = createSlice({
             state.exportingToPDF = false;
             state.exportToPDFJobId = "";
             state.exportToPDFCounter = 0;
+        },
+        setExecutionHistory(state, action: PayloadAction<ITask[]>) {
+            state.executionHistory = action.payload;
+        },
+        clearExecutionHistory(state) {
+            state.executionHistory = [];
         }
-
     },
 });
 
@@ -60,17 +70,22 @@ export default tasksSlice.reducer;
 
 export const {
     setCurrentTask,
+    setHistoricTask,
     setExportingToPDF,
     setExportToPDFJobId,
     resetExportToPDFCounter,
     increaseExportToPDFCounter,
     stopPDFExport,
+    setExecutionHistory,
+    clearExecutionHistory,
 } = tasksSlice.actions;
 
 export const getCurrentTask = (state: RootState) => state.tasks.currentTask;
+export const getHistoricTask = (state: RootState) => state.tasks.historicTask;
 export const getExportingToPDF = (state: RootState) => state.tasks.exportingToPDF;
 export const getExportToPDFJobId = (state: RootState) => state.tasks.exportToPDFJobId;
 export const getExportToPDFCounter = (state: RootState) => state.tasks.exportToPDFCounter;
+export const getExecutionHistory = (state: RootState) => state.tasks.executionHistory;
 
 export const fetchCurrentTask =
     (notebookId: Number) =>
@@ -189,4 +204,25 @@ export const getPDF =
                 toast.error(`The error occured during PDF export. ${error}`);
                 dispatch(stopPDFExport());
             }
+        };
+
+
+
+export const fetchExecutionHistory =
+    (notebookId: Number) =>
+        async (dispatch: Dispatch<AnyAction>) => {
+
+            dispatch(setHistoricTask({} as ITask));
+            dispatch(clearExecutionHistory());
+
+            const sessionId = getSessionId();
+
+            try {
+                const url = `/api/v1/execution_history/${notebookId}/${sessionId}`;
+                const { data } = await axios.get(url);
+                dispatch(setExecutionHistory(data))
+            } catch (error) {
+                dispatch(clearExecutionHistory());
+            }
+
         };

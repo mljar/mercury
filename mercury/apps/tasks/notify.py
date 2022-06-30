@@ -7,14 +7,16 @@ from apps.notebooks.models import Notebook
 
 
 def validate_notify(config: dict) -> str:
-    ''' returns the string with error message from notify parsing '''
+    """returns the string with error message from notify parsing"""
 
     if not config:
         return ""
     try:
         on_success, on_failure, attachment = parse_config(config)
         if not on_success and not on_failure:
-            return "Please specify `on_success` or `on_failure` in the `notify` parameter."
+            return (
+                "Please specify `on_success` or `on_failure` in the `notify` parameter."
+            )
         if attachment and not ("pdf" in attachment or "html" in attachment):
             return "Please specify `html` or `pdf` format in the `attachment` in the `notify`."
     except Exception as e:
@@ -96,7 +98,9 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url):
             if "html" in attachment and os.path.exists(notebook_html_path):
                 email.attach_file(notebook_html_path)
             if "pdf" in attachment and os.path.exists(notebook_html_path):
-                export_to_pdf({"notebook_id": notebook_id, "notebook_path": notebook_url})
+                export_to_pdf(
+                    {"notebook_id": notebook_id, "notebook_path": notebook_url}
+                )
                 notebook_pdf_path = notebook_html_path.replace(".html", ".pdf")
                 email.attach_file(notebook_pdf_path)
 

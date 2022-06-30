@@ -3,7 +3,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
+import { clearTasks, executeNotebook, exportToPDF, ITask } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -28,6 +28,7 @@ import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
 import MarkdownWidget from "./Widgets/Markdown";
+import SelectExecutionHistory from "./SelectExecutionHistory";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -443,6 +444,7 @@ export default function SideBar({
             </button>
           </div>
         )}
+        <SelectExecutionHistory disabled={waiting} />
       </div>
     </nav>
   );
