@@ -21,9 +21,15 @@ if (window.location.origin === "http://localhost:3000") {
 } else {
   axios.defaults.baseURL = window.location.origin;
 }
-if (window.location.origin === "https://hf.space") {
+if (window.location.origin.startsWith("https://hf.space")) {
   axios.defaults.baseURL = window.location.href;
 }
+
+// in the case of some special params in the url
+axios.defaults.baseURL = axios.defaults.baseURL.split("+")[0];
+axios.defaults.baseURL = axios.defaults.baseURL.split("?")[0];
+axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
+
 
 document.addEventListener("DOMContentLoaded", () =>
   render(
