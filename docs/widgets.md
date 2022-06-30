@@ -33,6 +33,24 @@ You can set a default value of the widget by setting the `value`. The format of 
 
 The rest of the parameters depend on the widget input type.
 
+<h3>Output widgets</h3>
+
+You can specify Markdown text in the sidebar. The syntax is as following:
+
+```yaml
+params:
+    some_text:
+        output: markdown
+        value: | 
+            ## header
+
+            This is Markdown text in the sidebar. 
+
+            - one
+            - two
+            - three
+```
+
 # Widgets
 
 ### Text
