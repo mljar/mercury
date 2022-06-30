@@ -18,6 +18,7 @@ import {
   isSelectWidget,
   isSliderWidget,
   isTextWidget,
+  isMarkdownWidget,
   IWidget,
 } from "./Widgets/Types";
 import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
@@ -26,6 +27,7 @@ import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
+import MarkdownWidget from "./Widgets/Markdown";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -73,6 +75,9 @@ export default function SideBar({
               value: widgetParams.value ? widgetParams.value : "",
             })
           );
+        } else if (isMarkdownWidget(widgetParams)) {
+          // do nothing
+          // dont put value into store
         } else {
           dispatch(setWidgetValue({ key, value: widgetParams.value }));
         }
@@ -168,6 +173,10 @@ export default function SideBar({
             rows={widgetParams?.rows}
             key={key}
           />
+        );
+      } else if (isMarkdownWidget(widgetParams)) {
+        widgets.push(
+          <MarkdownWidget value={widgetParams.value as string} key={key} />
         );
       }
     }

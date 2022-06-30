@@ -61,6 +61,12 @@ export interface IOutputFilesWidget {
   value: null;
 }
 
+export interface IMarkdownWidget {
+  output: string;
+  input: null;  // we need to add input to be IWidget
+  value: string;
+}
+
 export type IWidget =
   | ISelectWidget
   | ICheckboxWidget
@@ -69,7 +75,8 @@ export type IWidget =
   | IRangeWidget
   | IFileWidget
   | ITextWidget
-  | IOutputFilesWidget;
+  | IOutputFilesWidget
+  | IMarkdownWidget;
 
 export function isSelectWidget(widget: IWidget): widget is ISelectWidget {
   return (widget as ISelectWidget).input === "select";
@@ -101,4 +108,8 @@ export function isTextWidget(widget: IWidget): widget is ITextWidget {
 
 export function isOutputFilesWidget(widget: IWidget): widget is IOutputFilesWidget {
   return (widget as IOutputFilesWidget).output === "dir";
+}
+
+export function isMarkdownWidget(widget: IWidget): widget is IMarkdownWidget {
+  return (widget as IMarkdownWidget).output === "markdown";
 }

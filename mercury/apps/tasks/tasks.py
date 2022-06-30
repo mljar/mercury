@@ -67,6 +67,8 @@ def task_execute(self, job_params):
         all_variables = []
         remove_after_execution = []
         for k, v in widgets_params.items():
+            if v.get("output", "") == "markdown":
+                continue
             all_variables += [k]
             use_default = True
             if k in task_params:
