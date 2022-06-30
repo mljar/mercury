@@ -4,6 +4,6 @@ Mercury is an Open Source project licensed under the terms of
 the AGPLv3 license.  Please see <http://www.gnu.org/licenses/agpl-3.0.html>
 for license text.
 
-Mercury Pro has a commercial-friendly license allowing private forks
-and modifications of Mercury.  Please see https://mljar.com/mercury for
-more detail. You can find the commercial license terms in LICENSE-COMMERCIAL.txt.
+Mercury Pro has a commercial-friendly license.  
+You can find the commercial license terms in LICENSE-COMMERCIAL.txt.
+Please see https://mljar.com/pricing for purchasing options.
