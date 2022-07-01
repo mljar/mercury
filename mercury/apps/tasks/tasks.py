@@ -131,7 +131,7 @@ def task_execute(self, job_params):
                         for t in task_value:
                             if t in widgets_params[k]["choices"]:
                                 values_str_list += [f'"{t}"']
-                        if values_str_list:
+                        if values_str_list or len(task_value) == 0:
                             inject_code += f'{k} = [{",".join(values_str_list)}]\n'
                             use_default = False
                 elif v["input"] == "slider":
