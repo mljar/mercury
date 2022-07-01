@@ -410,8 +410,7 @@ export default function SideBar({
             disabled={waiting}
             title="Click to clear all previous runs of the notebook"
           >
-            <i className="fa fa-times-circle" aria-hidden="true"></i> Clear
-            tasks
+            <i className="fa fa-times-circle" aria-hidden="true"></i> Clear runs
           </button>
         </div>
         {showFiles && (

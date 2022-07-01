@@ -150,6 +150,8 @@ export const clearTasks =
                 const url = `/api/v1/clear_tasks/${notebookId}/${sessionId}`;
                 await axios.post(url);
                 dispatch(setCurrentTask({} as ITask));
+                dispatch(setHistoricTask({} as ITask));
+                dispatch(setExecutionHistory([]));
                 toast.success("All previous tasks deleted. The default view of the app is displayed.")
             } catch (error) {
                 toast.error(`Trying to clear previous tasks. The error occured. ${error}`)
