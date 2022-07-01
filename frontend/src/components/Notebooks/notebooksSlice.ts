@@ -8,7 +8,7 @@ import {
 import axios from 'axios';
 
 import { RootState } from '../../store';
-import { clearExecutionHistory, fetchExecutionHistory } from '../../tasks/tasksSlice';
+import { clearExecutionHistory } from '../../tasks/tasksSlice';
 import { setShowSideBar } from '../../views/appSlice';
 import { IWidget } from '../Widgets/Types';
 import { getWindowDimensions } from '../WindowDimensions';

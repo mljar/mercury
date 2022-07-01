@@ -77,9 +77,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   useEffect(() => {
     dispatch(fetchNotebook(notebookId));
     dispatch(fetchCurrentTask(notebookId));
-
     dispatch(fetchExecutionHistory(notebookId));
-
   }, [dispatch, notebookId, token]);
 
   useEffect(() => {
@@ -124,13 +122,20 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   }
 
   // set historic task to display if available
-  if(historicTask.state && historicTask.state === "DONE" && historicTask.result) {
+  if (
+    historicTask.state &&
+    historicTask.state === "DONE" &&
+    historicTask.result
+  ) {
     notebookPath = historicTask.result;
   }
-  if (historicTask.state && historicTask.result && historicTask.state === "ERROR") {
+  if (
+    historicTask.state &&
+    historicTask.result &&
+    historicTask.state === "ERROR"
+  ) {
     errorMsg = historicTask.result;
   }
-
 
   const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
     if (widgetsParams) {
@@ -150,12 +155,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
 
   return (
     <div className="App">
-      {!displayEmbed && (
-        <NavBar
-          isPro={isPro}
-          username={username}
-        />
-      )}
+      {!displayEmbed && <NavBar isPro={isPro} username={username} />}
       <BlockUi
         blocking={exportingToPDF}
         message="Exporting to PDF. Please wait ..."
@@ -182,7 +182,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 notebookPath={notebookPath}
                 displayEmbed={displayEmbed}
                 showFiles={areOutputFilesAvailable(notebook?.params?.params)}
-                isPresentation={notebook.output !== undefined && notebook.output === "slides"}
+                isPresentation={
+                  notebook.output !== undefined && notebook.output === "slides"
+                }
                 notebookParseErrors={notebook.errors}
               />
             )}

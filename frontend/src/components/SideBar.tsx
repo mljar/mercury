@@ -3,7 +3,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, executeNotebook, exportToPDF, ITask } from "../tasks/tasksSlice";
+import { clearTasks, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -399,6 +399,7 @@ export default function SideBar({
 
         <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
         <div>
+          <SelectExecutionHistory disabled={waiting} />
           <button
             className="btn btn-sm btn-outline-danger"
             onClick={() => {
@@ -444,7 +445,6 @@ export default function SideBar({
             </button>
           </div>
         )}
-        <SelectExecutionHistory disabled={waiting} />
       </div>
     </nav>
   );

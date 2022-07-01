@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import {
+  getCurrentTask,
   getExecutionHistory,
   getHistoricTask,
   setHistoricTask,
@@ -18,8 +19,24 @@ export default function SelectExecutionHistory({ disabled }: Props) {
   const dispatch = useDispatch();
   const executionHistory = useSelector(getExecutionHistory);
   const historicTask = useSelector(getHistoricTask);
+  const currentTask = useSelector(getCurrentTask);
 
-  console.log(executionHistory);
+  useEffect(() => {
+    if (executionHistory.length > 0) {
+      let lastHistoricTask = executionHistory[executionHistory.length - 1];
+
+      if (!historicTask.id && currentTask.id === lastHistoricTask.id) {
+        for (let [key, value] of Object.entries(
+          JSON.parse(currentTask.params)
+        )) {
+          if (value !== null) {
+            dispatch(setWidgetValue({ key, value }));
+          }
+        }
+      }
+    }
+  }, [dispatch, executionHistory, historicTask, currentTask]);
+
   if (executionHistory.length === 0) return <div></div>;
 
   const selectStyles = {
@@ -49,8 +66,6 @@ export default function SelectExecutionHistory({ disabled }: Props) {
 
   return (
     <div>
-      <hr />
-
       <div className="form-group mb-3">
         <label htmlFor="select-execution-history">Execution history</label>
         <Select
@@ -65,13 +80,10 @@ export default function SelectExecutionHistory({ disabled }: Props) {
             if (e) {
               let historical = executionHistory[parseInt(e.value)];
               dispatch(setHistoricTask(historical));
-
-              //console.log(historical.params);
               for (let [key, value] of Object.entries(
                 JSON.parse(historical.params)
               )) {
                 if (value !== null) {
-                  //console.log({ key, value });
                   dispatch(setWidgetValue({ key, value }));
                 }
               }
