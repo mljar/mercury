@@ -13,10 +13,10 @@ def list_files(directory):
 
 setup(
     name="mljar-mercury",
-    version="1.0.1",
+    version="1.1.0",
     maintainer="MLJAR Sp. z o.o.",
     maintainer_email="contact@mljar.com",
-    description="Convert Python Notebook to web app and share with others",
+    description="Convert Python Notebook to web app and share with non-technical users",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=open("mercury/requirements.txt").readlines(),

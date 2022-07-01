@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "1.0.1",
   "private": true,
+  "homepage": "http://mydomain.com/example/to/replace",
   "dependencies": {
     "@popperjs/core": "^2.11.0",
     "@reduxjs/toolkit": "^1.6.2",
