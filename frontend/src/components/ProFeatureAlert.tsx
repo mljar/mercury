@@ -12,7 +12,7 @@ export default function ProFeatureAlert({ featureName }: ProFeatureProps) {
           <i className="fa fa-info-circle" aria-hidden="true"></i> This is a Pro
           feature{" "}
         </h5>
-        You are using an open-source version of the Mercury framework. The
+        You are using an open-source version of the Mercury framework. The{' '} 
         {featureName} is a Pro feature available only for commercial users.
         Please consider purchasing the Mercury commercial license. It is
         perpetual and comes with additional features, dedicated support, and

@@ -32,5 +32,8 @@ tasks_urlpatterns = [
     url("get/(?P<session_id>.+)", GetRestAPITask.as_view()),
     url("export_pdf", ExportPDF.as_view()),
     url("get_pdf/(?P<job_id>.+)", GetPDFAddress.as_view()),
-    url("api/v1/execution_history/(?P<notebook_id>.+)/(?P<session_id>.+)", ExecutionHistoryView.as_view()),
+    url(
+        "api/v1/execution_history/(?P<notebook_id>.+)/(?P<session_id>.+)",
+        ExecutionHistoryView.as_view(),
+    ),
 ]

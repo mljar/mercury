@@ -32,6 +32,7 @@ app.autodiscover_tasks()
 def setup_periodic_tasks(sender, **kwargs):
     try:
         import django
+
         django.setup()
         from apps.notebooks.models import Notebook
 
@@ -67,8 +68,9 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task
 def execute_notebook(notebook_id):
-    
+
     import django
+
     django.setup()
     from apps.notebooks.models import Notebook
     from apps.tasks.models import Task

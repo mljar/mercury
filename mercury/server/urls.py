@@ -21,7 +21,12 @@ if settings.DEBUG or settings.SERVE_STATIC:
         return render(request, "index.html")
 
     # Serve static and media files from development server
-    urlpatterns += [path("", index), re_path(r"^app", index)]
+    urlpatterns += [
+        path("", index),
+        re_path(r"^app", index),
+        re_path(r"^login", index),
+        re_path(r"^account", index),
+    ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
