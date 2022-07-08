@@ -11,7 +11,7 @@ type Props = {
 };
 const Root = ({ store, history }: Props) => (
   <Provider store={store}>
-    <SingleRoute />
+    <Routes />
   </Provider>
 );
 
