@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NumericInput from "react-numeric-input";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "./widgetsSlice";
@@ -23,8 +23,9 @@ export default function NumericWidget({
   disabled,
 }: NumericProps) {
   const dispatch = useDispatch();
-  let minValue = 0;
-  let maxValue = 100;
+
+  let minValue = undefined;
+  let maxValue = undefined;
   let stepValue = 1;
   if (min) {
     minValue = min;
@@ -48,6 +49,14 @@ export default function NumericWidget({
         step={stepValue}
         onChange={(e) => {
           dispatch(setWidgetValue({ key: widgetKey, value: e }));
+        }}
+        onBlur={(e) => {
+          if (min && value && value < min) {
+            dispatch(setWidgetValue({ key: widgetKey, value: min }));
+          }
+          if (max && value && value > max) {
+            dispatch(setWidgetValue({ key: widgetKey, value: max }));
+          }
         }}
       />
     </div>

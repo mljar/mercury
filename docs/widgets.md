@@ -207,8 +207,8 @@ Available parameters:
 - `input: numeric` - defines the numeric widget,
 - `label` - the label above the widget,
 - `value` - should be a number, example: `value: 5.5`.
-- `min` - a minimum allowed value (default set to 0),
-- `max` - a maximum allowed value (default set to 100),
+- `min` - a minimum allowed value. There will be no minimum if not set.
+- `max` - a maximum allowed value. There will be no maximum if not set.
 - `step` - a step value (default set to 1).
 
 ```yaml

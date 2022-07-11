@@ -100,18 +100,24 @@ def task_execute(self, job_params):
                     # DO NOT tu.delete()
                 elif v["input"] == "numeric":
                     task_value = task_params[k]
+                    allowed_minimum = widgets_params[k].get("min")
+                    allowed_maximum = widgets_params[k].get("max")
+
+                    good_value = True
+                    if allowed_minimum is not None and task_value < allowed_minimum:
+                        good_value = False
+                    if allowed_maximum is not None and task_value > allowed_maximum:
+                        good_value = False
+
                     if (
-                        (
-                            str(task_value)
-                            .replace(".", "", 1)
-                            .replace(",", "")
-                            .replace("-", "", 1)
-                            .replace("e", "", 1)
-                            .isdigit()
-                        )
-                        and (task_value >= widgets_params[k].get("min", 0))
-                        and (task_value <= widgets_params[k].get("max", 100))
-                    ):
+                        str(task_value)
+                        .replace(".", "", 1)
+                        .replace(",", "")
+                        .replace("-", "", 1)
+                        .replace("e", "", 1)
+                        .isdigit()
+                    ) and good_value:
+
                         inject_code += f"{k} = {task_value}\n"
                         use_default = False
                 elif v["input"] == "checkbox":
