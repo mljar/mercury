@@ -8,6 +8,7 @@ import {
 import axios from 'axios';
 
 import { RootState } from '../store';
+import { setToken, setUsername } from './authSlice';
 
 
 const initialState = {
@@ -20,7 +21,7 @@ const versionSlice = createSlice({
   name: 'version',
   initialState,
   reducers: {
-    setVersion(state, action: PayloadAction<{isPro: boolean }>) {
+    setVersion(state, action: PayloadAction<{ isPro: boolean }>) {
       const { isPro } = action.payload;
       state.isPro = isPro;
       state.fetchingIsPro = false;
@@ -52,8 +53,15 @@ export const fetchVersion =
         dispatch(setVersion(data));
       } catch (error) {
         console.log(`Problem during loading Mercury version. ${error}`);
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            // clear auth data 
+            dispatch(setToken(null));
+            dispatch(setUsername(null));
+            window.location.reload();
+          }
+        }
       }
-
     };
 
 
