@@ -103,11 +103,13 @@ def task_execute(self, job_params):
                     allowed_minimum = widgets_params[k].get("min")
                     allowed_maximum = widgets_params[k].get("max")
 
-                    good_value = True
-                    if allowed_minimum is not None and task_value < allowed_minimum:
-                        good_value = False
-                    if allowed_maximum is not None and task_value > allowed_maximum:
-                        good_value = False
+                    # do not validate the numeric input for minimum and maximum value
+                    # validation will be done in the frontend
+                    #good_value = True
+                    #if allowed_minimum is not None and task_value < allowed_minimum:
+                    #    good_value = False
+                    #if allowed_maximum is not None and task_value > allowed_maximum:
+                    #    good_value = False
 
                     if (
                         str(task_value)
@@ -116,8 +118,7 @@ def task_execute(self, job_params):
                         .replace("-", "", 1)
                         .replace("e", "", 1)
                         .isdigit()
-                    ) and good_value:
-
+                    ):# and good_value:
                         inject_code += f"{k} = {task_value}\n"
                         use_default = False
                 elif v["input"] == "checkbox":
