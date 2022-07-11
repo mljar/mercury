@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import NumericInput from "react-numeric-input";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "./widgetsSlice";
