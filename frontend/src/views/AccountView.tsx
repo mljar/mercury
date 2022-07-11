@@ -110,21 +110,23 @@ export default withRouter(function AccountView() {
                     onChange={(e) => setNewPassword2(e.target.value)}
                   />
                 </div>
-                <button
-                  className="btn btn-primary"
-                  onClick={() =>
-                    dispatch(
-                      changePassword(oldPassword, newPassword1, newPassword2)
-                    )
-                  }
-                  disabled={
-                    oldPassword === "" ||
-                    newPassword1 === "" ||
-                    newPassword2 === ""
-                  }
-                >
-                  Change password
-                </button>
+                <div className="mb-3" style={{paddingBottom: "50px"}}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      dispatch(
+                        changePassword(oldPassword, newPassword1, newPassword2)
+                      )
+                    }
+                    disabled={
+                      oldPassword === "" ||
+                      newPassword1 === "" ||
+                      newPassword2 === ""
+                    }
+                  >
+                    Change password
+                  </button>
+                </div>
               </div>
             </div>
           </div>
