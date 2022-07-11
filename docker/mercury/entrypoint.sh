@@ -5,9 +5,6 @@ do
     echo "Waiting for server volume..."
 done
 
-# clear old data dbs
-rm *.sqlite
-rm *.sqlite3
 
 until python manage.py migrate
 do

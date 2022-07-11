@@ -10,7 +10,8 @@ RUN apt-get update && \
             libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
             libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 \ 
             lsb-release xdg-utils wget libcairo-gobject2 libxinerama1 libgtk2.0-0 libpangoft2-1.0-0 libthai0 libpixman-1-0 \ 
-            libxcb-render0 libharfbuzz0b libdatrie1 libgraphite2-3 libgbm1
+            libxcb-render0 libharfbuzz0b libdatrie1 libgraphite2-3 libgbm1 \
+            libpq-dev
 
 
 WORKDIR /app
@@ -19,6 +20,7 @@ ADD ./mercury/requirements.txt /app/mercury/
 RUN pip install --upgrade pip
 RUN pip install gunicorn
 RUN pip install -r mercury/requirements.txt
+RUN pip install psycopg2 
 
 # install Pro features if GITHUB_TOKEN is set
 RUN if [ -z "${GITHUB_TOKEN}" ] ; then \

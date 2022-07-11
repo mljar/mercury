@@ -54,7 +54,25 @@ services:
             EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
             EMAIL_PORT: ${EMAIL_PORT} 
             DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
+            DJANGO_DB: postgresql
+            POSTGRES_HOST: db
+            POSTGRES_NAME: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_PORT: 5432
+        depends_on:
+            - db
+    db:
+        image: postgres:13.0-alpine
+        restart: unless-stopped
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
 
 volumes:
     static_volume: {}
     media_volume: {}
+    postgres_data: {}
