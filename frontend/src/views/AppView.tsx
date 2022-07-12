@@ -84,8 +84,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     if (waitForTask()) {
       setTimeout(() => {
         dispatch(fetchCurrentTask(notebookId));
-
-        dispatch(fetchExecutionHistory(notebookId));
+        dispatch(fetchExecutionHistory(notebookId, false));
       }, 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

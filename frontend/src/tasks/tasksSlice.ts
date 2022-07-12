@@ -211,11 +211,13 @@ export const getPDF =
 
 
 export const fetchExecutionHistory =
-    (notebookId: Number) =>
+    (notebookId: Number, clearPreviousHistory = true) =>
         async (dispatch: Dispatch<AnyAction>) => {
 
             dispatch(setHistoricTask({} as ITask));
-            dispatch(clearExecutionHistory());
+            if(clearPreviousHistory) {
+                dispatch(clearExecutionHistory());
+            }
 
             const sessionId = getSessionId();
 
