@@ -399,7 +399,7 @@ export default function SideBar({
 
         <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
         <div>
-          <SelectExecutionHistory disabled={waiting} />
+          {!watchMode && <SelectExecutionHistory disabled={waiting} />}
           <button
             className="btn btn-sm btn-outline-danger"
             onClick={() => {
