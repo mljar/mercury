@@ -18,6 +18,9 @@ import {
   getCurrentTask,
   getExportingToPDF,
   getHistoricTask,
+  getPreviousTask,
+  ITask,
+  setPreviousTask,
 } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
@@ -50,6 +53,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const loadingState = useSelector(getLoadingStateSelected);
   const task = useSelector(getCurrentTask);
   const historicTask = useSelector(getHistoricTask);
+  const previousTask = useSelector(getPreviousTask);
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
   const outputFilesState = useSelector(getOutputFilesState);
@@ -78,6 +82,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     dispatch(fetchNotebook(notebookId));
     dispatch(fetchCurrentTask(notebookId));
     dispatch(fetchExecutionHistory(notebookId));
+    dispatch(setPreviousTask({} as ITask));
   }, [dispatch, notebookId, token]);
 
   useEffect(() => {
@@ -134,6 +139,16 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     historicTask.state === "ERROR"
   ) {
     errorMsg = historicTask.result;
+  }
+
+  // if we have previous task to show, just show it
+  if (
+    notebookPath === notebook.default_view_path &&
+    previousTask.state &&
+    previousTask.state === "DONE" &&
+    previousTask.result
+  ) {
+    notebookPath = previousTask.result;
   }
 
   const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {

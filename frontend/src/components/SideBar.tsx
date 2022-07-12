@@ -3,7 +3,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
+import { clearTasks, copyCurrentToPreviousTask, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -239,7 +239,14 @@ export default function SideBar({
                 type="button"
                 className="btn btn-success"
                 style={{ marginRight: "10px", width: "47%" }}
-                onClick={() => dispatch(executeNotebook(notebookId))}
+                onClick={() => {
+                  // copy current task to previous task
+                  // previous task is used for display
+                  // during wait for new results
+                  dispatch(copyCurrentToPreviousTask());
+                  // execute the notebook with new parameters
+                  dispatch(executeNotebook(notebookId));
+                }}
                 disabled={waiting || !allFilesUploaded()}
               >
                 <i className="fa fa-play" aria-hidden="true"></i> Run

@@ -24,6 +24,7 @@ export interface ITask {
 const initialState = {
     currentTask: {} as ITask,
     historicTask: {} as ITask,
+    previousTask: {} as ITask,
     exportingToPDF: false,
     exportToPDFJobId: '',
     exportToPDFCounter: 0,
@@ -39,6 +40,12 @@ const tasksSlice = createSlice({
         },
         setHistoricTask(state, action: PayloadAction<ITask>) {
             state.historicTask = action.payload;
+        },
+        setPreviousTask(state, action: PayloadAction<ITask>) {
+            state.previousTask = action.payload;
+        },
+        copyCurrentToPreviousTask(state) {
+            state.previousTask = state.currentTask;
         },
         setExportingToPDF(state, action: PayloadAction<boolean>) {
             state.exportingToPDF = action.payload;
@@ -71,6 +78,8 @@ export default tasksSlice.reducer;
 export const {
     setCurrentTask,
     setHistoricTask,
+    setPreviousTask,
+    copyCurrentToPreviousTask,
     setExportingToPDF,
     setExportToPDFJobId,
     resetExportToPDFCounter,
@@ -82,6 +91,7 @@ export const {
 
 export const getCurrentTask = (state: RootState) => state.tasks.currentTask;
 export const getHistoricTask = (state: RootState) => state.tasks.historicTask;
+export const getPreviousTask = (state: RootState) => state.tasks.previousTask;
 export const getExportingToPDF = (state: RootState) => state.tasks.exportingToPDF;
 export const getExportToPDFJobId = (state: RootState) => state.tasks.exportToPDFJobId;
 export const getExportToPDFCounter = (state: RootState) => state.tasks.exportToPDFCounter;
@@ -151,6 +161,7 @@ export const clearTasks =
                 await axios.post(url);
                 dispatch(setCurrentTask({} as ITask));
                 dispatch(setHistoricTask({} as ITask));
+                dispatch(setPreviousTask({} as ITask));
                 dispatch(setExecutionHistory([]));
                 toast.success("All previous tasks deleted. The default view of the app is displayed.")
             } catch (error) {
