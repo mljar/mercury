@@ -41,7 +41,7 @@ def get_parameters_cell_index(cells, all_variables):
 
 
 def sanitize_string(input_string):
-    return sub("""[\"\'(){}\[\]\`\^\:]""", "", input_string)
+    return sub("""[\"\'(){}\[\]\`\^]""", "", input_string)
 
 
 @shared_task(bind=True)

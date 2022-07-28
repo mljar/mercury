@@ -21,7 +21,7 @@ export default function TextWidget({
   let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (input_string: string) => {
-    return input_string.replace(/["'(){}[\]`^:]/gim, "");
+    return input_string.replace(/["'(){}[\]`^]/gim, "");
   };
 
   return (
