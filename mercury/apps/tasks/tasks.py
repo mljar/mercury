@@ -41,7 +41,7 @@ def get_parameters_cell_index(cells, all_variables):
 
 
 def sanitize_string(input_string):
-    return sub("""[\"\'(){}\[\]\`\^\:]""", "", input_string)
+    return sub("""[\"\'(){}\[\]\`\^]""", "", input_string)
 
 
 @shared_task(bind=True)
@@ -213,7 +213,7 @@ def task_execute(self, job_params):
                     except Exception as e:
                         raise Exception(f"Cant create {output_dir}")
                 # pass path to directory into the notebook's code
-                inject_code += f'{k} = "{str(output_dir)}"\n'
+                inject_code += f'{k} = r"{str(output_dir)}"\n'
 
             if v.get("output") is not None and v.get("output") == "response":
                 # create output directory for REST response created in the notebook
@@ -225,8 +225,8 @@ def task_execute(self, job_params):
                         raise Exception(f"Cant create {output_dir}")
                 # pass path to directory into the notebook's code
                 output_dir = output_dir / "response.json"
-                inject_code += f'{k} = "{str(output_dir)}"\n'
-                print(inject_code)
+                inject_code += f'{k} = r"{str(output_dir)}"\n'
+                
 
         new_cell = {
             "cell_type": "code",
