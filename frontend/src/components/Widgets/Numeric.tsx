@@ -1,5 +1,4 @@
 import React from "react";
-import NumericInput from "react-numeric-input";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "./widgetsSlice";
 
@@ -37,18 +36,20 @@ export default function NumericWidget({
     stepValue = step;
   }
 
+  let displayValue: string | number = "";
+  if (value) {
+    displayValue = value;
+  }
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`checkbox-${label}`}>{label}</label>
-      <NumericInput
+      <input
         className="form-control"
-        disabled={disabled}
-        value={value as number}
-        min={minValue}
-        max={maxValue}
-        step={stepValue}
+        type="number"
+        value={displayValue as number | string}
         onChange={(e) => {
-          dispatch(setWidgetValue({ key: widgetKey, value: e }));
+          dispatch(setWidgetValue({ key: widgetKey, value: e.target.value }));
         }}
         onBlur={(e) => {
           if (min && value && value < min) {
@@ -58,6 +59,9 @@ export default function NumericWidget({
             dispatch(setWidgetValue({ key: widgetKey, value: max }));
           }
         }}
+        min={minValue}
+        max={maxValue}
+        step={stepValue}
       />
     </div>
   );
