@@ -29,7 +29,7 @@ class SanitizeTestCase(TestCase):
         self.assertTrue("(" not in output_string)
         self.assertTrue("[" not in output_string)
         self.assertTrue(output_string.startswith("テスト"))
-        self.assertTrue(output_string.endswith("asdfasdf"))
+        self.assertTrue(output_string.endswith("asdfasdf:"))
 
 
 class ExecuteNotebookTestCase(TestCase):
