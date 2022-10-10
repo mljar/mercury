@@ -26,6 +26,6 @@ jobs:
           conda --version
           python --version
       - name: Install Mercury
-        run: conda install -c conda-forge mljar-mercury
+        run: conda install -c conda-forge -n testenv mljar-mercury
       - name: Run Mercury server
         run: mercury run
