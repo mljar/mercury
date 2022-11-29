@@ -1,6 +1,8 @@
 import { useParams, withRouter } from "react-router-dom";
 import AppView from "./AppView";
 
+import WebSocketProvider from "../websocket/context";
+
 function App() {
   const { notebook_id } = useParams<{ notebook_id: string }>();
   const notebookId = Number(notebook_id);
@@ -9,11 +11,13 @@ function App() {
   const displayEmbed = !!(embed && embed === "embed");
 
   return (
-    <AppView
-      isSingleApp={false}
-      notebookId={notebookId}
-      displayEmbed={displayEmbed}
-    />
+    <WebSocketProvider>
+      <AppView
+        isSingleApp={false}
+        notebookId={notebookId}
+        displayEmbed={displayEmbed}
+      />
+    </WebSocketProvider>
   );
 }
 

@@ -1,9 +1,14 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, copyCurrentToPreviousTask, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
+import {
+  clearTasks,
+  copyCurrentToPreviousTask,
+  executeNotebook,
+  exportToPDF,
+} from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -29,6 +34,9 @@ import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
 import MarkdownWidget from "./Widgets/Markdown";
 import SelectExecutionHistory from "./SelectExecutionHistory";
+
+import { WebSocketContext } from "../websocket/context";
+import WebSocketStatus from "../websocket/Status";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -205,6 +213,8 @@ export default function SideBar({
     additionalStyle = { padding: "0px" };
   }
 
+  const ws = useContext(WebSocketContext);
+
   return (
     <nav
       id="sidebarMenu"
@@ -235,6 +245,7 @@ export default function SideBar({
             {widgets}
 
             <div className="form-group mb-3">
+              
               <button
                 type="button"
                 className="btn btn-success"
@@ -243,9 +254,11 @@ export default function SideBar({
                   // copy current task to previous task
                   // previous task is used for display
                   // during wait for new results
-                  dispatch(copyCurrentToPreviousTask());
+                  //  dispatch(copyCurrentToPreviousTask());
                   // execute the notebook with new parameters
-                  dispatch(executeNotebook(notebookId));
+                  //  dispatch(executeNotebook(notebookId));
+
+                  ws.sendMessage("run");
                 }}
                 disabled={waiting || !allFilesUploaded()}
               >
@@ -300,6 +313,8 @@ export default function SideBar({
                 </ul>
               </div>
             </div>
+
+            <WebSocketStatus />
 
             {fileKeys && !allFilesUploaded() && (
               <div className="alert alert-danger mb-3" role="alert">
