@@ -1,3 +1,4 @@
+from cgitb import text
 import json
 
 from asgiref.sync import async_to_sync
@@ -9,6 +10,8 @@ class ExecutorProxy(WebsocketConsumer):
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
         self.session_group = f"session_{self.session_id}"
         
+        print(f"Connect to group: {self.session_group}")
+
         async_to_sync(self.channel_layer.group_add)(
             self.session_group, self.channel_name
         )
@@ -21,6 +24,8 @@ class ExecutorProxy(WebsocketConsumer):
         )
 
     def receive(self, text_data):
+        print("Received", text_data)
+
         json_data = json.loads(text_data)
         
         async_to_sync(self.channel_layer.group_send)(

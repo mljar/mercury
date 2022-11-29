@@ -14,6 +14,6 @@ def on_message(wsapp, message):
     #     "message": "hihi"
     # }))
 
-wsapp = websocket.WebSocketApp("ws://127.0.0.1:8000/ws/execute/example-session-id/", on_message=on_message)
+wsapp = websocket.WebSocketApp("ws://127.0.0.1:8000/ws/execute/example-session/", on_message=on_message)
 wsapp.run_forever()
 

@@ -245,7 +245,6 @@ export default function SideBar({
             {widgets}
 
             <div className="form-group mb-3">
-              
               <button
                 type="button"
                 className="btn btn-success"
@@ -258,7 +257,7 @@ export default function SideBar({
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
 
-                  ws.sendMessage("run");
+                  ws.sendMessage(JSON.stringify({ payload: "run" }));
                 }}
                 disabled={waiting || !allFilesUploaded()}
               >
