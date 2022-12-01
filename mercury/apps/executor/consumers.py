@@ -9,7 +9,7 @@ class ExecutorProxy(WebsocketConsumer):
     def connect(self):
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
         self.session_group = f"session_{self.session_id}"
-        
+
         print(f"Connect to group: {self.session_group}")
 
         async_to_sync(self.channel_layer.group_add)(
@@ -27,7 +27,7 @@ class ExecutorProxy(WebsocketConsumer):
         print("Received", text_data)
 
         json_data = json.loads(text_data)
-        
+
         async_to_sync(self.channel_layer.group_send)(
             self.session_group, {"type": "broadcast_message", "payload": json_data}
         )
@@ -37,4 +37,3 @@ class ExecutorProxy(WebsocketConsumer):
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({"payload": payload}))
-        
