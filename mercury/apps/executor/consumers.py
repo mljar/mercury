@@ -8,7 +8,7 @@ from channels.generic.websocket import WebsocketConsumer
 class ExecutorProxy(WebsocketConsumer):
     def connect(self):
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
-        self.session_group = f"session_{self.session_id}"
+        self.session_group = f"group-{self.session_id}"
 
         print(f"Connect to group: {self.session_group}")
 

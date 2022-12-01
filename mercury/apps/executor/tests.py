@@ -1,9 +1,10 @@
 from django.test import TestCase
 
-
+import json
 import nbformat as nbf
 
 from apps.executor.exporter import Exporter
+from apps.executor.executor import Executor
 
 # python manage.py test apps
 
@@ -26,12 +27,27 @@ class ExporterTestCase(TestCase):
     def test_export(self):
         nb = get_test_notebook(markdown=["# test"], code=["print(1)"])
 
+        #print(json.dumps(nb, indent=4))
+
         e = Exporter()
 
-        body, resources = e(nb)
+        body, resources = e.run(nb)
 
-        #print(body)
-        #print(resources)
+        # print(body)
+        # print(resources)
 
-        with open("test.html", "w") as fout:
-            fout.write(body)
+        # with open("test.html", "w") as fout:
+        #    fout.write(body)
+
+
+class ExecutorTestCase(TestCase):
+    def test_execute(self):
+        nb = get_test_notebook( markdown=["# test"], code=["print(1)"])
+
+        notebook_path = "test_execute.ipynb"
+        with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
+            nbf.write(nb, f)
+
+        e = Executor(notebook_path)
+        body = e.run()
+        
