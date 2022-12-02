@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -214,6 +214,7 @@ export default function SideBar({
   }
 
   const ws = useContext(WebSocketContext);
+  const [msg, setMsg] = useState("");
 
   return (
     <nav
@@ -245,6 +246,13 @@ export default function SideBar({
             {widgets}
 
             <div className="form-group mb-3">
+              <textarea
+                rows={3}
+                value={msg}
+                onChange={(e) => setMsg(e.target.value)}
+              ></textarea>
+            </div>
+            <div className="form-group mb-3">
               <button
                 type="button"
                 className="btn btn-success"
@@ -257,7 +265,7 @@ export default function SideBar({
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
 
-                  ws.sendMessage(JSON.stringify({ payload: "run" }));
+                  ws.sendMessage(JSON.stringify({ payload: msg }));
                 }}
                 disabled={waiting || !allFilesUploaded()}
               >

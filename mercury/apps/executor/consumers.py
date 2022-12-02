@@ -31,6 +31,8 @@ class ExecutorProxy(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.session_group, {"type": "broadcast_message", "payload": json_data}
         )
+        import time
+        time.sleep(10)
 
     def broadcast_message(self, event):
         payload = event["payload"]

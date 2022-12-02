@@ -3,7 +3,7 @@ import websocket
 
 from celery import shared_task
 
-'''
+
 def on_open(wsapp):
     print(">> on_open")
 
@@ -21,7 +21,7 @@ wsapp = websocket.WebSocketApp(
     "ws://127.0.0.1:8000/ws/execute/example-session/", on_message=on_message
 )
 wsapp.run_forever()
-'''
+
 
 
 @shared_task(bind=True)
