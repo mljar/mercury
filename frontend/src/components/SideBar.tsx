@@ -216,6 +216,8 @@ export default function SideBar({
   const ws = useContext(WebSocketContext);
   const [msg, setMsg] = useState("");
 
+  console.log({ notebookId, ws });
+
   return (
     <nav
       id="sidebarMenu"
@@ -321,7 +323,7 @@ export default function SideBar({
               </div>
             </div>
 
-            <WebSocketStatus />
+            {notebookId !== undefined && <WebSocketStatus />}
 
             {fileKeys && !allFilesUploaded() && (
               <div className="alert alert-danger mb-3" role="alert">

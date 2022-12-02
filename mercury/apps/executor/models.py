@@ -15,3 +15,7 @@ class Worker(models.Model):
     state = models.CharField(max_length=128, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+    # add automatic update at
+    

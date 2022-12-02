@@ -76,11 +76,13 @@ export default function WebSocketProvider({
   }
 
   function connect() {
+    console.log("------------------------------")
     if (
       selectedNotebook !== undefined &&
       selectedNotebook.id !== undefined &&
       connection === undefined
     ) {
+      console.log("--************---------------")
       dispatch(setWebSocketStatus(WebSocketStatus.Connecting));
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${
