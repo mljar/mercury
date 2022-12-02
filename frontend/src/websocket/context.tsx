@@ -36,7 +36,7 @@ export default function WebSocketProvider({
   }
   if (connection === undefined) {
     connection = new WebSocket(
-      "ws://127.0.0.1:8000/ws/execute/example-session/"
+      "ws://127.0.0.1:8000/ws/execute/example-session/client/2/"
     );
     connection.onopen = onOpen;
     connection.onmessage = onMessage;
