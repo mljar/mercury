@@ -14,9 +14,8 @@ class Executor:
     def run(self):
         for c in self.notebook.cells:
             self.shell.cell(c)
-        
+
         exporter = Exporter()
         body, _ = exporter.run(nbformat.reads(nb2str(self.notebook), as_version=4))
 
         return body
-        

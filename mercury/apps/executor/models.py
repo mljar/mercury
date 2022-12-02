@@ -2,6 +2,7 @@ from django.db import models
 
 from apps.notebooks.models import Notebook
 
+
 class Worker(models.Model):
     # web browser session id
     session_id = models.CharField(max_length=128)

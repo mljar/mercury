@@ -226,7 +226,6 @@ def task_execute(self, job_params):
                 # pass path to directory into the notebook's code
                 output_dir = output_dir / "response.json"
                 inject_code += f'{k} = r"{str(output_dir)}"\n'
-                
 
         new_cell = {
             "cell_type": "code",

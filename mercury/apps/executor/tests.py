@@ -27,7 +27,7 @@ class ExporterTestCase(TestCase):
     def test_export(self):
         nb = get_test_notebook(markdown=["# test"], code=["print(1)"])
 
-        #print(json.dumps(nb, indent=4))
+        # print(json.dumps(nb, indent=4))
 
         e = Exporter()
 
@@ -42,7 +42,7 @@ class ExporterTestCase(TestCase):
 
 class ExecutorTestCase(TestCase):
     def test_execute(self):
-        nb = get_test_notebook( markdown=["# test"], code=["print(1)"])
+        nb = get_test_notebook(markdown=["# test"], code=["print(1)"])
 
         notebook_path = "test_execute.ipynb"
         with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
@@ -50,4 +50,3 @@ class ExecutorTestCase(TestCase):
 
         e = Executor(notebook_path)
         body = e.run()
-        
