@@ -25,6 +25,16 @@ print(Worker.objects.all())
 
 import sys, signal
 
+from channels.layers import get_channel_layer
+
+from asgiref.sync import async_to_sync
+
+
+print(sys.argv)
+notebook_id = int(sys.argv[1])
+session_id = sys.argv[2]
+worker_id = sys.argv[3]
+
 
 def signal_handler(signal, frame):
     print("\nBye bye!")
@@ -58,11 +68,31 @@ def on_open(ws):
     ws.send(json.dumps({"msg": "Worker is ready", "state": "started"}))
 
 
-def on_message(wsapp, message):
+def on_message(ws, message):
     global counter
     print(">> on_message")
     print(message, counter)
-    q.put(json.dumps({"counter": counter}))
+    
+    data = json.loads(message)
+    print(data)
+    if "payload" in data:
+        if "purpose" in data["payload"]:
+            purpose = data["payload"]["purpose"]
+            print(purpose)
+            if purpose == "worker-ping":
+                client_group = f"client-{notebook_id}-{session_id}"
+                print(client_group)
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(client_group, {
+                    "type": "broadcast_message",
+                    "payload": {
+                        "purpose": "worker-pong",
+                        "status": "running"
+                    }
+                })
+                print("sent")
+    
+    #q.put(json.dumps({"counter": counter}))
     counter += 1
 
 
@@ -91,9 +121,6 @@ RECONNECT_WAIT_TIME = 10
 CONNECT_MAX_TRIES = 2
 connect_tries = 0
 
-session_id = "example-session"
-notebook_id = 2
-
 
 def worker_starting():
     workers = Worker.objects.filter(session_id=session_id)
@@ -102,7 +129,7 @@ def worker_starting():
 while True:
     start_time = time.time()
     wsapp = websocket.WebSocketApp(
-        f"ws://127.0.0.1:8000/ws/execute/{session_id}/worker/{notebook_id}/",
+        f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
         on_message=on_message,
         on_pong=on_pong,
         on_close=on_close,

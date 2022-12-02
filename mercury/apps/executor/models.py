@@ -16,6 +16,4 @@ class Worker(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-
     # add automatic update at
-    
