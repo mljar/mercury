@@ -4,7 +4,6 @@ import subprocess
 
 from celery import shared_task
 
-
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):
 
@@ -19,3 +18,4 @@ def task_start_websocket_worker(self, job_params):
     print(" ".join(command))
     # worker = subprocess.Popen(command)
     print("end")
+

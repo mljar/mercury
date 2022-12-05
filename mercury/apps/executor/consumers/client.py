@@ -14,6 +14,8 @@ from apps.executor.tasks import task_start_websocket_worker
 
 from apps.executor.consumers.utils import get_client_group, get_worker_group
 
+from datetime import datetime, timedelta
+from django.utils.timezone import make_aware
 
 class ClientProxy(WebsocketConsumer):
     def connect(self):
@@ -43,10 +45,12 @@ class ClientProxy(WebsocketConsumer):
 
         json_data = json.loads(text_data)
 
-        if json_data["purpose"] == "worker-ping":
-            self.worker_ping()
-            return
-
+        if "purpose" in json_data:
+            if json_data["purpose"] == "worker-ping":
+                self.worker_ping()
+                return
+            if json_data["purpose"] == "new_params":
+                pass
         # send to all clients
         # async_to_sync(self.channel_layer.group_send)(
         #    self.client_group, {"type": "broadcast_message", "payload": json_data}
@@ -82,6 +86,7 @@ class ClientProxy(WebsocketConsumer):
         workers = Worker.objects.filter(
             session_id=self.session_id, notebook_id=self.notebook_id, state="Running"
         )
+        
         if not workers:
             self.need_worker()
             async_to_sync(self.channel_layer.group_send)(
@@ -91,6 +96,11 @@ class ClientProxy(WebsocketConsumer):
                     "payload": {"purpose": "worker-state", "state": "Initialized"},
                 },
             )
+
+            workers = Worker.objects.filter(
+                updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
+            )
+            workers.delete()
 
         else:
             print("send to worker group", self.worker_group)

@@ -23,13 +23,11 @@ django.setup()
 from apps.executor.models import Worker
 
 print(Worker.objects.all())
-
+from django.utils.timezone import make_aware
 
 import sys, signal
 
-from channels.layers import get_channel_layer
-
-from asgiref.sync import async_to_sync
+from datetime import datetime, timedelta
 
 
 print(sys.argv)
@@ -59,7 +57,7 @@ def worker():
     while True:
         item = q.get()
         print(f"Working on {item}")
-        time.sleep(10)
+        time.sleep(100)
         print(f"Finished {item}")
         q.task_done()
 
@@ -108,27 +106,30 @@ def on_message(ws, message):
         print(purpose)
         if purpose == "worker-ping":
             try:
-                Worker.objects.get(pk=worker_id)
+                w = Worker.objects.get(pk=worker_id)
+                w.state = "Running"
+                w.save()
             except Worker.DoesNotExist as e:
                 print(f"Cant find worker ({worker_id}). Quit")
                 sys.exit(1)
-            ws.send(json.dumps({"purpose": "worker-state", "state": "running"}))
+            ws.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
 
-    # q.put(json.dumps({"counter": counter}))
+    q.put(json.dumps({"counter": counter}))
     counter += 1
 
 
 def on_pong(wsapp, message):
-    global counter
-    print("pong", counter)
-    counter += 1
     try:
         w = Worker.objects.get(pk=worker_id)
-        w.state = "Running"
-        w.save()
-    except Exception as e:
-        print(f"Pong error. Quit")
+        if w.updated_at < make_aware(datetime.now() - timedelta(minutes=1)):
+            print("no ping from client, quit")
+            w.delete()
+            sys.exit(1)
 
+
+    except Exception as e:
+        print(f"on_pong error, quit")
+        print(traceback.format_exc())
 
 def on_error(ws, message):
     print("on_error", message)
@@ -140,6 +141,7 @@ def on_close(ws, close_status_code, close_msg):
         close_status_code,
         close_msg,
     )
+
 
 
 MIN_RUN_TIME = 10  # ws should run more time than this to be considered as live

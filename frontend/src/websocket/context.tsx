@@ -5,6 +5,7 @@ import {
   setWebSocketStatus,
   setWorkerStatus,
   WebSocketStatus,
+  WorkerStatus,
 } from "./wsSlice";
 
 import { useSelector } from "react-redux";
@@ -53,11 +54,13 @@ export default function WebSocketProvider({
     console.log("onErrr");
     console.log(JSON.stringify(event));
     dispatch(setWebSocketStatus(WebSocketStatus.Disconnected));
+    dispatch(setWorkerStatus(WorkerStatus.Unknown));
   }
 
   function onClose(event: any): void {
     console.log("onClose");
     dispatch(setWebSocketStatus(WebSocketStatus.Disconnected));
+    dispatch(setWorkerStatus(WorkerStatus.Unknown));
     connection = undefined;
     setTimeout(() => connect(), 5000);
   }
