@@ -7,6 +7,8 @@ import time
 import threading
 import queue
 
+import traceback
+import sys
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
@@ -33,20 +35,24 @@ from asgiref.sync import async_to_sync
 print(sys.argv)
 notebook_id = int(sys.argv[1])
 session_id = sys.argv[2]
-worker_id = sys.argv[3]
+worker_id = int(sys.argv[3])
 
 
 def signal_handler(signal, frame):
     print("\nBye bye!")
+    try:
+        Worker.objects.get(pk=worker_id).delete()
+    except Exception:
+        pass
     sys.exit(0)
 
 
 signal.signal(signal.SIGINT, signal_handler)
 
-counter = 0
-
 
 q = queue.Queue()
+
+counter = 0
 
 
 def worker():
@@ -65,34 +71,50 @@ def on_open(ws):
 
     print(">> on_open")
 
-    ws.send(json.dumps({"msg": "Worker is ready", "state": "started"}))
+    try:
+        w = Worker.objects.get(pk=worker_id)
+    except Worker.DoesNotExist as e:
+        print(f"Cant find worker ({worker_id}). Quit")
+        sys.exit(1)
+    try:
+        w.state = "Running"
+        w.save()
+    except Exception as e:
+        print("Error when set state")
+    try:
+        workers = Worker.objects.filter(
+            session_id=session_id, notebook__id=notebook_id, pk__lt=worker_id
+        )
+        workers.delete()
+    except Exception as e:
+        print("Error when deleting older workers.", str(e))
+        print(traceback.format_exc())
+
+    ws.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
 
 
 def on_message(ws, message):
-    global counter
-    print(">> on_message")
-    print(message, counter)
     
+    print(">> on_message")
+    print(message)
+    global counter
+    print(message, counter)
+
     data = json.loads(message)
     print(data)
-    if "payload" in data:
-        if "purpose" in data["payload"]:
-            purpose = data["payload"]["purpose"]
-            print(purpose)
-            if purpose == "worker-ping":
-                client_group = f"client-{notebook_id}-{session_id}"
-                print(client_group)
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(client_group, {
-                    "type": "broadcast_message",
-                    "payload": {
-                        "purpose": "worker-pong",
-                        "status": "running"
-                    }
-                })
-                print("sent")
-    
-    #q.put(json.dumps({"counter": counter}))
+
+    if "purpose" in data:
+        purpose = data["purpose"]
+        print(purpose)
+        if purpose == "worker-ping":
+            try:
+                Worker.objects.get(pk=worker_id)
+            except Worker.DoesNotExist as e:
+                print(f"Cant find worker ({worker_id}). Quit")
+                sys.exit(1)
+            ws.send(json.dumps({"purpose": "worker-state", "state": "running"}))
+
+    # q.put(json.dumps({"counter": counter}))
     counter += 1
 
 
@@ -100,8 +122,12 @@ def on_pong(wsapp, message):
     global counter
     print("pong", counter)
     counter += 1
-    # if counter > 2:
-    #    sys.exit()
+    try:
+        w = Worker.objects.get(pk=worker_id)
+        w.state = "Running"
+        w.save()
+    except Exception as e:
+        print(f"Pong error. Quit")
 
 
 def on_error(ws, message):

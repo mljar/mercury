@@ -43,10 +43,9 @@ export default function WebSocketProvider({
     console.log("reveived from server", event);
 
     const response = JSON.parse(event.data);
-    if ("payload" in response) {
-      const { payload } = response;
-      if (payload.purpose === "worker-pong") {
-        dispatch(setWorkerStatus(payload.status));
+    if ("purpose" in response) {
+      if (response.purpose === "worker-state") {
+        dispatch(setWorkerStatus(response.state));
       }
     }
   }
@@ -64,7 +63,6 @@ export default function WebSocketProvider({
   }
 
   function ping(): void {
-    console.log("ping");
     sendMessage(
       JSON.stringify({
         purpose: "worker-ping",
@@ -76,13 +74,13 @@ export default function WebSocketProvider({
   }
 
   function connect() {
-    console.log("------------------------------")
+    console.log("------------------------------");
     if (
       selectedNotebook !== undefined &&
       selectedNotebook.id !== undefined &&
       connection === undefined
     ) {
-      console.log("--************---------------")
+      console.log("--************---------------");
       dispatch(setWebSocketStatus(WebSocketStatus.Connecting));
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${
