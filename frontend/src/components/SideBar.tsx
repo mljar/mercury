@@ -37,6 +37,7 @@ import SelectExecutionHistory from "./SelectExecutionHistory";
 
 import { WebSocketContext } from "../websocket/context";
 import WebSocketStatus from "../websocket/Status";
+import { runNotebook } from "../websocket/wsSlice";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -267,7 +268,7 @@ export default function SideBar({
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
 
-                  ws.sendMessage(JSON.stringify({ payload: msg }));
+                  ws.sendMessage(JSON.stringify(runNotebook()));
                 }}
                 disabled={waiting || !allFilesUploaded()}
               >

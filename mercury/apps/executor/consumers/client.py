@@ -1,21 +1,17 @@
-from cgitb import text
 import json
+from cgitb import text
+from datetime import datetime, timedelta
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
-from apps.executor.models import Worker
-from apps.notebooks.models import Notebook
-
-
 from django.db import transaction
-
-from apps.executor.tasks import task_start_websocket_worker
+from django.utils.timezone import make_aware
 
 from apps.executor.consumers.utils import get_client_group, get_worker_group
+from apps.executor.models import Worker
+from apps.executor.tasks import task_start_websocket_worker
+from apps.notebooks.models import Notebook
 
-from datetime import datetime, timedelta
-from django.utils.timezone import make_aware
 
 class ClientProxy(WebsocketConsumer):
     def connect(self):
@@ -49,15 +45,13 @@ class ClientProxy(WebsocketConsumer):
             if json_data["purpose"] == "worker-ping":
                 self.worker_ping()
                 return
-            if json_data["purpose"] == "new_params":
-                pass
+            if json_data["purpose"] == "run-notebook":
+                async_to_sync(self.channel_layer.group_send)(
+                    self.worker_group, {"type": "broadcast_message", "payload": json_data}
+                )     
         # send to all clients
         # async_to_sync(self.channel_layer.group_send)(
         #    self.client_group, {"type": "broadcast_message", "payload": json_data}
-        # )
-        # sent to worker (should be only one)
-        # async_to_sync(self.channel_layer.group_send)(
-        #    self.worker_group, {"type": "broadcast_message", "payload": json_data}
         # )
 
     def broadcast_message(self, event):
@@ -71,7 +65,7 @@ class ClientProxy(WebsocketConsumer):
             worker = Worker(
                 session_id=self.session_id,
                 notebook_id=self.notebook_id,
-                state="Initialized",
+                state="Queued",
             )
             worker.save()
             job_params = {
@@ -93,7 +87,7 @@ class ClientProxy(WebsocketConsumer):
                 self.client_group,
                 {
                     "type": "broadcast_message",
-                    "payload": {"purpose": "worker-state", "state": "Initialized"},
+                    "payload": {"purpose": "worker-state", "state": "Queued"},
                 },
             )
 
@@ -103,7 +97,6 @@ class ClientProxy(WebsocketConsumer):
             workers.delete()
 
         else:
-            print("send to worker group", self.worker_group)
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
                 {

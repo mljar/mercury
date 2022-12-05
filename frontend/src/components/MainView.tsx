@@ -4,6 +4,8 @@ import axios from "axios";
 import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
+import { useSelector } from "react-redux";
+import { getNotebookSrc } from "../websocket/wsSlice";
 
 type MainViewProps = {
   loadingState: string;
@@ -33,6 +35,8 @@ export default function MainView({
   const { height } = useWindowDimensions();
 
   const iframeHeight = displayEmbed ? height - 10 : height - 58;
+
+  const notebookSrc = useSelector(getNotebookSrc);
 
   return (
     <main
@@ -90,6 +94,14 @@ export default function MainView({
               id="main-iframe"
             ></iframe>
           )}
+
+          {notebookSrc === "" && <p>nothing there</p>}
+          {notebookSrc !== "" && <iframe srcDoc={notebookSrc} width="100%"
+              height={iframeHeight}
+              key="notebook-src"
+              title="display-src"
+              id="main-iframe"
+              />}
         </div>
       </BlockUi>
     </main>

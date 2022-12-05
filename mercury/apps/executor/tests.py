@@ -1,10 +1,10 @@
+import json
+
+import nbformat as nbf
 from django.test import TestCase
 
-import json
-import nbformat as nbf
-
-from apps.executor.exporter import Exporter
 from apps.executor.executor import Executor
+from apps.executor.exporter import Exporter
 
 # python manage.py test apps
 

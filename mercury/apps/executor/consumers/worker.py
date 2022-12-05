@@ -1,18 +1,14 @@
-from cgitb import text
 import json
+from cgitb import text
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
-from apps.executor.models import Worker
-from apps.notebooks.models import Notebook
-
-
 from django.db import transaction
 
-from apps.executor.tasks import task_start_websocket_worker
-
 from apps.executor.consumers.utils import get_client_group, get_worker_group
+from apps.executor.models import Worker
+from apps.executor.tasks import task_start_websocket_worker
+from apps.notebooks.models import Notebook
 
 
 class WorkerProxy(WebsocketConsumer):

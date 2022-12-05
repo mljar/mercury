@@ -1,8 +1,9 @@
 import os
-import sys
 import subprocess
+import sys
 
 from celery import shared_task
+
 
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):

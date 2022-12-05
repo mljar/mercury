@@ -40,6 +40,7 @@ import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
+import { getNotebookSrc } from "../websocket/wsSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -167,6 +168,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     showRestApi = true;
   }
 
+  
   return (
     <div className="App">
       {!displayEmbed && <NavBar isPro={isPro} username={username} />}
@@ -254,6 +256,8 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 waiting={waitForTask()}
               />
             )}
+
+            
           </div>
         </div>
       </BlockUi>
