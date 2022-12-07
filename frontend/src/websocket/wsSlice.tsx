@@ -21,6 +21,8 @@ const initialState = {
   webSocketStatus: WebSocketStatus.Unknown,
   workerStatus: WorkerStatus.Unknown,
   notebookSrc: "",
+  indexCss: "",
+  themeLightCss: "",
 };
 
 const wsSlice = createSlice({
@@ -36,18 +38,31 @@ const wsSlice = createSlice({
     setNotebookSrc(state, action: PayloadAction<string>) {
       state.notebookSrc = action.payload;
     },
+    setIndexCss(state, action: PayloadAction<string>) {
+      state.indexCss = action.payload;
+    },
+    setThemeLightCss(state, action: PayloadAction<string>) {
+      state.themeLightCss = action.payload;
+    },
   },
 });
 
 export default wsSlice.reducer;
 
-export const { setWebSocketStatus, setWorkerStatus, setNotebookSrc } =
-  wsSlice.actions;
+export const {
+  setWebSocketStatus,
+  setWorkerStatus,
+  setNotebookSrc,
+  setIndexCss,
+  setThemeLightCss,
+} = wsSlice.actions;
 
 export const getWebSocketStatus = (state: RootState) =>
   state.ws.webSocketStatus;
 export const getWorkerStatus = (state: RootState) => state.ws.workerStatus;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
+export const getIndexCss = (state: RootState) => state.ws.indexCss;
+export const getThemeLightCss = (state: RootState) => state.ws.themeLightCss;
 
 export const runNotebook = () => {
   return {

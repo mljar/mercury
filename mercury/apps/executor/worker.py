@@ -31,7 +31,9 @@ worker_id = int(sys.argv[3])
 
 notebook = Notebook.objects.get(pk = notebook_id)
 print("Loading", notebook.path)
-shell = Executor(notebook.path)
+
+
+shell = Executor("/home/piotr/sandbox/mercury/mercury/demo.ipynb")
 
 
 
@@ -76,6 +78,17 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
+index_css, theme_light_css = "", ""
+
+#with open("/home/piotr/sandbox/mercury/mercury/menv/share/jupyter/nbconvert/templates/lab/static/full-index.css", "r") as fin:
+#    index_css = fin.read()
+
+#with open("/home/piotr/sandbox/mercury/mercury/menv/share/jupyter/nbconvert/templates/lab/static/full-theme-light.css", "r") as fin:
+#    theme_light_css = fin.read()
+
+
+
+
 q = queue.Queue()
 
 counter = 0
@@ -112,6 +125,8 @@ threading.Thread(target=worker, daemon=True).start()
 def on_open(ws):
     worker_exists_and_running(worker_id, ws)
     delete_old_workers(worker_id, notebook_id, session_id)
+    #wsapp.send(json.dumps({"purpose": "set-index-ccs", "css": index_css}))
+    #wsapp.send(json.dumps({"purpose": "set-theme-light-css", "css": theme_light_css}))
 
 
 def on_message(ws, message):

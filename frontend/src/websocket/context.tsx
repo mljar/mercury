@@ -2,6 +2,8 @@ import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
 import { getSelectedNotebook } from "../components/Notebooks/notebooksSlice";
 import {
+  setIndexCss,
+  setThemeLightCss,
   setNotebookSrc,
   setWebSocketStatus,
   setWorkerStatus,
@@ -39,7 +41,7 @@ export default function WebSocketProvider({
     ping();
   }
   function onMessage(event: any): void {
-    console.log("reveived from server", event.data);
+    //console.log("reveived from server", event.data);
 
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
@@ -47,6 +49,10 @@ export default function WebSocketProvider({
         dispatch(setWorkerStatus(response.state));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
+      } else if (response.purpose === "set-index-css") {
+        dispatch(setIndexCss(response.css));
+      } else if (response.purpose === "set-theme-light-css") {
+        dispatch(setThemeLightCss(response.css));
       }
     }
   }

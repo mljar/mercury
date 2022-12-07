@@ -39,8 +39,7 @@ import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
-import WaitPDFExport from "../components/WaitPDFExport";
-import { getNotebookSrc } from "../websocket/wsSlice";
+import WaitPDFExport from "../components/WaitPDFExport"; 
 
 type AppProps = {
   isSingleApp: boolean;

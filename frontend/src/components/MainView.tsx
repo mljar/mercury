@@ -5,7 +5,7 @@ import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
 import { useSelector } from "react-redux";
-import { getNotebookSrc } from "../websocket/wsSlice";
+import { getNotebookSrc, getIndexCss, getThemeLightCss } from "../websocket/wsSlice";
 
 type MainViewProps = {
   loadingState: string;
@@ -36,7 +36,13 @@ export default function MainView({
 
   const iframeHeight = displayEmbed ? height - 10 : height - 58;
 
-  const notebookSrc = useSelector(getNotebookSrc);
+  //const indexCss = useSelector(getIndexCss);
+  //const themeLightCss = useSelector(getThemeLightCss);
+  let notebookSrc = useSelector(getNotebookSrc);
+  //notebookSrc = notebookSrc.replace("/* empty index.css */", indexCss);
+  //notebookSrc = notebookSrc.replace("/* empty theme-light.css */", themeLightCss);
+  
+  console.log(notebookSrc)
 
   return (
     <main
@@ -96,12 +102,16 @@ export default function MainView({
           )}
 
           {notebookSrc === "" && <p>nothing there</p>}
-          {notebookSrc !== "" && <iframe srcDoc={notebookSrc} width="100%"
+          {notebookSrc !== "" && (
+            <iframe
+              srcDoc={notebookSrc}
+              width="100%"
               height={iframeHeight}
               key="notebook-src"
               title="display-src"
               id="main-iframe"
-              />}
+            />
+          )}
         </div>
       </BlockUi>
     </main>
