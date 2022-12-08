@@ -1,6 +1,8 @@
 import json
-from nbconvert import HTMLExporter
 import time
+
+from nbconvert import HTMLExporter
+
 
 class Exporter:
     def __init__(self):

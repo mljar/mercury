@@ -6,6 +6,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.db import transaction
 from django.utils.timezone import make_aware
+from django.db.models import Q
 
 from apps.executor.consumers.utils import get_client_group, get_worker_group
 from apps.executor.models import Worker
@@ -47,8 +48,9 @@ class ClientProxy(WebsocketConsumer):
                 return
             if json_data["purpose"] == "run-notebook":
                 async_to_sync(self.channel_layer.group_send)(
-                    self.worker_group, {"type": "broadcast_message", "payload": json_data}
-                )     
+                    self.worker_group,
+                    {"type": "broadcast_message", "payload": json_data},
+                )
         # send to all clients
         # async_to_sync(self.channel_layer.group_send)(
         #    self.client_group, {"type": "broadcast_message", "payload": json_data}
@@ -78,9 +80,11 @@ class ClientProxy(WebsocketConsumer):
     def worker_ping(self):
 
         workers = Worker.objects.filter(
-            session_id=self.session_id, notebook_id=self.notebook_id, state="Running"
+            Q(state="Running") | Q(state="Queued"),
+            session_id=self.session_id,
+            notebook_id=self.notebook_id,
         )
-        
+
         if not workers:
             self.need_worker()
             async_to_sync(self.channel_layer.group_send)(
