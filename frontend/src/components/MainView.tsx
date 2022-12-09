@@ -5,7 +5,16 @@ import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
 import { useSelector } from "react-redux";
-import { getNotebookSrc, getIndexCss, getThemeLightCss } from "../websocket/wsSlice";
+import {
+  getNotebookSrc,
+  getIndexCss,
+  getThemeLightCss,
+} from "../websocket/wsSlice";
+
+import ReactHtmlParser from "react-html-parser";
+import { createPortal } from "react-dom";
+import Frame from "react-frame-component";
+import InnerHTML from "dangerously-set-html-content";
 
 type MainViewProps = {
   loadingState: string;
@@ -41,8 +50,8 @@ export default function MainView({
   let notebookSrc = useSelector(getNotebookSrc);
   //notebookSrc = notebookSrc.replace("/* empty index.css */", indexCss);
   //notebookSrc = notebookSrc.replace("/* empty theme-light.css */", themeLightCss);
-  
-  console.log(notebookSrc)
+
+  // console.log(notebookSrc);
 
   return (
     <main
@@ -90,7 +99,7 @@ export default function MainView({
             </div>
           )}
 
-          {errorMsg === "" && loadingState !== "loading" && (
+          {/* {errorMsg === "" && loadingState !== "loading" && (
             <iframe
               width="100%"
               height={iframeHeight}
@@ -99,10 +108,10 @@ export default function MainView({
               title="display"
               id="main-iframe"
             ></iframe>
-          )}
+          )} */}
 
           {notebookSrc === "" && <p>nothing there</p>}
-          {notebookSrc !== "" && (
+          {/* {notebookSrc !== "" && (
             <iframe
               srcDoc={notebookSrc}
               width="100%"
@@ -110,7 +119,28 @@ export default function MainView({
               key="notebook-src"
               title="display-src"
               id="main-iframe"
+              onLoad={(e) => {
+                console.log("ready!");
+              }}
             />
+          )}
+
+          {notebookSrc !== "" && (
+            <Frame width="100%" height={iframeHeight}>
+              {ReactHtmlParser(notebookSrc)}
+            </Frame>
+          )}
+
+          {notebookSrc !== "" && (
+            <Frame width="100%" height={iframeHeight}>
+              <div dangerouslySetInnerHTML={{ __html: notebookSrc }} />
+            </Frame>
+          )} */}
+
+          {notebookSrc !== "" && (
+            <div style={{width: "80%", margin: "0px", padding: "0px"}}>
+              <InnerHTML html={notebookSrc} className="mydiv" />
+            </div>
           )}
         </div>
       </BlockUi>

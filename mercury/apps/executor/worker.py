@@ -24,6 +24,8 @@ from apps.executor.models import Worker
 from apps.notebooks.models import Notebook
 from apps.executor.executor import Executor
 
+from execnb.nbio import read_nb
+
 # input params
 notebook_id = int(sys.argv[1])
 session_id = sys.argv[2]
@@ -33,7 +35,8 @@ notebook = Notebook.objects.get(pk = notebook_id)
 print("Loading", notebook.path)
 
 
-shell = Executor("/home/piotr/sandbox/mercury/mercury/demo.ipynb")
+nb = read_nb("/home/piotr/sandbox/mercury/mercury/demo.ipynb")
+shell = Executor()
 
 
 
@@ -104,7 +107,7 @@ def worker():
         print(json_data)
 
         start = time.time()
-        body = shell.run()
+        body = shell.run_notebook(nb, full_header=True)
         #print(body)
         print(wsapp)
         print(time.time()-start)
