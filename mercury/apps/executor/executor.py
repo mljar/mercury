@@ -14,7 +14,7 @@ from apps.executor.exporter import Exporter
 import copy
 
 from execnb.nbio import _dict2obj, dict2nb
-from apps.executor.utils import one_cell_notebook
+from apps.executor.utils import one_cell_notebook, get_test_notebook
 
 class Executor:
     def __init__(self):
@@ -74,9 +74,17 @@ nb = dict2nb(nb)
 e = Executor()
 b = e.run_notebook(nb)
 
+
+
+nb = get_test_notebook(code=["import handcalcs.render", "\n%%render\na=1"])
+nb = dict2nb(nb)
+e = Executor()
+b = e.run_notebook(nb)
+
+
 # # print(b)
-# with open("test.html", "w") as fout:
-#     fout.write(b)
+with open("test.html", "w") as fout:
+    fout.write(b)
 
 
 # nb.cells += [

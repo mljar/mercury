@@ -51,11 +51,13 @@
     <!-- Load mathjax -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML-full,Safe"></script>
     <!-- MathJax configuration -->
-    <script type="text/x-mathjax-config">
+    <!-- <script> type="text/x-mathjax-config"> -->
+    <script>
       init_mathjax = function() {
           if (window.MathJax) {
-          // MathJax loaded
+            // MathJax loaded
               MathJax.Hub.Config({
+                  showProcessingMessages: false,
                   TeX: {
                       equationNumbers: {
                       autoNumber: "AMS",
@@ -81,6 +83,7 @@
       }
       init_mathjax();
     </script>
+
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

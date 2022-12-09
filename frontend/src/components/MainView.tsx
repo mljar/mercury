@@ -44,8 +44,12 @@ export default function MainView({
   const iframeHeight = displayEmbed ? height - 10 : height - 58;
   const dispatch = useDispatch();
   let notebookSrc = useSelector(getNotebookSrc);
+  if(notebookSrc !== "") {
+    notebookSrc = "<script>init_mathjax();</script>" + notebookSrc;
+  }
 
   useEffect(() => {
+  
     if (notebookPath !== undefined) {
       axios
         .get(`${axios.defaults.baseURL}${notebookPath}${slidesHash}`)
@@ -121,9 +125,11 @@ export default function MainView({
                 id="main-iframe"
               ></iframe>
             )}
+            {/* <InnerHTML html={"<script>init_mathjax();</script>"} /> */}
+          
 
           {notebookSrc !== "" && (
-            <InnerHTML html={notebookSrc} className="mydiv" />
+            <InnerHTML html={notebookSrc} />
           )}
         </div>
       </BlockUi>
