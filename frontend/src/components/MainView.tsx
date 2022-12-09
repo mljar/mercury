@@ -1,14 +1,15 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getNotebookSrc,
   getIndexCss,
   getThemeLightCss,
+  setNotebookSrc,
 } from "../websocket/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
@@ -41,14 +42,26 @@ export default function MainView({
   const { height } = useWindowDimensions();
 
   const iframeHeight = displayEmbed ? height - 10 : height - 58;
-
-  //const indexCss = useSelector(getIndexCss);
-  //const themeLightCss = useSelector(getThemeLightCss);
+  const dispatch = useDispatch();
   let notebookSrc = useSelector(getNotebookSrc);
-  //notebookSrc = notebookSrc.replace("/* empty index.css */", indexCss);
-  //notebookSrc = notebookSrc.replace("/* empty theme-light.css */", themeLightCss);
 
-  // console.log(notebookSrc);
+  useEffect(() => {
+    if (notebookPath !== undefined) {
+      axios
+        .get(`${axios.defaults.baseURL}${notebookPath}${slidesHash}`)
+        .then((response) => {
+          let nbSrc = response.data;
+          nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
+          nbSrc = nbSrc.replace("<html>", "");
+          nbSrc = nbSrc.replace("</html>", "");
+          nbSrc = nbSrc.replace("<body", "<div");
+          nbSrc = nbSrc.replace("</body>", "</div>");
+          nbSrc = nbSrc.replace("<!DOCTYPE html>", "");
+
+          dispatch(setNotebookSrc(nbSrc));
+        });
+    }
+  }, [dispatch, notebookPath, slidesHash]);
 
   return (
     <main
@@ -96,48 +109,21 @@ export default function MainView({
             </div>
           )}
 
-          {errorMsg === "" && loadingState !== "loading" && (
-            <iframe
-              width="100%"
-              height={iframeHeight}
-              key={notebookPath}
-              src={`${axios.defaults.baseURL}${notebookPath}${slidesHash}`}
-              title="display"
-              id="main-iframe"
-            ></iframe>
-          )}
-
-          {notebookSrc === "" && <p>nothing there</p>}
-          {/* {notebookSrc !== "" && (
-            <iframe
-              srcDoc={notebookSrc}
-              width="100%"
-              height={iframeHeight}
-              key="notebook-src"
-              title="display-src"
-              id="main-iframe"
-              onLoad={(e) => {
-                console.log("ready!");
-              }}
-            />
-          )}
+          {errorMsg === "" &&
+            loadingState !== "loading" &&
+            notebookSrc === "" && (
+              <iframe
+                width="100%"
+                height={iframeHeight}
+                key={notebookPath}
+                src={`${axios.defaults.baseURL}${notebookPath}${slidesHash}`}
+                title="display"
+                id="main-iframe"
+              ></iframe>
+            )}
 
           {notebookSrc !== "" && (
-            <Frame width="100%" height={iframeHeight}>
-              {ReactHtmlParser(notebookSrc)}
-            </Frame>
-          )}
-
-          {notebookSrc !== "" && (
-            <Frame width="100%" height={iframeHeight}>
-              <div dangerouslySetInnerHTML={{ __html: notebookSrc }} />
-            </Frame>
-          )} */}
-
-          {notebookSrc !== "" && (
-            // <div style={{width: "80%", margin: "0px", padding: "0px"}}>
-              <InnerHTML html={notebookSrc} className="mydiv" />
-            // </div>
+            <InnerHTML html={notebookSrc} className="mydiv" />
           )}
         </div>
       </BlockUi>
