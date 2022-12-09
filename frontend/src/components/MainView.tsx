@@ -11,9 +11,6 @@ import {
   getThemeLightCss,
 } from "../websocket/wsSlice";
 
-import ReactHtmlParser from "react-html-parser";
-import { createPortal } from "react-dom";
-import Frame from "react-frame-component";
 import InnerHTML from "dangerously-set-html-content";
 
 type MainViewProps = {
@@ -99,7 +96,7 @@ export default function MainView({
             </div>
           )}
 
-          {/* {errorMsg === "" && loadingState !== "loading" && (
+          {errorMsg === "" && loadingState !== "loading" && (
             <iframe
               width="100%"
               height={iframeHeight}
@@ -108,7 +105,7 @@ export default function MainView({
               title="display"
               id="main-iframe"
             ></iframe>
-          )} */}
+          )}
 
           {notebookSrc === "" && <p>nothing there</p>}
           {/* {notebookSrc !== "" && (
@@ -138,9 +135,9 @@ export default function MainView({
           )} */}
 
           {notebookSrc !== "" && (
-            <div style={{width: "80%", margin: "0px", padding: "0px"}}>
+            // <div style={{width: "80%", margin: "0px", padding: "0px"}}>
               <InnerHTML html={notebookSrc} className="mydiv" />
-            </div>
+            // </div>
           )}
         </div>
       </BlockUi>

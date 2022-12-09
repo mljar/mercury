@@ -107,7 +107,7 @@ def worker():
         print(json_data)
 
         start = time.time()
-        body = shell.run_notebook(nb, full_header=True)
+        body = shell.run_notebook(nb, full_header=False)
         #print(body)
         print(wsapp)
         print(time.time()-start)
