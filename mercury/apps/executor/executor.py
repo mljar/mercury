@@ -18,9 +18,13 @@ from apps.executor.utils import one_cell_notebook, get_test_notebook
 
 class Executor:
     def __init__(self):
-        self.shell = CaptureShell()
-        self.shell.enable_matplotlib()
         self.exporter = Exporter()
+        self.shell = CaptureShell()
+        try:
+            self.shell.enable_matplotlib()
+        except Exception as e:
+            pass
+
         
     def run_cell(self, cell):
 
@@ -75,16 +79,14 @@ e = Executor()
 b = e.run_notebook(nb)
 
 
-
-nb = get_test_notebook(code=["import handcalcs.render", "\n%%render\na=1"])
-nb = dict2nb(nb)
-e = Executor()
-b = e.run_notebook(nb)
-
+#nb = get_test_notebook(code=["import handcalcs.render", "\n%%render\na=1"])
+#nb = dict2nb(nb)
+#e = Executor()
+#b = e.run_notebook(nb)
 
 # # print(b)
-with open("test.html", "w") as fout:
-    fout.write(b)
+#with open("test.html", "w") as fout:
+#    fout.write(b)
 
 
 # nb.cells += [

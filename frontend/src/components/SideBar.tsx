@@ -36,8 +36,10 @@ import MarkdownWidget from "./Widgets/Markdown";
 import SelectExecutionHistory from "./SelectExecutionHistory";
 
 import { WebSocketContext } from "../websocket/context";
-import WebSocketStatus from "../websocket/Status";
-import { runNotebook } from "../websocket/wsSlice";
+import WebSocketStatusBar from "../websocket/StatusBar";
+import {
+  runNotebook,
+} from "../websocket/wsSlice";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -217,8 +219,6 @@ export default function SideBar({
   const ws = useContext(WebSocketContext);
   const [msg, setMsg] = useState("");
 
-  console.log({ notebookId, ws });
-
   return (
     <nav
       id="sidebarMenu"
@@ -267,7 +267,6 @@ export default function SideBar({
                   //  dispatch(copyCurrentToPreviousTask());
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
-
                   ws.sendMessage(JSON.stringify(runNotebook()));
                 }}
                 disabled={waiting || !allFilesUploaded()}
@@ -323,8 +322,6 @@ export default function SideBar({
                 </ul>
               </div>
             </div>
-
-            {notebookId !== undefined && <WebSocketStatus />}
 
             {fileKeys && !allFilesUploaded() && (
               <div className="alert alert-danger mb-3" role="alert">
@@ -474,6 +471,14 @@ export default function SideBar({
               <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output
               Files
             </button>
+          </div>
+        )}
+        {notebookId !== undefined && (
+          <div>
+            <hr />
+            <div style={{ paddingLeft: "10px" }}>
+              <WebSocketStatusBar />{" "}
+            </div>
           </div>
         )}
       </div>

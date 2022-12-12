@@ -9,6 +9,8 @@ import {
   setWorkerStatus,
   WebSocketStatus,
   WorkerStatus,
+  getWebSocketStatus,
+  getWorkerStatus,
 } from "./wsSlice";
 
 import { useSelector } from "react-redux";
@@ -23,12 +25,12 @@ export default function WebSocketProvider({
 }: {
   children: JSX.Element;
 }) {
+  console.log("WebSocketProvider");
+
   const dispatch = useDispatch();
   const selectedNotebook = useSelector(getSelectedNotebook);
 
-  console.log("WebSocketProvider");
   let connection: WebSocket | undefined = undefined;
-  let ws = null;
 
   const sendMessage = (payload: string) => {
     if (connection !== undefined && connection.readyState === connection.OPEN) {
@@ -40,8 +42,9 @@ export default function WebSocketProvider({
     dispatch(setWebSocketStatus(WebSocketStatus.Connected));
     ping();
   }
+
   function onMessage(event: any): void {
-    //console.log("reveived from server", event.data);
+    // console.log("reveived from server", event.data);
 
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
@@ -56,7 +59,7 @@ export default function WebSocketProvider({
       }
     }
   }
-  
+
   function onError(event: any): void {
     dispatch(setWebSocketStatus(WebSocketStatus.Disconnected));
     dispatch(setWorkerStatus(WorkerStatus.Unknown));
@@ -81,12 +84,13 @@ export default function WebSocketProvider({
   }
 
   function connect() {
+    console.log("connect")
     if (
       selectedNotebook !== undefined &&
       selectedNotebook.id !== undefined &&
-      connection === undefined
+      connection === undefined 
     ) {
-      dispatch(setWebSocketStatus(WebSocketStatus.Connecting));
+      console.log("connecting ...")
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${
           selectedNotebook.id
@@ -100,7 +104,7 @@ export default function WebSocketProvider({
   }
   connect();
 
-  ws = {
+  const ws = {
     sendMessage,
   };
 

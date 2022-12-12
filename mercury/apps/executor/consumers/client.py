@@ -94,12 +94,6 @@ class ClientProxy(WebsocketConsumer):
                     "payload": {"purpose": "worker-state", "state": "Queued"},
                 },
             )
-
-            workers = Worker.objects.filter(
-                updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
-            )
-            workers.delete()
-
         else:
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
@@ -108,3 +102,9 @@ class ClientProxy(WebsocketConsumer):
                     "payload": {"purpose": "worker-ping"},
                 },
             )
+
+        # clearn stale workers
+        workers = Worker.objects.filter(
+            updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
+        )
+        workers.delete()

@@ -17,11 +17,3 @@ html {
   min-height: 100%;
 }
 
-.mydiv,
-.mydiv::before,
-.mydiv::after,
-.mydiv *
-.mydiv *::before,
-.mydiv *::after {
-  all: revert;
-}

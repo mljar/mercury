@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 import NavBar from "../components/NavBar";
@@ -39,7 +39,8 @@ import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
-import WaitPDFExport from "../components/WaitPDFExport"; 
+import WaitPDFExport from "../components/WaitPDFExport";
+
 
 type AppProps = {
   isSingleApp: boolean;
@@ -167,7 +168,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     showRestApi = true;
   }
 
-  
   return (
     <div className="App">
       {!displayEmbed && <NavBar isPro={isPro} username={username} />}
@@ -255,8 +255,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 waiting={waitForTask()}
               />
             )}
-
-            
           </div>
         </div>
       </BlockUi>
