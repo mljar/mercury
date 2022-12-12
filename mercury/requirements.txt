@@ -20,5 +20,5 @@ pyppeteer==1.0.2
 channels[daphne]==4.0.0
 websocket-client==1.4.2
 execnb
-
+ipywidgets==8.0.3
 
