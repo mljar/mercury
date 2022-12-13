@@ -34,13 +34,17 @@ worker_id = int(sys.argv[3])
 notebook = Notebook.objects.get(pk = notebook_id)
 print("Loading", notebook.path)
 
-
-nb = read_nb("/home/piotr/sandbox/mercury/mercury/demo.ipynb")
+nb = read_nb(notebook.path) 
+#"/home/piotr/sandbox/mercury/mercury/demo.ipynb")
 shell = Executor()
 
 
+# first execution
 
-def remove_worker(worker_id):
+
+
+
+def delete_current_worker():
     try:
         Worker.objects.get(pk=worker_id).delete()
     except Exception:
@@ -54,11 +58,13 @@ def worker_exists_and_running(worker_id, ws):
         print(f"Cant find worker ({worker_id}). Quit")
         sys.exit(1)
     try:
-        w.state = "Running"
+        my_state = "Busy" if is_busy else "Running"
+        w.state = my_state
         w.save()
+        ws.send(json.dumps({"purpose": "worker-state", "state": my_state}))
     except Exception as e:
         print("Error when set state")
-    ws.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
+
 
 
 def delete_old_workers(worker_id, notebook_id, session_id):
@@ -74,26 +80,15 @@ def delete_old_workers(worker_id, notebook_id, session_id):
 
 def signal_handler(signal, frame):
     print("\nBye bye!")
-    remove_worker(worker_id)
+    delete_current_worker()
     sys.exit(0)
 
 
 signal.signal(signal.SIGINT, signal_handler)
 
 
-index_css, theme_light_css = "", ""
-
-#with open("/home/piotr/sandbox/mercury/mercury/menv/share/jupyter/nbconvert/templates/lab/static/full-index.css", "r") as fin:
-#    index_css = fin.read()
-
-#with open("/home/piotr/sandbox/mercury/mercury/menv/share/jupyter/nbconvert/templates/lab/static/full-theme-light.css", "r") as fin:
-#    theme_light_css = fin.read()
-
-
-
-
+is_busy = False
 q = queue.Queue()
-
 counter = 0
 
 
@@ -105,13 +100,14 @@ def worker():
 
         print(f"... Working on {item}")
         print(json_data)
-
+        is_busy = True
+        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
         start = time.time()
         body = shell.run_notebook(nb, full_header=False)
-        #print(body)
-        print(wsapp)
-        print(time.time()-start)
         
+        print(time.time()-start)
+        is_busy = False
+        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
         wsapp.send(json.dumps({"purpose": "executed-notebook", "body": body}))
 
         with open("dupa.html", "w") as fout:
@@ -145,6 +141,10 @@ def on_message(ws, message):
             worker_exists_and_running(worker_id, ws)
         if purpose == "run-notebook":
             q.put(json.dumps({"purpose": "run-notebook"}))
+        if purpose == "close-worker":
+            delete_current_worker()
+            print("no worker-ping from client, quit")
+            sys.exit(1)
 
     counter += 1
 

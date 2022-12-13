@@ -217,7 +217,6 @@ export default function SideBar({
   }
 
   const ws = useContext(WebSocketContext);
-  const [msg, setMsg] = useState("");
 
   return (
     <nav
@@ -247,14 +246,6 @@ export default function SideBar({
         <div style={{ padding: "0px" }}>
           <form>
             {widgets}
-
-            <div className="form-group mb-3">
-              <textarea
-                rows={3}
-                value={msg}
-                onChange={(e) => setMsg(e.target.value)}
-              ></textarea>
-            </div>
             <div className="form-group mb-3">
               <button
                 type="button"

@@ -33,6 +33,14 @@ class ClientProxy(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
+        #
+        # close worker
+        #
+        async_to_sync(self.channel_layer.group_send)(
+            self.worker_group,
+            {"type": "broadcast_message", "payload": {"purpose": "close-worker"}},
+        )
+
         async_to_sync(self.channel_layer.group_discard)(
             self.client_group, self.channel_name
         )

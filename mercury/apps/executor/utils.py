@@ -17,3 +17,6 @@ def one_cell_notebook(code=""):
     nb = nbf.v4.new_notebook()
     nb["cells"] = [nbf.v4.new_code_cell(code)]
     return nb
+
+def parse_widgets(nb):
+    pass
