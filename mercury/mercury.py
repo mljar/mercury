@@ -14,6 +14,13 @@ sys.path.insert(0, BACKEND_DIR)
 
 from demo import create_demo_notebook
 
+__version__ = "2.0.0"
+
+from widgets.app import App
+from widgets.manager import add_widget, get_widget, set_update
+from widgets.slider import Slider
+
+
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
