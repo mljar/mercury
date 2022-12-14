@@ -64,8 +64,10 @@ export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
 export const getIndexCss = (state: RootState) => state.ws.indexCss;
 export const getThemeLightCss = (state: RootState) => state.ws.themeLightCss;
 
-export const runNotebook = () => {
+export const runNotebook = (widgets_params: string) => {
+  
   return {
     purpose: "run-notebook",
+    widgets: widgets_params,
   };
 };

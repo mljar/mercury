@@ -25,21 +25,22 @@ from apps.notebooks.models import Notebook
 from apps.executor.executor import Executor
 from apps.executor.utils import parse_params
 from execnb.nbio import read_nb, nb2dict
+from widgets.manager import set_update
 
 # input params
 notebook_id = int(sys.argv[1])
 session_id = sys.argv[2]
 worker_id = int(sys.argv[3])
 
-notebook = Notebook.objects.get(pk = notebook_id)
+notebook = Notebook.objects.get(pk=notebook_id)
 print("Loading", notebook.path)
 
-nb = read_nb(notebook.path) 
-#"/home/piotr/sandbox/mercury/mercury/demo.ipynb")
+nb = read_nb(notebook.path)
+# "/home/piotr/sandbox/mercury/mercury/demo.ipynb")
 shell = Executor()
 
 # get params
-print("params from db") 
+print("params from db")
 print(notebook.params)
 print("***")
 
@@ -49,9 +50,10 @@ shell.run_notebook(nb, export_html=False)
 
 # get params from executed notebook
 params = {}
-widgets_mapping = parse_params(nb2dict(nb), params)
+widgets_mapping, widgets_to_cells = parse_params(nb2dict(nb), params)
 print(params)
 print(widgets_mapping)
+print(widgets_to_cells)
 
 # compare params, and update if needed
 print("TODO: update params in db if needed")
@@ -80,9 +82,9 @@ def worker_exists_and_running(worker_id, ws):
         w.state = my_state
         w.save()
         ws.send(json.dumps({"purpose": "worker-state", "state": my_state}))
+        print("-->", my_state)
     except Exception as e:
         print("Error when set state")
-
 
 
 def delete_old_workers(worker_id, notebook_id, session_id):
@@ -111,23 +113,66 @@ counter = 0
 
 
 def worker():
+    global shell
+    global counter
+    global is_busy
     while True:
         item = q.get()
+        print("task done")
+
+        is_busy = True
+        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
+            
 
         json_data = json.loads(item)
 
         if json_data.get("purpose", "") == "run-notebook":
-            is_busy = True
-            wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
-            body = shell.run_notebook(nb, export_html=True, full_header=False, show_code=show_code)
-            is_busy = False
-            wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
+
+            
+            
+            print(json_data["widgets"])
+            widgets = json.loads(json_data["widgets"])
+            
+            start_cell_index = 0
+            # fill notebook with widgets values
+            for w in widgets.keys():
+                value = widgets[w]
+                print(w, value)
+                model_id = widgets_mapping[w]
+                print(model_id)
+                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
+                print(code)
+                r = shell.run(code)
+                print(r)
+                start_cell_index = widgets_to_cells[w]
+
+
+            print("start_cell_index", start_cell_index)
+
+
+            for i in range(start_cell_index+1, len(nb.cells)):
+                #print(nb.cells[i])
+                shell.run_cell(nb.cells[i], counter=i)
+
+            body = shell.export_html(nb, full_header=False, show_code=show_code)
+
+            #body = shell.run_notebook(
+            #    nb, export_html=True, full_header=False, show_code=show_code
+            #)
+
+            with open(f"test_{counter}.html", "w") as fout:
+                fout.write(body)
+
+
             wsapp.send(json.dumps({"purpose": "executed-notebook", "body": body}))
 
         if json_data.get("purpose", "") == "clear-session":
             shell = Executor()
 
 
+        is_busy = False
+        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
+        print("task done")
         q.task_done()
 
 
@@ -138,9 +183,10 @@ def on_open(ws):
     worker_exists_and_running(worker_id, ws)
     delete_old_workers(worker_id, notebook_id, session_id)
 
+
 def on_message(ws, message):
 
-    global counter 
+    global counter
 
     data = json.loads(message)
 
@@ -150,7 +196,11 @@ def on_message(ws, message):
         if purpose == "worker-ping":
             worker_exists_and_running(worker_id, ws)
         if purpose == "run-notebook":
-            q.put(json.dumps({"purpose": "run-notebook"}))
+            q.put(
+                json.dumps(
+                    {"purpose": "run-notebook", "widgets": data.get("widgets", "{}")}
+                )
+            )
         if purpose == "clear-session":
             q.put(json.dumps({"purpose": "clear-session"}))
         if purpose == "close-worker":

@@ -52,10 +52,6 @@ export default function WebSocketProvider({
         dispatch(setWorkerStatus(response.state));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
-      } else if (response.purpose === "set-index-css") {
-        dispatch(setIndexCss(response.css));
-      } else if (response.purpose === "set-theme-light-css") {
-        dispatch(setThemeLightCss(response.css));
       }
     }
   }
@@ -79,7 +75,7 @@ export default function WebSocketProvider({
       })
     );
     if (connection !== undefined && connection.readyState === connection.OPEN) {
-      setTimeout(() => ping(), 5000);
+      setTimeout(() => ping(), 1000);
     }
   }
 

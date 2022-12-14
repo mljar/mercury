@@ -20,8 +20,10 @@ def one_cell_notebook(code=""):
 
 def parse_params(nb, params={}):
     # nb in nbformat
+    cell_counter = 0
     widget_counter = 1
     widget_number_to_model_id = {}
+    widget_number_to_cell_index = {}
     for cell in nb["cells"]:
         if cell["cell_type"] == "code":
             if "outputs" in cell:
@@ -57,4 +59,7 @@ def parse_params(nb, params={}):
                                 "label": view.get("label", "")
                             }
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
-    return widget_number_to_model_id
+                            widget_number_to_cell_index[widget_number] = cell_counter
+                            
+        cell_counter += 1
+    return widget_number_to_model_id, widget_number_to_cell_index
