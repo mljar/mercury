@@ -18,6 +18,7 @@ export interface INotebookParams {
   description: string | null;
   date: string | null;
   author: string | null;
+  'show-code': boolean | null;
   params: IWidget[];
 }
 

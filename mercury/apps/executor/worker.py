@@ -23,8 +23,8 @@ django.setup()
 from apps.executor.models import Worker
 from apps.notebooks.models import Notebook
 from apps.executor.executor import Executor
-
-from execnb.nbio import read_nb
+from apps.executor.utils import parse_params
+from execnb.nbio import read_nb, nb2dict
 
 # input params
 notebook_id = int(sys.argv[1])
@@ -38,10 +38,27 @@ nb = read_nb(notebook.path)
 #"/home/piotr/sandbox/mercury/mercury/demo.ipynb")
 shell = Executor()
 
+# get params
+print("params from db") 
+print(notebook.params)
+print("***")
 
 # first execution
+shell.run_notebook(nb, export_html=False)
 
 
+# get params from executed notebook
+params = {}
+parse_params(nb2dict(nb), params)
+print(params)
+
+# compare params, and update if needed
+print("TODO: update params in db if needed")
+
+
+show_code = params.get("show-code", False)
+
+print("show-code", show_code)
 
 
 def delete_current_worker():
@@ -103,7 +120,7 @@ def worker():
         is_busy = True
         wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
         start = time.time()
-        body = shell.run_notebook(nb, full_header=False)
+        body = shell.run_notebook(nb, export_html=True, full_header=False, show_code=show_code)
         
         print(time.time()-start)
         is_busy = False

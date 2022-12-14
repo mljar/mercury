@@ -13,6 +13,7 @@ import {
 } from "../websocket/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
+import { getSelectedNotebook } from "./Notebooks/notebooksSlice";
 
 type MainViewProps = {
   loadingState: string;
@@ -43,13 +44,36 @@ export default function MainView({
 
   const iframeHeight = displayEmbed ? height - 10 : height - 58;
   const dispatch = useDispatch();
+  let nb = useSelector(getSelectedNotebook);
   let notebookSrc = useSelector(getNotebookSrc);
-  if(notebookSrc !== "") {
+
+  let showCode = false;
+  if (nb !== undefined && nb.params !== undefined) {
+    if (
+      nb.params["show-code"] !== undefined &&
+      nb.params["show-code"] !== null
+    ) {
+      showCode = nb.params["show-code"];
+    }
+  }
+  if (notebookSrc !== "") {
     notebookSrc = "<script>init_mathjax();</script>" + notebookSrc;
+
+    if (!showCode) {
+      const hideCodeStyle = `<style type="text/css">
+      .jp-mod-noOutputs {
+          padding: 0px; 
+      }
+      .jp-mod-noInput {
+        padding-top: 0px;
+        padding-bottom: 0px;
+      }
+      </style>`;
+      notebookSrc = hideCodeStyle + notebookSrc;
+    }
   }
 
   useEffect(() => {
-  
     if (notebookPath !== undefined) {
       axios
         .get(`${axios.defaults.baseURL}${notebookPath}${slidesHash}`)
@@ -125,12 +149,9 @@ export default function MainView({
                 id="main-iframe"
               ></iframe>
             )}
-            {/* <InnerHTML html={"<script>init_mathjax();</script>"} /> */}
-          
+          {/* <InnerHTML html={"<script>init_mathjax();</script>"} /> */}
 
-          {notebookSrc !== "" && (
-            <InnerHTML html={notebookSrc} />
-          )}
+          {notebookSrc !== "" && <InnerHTML html={notebookSrc} />}
         </div>
       </BlockUi>
     </main>
