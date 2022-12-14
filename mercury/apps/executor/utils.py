@@ -20,6 +20,8 @@ def one_cell_notebook(code=""):
 
 def parse_params(nb, params={}):
     # nb in nbformat
+    widget_counter = 1
+    widget_number_to_model_id = {}
     for cell in nb["cells"]:
         if cell["cell_type"] == "code":
             if "outputs" in cell:
@@ -43,12 +45,16 @@ def parse_params(nb, params={}):
                             if view.get("show_code") is not None:
                                 params["show-code"] = view.get("show_code")
                         if widget_type == "Slider":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
                             if "params" not in params:
                                 params["params"] = {}
-                            params["params"]["w1"] = {
+                            params["params"][widget_number] = {
                                 "input": "slider",
                                 "value": view.get("value", 0),
                                 "min": view.get("min", 0),
                                 "max": view.get("max", 100),
                                 "label": view.get("label", "")
                             }
+                            widget_number_to_model_id[widget_number] = view.get("model_id", "")
+    return widget_number_to_model_id

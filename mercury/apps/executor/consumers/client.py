@@ -88,26 +88,28 @@ class ClientProxy(WebsocketConsumer):
     def worker_ping(self):
 
         workers = Worker.objects.filter(
-            Q(state="Running") | Q(state="Queued"),
+            Q(state="Running") | Q(state="Queued") | Q(state="Busy"),
             session_id=self.session_id,
             notebook_id=self.notebook_id,
         )
 
         if not workers:
             self.need_worker()
-            async_to_sync(self.channel_layer.group_send)(
-                self.client_group,
-                {
-                    "type": "broadcast_message",
-                    "payload": {"purpose": "worker-state", "state": "Queued"},
-                },
-            )
         else:
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
                 {
                     "type": "broadcast_message",
                     "payload": {"purpose": "worker-ping"},
+                },
+            )
+
+        if workers.filter(state="Queued"):
+            async_to_sync(self.channel_layer.group_send)(
+                self.client_group,
+                {
+                    "type": "broadcast_message",
+                    "payload": {"purpose": "worker-state", "state": "Queued"},
                 },
             )
 

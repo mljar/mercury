@@ -49,8 +49,9 @@ shell.run_notebook(nb, export_html=False)
 
 # get params from executed notebook
 params = {}
-parse_params(nb2dict(nb), params)
+widgets_mapping = parse_params(nb2dict(nb), params)
 print(params)
+print(widgets_mapping)
 
 # compare params, and update if needed
 print("TODO: update params in db if needed")
@@ -115,23 +116,18 @@ def worker():
 
         json_data = json.loads(item)
 
-        print(f"... Working on {item}")
-        print(json_data)
-        is_busy = True
-        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
-        start = time.time()
-        body = shell.run_notebook(nb, export_html=True, full_header=False, show_code=show_code)
-        
-        print(time.time()-start)
-        is_busy = False
-        wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
-        wsapp.send(json.dumps({"purpose": "executed-notebook", "body": body}))
+        if json_data.get("purpose", "") == "run-notebook":
+            is_busy = True
+            wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
+            body = shell.run_notebook(nb, export_html=True, full_header=False, show_code=show_code)
+            is_busy = False
+            wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
+            wsapp.send(json.dumps({"purpose": "executed-notebook", "body": body}))
 
-        with open("dupa.html", "w") as fout:
-            fout.write(body)
+        if json_data.get("purpose", "") == "clear-session":
+            shell = Executor()
 
-        print(f"... Finished {item}")
-        
+
         q.task_done()
 
 
@@ -141,9 +137,6 @@ threading.Thread(target=worker, daemon=True).start()
 def on_open(ws):
     worker_exists_and_running(worker_id, ws)
     delete_old_workers(worker_id, notebook_id, session_id)
-    #wsapp.send(json.dumps({"purpose": "set-index-ccs", "css": index_css}))
-    #wsapp.send(json.dumps({"purpose": "set-theme-light-css", "css": theme_light_css}))
-
 
 def on_message(ws, message):
 
@@ -158,6 +151,8 @@ def on_message(ws, message):
             worker_exists_and_running(worker_id, ws)
         if purpose == "run-notebook":
             q.put(json.dumps({"purpose": "run-notebook"}))
+        if purpose == "clear-session":
+            q.put(json.dumps({"purpose": "clear-session"}))
         if purpose == "close-worker":
             delete_current_worker()
             print("no worker-ping from client, quit")
