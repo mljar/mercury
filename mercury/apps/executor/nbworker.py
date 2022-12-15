@@ -6,10 +6,9 @@ import sys
 import threading
 import time
 import traceback
-from datetime import datetime, timedelta
 
 import websocket
-from django.utils.timezone import make_aware
+
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
@@ -20,12 +19,23 @@ import django
 
 django.setup()
 
-from apps.executor.models import Worker
-from apps.notebooks.models import Notebook
 from apps.executor.executor import Executor
 from apps.executor.utils import parse_params
 from execnb.nbio import read_nb, nb2dict
 from widgets.manager import set_update
+
+
+import logging
+
+LOG_LEVEL = logging.INFO
+logging.basicConfig(
+    # filename="nbworker.log", filemode="w",
+    format="%(asctime)s %(message)s",
+    level=LOG_LEVEL,
+)
+
+logging.info("test")
+
 
 # input params
 notebook_id = int(sys.argv[1])
@@ -64,12 +74,6 @@ show_code = params.get("show-code", False)
 print("show-code", show_code)
 
 
-def delete_current_worker():
-    try:
-        Worker.objects.get(pk=worker_id).delete()
-    except Exception:
-        pass
-
 
 def worker_exists_and_running(worker_id, ws):
     try:
@@ -85,17 +89,6 @@ def worker_exists_and_running(worker_id, ws):
         print("-->", my_state)
     except Exception as e:
         print("Error when set state")
-
-
-def delete_old_workers(worker_id, notebook_id, session_id):
-    try:
-        workers = Worker.objects.filter(
-            session_id=session_id, notebook__id=notebook_id, pk__lt=worker_id
-        )
-        workers.delete()
-    except Exception as e:
-        print("Error when deleting older workers.", str(e))
-        print(traceback.format_exc())
 
 
 def signal_handler(signal, frame):
@@ -122,17 +115,14 @@ def worker():
 
         is_busy = True
         wsapp.send(json.dumps({"purpose": "worker-state", "state": "Busy"}))
-            
 
         json_data = json.loads(item)
 
         if json_data.get("purpose", "") == "run-notebook":
 
-            
-            
             print(json_data["widgets"])
             widgets = json.loads(json_data["widgets"])
-            
+
             start_cell_index = 0
             # fill notebook with widgets values
             for w in widgets.keys():
@@ -146,29 +136,25 @@ def worker():
                 print(r)
                 start_cell_index = widgets_to_cells[w]
 
-
             print("start_cell_index", start_cell_index)
 
-
-            for i in range(start_cell_index+1, len(nb.cells)):
-                #print(nb.cells[i])
+            for i in range(start_cell_index + 1, len(nb.cells)):
+                # print(nb.cells[i])
                 shell.run_cell(nb.cells[i], counter=i)
 
             body = shell.export_html(nb, full_header=False, show_code=show_code)
 
-            #body = shell.run_notebook(
+            # body = shell.run_notebook(
             #    nb, export_html=True, full_header=False, show_code=show_code
-            #)
+            # )
 
             with open(f"test_{counter}.html", "w") as fout:
                 fout.write(body)
-
 
             wsapp.send(json.dumps({"purpose": "executed-notebook", "body": body}))
 
         if json_data.get("purpose", "") == "clear-session":
             shell = Executor()
-
 
         is_busy = False
         wsapp.send(json.dumps({"purpose": "worker-state", "state": "Running"}))
@@ -179,79 +165,36 @@ def worker():
 threading.Thread(target=worker, daemon=True).start()
 
 
-def on_open(ws):
-    worker_exists_and_running(worker_id, ws)
-    delete_old_workers(worker_id, notebook_id, session_id)
-
-
-def on_message(ws, message):
-
-    global counter
-
-    data = json.loads(message)
-
-    if "purpose" in data:
-        purpose = data["purpose"]
-        print(purpose)
-        if purpose == "worker-ping":
-            worker_exists_and_running(worker_id, ws)
-        if purpose == "run-notebook":
-            q.put(
-                json.dumps(
-                    {"purpose": "run-notebook", "widgets": data.get("widgets", "{}")}
-                )
-            )
-        if purpose == "clear-session":
-            q.put(json.dumps({"purpose": "clear-session"}))
-        if purpose == "close-worker":
-            delete_current_worker()
-            print("no worker-ping from client, quit")
-            sys.exit(1)
-
-    counter += 1
-
-
-def on_pong(wsapp, message):
-    try:
-        w = Worker.objects.get(pk=worker_id)
-        if w.updated_at < make_aware(datetime.now() - timedelta(minutes=1)):
-            w.delete()
-            print("no worker-ping from client, quit")
-            sys.exit(1)
-    except Exception as e:
-        print(f"on_pong error, quit")
-        sys.exit(1)
-
-
-def on_error(ws, message):
-    print("on_error", message)
-
-
-def on_close(ws, close_status_code, close_msg):
-    print(
-        "on_close",
-        close_status_code,
-        close_msg,
-    )
-
-
 MIN_RUN_TIME = 10  # ws should run more time than this to be considered as live
 RECONNECT_WAIT_TIME = 10
 CONNECT_MAX_TRIES = 2
 connect_tries = 0
 
 
+
+
 while True:
     start_time = time.time()
-    wsapp = websocket.WebSocketApp(
+
+    # wsapp = websocket.WebSocketApp(
+    #     f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
+    #     on_message=on_message,
+    #     on_pong=on_pong,
+    #     on_close=on_close,
+    #     on_open=on_open,
+    #     on_error=on_error,
+    # )
+    # wsapp.run_forever(ping_interval=5, ping_timeout=3)
+
+    client = Client(
         f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
-        on_message=on_message,
-        on_pong=on_pong,
-        on_close=on_close,
-        on_open=on_open,
-        on_error=on_error,
+        notebook_id,
+        session_id,
+        worker_id,
     )
+    wsapp = client.ws
     wsapp.run_forever(ping_interval=5, ping_timeout=3)
+
     end_time = time.time()
 
     # if ws running less than 10 seconds then something is wrong
