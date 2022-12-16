@@ -15,6 +15,13 @@ def get_widget(model_id):
 #     return getattr(w, field)
 
 def set_update(model_id, field, new_value):
+    # returns 
+    # True if there was update
+    # False if no update 
     w = get_widget(model_id)
     if w is not None:
-        setattr(w, field, new_value)
+        if getattr(w, field) != new_value:
+            setattr(w, field, new_value)
+            return True
+
+    return False

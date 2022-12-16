@@ -21,6 +21,9 @@ from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.notify import validate_notify
 
 
+from apps.executor.utils import parse_params
+
+
 def process_nbconvert_errors(error_msg):
     known_warnings = [
         "warn(",
@@ -138,6 +141,8 @@ def task_init_notebook(
 
             print("check V2")
             # check if nb in V2
+            parse_params(nb, params)
+            '''
             for cell in nb["cells"]:
 
                 if cell["cell_type"] == "code":
@@ -171,6 +176,7 @@ def task_init_notebook(
                                         "max": view.get("max", 100),
                                         "label": view.get("label", "")
                                     }
+            '''
 
         if update_notebook and nb is not None:
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:

@@ -10,6 +10,9 @@ class WorkerState(str, Enum):
 class Purpose(str, Enum):
     WorkerPing = "worker-ping"
     WorkerState = "worker-state"
+    InitNotebook = "init-notebook"
     RunNotebook = "run-notebook"
     ClearSession = "clear-session"
     CloseWorker = "close-worker"
+
+    ExecutedNotebook = "executed-notebook"

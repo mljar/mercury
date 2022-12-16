@@ -1,22 +1,28 @@
 import sys
 import json
+
 import websocket
 
 import logging
+from queue import Queue 
 
 from apps.executor.nbworker.utils import WorkerState, Purpose
+from apps.executor.nbworker.db import DBClient
 
 log = logging.getLogger(__name__)
 
 
-class WSClient:
+class WSClient(DBClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
 
         super(WSClient, self).__init__(notebook_id, session_id, worker_id)
 
         self.connect(ws_address)
 
-        self.state = WorkerState.Running
+        self.queue = Queue()
+
+        self.msg_counter = 0
+
 
     def connect(self, ws_address):
         try:
@@ -36,14 +42,17 @@ class WSClient:
 
     def on_open(self, ws):
         log.info("Open ws connection")
+        self.queue.put(json.dumps({"purpose": Purpose.InitNotebook}))
         if self.worker_exists():
-            self.send_status()
+            self.set_worker_state(WorkerState.Running)
+            self.send_state()
         self.delete_stale_workers()
 
     def on_close(self, ws, close_status_code, close_msg):
-        log.info("WS close connection, status={close_status_code}, msg={close_msg}")
+        log.info(f"WS close connection, status={close_status_code}, msg={close_msg}")
 
     def on_pong(self, wsapp, msg):
+        log.info("WS on_pong")
         if self.is_worker_stale():
             self.delete_worker()
             log.info(f"Worker id={self.worker_id} is stale, quit")
@@ -53,39 +62,20 @@ class WSClient:
         log.debug(f"WS on_error, {msg}")
 
     def on_message(self, ws, msg):
-
-        global counter
-
-        data = json.loads(msg)
-
-        if "purpose" in data:
-            purpose = data["purpose"]
-            logging.info(purpose)
-            if purpose == "worker-ping":
-                worker_exists_and_running(worker_id, ws)
-            if purpose == "run-notebook":
-                q.put(
-                    json.dumps(
-                        {
-                            "purpose": "run-notebook",
-                            "widgets": data.get("widgets", "{}"),
-                        }
-                    )
-                )
-            if purpose == "clear-session":
-                q.put(json.dumps({"purpose": "clear-session"}))
-            if purpose == "close-worker":
-                delete_current_worker()
-                print("no worker-ping from client, quit")
-                sys.exit(1)
-
-        counter += 1
+        log.debug(f"WS on_message {msg}")
+        self.queue.put(msg)
+        self.msg_counter += 1
 
     def send_state(self):
         try:
-            log.debug(f"Send state {self.state}")
+            log.debug(f"Send state {self.worker_state()}")
             self.ws.send(
-                json.dumps({"purpose": Purpose.WorkerState, "state": self.state})
+                json.dumps({"purpose": Purpose.WorkerState, "state": self.worker_state()})
             )
         except Exception as e:
             log.exception("Exception when send state")
+
+
+    def update_worker_state(self, new_state):
+        self.set_worker_state(new_state)
+        self.send_state()
