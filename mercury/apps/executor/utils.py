@@ -21,7 +21,7 @@ def one_cell_notebook(code=""):
 def parse_params(nb, params={}):
     # nb in nbformat
     cell_counter = 0
-    widget_counter = 1
+    widget_counter = 0
     widget_number_to_model_id = {}
     widget_number_to_cell_index = {}
     for cell in nb["cells"]:

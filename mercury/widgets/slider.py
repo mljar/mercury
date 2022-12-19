@@ -3,15 +3,15 @@ import json
 
 from IPython.display import display
 
-from .manager import add_widget, get_widget
+from .manager import add_widget, get_widget, get_widget_by_index, widget_index_exists
 
 
 class Slider:
     def __init__(
         self, value=0, min_value=0, max_value=10, label="", step=1, model_id=""
     ):
-        if model_id != "":
-            self = get_widget(model_id)
+        if widget_index_exists():
+            self.slider = get_widget_by_index()
         else:
             self.slider = ipywidgets.IntSlider(
                 value=value,
@@ -20,7 +20,7 @@ class Slider:
                 description=label,
                 step=step,
             )
-            add_widget(self.slider.model_id, self)
+            add_widget(self.slider.model_id, self.slider)
         display(self)
 
     @property

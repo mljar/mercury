@@ -68,7 +68,7 @@ class NBWorker(WSClient):
 
     def update_nb(self, widgets):
         log.debug(f"Update nb {widgets}")
-        
+
         index_execute_from = 0
         # fill notebook with widgets values
         for w in widgets.keys():
@@ -83,7 +83,7 @@ class NBWorker(WSClient):
             log.debug(f"Update reponse {r}, updated={updated}")
 
             if updated:
-                cell_index = self.widgets_to_cells[w]
+                cell_index = self.widget_index_to_cell_index[w]
                 log.debug(f"Widget updated, update nb from {cell_index}")
                 
                 if index_execute_from == 0:
@@ -92,13 +92,43 @@ class NBWorker(WSClient):
                     index_execute_from = min(index_execute_from, cell_index+1)
 
 
+        # cell index to smallest widget index
+        ci2wi = {} # keeps the smallest widget index
+        for wi in self.widget_index_to_cell_index.keys():
+            ci = self.widget_index_to_cell_index[wi]
+            if ci in ci2wi:
+                ci2wi[ci] = min(ci2wi[ci], int(wi[1:]))
+            else:
+                ci2wi[ci] = int(wi[1:])
+        
         log.debug(f"Execute nb from {index_execute_from}")
+        log.debug(f"Cell index to smallest widget index {ci2wi}")    
+        
         if index_execute_from != 0:
             self.nb = copy.deepcopy(self.nb_original)
             for i in range(index_execute_from, len(self.nb.cells)):
+
+                log.debug(f"Execute cell index={i}")
+
+                if i in ci2wi:
+                    reset_widgets_counter = ci2wi[i]
+                    log.debug(f"Reset widgets counter {reset_widgets_counter}")
+                    code = f'from widgets.manager import set_widgets_counter\nset_widgets_counter({reset_widgets_counter})'
+                    log.debug(code)
+                    r = self.executor.run(code)
+                    log.debug(r)
+                else:
+                    log.debug("Cell index={i} not found")
+                
+
+
                 self.executor.run_cell(self.nb.cells[i], counter=i)
+
+
         else:
             log.debug("Skip nb execution, no changes in widgets")
+            
+            
 
 
     def init_notebook(self):
@@ -111,11 +141,14 @@ class NBWorker(WSClient):
 
         # TODO: update params in db if needed"
         params = {}
-        self.widgets_mapping, self.widgets_to_cells = parse_params(
+        self.widgets_mapping, self.widget_index_to_cell_index = parse_params(
             nb2dict(self.nb_original), params
         )
         log.debug(params)
         log.debug(self.widgets_mapping)
-        log.debug(self.widgets_to_cells)
+        log.debug(self.widget_index_to_cell_index)
 
         self.show_code = params.get("show-code", False)
+        
+        self.nb = copy.deepcopy(self.nb_original)
+
