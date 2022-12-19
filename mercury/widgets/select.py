@@ -6,21 +6,20 @@ from IPython.display import display
 from .manager import add_widget, get_widget, get_widget_by_index, widget_index_exists
 
 
-class Slider:
+class Select:
     def __init__(
-        self, value=0, min_value=0, max_value=10, label="", step=1
+        self, value=0, choices=[], label="", multi=False
     ):
+        self.multi = multi
         if widget_index_exists():
-            self.slider = get_widget_by_index()
+            self.dropdown = get_widget_by_index()
         else:
-            self.slider = ipywidgets.IntSlider(
+            self.dropdown = ipywidgets.Dropdown(
                 value=value,
-                min=min_value,
-                max=max_value,
+                options=choices,
                 description=label,
-                step=step,
             )
-            add_widget(self.slider.model_id, self.slider)
+            add_widget(self.slider.model_id, self.dropdown)
         display(self)
 
     @property
@@ -31,12 +30,21 @@ class Slider:
     def value(self, v):
         self.slider.value = v
 
+
+    @property 
+    def choices(self):
+        return self.dropdown.choices
+
+    @choices.setter
+    def choices(self, new_choices):
+        self.dropdown.choices = new_choices
+
     def __str__(self):
-        return "m.Slider"
+        return "m.Select"
 
     def __repr__(self):
 
-        return "mercury.Slider"
+        return "mercury.Select"
 
     def _repr_mimebundle_(self, **kwargs):
         # data = {}
@@ -46,13 +54,12 @@ class Slider:
         
         if len(data) > 1:
             view = {
-                "widget": "Slider",
-                "value": self.slider.value,
-                "min": self.slider.min,
-                "max": self.slider.max,
-                "step": self.slider.step,
-                "label": self.slider.description,
-                "model_id": self.slider.model_id,
+                "widget": "Select",
+                "value": self.dropdown.value,
+                "choices": self.dropdown.options,
+                "multi": self.multi,
+                "label": self.dropdown.description,
+                "model_id": self.dropdown.model_id,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

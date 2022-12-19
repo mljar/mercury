@@ -58,6 +58,19 @@ def parse_params(nb, params={}):
                                 "max": view.get("max", 100),
                                 "label": view.get("label", "")
                             }
+                        if widget_type == "Select":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "select",
+                                "value": view.get("value", ""),
+                                "choices": view.get("choices", []),
+                                "multi": view.get("multi", False),
+                                "label": view.get("label", "")
+                            }
+
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
                             widget_number_to_cell_index[widget_number] = cell_counter
                             
