@@ -55,12 +55,17 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
+RECONNECT_WAIT_TIME = 10
+CONNECT_MAX_TRIES = 2
+
+
 if __name__ == "__main__":
     log.info(f"Start NBWorker with arguments {sys.argv}")
-
-    nb_worker = NBWorker(
-        f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
-        notebook_id,
-        session_id,
-        worker_id,
-    )
+    for _ in range(CONNECT_MAX_TRIES):
+        nb_worker = NBWorker(
+            f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
+            notebook_id,
+            session_id,
+            worker_id,
+        )
+        time.sleep(RECONNECT_WAIT_TIME)
