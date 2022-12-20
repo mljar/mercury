@@ -10,6 +10,8 @@ function App() {
   const { embed } = useParams<{ embed: string }>();
   const displayEmbed = !!(embed && embed === "embed");
 
+  console.log("AppMultiView")
+
   return (
     <WebSocketProvider>
       <AppView

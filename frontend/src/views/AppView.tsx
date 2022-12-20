@@ -168,6 +168,8 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     showRestApi = true;
   }
 
+  console.log("AppView")
+
   return (
     <div className="App">
       {!displayEmbed && <NavBar isPro={isPro} username={username} />}

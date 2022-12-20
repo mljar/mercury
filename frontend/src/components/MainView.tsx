@@ -7,8 +7,6 @@ import BlockUi from "react-block-ui";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getNotebookSrc,
-  getIndexCss,
-  getThemeLightCss,
   setNotebookSrc,
 } from "../websocket/wsSlice";
 
