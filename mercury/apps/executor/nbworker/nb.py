@@ -76,7 +76,10 @@ class NBWorker(WSClient):
             model_id = self.widgets_mapping[w]
             log.debug(f"Update widget id={w} model_id={model_id} value={value}")
 
-            code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
+            if isinstance(value, str):
+                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'
+            else:
+                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
             r = self.executor.run(code)
             
             updated = "True" in str(r)
@@ -87,7 +90,7 @@ class NBWorker(WSClient):
                 log.debug(f"Widget updated, update nb from {cell_index}")
                 
                 if index_execute_from == 0:
-                    index_execute_from = cell_index+1
+                    index_execute_from = cell_index
                 else:
                     index_execute_from = min(index_execute_from, cell_index)
 
@@ -124,6 +127,11 @@ class NBWorker(WSClient):
 
                 self.executor.run_cell(self.nb.cells[i], counter=i)
 
+                if self.nb.cells[i].cell_type == "code":
+                    for output in self.nb.cells[i].get("outputs", []):
+                        if "data" in output:
+                            if "application/mercury+json" in output["data"]:
+                                log.debug(output)
 
         else:
             log.debug("Skip nb execution, no changes in widgets")

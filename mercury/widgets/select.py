@@ -36,7 +36,14 @@ class Select:
 
     @value.setter
     def value(self, v):
-        self.dropdown.value = v
+        try:
+            self.dropdown.value = v
+        except Exception as e:
+            if len(self.dropdown.options) > 0:
+                self.dropdown.value = self.dropdown.options[0]
+            else:
+                self.dropdown.value = None
+
 
     def __str__(self):
         return "m.Select"

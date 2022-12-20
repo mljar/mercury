@@ -12,6 +12,9 @@ class Slider:
     ):
         if widget_index_exists():
             self.slider = get_widget_by_index()
+            if self.slider.min != min_value:
+                self.slider.min = min_value
+            # TODO: add rest of attributes
         else:
             self.slider = ipywidgets.IntSlider(
                 value=value,

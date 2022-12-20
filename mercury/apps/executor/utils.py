@@ -1,6 +1,9 @@
 import json
+import logging
 import nbformat as nbf
 
+
+log = logging.getLogger(__name__)
 
 def get_test_notebook(markdown=[], code=[]):
     nb = nbf.v4.new_notebook()
@@ -20,6 +23,7 @@ def one_cell_notebook(code=""):
 
 def parse_params(nb, params={}):
     # nb in nbformat
+    print("Parse notebook to construct Mercury params")
     cell_counter = 0
     widget_counter = 0
     widget_number_to_model_id = {}
@@ -39,12 +43,16 @@ def parse_params(nb, params={}):
                         view = json.loads(view)
 
                         # check model_id duplicates
+
+                        print(f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}')
+
                         if view.get("model_id", "") in all_model_ids:
                             continue
 
                         widget_type = view.get("widget")
                         if widget_type is None:
                             continue
+                        widget_number = None
                         if widget_type == "App":
                             if view.get("title") is not None:
                                 params["title"] = view.get("title")
@@ -76,10 +84,10 @@ def parse_params(nb, params={}):
                                 "multi": view.get("multi", False),
                                 "label": view.get("label", "")
                             }
-
+                        if widget_number is not None:
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
                             widget_number_to_cell_index[widget_number] = cell_counter
-                            all_model_ids += [view.get("model_id", "")]
+                        all_model_ids += [view.get("model_id", "")]
                             
         cell_counter += 1
     return widget_number_to_model_id, widget_number_to_cell_index
