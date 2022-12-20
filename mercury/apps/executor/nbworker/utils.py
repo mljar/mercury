@@ -16,3 +16,4 @@ class Purpose(str, Enum):
     CloseWorker = "close-worker"
 
     ExecutedNotebook = "executed-notebook"
+    UpdateWidgets = "update-widgets"

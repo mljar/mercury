@@ -1,16 +1,14 @@
 import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
-import { getSelectedNotebook } from "../components/Notebooks/notebooksSlice";
+import { getSelectedNotebook, updateWidgetsParams } from "../components/Notebooks/notebooksSlice";
 import {
-  setIndexCss,
-  setThemeLightCss,
+
   setNotebookSrc,
   setWebSocketStatus,
   setWorkerStatus,
   WebSocketStatus,
   WorkerStatus,
-  getWebSocketStatus,
-  getWorkerStatus,
+
 } from "./wsSlice";
 
 import { useSelector } from "react-redux";
@@ -52,6 +50,9 @@ export default function WebSocketProvider({
         dispatch(setWorkerStatus(response.state));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
+      } else if (response.purpose === "update-widgets") {
+        console.log(response);
+        dispatch(updateWidgetsParams(response));
       }
     }
   }

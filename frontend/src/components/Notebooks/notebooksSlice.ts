@@ -10,7 +10,7 @@ import axios from 'axios';
 import { RootState } from '../../store';
 import { clearExecutionHistory } from '../../tasks/tasksSlice';
 import { setShowSideBar } from '../../views/appSlice';
-import { IWidget } from '../Widgets/Types';
+import { IWidget, isSelectWidget } from '../Widgets/Types';
 import { getWindowDimensions } from '../WindowDimensions';
 
 export interface INotebookParams {
@@ -76,6 +76,41 @@ const notebooksSlice = createSlice({
     setSlidesHash(state, action: PayloadAction<string>) {
       state.slidesHash = action.payload;
     },
+    updateWidgetsParams(state, action: PayloadAction<any>) {
+      console.log("udapte widgets params");
+      console.log(action.payload);
+      console.log(state.selectedNotebook.params.params)
+      const { widgetKey } = action.payload;
+      for (let [key, widgetParams] of Object.entries(state.selectedNotebook.params.params)) {
+        console.log(key, widgetParams);
+        if (key === widgetKey) {
+          console.log("match **")
+
+          if (isSelectWidget(widgetParams)) {
+            console.log("it is a select widget!")
+          }
+
+          console.log(state.selectedNotebook.params.params[widgetKey])
+          let newWidget = {...state.selectedNotebook.params.params[widgetKey]};
+
+          if (isSelectWidget(newWidget)) {
+            console.log("it is a select widget!")
+            newWidget.choices = action.payload.choices;
+          }
+          state.selectedNotebook.params.params[widgetKey] = newWidget;
+
+
+
+          for (let [widgetAttribute, widgetValue] of Object.entries(action.payload)) {
+            console.log(widgetAttribute);
+            console.log(widgetValue);
+            
+
+          }
+
+        }
+      }
+    }
   },
 });
 
@@ -87,6 +122,7 @@ export const {
   setSelectedNotebook,
   setLoadingStateSelected,
   setSlidesHash,
+  updateWidgetsParams,
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;

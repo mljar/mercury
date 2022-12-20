@@ -127,11 +127,26 @@ class NBWorker(WSClient):
 
                 self.executor.run_cell(self.nb.cells[i], counter=i)
 
-                if self.nb.cells[i].cell_type == "code":
-                    for output in self.nb.cells[i].get("outputs", []):
-                        if "data" in output:
-                            if "application/mercury+json" in output["data"]:
-                                log.debug(output)
+                for output in self.nb.cells[i].get("outputs", []):
+                    if "data" in output:
+                        if "application/mercury+json" in output["data"]:
+                            w = output["data"]["application/mercury+json"]
+                            log.debug(w)
+                            w = json.loads(w)
+
+                            wi = ""
+                            for k in self.widgets_mapping.keys():
+                                if self.widgets_mapping[k] == w.get("model_id", ""):
+                                    wi = k 
+                            log.debug(f"Widget index {wi}")
+                            if wi == "":
+                                continue
+                            # prepare msg to send by ws
+                            msg = w
+                            msg["purpose"] = Purpose.UpdateWidgets
+                            msg["widgetKey"] = wi
+                            self.ws.send(json.dumps(msg))
+                
 
         else:
             log.debug("Skip nb execution, no changes in widgets")
