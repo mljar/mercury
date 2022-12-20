@@ -20,6 +20,7 @@ class App:
             "title": self.title,
             "description": self.description,
             "show_code": self.show_code,
+            "model_id": "mercury-app",
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
         return data

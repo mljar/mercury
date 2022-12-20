@@ -89,7 +89,7 @@ class NBWorker(WSClient):
                 if index_execute_from == 0:
                     index_execute_from = cell_index+1
                 else:
-                    index_execute_from = min(index_execute_from, cell_index+1)
+                    index_execute_from = min(index_execute_from, cell_index)
 
 
         # cell index to smallest widget index
