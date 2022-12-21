@@ -60,7 +60,7 @@ def parse_params(nb, params={}):
                                 params["description"] = view.get("description")
                             if view.get("show_code") is not None:
                                 params["show-code"] = view.get("show_code")
-                        if widget_type == "Slider":
+                        elif widget_type == "Slider":
                             widget_number = f"w{widget_counter}"
                             widget_counter += 1
                             if "params" not in params:
@@ -69,10 +69,10 @@ def parse_params(nb, params={}):
                                 "input": "slider",
                                 "value": view.get("value", 0),
                                 "min": view.get("min", 0),
-                                "max": view.get("max", 100),
+                                "max": view.get("max", 10),
                                 "label": view.get("label", "")
                             }
-                        if widget_type == "Select":
+                        elif widget_type == "Select":
                             widget_number = f"w{widget_counter}"
                             widget_counter += 1
                             if "params" not in params:
@@ -84,6 +84,30 @@ def parse_params(nb, params={}):
                                 "multi": view.get("multi", False),
                                 "label": view.get("label", "")
                             }
+                        elif widget_type == "Range":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "range",
+                                "value": view.get("value", [0,1]),
+                                "min": view.get("min", 0),
+                                "max": view.get("max", 10),
+                                "label": view.get("label", "")
+                            }
+                        elif widget_type == "Text":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "text",
+                                "value": view.get("value", ""),
+                                "rows": view.get("rows", 1),
+                                "label": view.get("label", "")
+                            }
+                            
                         if widget_number is not None:
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
                             widget_number_to_cell_index[widget_number] = cell_counter

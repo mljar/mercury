@@ -20,6 +20,8 @@ from widgets.app import App
 from widgets.manager import add_widget, get_widget, set_update, set_widgets_counter, get_widget_index
 from widgets.slider import Slider
 from widgets.select import Select
+from widgets.range import Range
+from widgets.text import Text
 
 def main():
     """Run administrative tasks."""
