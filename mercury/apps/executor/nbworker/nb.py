@@ -19,9 +19,12 @@ class NBWorker(WSClient):
 
         super(NBWorker, self).__init__(ws_address, notebook_id, session_id, worker_id)
 
+        self.prev_nb = None
+
         threading.Thread(target=self.process_msgs, daemon=True).start()
 
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
+
 
     def process_msgs(self):
         while True:
@@ -108,7 +111,10 @@ class NBWorker(WSClient):
         log.debug(f"Cell index to smallest widget index {ci2wi}")    
         
         if index_execute_from != 0:
-            self.nb = copy.deepcopy(self.nb_original)
+            if self.prev_nb is not None:
+                self.nb = copy.deepcopy(self.prev_nb)
+            else:
+                self.nb = copy.deepcopy(self.nb_original)
             for i in range(index_execute_from, len(self.nb.cells)):
 
                 log.debug(f"Execute cell index={i}")
@@ -147,7 +153,7 @@ class NBWorker(WSClient):
                             msg["widgetKey"] = wi
                             self.ws.send(json.dumps(msg))
                 
-
+            self.prev_nb = copy.deepcopy(self.nb)
         else:
             log.debug("Skip nb execution, no changes in widgets")
             

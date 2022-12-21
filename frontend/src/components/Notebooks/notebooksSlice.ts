@@ -6,11 +6,13 @@ import {
   Dispatch,
 } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 
 import { RootState } from '../../store';
 import { clearExecutionHistory } from '../../tasks/tasksSlice';
 import { setShowSideBar } from '../../views/appSlice';
-import { IWidget, isSelectWidget } from '../Widgets/Types';
+import { IWidget, isSelectWidget, isSliderWidget, isTextWidget, isRangeWidget } from '../Widgets/Types';
+//import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from '../WindowDimensions';
 
 export interface INotebookParams {
@@ -44,15 +46,25 @@ const initialState = {
   notebooks: [] as INotebook[],
   loadingState: "loading",
   selectedNotebook: {} as INotebook,
+  selectedNotebookId: undefined as undefined | Number,
   loadingStateSelected: "loading",
   watchModeCounter: 0,
   slidesHash: "",
+  widgets: {} as Record<string, string | boolean | number | [number, number] | string[] | null | undefined | unknown>
 };
 
 const notebooksSlice = createSlice({
   name: 'notebooks',
   initialState,
   reducers: {
+    setWidgetValue(state, action: PayloadAction<{ key: string, value: string | boolean | number | [number, number] | string[] | null | undefined | unknown }>) {
+      const { key, value } = action.payload;
+      console.log("set widget value", key, value)
+      state.widgets[key] = value;
+    },
+    clearWidgets(state) {
+      state.widgets = {};
+    },
     setNotebooks(state, action: PayloadAction<INotebook[]>) {
       state.notebooks = action.payload;
     },
@@ -65,6 +77,7 @@ const notebooksSlice = createSlice({
         // console.log("skip notebook update")
       } else {
         state.selectedNotebook = action.payload;
+        state.selectedNotebookId = state.selectedNotebook.id;
       }
       if (action.payload.state.startsWith("WATCH")) {
         state.watchModeCounter += 1;
@@ -79,39 +92,92 @@ const notebooksSlice = createSlice({
     updateWidgetsParams(state, action: PayloadAction<any>) {
       console.log("udapte widgets params");
       console.log(action.payload);
-      console.log(state.selectedNotebook.params.params)
+
       const { widgetKey } = action.payload;
-      for (let [key, widgetParams] of Object.entries(state.selectedNotebook.params.params)) {
-        console.log(key, widgetParams);
+
+      let updated = false;
+
+      for (let key of Object.keys(state.selectedNotebook.params.params)) {
+        console.log(key);
         if (key === widgetKey) {
-          console.log("match **")
+          console.log("** match **")
 
-          if (isSelectWidget(widgetParams)) {
-            console.log("it is a select widget!")
+          let widget = { ...state.selectedNotebook.params.params[widgetKey] };
+
+          // always update the value
+          updated = true;
+          state.widgets[key] = action.payload.value;
+
+          if (isRangeWidget(widget)) {
+            if (widget.min !== action.payload.min) {
+              widget.min = action.payload.min;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.max !== action.payload.max) {
+              widget.max = action.payload.max;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.step !== action.payload.step) {
+              widget.step = action.payload.step;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
+          } else if (isTextWidget(widget)) {
+            if (widget.rows !== action.payload.rows) {
+              widget.rows = action.payload.rows;
+              updated = true;
+            }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
+          } else if (isSliderWidget(widget)) {
+            if (widget.min !== action.payload.min) {
+              widget.min = action.payload.min;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.max !== action.payload.max) {
+              widget.max = action.payload.max;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.step !== action.payload.step) {
+              widget.step = action.payload.step;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
+          } else if (isSelectWidget(widget)) {
+            if (widget.choices.toString() !== action.payload.choices.toString()) {
+              widget.choices = action.payload.choices;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
           }
 
-          console.log(state.selectedNotebook.params.params[widgetKey])
-          let newWidget = {...state.selectedNotebook.params.params[widgetKey]};
 
-          if (isSelectWidget(newWidget)) {
-            console.log("it is a select widget!")
-            newWidget.choices = action.payload.choices;
+          if (updated) {
+            state.selectedNotebook.params.params[widgetKey] = widget;
           }
-          state.selectedNotebook.params.params[widgetKey] = newWidget;
-
-
-
-          for (let [widgetAttribute, widgetValue] of Object.entries(action.payload)) {
-            console.log(widgetAttribute);
-            console.log(widgetValue);
-            
-
-          }
-
         }
       }
     }
   },
+
 });
 
 export default notebooksSlice.reducer;
@@ -123,14 +189,19 @@ export const {
   setLoadingStateSelected,
   setSlidesHash,
   updateWidgetsParams,
+  setWidgetValue,
+  clearWidgets,
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;
 export const getLoadingState = (state: RootState) => state.notebooks.loadingState;
 export const getSelectedNotebook = (state: RootState) => state.notebooks.selectedNotebook;
+export const getSelectedNotebookId = (state: RootState) => state.notebooks.selectedNotebookId;
 export const getLoadingStateSelected = (state: RootState) => state.notebooks.loadingStateSelected;
 export const getWatchModeCounter = (state: RootState) => state.notebooks.watchModeCounter;
 export const getSlidesHash = (state: RootState) => state.notebooks.slidesHash;
+
+export const getWidgetsValues = (state: RootState) => state.notebooks.widgets;
 
 export const fetchNotebooks =
   () =>

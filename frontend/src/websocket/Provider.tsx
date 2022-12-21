@@ -1,13 +1,13 @@
 import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
-import { getSelectedNotebook, updateWidgetsParams } from "../components/Notebooks/notebooksSlice";
+import { getSelectedNotebookId, updateWidgetsParams } from "../components/Notebooks/notebooksSlice";
 import {
 
   setNotebookSrc,
-  setWebSocketStatus,
-  setWorkerStatus,
-  WebSocketStatus,
-  WorkerStatus,
+  setWebSocketState,
+  setWorkerState,
+  WebSocketState,
+  WorkerState,
 
 } from "./wsSlice";
 
@@ -26,7 +26,7 @@ export default function WebSocketProvider({
   console.log("WebSocketProvider");
 
   const dispatch = useDispatch();
-  const selectedNotebook = useSelector(getSelectedNotebook);
+  const selectedNotebookId = useSelector(getSelectedNotebookId);
 
   let connection: WebSocket | undefined = undefined;
 
@@ -37,7 +37,7 @@ export default function WebSocketProvider({
   };
 
   function onOpen(event: any): void {
-    dispatch(setWebSocketStatus(WebSocketStatus.Connected));
+    dispatch(setWebSocketState(WebSocketState.Connected));
     ping();
   }
 
@@ -47,24 +47,23 @@ export default function WebSocketProvider({
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
       if (response.purpose === "worker-state") {
-        dispatch(setWorkerStatus(response.state));
+        dispatch(setWorkerState(response.state));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
       } else if (response.purpose === "update-widgets") {
-        console.log(response);
         dispatch(updateWidgetsParams(response));
       }
     }
   }
 
   function onError(event: any): void {
-    dispatch(setWebSocketStatus(WebSocketStatus.Disconnected));
-    dispatch(setWorkerStatus(WorkerStatus.Unknown));
+    dispatch(setWebSocketState(WebSocketState.Disconnected));
+    dispatch(setWorkerState(WorkerState.Unknown));
   }
 
   function onClose(event: any): void {
-    dispatch(setWebSocketStatus(WebSocketStatus.Disconnected));
-    dispatch(setWorkerStatus(WorkerStatus.Unknown));
+    dispatch(setWebSocketState(WebSocketState.Disconnected));
+    dispatch(setWorkerState(WorkerState.Unknown));
     connection = undefined;
     setTimeout(() => connect(), 5000);
   }
@@ -83,14 +82,13 @@ export default function WebSocketProvider({
   function connect() {
     console.log("connect")
     if (
-      selectedNotebook !== undefined &&
-      selectedNotebook.id !== undefined &&
+      selectedNotebookId !== undefined &&
       connection === undefined 
     ) {
       console.log("connecting ...")
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${
-          selectedNotebook.id
+          selectedNotebookId
         }/${getSessionId()}/`
       );
       connection.onopen = onOpen;

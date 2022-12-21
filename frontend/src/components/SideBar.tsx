@@ -26,7 +26,8 @@ import {
   isMarkdownWidget,
   IWidget,
 } from "./Widgets/Types";
-import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+//import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+import { getWidgetsValues, setWidgetValue } from "./Notebooks/notebooksSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
@@ -35,12 +36,12 @@ import { handleDownload } from "../utils";
 import MarkdownWidget from "./Widgets/Markdown";
 import SelectExecutionHistory from "./SelectExecutionHistory";
 
-import { WebSocketContext } from "../websocket/context";
-import WebSocketStatusBar from "../websocket/StatusBar";
+import { WebSocketContext } from "../websocket/Provider";
+import WebSocketStateBar from "../websocket/StatusBar";
 import {
-  getWorkerStatus,
+  getWorkerState,
   runNotebook,
-  WorkerStatus,
+  WorkerState,
 } from "../websocket/wsSlice";
 
 type SideBarProps = {
@@ -76,11 +77,20 @@ export default function SideBar({
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
-  const workerStatus = useSelector(getWorkerStatus);
+  const workerState = useSelector(getWorkerState);
 
   useEffect(() => {
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+
+        if(key in widgetsValues) {
+          console.log("skip set widget value");
+          continue;
+        } else {
+          console.log("set widget initial value");
+        }
+
+
         if (widgetParams.input === "file") {
           dispatch(setWidgetValue({ key, value: [] as string[] }));
         } else if (widgetParams.input === "text") {
@@ -269,15 +279,15 @@ export default function SideBar({
                 disabled={
                   waiting ||
                   !allFilesUploaded() ||
-                  workerStatus !== WorkerStatus.Running
+                  workerState !== WorkerState.Running
                 }
               >
-                {workerStatus === WorkerStatus.Running && (
+                {workerState === WorkerState.Running && (
                   <span>
                     <i className="fa fa-play" aria-hidden="true"></i> Run
                   </span>
                 )}
-                {workerStatus === WorkerStatus.Busy && (
+                {workerState === WorkerState.Busy && (
                   <span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -295,8 +305,8 @@ export default function SideBar({
                     Busy
                   </span>
                 )}
-                {workerStatus !== WorkerStatus.Busy &&
-                  workerStatus !== WorkerStatus.Running && (
+                {workerState !== WorkerState.Busy &&
+                  workerState !== WorkerState.Running && (
                     <span>Wait for worker ...</span>
                   )}
               </button>
@@ -504,7 +514,7 @@ export default function SideBar({
           <div>
             <hr />
             <div style={{ paddingLeft: "10px" }}>
-              <WebSocketStatusBar />{" "}
+              <WebSocketStateBar />{" "}
             </div>
           </div>
         )}

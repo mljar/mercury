@@ -1,16 +1,14 @@
 import { useParams, withRouter } from "react-router-dom";
 import AppView from "./AppView";
 
-import WebSocketProvider from "../websocket/context";
+import WebSocketProvider from "../websocket/Provider";
 
-function App() {
+function MyApp() {
   const { notebook_id } = useParams<{ notebook_id: string }>();
   const notebookId = Number(notebook_id);
 
   const { embed } = useParams<{ embed: string }>();
   const displayEmbed = !!(embed && embed === "embed");
-
-  console.log("AppMultiView")
 
   return (
     <WebSocketProvider>
@@ -23,5 +21,5 @@ function App() {
   );
 }
 
-const AppMultiView = withRouter(App);
-export default AppMultiView;
+const App = withRouter(MyApp);
+export default App;

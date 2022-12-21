@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "./widgetsSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type NumericProps = {
   widgetKey: string;

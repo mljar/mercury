@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { setWidgetValue } from "./widgetsSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 
 import { FilePond, registerPlugin } from "react-filepond";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";

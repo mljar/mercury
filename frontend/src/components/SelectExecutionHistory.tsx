@@ -8,7 +8,9 @@ import {
   getHistoricTask,
   setHistoricTask,
 } from "../tasks/tasksSlice";
-import { setWidgetValue } from "./Widgets/widgetsSlice";
+//import { setWidgetValue } from "./Widgets/widgetsSlice";
+import { setWidgetValue } from "./Notebooks/notebooksSlice";
+
 type SingleOption = { value: string; label: string };
 
 type Props = {

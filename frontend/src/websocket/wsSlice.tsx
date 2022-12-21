@@ -2,14 +2,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-export enum WebSocketStatus {
+
+
+export enum WebSocketState {
   Connecting = "Connecting",
   Connected = "Connected",
   Unknown = "Unknown",
   Disconnected = "Disconnected",
 }
 
-export enum WorkerStatus {
+export enum WorkerState {
   Unknown = "Unknown",
   Starting = "Starting",
   Running = "Running",
@@ -18,8 +20,8 @@ export enum WorkerStatus {
 }
 
 const initialState = {
-  webSocketStatus: WebSocketStatus.Unknown,
-  workerStatus: WorkerStatus.Unknown,
+  WebSocketState: WebSocketState.Unknown,
+  WorkerState: WorkerState.Unknown,
   notebookSrc: "",
 };
 
@@ -27,11 +29,11 @@ const wsSlice = createSlice({
   name: "ws",
   initialState,
   reducers: {
-    setWebSocketStatus(state, action: PayloadAction<WebSocketStatus>) {
-      state.webSocketStatus = action.payload;
+    setWebSocketState(state, action: PayloadAction<WebSocketState>) {
+      state.WebSocketState = action.payload;
     },
-    setWorkerStatus(state, action: PayloadAction<WorkerStatus>) {
-      state.workerStatus = action.payload;
+    setWorkerState(state, action: PayloadAction<WorkerState>) {
+      state.WorkerState = action.payload;
     },
     setNotebookSrc(state, action: PayloadAction<string>) {
       state.notebookSrc = action.payload;
@@ -42,14 +44,14 @@ const wsSlice = createSlice({
 export default wsSlice.reducer;
 
 export const {
-  setWebSocketStatus,
-  setWorkerStatus,
+  setWebSocketState,
+  setWorkerState,
   setNotebookSrc,
 } = wsSlice.actions;
 
-export const getWebSocketStatus = (state: RootState) =>
-  state.ws.webSocketStatus;
-export const getWorkerStatus = (state: RootState) => state.ws.workerStatus;
+export const getWebSocketState = (state: RootState) =>
+  state.ws.WebSocketState;
+export const getWorkerState = (state: RootState) => state.ws.WorkerState;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
 
 export const runNotebook = (widgets_params: string) => {

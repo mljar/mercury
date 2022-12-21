@@ -6,7 +6,7 @@ import { setToken, setUsername } from "./components/authSlice";
 import { fetchVersion } from "./components/versionSlice";
 import { getSessionId } from "./utils";
 import { BrowserRouter as Router } from "react-router-dom";
-import AppMultiView from "./views/AppMultiView";
+import MainApp from "./views/App";
 import AccountView from "./views/AccountView";
 import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
@@ -43,7 +43,7 @@ export default function Routes() {
           <Route
             exact
             path="/app/:notebook_id/:embed?"
-            component={AppMultiView}
+            component={MainApp}
           />
           <Route exact path="/login" component={LoginView} />
           <Route exact path="/account" component={AccountView} />
