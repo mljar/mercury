@@ -10,6 +10,9 @@ widgets_counter = 0
 cell_index_to_widgets_index = {}
 
 
+class WidgetException(Exception):
+    pass
+
 def set_widgets_counter(new_value):
     global widgets_counter
     widgets_counter = new_value

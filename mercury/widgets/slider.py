@@ -3,18 +3,30 @@ import json
 
 from IPython.display import display
 
-from .manager import add_widget, get_widget, get_widget_by_index, widget_index_exists
+from .manager import WidgetException, add_widget, get_widget, get_widget_by_index, widget_index_exists
 
 
 class Slider:
     def __init__(
         self, value=0, min_value=0, max_value=10, label="", step=1
     ):
+        if value < min_value:
+            raise WidgetException("value should be equal or larger than min_value")
+        if value > max_value:
+            raise WidgetException("value should be equal or smaller than max_value")
+
         if widget_index_exists():
             self.slider = get_widget_by_index()
             if self.slider.min != min_value:
                 self.slider.min = min_value
-            # TODO: add rest of attributes
+                self.slider.value = value
+            if self.slider.max != max_value:
+                self.slider.max = max_value
+                self.slider.value = value
+            if self.slider.step != step:
+                self.slider.step = step
+                self.slider.value = value
+            self.slider.description = label
         else:
             self.slider = ipywidgets.IntSlider(
                 value=value,

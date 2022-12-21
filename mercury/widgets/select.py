@@ -18,8 +18,7 @@ class Select:
             if list(self.dropdown.options) != choices:
                 self.dropdown.options = choices
                 self.dropdown.value = value
-            if self.dropdown.description != label:    
-                self.dropdown.description = label
+            self.dropdown.description = label
         else:
             self.dropdown = ipywidgets.Dropdown(
                 value=value,
