@@ -22,6 +22,8 @@ from widgets.slider import Slider
 from widgets.select import Select
 from widgets.range import Range
 from widgets.text import Text
+from widgets.file import File 
+
 
 def main():
     """Run administrative tasks."""

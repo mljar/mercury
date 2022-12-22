@@ -107,6 +107,16 @@ def parse_params(nb, params={}):
                                 "rows": view.get("rows", 1),
                                 "label": view.get("label", "")
                             }
+                        elif widget_type == "File":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "file",
+                                "maxFileSize": view.get("max_file_size", 1),
+                                "label": view.get("label", "")
+                            }
                             
                         if widget_number is not None:
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
