@@ -108,7 +108,7 @@ export default function SideBar({
         }
       }
     }
-  }, [dispatch, widgetsParams]);
+  }, [dispatch, widgetsParams, widgetsValues]);
 
   let widgets = [];
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button

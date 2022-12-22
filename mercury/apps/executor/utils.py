@@ -29,6 +29,7 @@ def parse_params(nb, params={}):
     widget_number_to_model_id = {}
     widget_number_to_cell_index = {}
     all_model_ids = []
+    widget_types = {}
     for cell in nb["cells"]:
         if cell["cell_type"] == "code":
             if "outputs" in cell:
@@ -121,7 +122,8 @@ def parse_params(nb, params={}):
                         if widget_number is not None:
                             widget_number_to_model_id[widget_number] = view.get("model_id", "")
                             widget_number_to_cell_index[widget_number] = cell_counter
+                            widget_types[widget_number] = widget_type
                         all_model_ids += [view.get("model_id", "")]
                             
         cell_counter += 1
-    return widget_number_to_model_id, widget_number_to_cell_index
+    return widget_number_to_model_id, widget_number_to_cell_index, widget_types

@@ -42,6 +42,8 @@ export interface INotebook {
   errors: string;
 }
 
+type WidgetValueType = string | boolean | number | [number, number] | string[] | null | undefined | unknown;
+
 const initialState = {
   notebooks: [] as INotebook[],
   loadingState: "loading",
@@ -50,14 +52,14 @@ const initialState = {
   loadingStateSelected: "loading",
   watchModeCounter: 0,
   slidesHash: "",
-  widgets: {} as Record<string, string | boolean | number | [number, number] | string[] | null | undefined | unknown>
+  widgets: {} as Record<string, WidgetValueType>
 };
 
 const notebooksSlice = createSlice({
   name: 'notebooks',
   initialState,
   reducers: {
-    setWidgetValue(state, action: PayloadAction<{ key: string, value: string | boolean | number | [number, number] | string[] | null | undefined | unknown }>) {
+    setWidgetValue(state, action: PayloadAction<{ key: string, value: WidgetValueType }>) {
       const { key, value } = action.payload;
       console.log("set widget value", key, value)
       state.widgets[key] = value;

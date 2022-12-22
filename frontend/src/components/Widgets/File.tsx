@@ -40,7 +40,10 @@ export default function FileWidget({
           disabled={disabled}
           maxFileSize={fileSizeLimit}
           onprocessfile={(error, file) => {
-            dispatch(setWidgetValue({ key: widgetKey, value: file.serverId }));
+            console.log(file)
+            console.log(file.origin)
+            console.log(file.filename);
+            dispatch(setWidgetValue({ key: widgetKey, value: [file.filename, file.serverId] }));
           }}
           server={{
             url: `${axios.defaults.baseURL}/api/v1/fp`,
