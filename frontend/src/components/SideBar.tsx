@@ -217,7 +217,7 @@ export default function SideBar({
         return false;
       }
       let files = widgetsValues[key] as string[];
-      if (files.length === 0) {
+      if (files === undefined || files.length === 0) {
         return false;
       }
     }

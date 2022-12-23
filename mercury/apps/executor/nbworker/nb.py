@@ -91,6 +91,7 @@ class NBWorker(WSClient):
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'
             else:
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
+            log.debug(f"Execute code {code}")
             r = self.executor.run(code)
 
             updated = "True" in str(r)

@@ -11,7 +11,8 @@ from .manager import (
     get_widget,
     get_widget_by_index,
     widget_index_exists,
-) 
+)
+
 
 class File:
     def __init__(self, label="File upload", max_file_size="100MB"):
@@ -22,19 +23,19 @@ class File:
         else:
             self.file = ipywidgets.FileUpload(description=label)
             self.file.filepath = None
+            self.file.filename = None
             add_widget(self.file.model_id, self.file)
         display(self)
 
     @property
     def value(self):
         if len(self.file.value):
-            if self.file.value[0].content is not None:
-                return self.file.value[0].content
-            else:
-                if self.file.filepath is not None:
-                    # read that file
-                    with open(self.file.filepath, "rb") as fin:
-                        return fin.read()
+            return self.file.value[0].content
+
+        if self.file.filepath is not None:
+            # read that file
+            with open(self.file.filepath, "rb") as fin:
+                return fin.read()
 
         return None
 
@@ -42,13 +43,20 @@ class File:
     def filename(self):
         if len(self.file.value):
             return self.file.value[0].name
+        if self.file.filename is not None:
+            return self.file.filename
         return None
 
     @property
     def filepath(self):
-        if not len(self.file.value):
-            return None
-        if self.file.filepath is None:
+        if self.file.filepath is not None:
+            return self.file.filepath
+
+        if (
+            len(self.file.value)
+            and self.filename is not None
+            and self.value is not None
+        ):
             # store file in temp dir
             # and return the path
             temp_dir = tempfile.TemporaryDirectory()
@@ -59,23 +67,13 @@ class File:
 
             return self.file.filepath
 
-        return self.file.filepath
+        return None
 
     @value.setter
     def value(self, v):
         filename, filepath = v
         self.file.filepath = filepath
-        new_value = (
-            {
-                "name": filename,
-                "content": None,
-                "type": filepath.split(".")[-1],
-                "size": os.path.getsize(filepath),
-                "last_modified": os.path.getmtime(filepath),
-            },
-        )
-        print(new_value)
-        self.file.value = new_value
+        self.file.filename = filename
 
     def __str__(self):
         return "m.File"
@@ -93,7 +91,6 @@ class File:
         if len(data) > 1:
             view = {
                 "widget": "File",
-                "value": self.file.value,
                 "max_file_size": self.max_file_size,
                 "label": self.file.description,
                 "model_id": self.file.model_id,
