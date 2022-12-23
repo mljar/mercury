@@ -106,10 +106,6 @@ const notebooksSlice = createSlice({
 
           let widget = { ...state.selectedNotebook.params.params[widgetKey] };
 
-          // always update the value
-          updated = true;
-          state.widgets[key] = action.payload.value;
-
           if (isRangeWidget(widget)) {
             if (widget.min !== action.payload.min) {
               widget.min = action.payload.min;

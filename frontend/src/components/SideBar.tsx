@@ -207,6 +207,7 @@ export default function SideBar({
     }
   }
 
+  
   const allFilesUploaded = () => {
     if (fileKeys.length === 0) {
       // no files at all, so OK
