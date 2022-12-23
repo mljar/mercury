@@ -23,6 +23,7 @@ from widgets.select import Select
 from widgets.range import Range
 from widgets.text import Text
 from widgets.file import File 
+from widgets.checkbox import Checkbox
 
 
 def main():

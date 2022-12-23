@@ -11,7 +11,7 @@ import { createEmitAndSemanticDiagnosticsBuilderProgram } from 'typescript';
 import { RootState } from '../../store';
 import { clearExecutionHistory } from '../../tasks/tasksSlice';
 import { setShowSideBar } from '../../views/appSlice';
-import { IWidget, isSelectWidget, isSliderWidget, isTextWidget, isRangeWidget } from '../Widgets/Types';
+import { IWidget, isSelectWidget, isSliderWidget, isTextWidget, isRangeWidget, isCheckboxWidget } from '../Widgets/Types';
 //import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from '../WindowDimensions';
 
@@ -161,6 +161,11 @@ const notebooksSlice = createSlice({
               state.widgets[key] = action.payload.value;
               updated = true;
             }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
+          } else if (isCheckboxWidget(widget)) {
             if (widget.label !== action.payload.label) {
               widget.label = action.payload.label;
               updated = true;
