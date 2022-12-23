@@ -86,12 +86,18 @@ class NBWorker(WSClient):
                 tu = TemporaryUpload.objects.get(upload_id=value[1])
                 value[1] = tu.get_file_path()
                 log.debug(f"File path is {value[1]}")
-
-            if isinstance(value, str):
+            
+                code = ('from widgets.manager import set_update\n'
+                f'set_update("{model_id}", field="filename", new_value="{value[0]}")\n'
+                f'set_update("{model_id}", field="filepath", new_value="{value[1]}")\n')
+            
+            elif isinstance(value, str):
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'
             else:
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
+            
             log.debug(f"Execute code {code}")
+            
             r = self.executor.run(code)
 
             updated = "True" in str(r)
