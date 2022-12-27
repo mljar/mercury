@@ -24,6 +24,8 @@ from widgets.range import Range
 from widgets.text import Text
 from widgets.file import File 
 from widgets.checkbox import Checkbox
+from widgets.numeric import Numeric
+from widgets.multiselect import MultiSelect
 
 
 def main():

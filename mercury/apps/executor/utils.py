@@ -82,7 +82,19 @@ def parse_params(nb, params={}):
                                 "input": "select",
                                 "value": view.get("value", ""),
                                 "choices": view.get("choices", []),
-                                "multi": view.get("multi", False),
+                                "multi": False,
+                                "label": view.get("label", "")
+                            }
+                        elif widget_type == "MultiSelect":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "select",
+                                "value": view.get("value", []),
+                                "choices": view.get("choices", []),
+                                "multi": True,
                                 "label": view.get("label", "")
                             }
                         elif widget_type == "Range":
@@ -126,6 +138,19 @@ def parse_params(nb, params={}):
                             params["params"][widget_number] = {
                                 "input": "checkbox",
                                 "value": view.get("value", True),
+                                "label": view.get("label", "")
+                            }
+                        elif widget_type == "Numeric":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "input": "numeric",
+                                "value": view.get("value", 0),
+                                "min": view.get("min", 0),
+                                "max": view.get("max", 10),
+                                "step": view.get("step", 1),
                                 "label": view.get("label", "")
                             }
                             

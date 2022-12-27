@@ -16,58 +16,58 @@ class Numeric:
             raise WidgetException("value should be equal or smaller than max_value")
 
         if widget_index_exists():
-            self.slider = get_widget_by_index()
-            if self.slider.min != min_value:
-                self.slider.min = min_value
-                self.slider.value = value
-            if self.slider.max != max_value:
-                self.slider.max = max_value
-                self.slider.value = value
-            if self.slider.step != step:
-                self.slider.step = step
-                self.slider.value = value
-            self.slider.description = label
+            self.numeric = get_widget_by_index()
+            if self.numeric.min != min_value:
+                self.numeric.min = min_value
+                self.numeric.value = value
+            if self.numeric.max != max_value:
+                self.numeric.max = max_value
+                self.numeric.value = value
+            if self.numeric.step != step:
+                self.numeric.step = step
+                self.numeric.value = value
+            self.numeric.description = label
         else:
-            self.slider = ipywidgets.BoundedFloatText(
+            self.numeric = ipywidgets.BoundedFloatText(
                 value=value,
                 min=min_value,
                 max=max_value,
                 description=label,
                 step=step,
             )
-            add_widget(self.slider.model_id, self.slider)
+            add_widget(self.numeric.model_id, self.numeric)
         display(self)
 
     @property
     def value(self):
-        return self.slider.value
+        return self.numeric.value
 
     @value.setter
     def value(self, v):
-        self.slider.value = v
+        self.numeric.value = v
 
     def __str__(self):
-        return "m.Slider"
+        return "m.Numeric"
 
     def __repr__(self):
 
-        return "mercury.Slider"
+        return "mercury.Numeric"
 
     def _repr_mimebundle_(self, **kwargs):
         # data = {}
         # data["text/plain"] = repr(self)
         # return data
-        data = self.slider._repr_mimebundle_()
+        data = self.numeric._repr_mimebundle_()
         
         if len(data) > 1:
             view = {
-                "widget": "Slider",
-                "value": self.slider.value,
-                "min": self.slider.min,
-                "max": self.slider.max,
-                "step": self.slider.step,
-                "label": self.slider.description,
-                "model_id": self.slider.model_id,
+                "widget": "Numeric",
+                "value": self.numeric.value,
+                "min": self.numeric.min,
+                "max": self.numeric.max,
+                "step": self.numeric.step,
+                "label": self.numeric.description,
+                "model_id": self.numeric.model_id,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

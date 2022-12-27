@@ -14,7 +14,7 @@ class Checkbox:
             self.checkbox = get_widget_by_index()
             self.checkbox.description = label
         else:
-            self.checkbox = ipywidgets.Textarea(
+            self.checkbox = ipywidgets.Checkbox(
                 value=value,
                 description=label
             )
