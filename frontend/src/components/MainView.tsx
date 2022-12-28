@@ -23,7 +23,6 @@ type MainViewProps = {
   columnsWidth: number;
   isPresentation: boolean;
 };
- 
 
 export default function MainView({
   loadingState,
@@ -71,19 +70,25 @@ export default function MainView({
     }
   }
 
-  if(notebookSrc !== "" && isPresentation && slidesHash !== "") {
-    console.log("set slide number");
-    const splitted = slidesHash.split("/");
-    let injectCode = "";
-    if(splitted.length === 3) {
-      injectCode = `Reveal.slide(${splitted[1]}, ${splitted[2]});`;
-    } else if(splitted.length === 2) {
-      injectCode = `Reveal.slide(${splitted[1]});`;
-    }
+  if (notebookSrc !== "" && isPresentation && slidesHash !== "") {
+    if (notebookSrc.indexOf("Reveal.slide(") === -1) {
+      const splitted = slidesHash.split("/");
+      let injectCode = "";
+      if (splitted.length === 4) {
+        injectCode = `Reveal.slide(${splitted[1]}, ${splitted[2]}, ${splitted[3]});`;
+      } else if (splitted.length === 3) {
+        injectCode = `Reveal.slide(${splitted[1]}, ${splitted[2]});`;
+      } else if (splitted.length === 2) {
+        injectCode = `Reveal.slide(${splitted[1]});`;
+      }
 
-    console.log(injectCode);
-    
-    notebookSrc = notebookSrc.replace("setScrollingSlide);", `setScrollingSlide); ${injectCode}`);
+      if (injectCode !== "") {
+        notebookSrc = notebookSrc.replace(
+          "setScrollingSlide);",
+          `setScrollingSlide); try{ ${injectCode} } catch(error) {}`
+        );
+      }
+    }
   }
 
   useEffect(() => {
@@ -104,15 +109,6 @@ export default function MainView({
         });
     }
   }, [dispatch, notebookPath, slidesHash, isPresentation]);
-
-  useEffect(() => {
-    console.log("useEffect ...");
-    
-    console.log({ slidesHash });
-
-
-
-  }, [notebookSrc, slidesHash]);
 
   return (
     <main
@@ -184,6 +180,8 @@ export default function MainView({
                 srcDoc={notebookSrc}
                 title="display"
                 id="main-iframe"
+                onError={()=> {console.log("iframe error")}}
+                
               ></iframe>
             )}
 
