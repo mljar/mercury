@@ -5,10 +5,7 @@ import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getNotebookSrc,
-  setNotebookSrc,
-} from "../websocket/wsSlice";
+import { getNotebookSrc, setNotebookSrc } from "../websocket/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
 import { getSelectedNotebook } from "./Notebooks/notebooksSlice";
@@ -24,7 +21,9 @@ type MainViewProps = {
   username: string;
   slidesHash: string;
   columnsWidth: number;
+  isPresentation: boolean;
 };
+ 
 
 export default function MainView({
   loadingState,
@@ -37,6 +36,7 @@ export default function MainView({
   username,
   slidesHash,
   columnsWidth,
+  isPresentation,
 }: MainViewProps) {
   const { height } = useWindowDimensions();
 
@@ -54,7 +54,7 @@ export default function MainView({
       showCode = nb.params["show-code"];
     }
   }
-  if (notebookSrc !== "") {
+  if (notebookSrc !== "" && !isPresentation) {
     notebookSrc = "<script>init_mathjax();</script>" + notebookSrc;
 
     if (!showCode) {
@@ -71,23 +71,48 @@ export default function MainView({
     }
   }
 
+  if(notebookSrc !== "" && isPresentation && slidesHash !== "") {
+    console.log("set slide number");
+    const splitted = slidesHash.split("/");
+    let injectCode = "";
+    if(splitted.length === 3) {
+      injectCode = `Reveal.slide(${splitted[1]}, ${splitted[2]});`;
+    } else if(splitted.length === 2) {
+      injectCode = `Reveal.slide(${splitted[1]});`;
+    }
+
+    console.log(injectCode);
+    
+    notebookSrc = notebookSrc.replace("setScrollingSlide);", `setScrollingSlide); ${injectCode}`);
+  }
+
   useEffect(() => {
     if (notebookPath !== undefined) {
       axios
         .get(`${axios.defaults.baseURL}${notebookPath}${slidesHash}`)
         .then((response) => {
           let nbSrc = response.data;
-          nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
-          nbSrc = nbSrc.replace("<html>", "");
-          nbSrc = nbSrc.replace("</html>", "");
-          nbSrc = nbSrc.replace("<body", "<div");
-          nbSrc = nbSrc.replace("</body>", "</div>");
-          nbSrc = nbSrc.replace("<!DOCTYPE html>", "");
-
+          if (!isPresentation) {
+            nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
+            nbSrc = nbSrc.replace("<html>", "");
+            nbSrc = nbSrc.replace("</html>", "");
+            nbSrc = nbSrc.replace("<body", "<div");
+            nbSrc = nbSrc.replace("</body>", "</div>");
+            nbSrc = nbSrc.replace("<!DOCTYPE html>", "");
+          }
           dispatch(setNotebookSrc(nbSrc));
         });
     }
-  }, [dispatch, notebookPath, slidesHash]);
+  }, [dispatch, notebookPath, slidesHash, isPresentation]);
+
+  useEffect(() => {
+    console.log("useEffect ...");
+    
+    console.log({ slidesHash });
+
+
+
+  }, [notebookSrc, slidesHash]);
 
   return (
     <main
@@ -135,9 +160,9 @@ export default function MainView({
             </div>
           )}
 
-          {errorMsg === "" &&
+          {/* {errorMsg === "" &&
             loadingState !== "loading" &&
-            notebookSrc === "" && (
+            isPresentation && (
               <iframe
                 width="100%"
                 height={iframeHeight}
@@ -146,10 +171,25 @@ export default function MainView({
                 title="display"
                 id="main-iframe"
               ></iframe>
-            )}
-          {/* <InnerHTML html={"<script>init_mathjax();</script>"} /> */}
+            )}  */}
 
-          {notebookSrc !== "" && <InnerHTML html={notebookSrc} />}
+          {errorMsg === "" &&
+            loadingState !== "loading" &&
+            isPresentation &&
+            notebookSrc !== "" && (
+              <iframe
+                width="100%"
+                height={iframeHeight}
+                key={notebookPath}
+                srcDoc={notebookSrc}
+                title="display"
+                id="main-iframe"
+              ></iframe>
+            )}
+
+          {notebookSrc !== "" && !isPresentation && (
+            <InnerHTML html={notebookSrc} />
+          )}
         </div>
       </BlockUi>
     </main>

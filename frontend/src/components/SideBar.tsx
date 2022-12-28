@@ -8,6 +8,7 @@ import {
   copyCurrentToPreviousTask,
   executeNotebook,
   exportToPDF,
+  scrapeSlidesHash,
 } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
@@ -27,7 +28,11 @@ import {
   IWidget,
 } from "./Widgets/Types";
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
-import { getWidgetsValues, setWidgetValue } from "./Notebooks/notebooksSlice";
+import {
+  getWidgetsValues,
+  setSlidesHash,
+  setWidgetValue,
+} from "./Notebooks/notebooksSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
 import { fetchNotebook } from "./Notebooks/notebooksSlice";
@@ -38,11 +43,7 @@ import SelectExecutionHistory from "./SelectExecutionHistory";
 
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
-import {
-  getWorkerState,
-  runNotebook,
-  WorkerState,
-} from "../websocket/wsSlice";
+import { getWorkerState, runNotebook, WorkerState } from "../websocket/wsSlice";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -82,14 +83,12 @@ export default function SideBar({
   useEffect(() => {
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
-
-        if(key in widgetsValues) {
+        if (key in widgetsValues) {
           console.log("skip set widget value");
           continue;
         } else {
           console.log("set widget initial value");
         }
-
 
         if (widgetParams.input === "file") {
           dispatch(setWidgetValue({ key, value: [] as string[] }));
@@ -207,7 +206,6 @@ export default function SideBar({
     }
   }
 
-  
   const allFilesUploaded = () => {
     if (fileKeys.length === 0) {
       // no files at all, so OK
@@ -272,6 +270,10 @@ export default function SideBar({
                   //  dispatch(copyCurrentToPreviousTask());
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
+
+                  const slidesHash = scrapeSlidesHash();
+                  dispatch(setSlidesHash(slidesHash));
+                  console.log({ slidesHash });
 
                   ws.sendMessage(
                     JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))

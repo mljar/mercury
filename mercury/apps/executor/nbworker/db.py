@@ -29,6 +29,14 @@ class DBClient:
             log.exception("Expetion when notebook load, quit")
             sys.exit(0)
 
+    def is_presentation(self):
+        try:
+            log.debug("Check if notebook is presentation")
+            return self.notebook.output == "slides"
+        except Exception:
+            log.exception("Exception when check if notebook is presentation")
+        return False
+
     def worker_state(self):
         return self.state
 

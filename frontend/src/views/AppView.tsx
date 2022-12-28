@@ -248,6 +248,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 username={username}
                 slidesHash={slidesHash}
                 columnsWidth={showSideBar ? 9 : 12}
+                isPresentation={
+                  notebook.output !== undefined && notebook.output === "slides"
+                }
               />
             )}
             {appView === "files" && (

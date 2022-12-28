@@ -115,7 +115,7 @@ export const fetchCurrentTask =
 
         };
 
-const scrapeSlidesHash = () => {
+export const scrapeSlidesHash = () => {
     try {
         const iframeElement = (document.getElementById("main-iframe") as HTMLIFrameElement);
         const hash = iframeElement?.contentWindow?.location?.hash;

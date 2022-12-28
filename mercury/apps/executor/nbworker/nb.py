@@ -61,9 +61,14 @@ class NBWorker(WSClient):
 
         self.update_nb(widgets)
 
-        body = self.executor.export_html(
-            self.nb, full_header=False, show_code=self.show_code
-        )
+        if self.is_presentation:
+            body = self.executor.export_html(
+                self.nb, full_header=True, show_code=self.show_code
+            )
+        else:
+            body = self.executor.export_html(
+                self.nb, full_header=False, show_code=self.show_code
+            )
 
         # with open(f"test_{counter}.html", "w") as fout:
         #    fout.write(body)
@@ -173,8 +178,9 @@ class NBWorker(WSClient):
         log.debug("Init notebook")
         self.update_worker_state(WorkerState.Busy)
 
-        self.executor = Executor()
+        self.executor = Executor(is_presentation = self.is_presentation())
         self.nb_original = read_nb(self.notebook.path)
+
         self.executor.run_notebook(self.nb_original, export_html=False)
 
         # TODO: update params in db if needed"

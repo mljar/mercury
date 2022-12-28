@@ -19,8 +19,8 @@ from apps.executor.utils import one_cell_notebook, get_test_notebook
 
 
 class Executor:
-    def __init__(self, show_code=False):
-        self.exporter = Exporter(show_code)
+    def __init__(self, show_code=False, is_presentation=False):
+        self.exporter = Exporter(show_code, is_presentation)
         self.shell = CaptureShell()
         try:
             self.shell.enable_matplotlib()
@@ -86,6 +86,12 @@ nb = dict2nb(nb)
 e = Executor()
 b = e.run_notebook(nb, show_code=False)
 
+#executor = Executor(is_presentation=True)
+#nb_original = read_nb("./slides.ipynb")
+#b = executor.run_notebook(nb_original, export_html=True)
+
+#print(nb_original)
+#print(b)
 # with open("test.html", "w") as fout:
 #    fout.write(b)
 
