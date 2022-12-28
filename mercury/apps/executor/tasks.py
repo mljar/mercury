@@ -17,6 +17,6 @@ def task_start_websocket_worker(self, job_params):
     ]
     print(command)
     print(" ".join(command))
-    # worker = subprocess.Popen(command)
+    worker = subprocess.Popen(command)
     print("end")
 
