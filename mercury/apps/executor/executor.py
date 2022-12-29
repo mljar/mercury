@@ -86,12 +86,12 @@ nb = dict2nb(nb)
 e = Executor()
 b = e.run_notebook(nb, show_code=False)
 
-#executor = Executor(is_presentation=True)
-#nb_original = read_nb("./slides.ipynb")
-#b = executor.run_notebook(nb_original, export_html=True)
+# executor = Executor(is_presentation=True)
+# nb_original = read_nb("./slides.ipynb")
+# b = executor.run_notebook(nb_original, export_html=True)
 
-#print(nb_original)
-#print(b)
+# print(nb_original)
+# print(b)
 # with open("test.html", "w") as fout:
 #    fout.write(b)
 

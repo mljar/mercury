@@ -5,6 +5,7 @@ import nbformat as nbf
 
 log = logging.getLogger(__name__)
 
+
 def get_test_notebook(markdown=[], code=[]):
     nb = nbf.v4.new_notebook()
     nb["cells"] = []
@@ -20,6 +21,7 @@ def one_cell_notebook(code=""):
     nb = nbf.v4.new_notebook()
     nb["cells"] = [nbf.v4.new_code_cell(code)]
     return nb
+
 
 def parse_params(nb, params={}):
     # nb in nbformat
@@ -45,7 +47,9 @@ def parse_params(nb, params={}):
 
                         # check model_id duplicates
 
-                        print(f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}')
+                        print(
+                            f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}'
+                        )
 
                         if view.get("model_id", "") in all_model_ids:
                             continue
@@ -71,7 +75,7 @@ def parse_params(nb, params={}):
                                 "value": view.get("value", 0),
                                 "min": view.get("min", 0),
                                 "max": view.get("max", 10),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "Select":
                             widget_number = f"w{widget_counter}"
@@ -83,7 +87,7 @@ def parse_params(nb, params={}):
                                 "value": view.get("value", ""),
                                 "choices": view.get("choices", []),
                                 "multi": False,
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "MultiSelect":
                             widget_number = f"w{widget_counter}"
@@ -95,7 +99,7 @@ def parse_params(nb, params={}):
                                 "value": view.get("value", []),
                                 "choices": view.get("choices", []),
                                 "multi": True,
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "Range":
                             widget_number = f"w{widget_counter}"
@@ -104,10 +108,10 @@ def parse_params(nb, params={}):
                                 params["params"] = {}
                             params["params"][widget_number] = {
                                 "input": "range",
-                                "value": view.get("value", [0,1]),
+                                "value": view.get("value", [0, 1]),
                                 "min": view.get("min", 0),
                                 "max": view.get("max", 10),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "Text":
                             widget_number = f"w{widget_counter}"
@@ -118,7 +122,7 @@ def parse_params(nb, params={}):
                                 "input": "text",
                                 "value": view.get("value", ""),
                                 "rows": view.get("rows", 1),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "File":
                             widget_number = f"w{widget_counter}"
@@ -128,7 +132,7 @@ def parse_params(nb, params={}):
                             params["params"][widget_number] = {
                                 "input": "file",
                                 "maxFileSize": view.get("max_file_size", 1),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "Checkbox":
                             widget_number = f"w{widget_counter}"
@@ -138,7 +142,7 @@ def parse_params(nb, params={}):
                             params["params"][widget_number] = {
                                 "input": "checkbox",
                                 "value": view.get("value", True),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
                         elif widget_type == "Numeric":
                             widget_number = f"w{widget_counter}"
@@ -151,14 +155,16 @@ def parse_params(nb, params={}):
                                 "min": view.get("min", 0),
                                 "max": view.get("max", 10),
                                 "step": view.get("step", 1),
-                                "label": view.get("label", "")
+                                "label": view.get("label", ""),
                             }
-                            
+
                         if widget_number is not None:
-                            widget_number_to_model_id[widget_number] = view.get("model_id", "")
+                            widget_number_to_model_id[widget_number] = view.get(
+                                "model_id", ""
+                            )
                             widget_number_to_cell_index[widget_number] = cell_counter
                             widget_types[widget_number] = widget_type
                         all_model_ids += [view.get("model_id", "")]
-                            
+
         cell_counter += 1
     return widget_number_to_model_id, widget_number_to_cell_index, widget_types

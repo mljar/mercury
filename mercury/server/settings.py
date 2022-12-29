@@ -64,7 +64,9 @@ else:
             with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(content)
 
-
+STORAGE_MEDIA = "media"
+STORAGE_S3 = "s3"
+STORAGE = STORAGE_MEDIA
 DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
 DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
 
@@ -113,6 +115,7 @@ INSTALLED_APPS = [
     "apps.tasks",
     "apps.notebooks",
     "apps.executor",
+    "apps.storage",
 ]
 
 if is_pro:

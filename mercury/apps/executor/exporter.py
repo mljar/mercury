@@ -27,7 +27,6 @@ class Exporter:
 
         n = copy.deepcopy(notebook)
 
-        
         to_delete = None
         for i, cell in enumerate(n.cells):
             if "source" in cell:
@@ -35,8 +34,6 @@ class Exporter:
                     to_delete = i
         if to_delete is not None:
             del n.cells[to_delete]
-
-        
 
         # for cell in n.cells:
         #     if "outputs" in cell:

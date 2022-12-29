@@ -84,25 +84,29 @@ class NBWorker(WSClient):
             value = widgets[w]
             model_id = self.widgets_mapping[w]
             widget_type = self.widget_types.get(w, "")
-            log.debug(f"Update widget id={w} model_id={model_id} value={value} widget type {widget_type}")
+            log.debug(
+                f"Update widget id={w} model_id={model_id} value={value} widget type {widget_type}"
+            )
 
             if widget_type == "File" and len(value) == 2:
                 log.debug(f"Get file {value[0]} from id={value[1]}")
                 tu = TemporaryUpload.objects.get(upload_id=value[1])
                 value[1] = tu.get_file_path()
                 log.debug(f"File path is {value[1]}")
-            
-                code = ('from widgets.manager import set_update\n'
-                f'set_update("{model_id}", field="filename", new_value="{value[0]}")\n'
-                f'set_update("{model_id}", field="filepath", new_value="{value[1]}")\n')
-            
+
+                code = (
+                    "from widgets.manager import set_update\n"
+                    f'set_update("{model_id}", field="filename", new_value="{value[0]}")\n'
+                    f'set_update("{model_id}", field="filepath", new_value="{value[1]}")\n'
+                )
+
             elif isinstance(value, str):
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'
             else:
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
-            
+
             log.debug(f"Execute code {code}")
-            
+
             r = self.executor.run(code)
 
             updated = "True" in str(r)
@@ -178,7 +182,7 @@ class NBWorker(WSClient):
         log.debug("Init notebook")
         self.update_worker_state(WorkerState.Busy)
 
-        self.executor = Executor(is_presentation = self.is_presentation())
+        self.executor = Executor(is_presentation=self.is_presentation())
         self.nb_original = read_nb(self.notebook.path)
 
         self.executor.run_notebook(self.nb_original, export_html=False)

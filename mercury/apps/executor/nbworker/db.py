@@ -20,7 +20,6 @@ class DBClient:
         self.state = WorkerState.Unknown
         self.load_notebook()
 
-        
     def load_notebook(self):
         try:
             log.debug(f"Load notebook id={self.notebook_id}")
@@ -60,7 +59,7 @@ class DBClient:
 
     def delete_worker(self):
         DBClient.delete_worker_in_db(self.worker_id)
-        
+
     def delete_stale_workers(self):
         try:
             log.debug(

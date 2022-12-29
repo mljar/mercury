@@ -1,5 +1,5 @@
 import json
-import time 
+import time
 
 import nbformat as nbf
 from django.test import TestCase
@@ -16,13 +16,11 @@ from apps.executor.utils import one_cell_notebook, get_test_notebook
 
 
 class ExecutorTestCase(TestCase):
-    
     def test_get_header(self):
         e = Executor()
         h = e.get_header()
         self.assertTrue(h.startswith("<head>"))
         self.assertTrue(h.endswith("</head>"))
-        
 
     def test_execute(self):
         nb = get_test_notebook(markdown=["# test"], code=["print(1)"])
@@ -33,8 +31,6 @@ class ExecutorTestCase(TestCase):
         e = Executor()
         body = e.run_notebook(nb, full_header=False)
 
-
         print(time.time() - start)
 
-
-        #print(body)
+        # print(body)

@@ -142,7 +142,7 @@ def task_init_notebook(
             print("check V2")
             # check if nb in V2
             parse_params(nb, params)
-            '''
+            """
             for cell in nb["cells"]:
 
                 if cell["cell_type"] == "code":
@@ -176,7 +176,7 @@ def task_init_notebook(
                                         "max": view.get("max", 100),
                                         "label": view.get("label", "")
                                     }
-            '''
+            """
 
         if update_notebook and nb is not None:
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:

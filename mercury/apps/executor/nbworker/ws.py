@@ -4,7 +4,7 @@ import json
 import websocket
 
 import logging
-from queue import Queue 
+from queue import Queue
 
 from apps.executor.nbworker.utils import WorkerState, Purpose
 from apps.executor.nbworker.db import DBClient
@@ -22,7 +22,6 @@ class WSClient(DBClient):
         self.queue = Queue()
 
         self.msg_counter = 0
-
 
     def connect(self, ws_address):
         try:
@@ -70,11 +69,12 @@ class WSClient(DBClient):
         try:
             log.debug(f"Send state {self.worker_state()}")
             self.ws.send(
-                json.dumps({"purpose": Purpose.WorkerState, "state": self.worker_state()})
+                json.dumps(
+                    {"purpose": Purpose.WorkerState, "state": self.worker_state()}
+                )
             )
         except Exception as e:
             log.exception("Exception when send state")
-
 
     def update_worker_state(self, new_state):
         self.set_worker_state(new_state)
