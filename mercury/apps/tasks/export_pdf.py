@@ -1,11 +1,10 @@
 import asyncio
+import concurrent.futures
 import os
 import tempfile
-
 from subprocess import PIPE, Popen
-from pyppeteer import launch
 
-import concurrent.futures
+from pyppeteer import launch
 
 
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):

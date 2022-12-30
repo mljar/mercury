@@ -1,7 +1,7 @@
 import json
 import logging
-import nbformat as nbf
 
+import nbformat as nbf
 
 log = logging.getLogger(__name__)
 
@@ -133,6 +133,14 @@ def parse_params(nb, params={}):
                                 "input": "file",
                                 "maxFileSize": view.get("max_file_size", 1),
                                 "label": view.get("label", ""),
+                            }
+                        elif widget_type == "OutputDir":
+                            widget_number = f"w{widget_counter}"
+                            widget_counter += 1
+                            if "params" not in params:
+                                params["params"] = {}
+                            params["params"][widget_number] = {
+                                "output": "dir",
                             }
                         elif widget_type == "Checkbox":
                             widget_number = f"w{widget_counter}"

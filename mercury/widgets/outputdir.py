@@ -14,22 +14,31 @@ from .manager import (
 )
 
 
+class DirPath:
+    def __init__(self, dir_path):
+        self.value = dir_path
+
 class OutputDir:
     def __init__(self):
-        self.value = "."
-        
+        if widget_index_exists():
+            self.dir_path = get_widget_by_index()
+        else:
+            self.dir_path = DirPath(".")
+            add_widget("output-dir", self.dir_path)
+        display(self)
+
+    #@property
+    #def value(self):
+    #    return self.value
 
     @property
-    def value(self):
-        return self.value
+    def path(self):
+        return self.dir_path.value
 
-    @property
-    def filepath(self):
-        return self.value
-
-    @value.setter
-    def value(self, v):
-        self.value = v
+    #@value.setter
+    #def value(self, v):
+    #    if self.value != v:
+    #        self.value = v
 
     def __str__(self):
         return "mercury.OutputDir"
@@ -43,6 +52,7 @@ class OutputDir:
     
         view = {
             "widget": "OutputDir",        
+            "model_id": "output-dir"
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
         

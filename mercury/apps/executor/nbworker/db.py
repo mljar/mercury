@@ -1,12 +1,12 @@
-import sys
-from apps.executor.models import Worker
-from apps.notebooks.models import Notebook
-from django.utils.timezone import make_aware
 import logging
-
+import sys
 from datetime import datetime, timedelta
 
+from django.utils.timezone import make_aware
+
+from apps.executor.models import Worker
 from apps.executor.nbworker.utils import WorkerState
+from apps.notebooks.models import Notebook
 
 log = logging.getLogger(__name__)
 

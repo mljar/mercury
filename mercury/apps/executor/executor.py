@@ -1,21 +1,21 @@
 import json
+import os
+import sys
 
 import nbformat
 from execnb.nbio import nb2dict, nb2str, read_nb, write_nb
 from execnb.shell import CaptureShell
 
-
-import os, sys
-
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
 sys.path.insert(0, BACKEND_DIR)
 
-from apps.executor.exporter import Exporter
 import copy
 
 from execnb.nbio import _dict2obj, dict2nb
-from apps.executor.utils import one_cell_notebook, get_test_notebook
+
+from apps.executor.exporter import Exporter
+from apps.executor.utils import get_test_notebook, one_cell_notebook
 
 
 class Executor:

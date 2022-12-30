@@ -1,19 +1,19 @@
-import os
 import json
-import yaml as yaml_lib
+import os
 import tempfile
 
+import yaml as yaml_lib
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.core import mail
+from django.test import TestCase
 from rest_framework.reverse import reverse
 
+from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 from apps.notebooks.tests import create_notebook_with_yaml
-from apps.notebooks.models import Notebook
 from apps.tasks.models import Task
-from apps.tasks.tasks import task_execute, sanitize_string
 from apps.tasks.notify import notify
+from apps.tasks.tasks import sanitize_string, task_execute
 
 # python manage.py test apps.tasks.tests -v 2
 

@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 import websocket
 from django.utils.timezone import make_aware
 
-
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..", "..")
 sys.path.insert(0, BACKEND_DIR)
@@ -33,8 +32,8 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-from apps.executor.nbworker.nb import NBWorker
 from apps.executor.nbworker.db import DBClient
+from apps.executor.nbworker.nb import NBWorker
 
 if len(sys.argv) != 4:
     log.error("Wrong number of input parameters")

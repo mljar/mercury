@@ -3,25 +3,23 @@ import os
 import subprocess
 import sys
 import uuid
-import nbformat
-import yaml
-
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
-from croniter import croniter
+
+import nbformat
+import yaml
 from celery import shared_task
+from croniter import croniter
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
-from apps.notebooks.models import Notebook
-from apps.tasks.models import Task
-from apps.notebooks.slides_themes import SlidesThemes
-from apps.tasks.notify import validate_notify
-
-
 from apps.executor.utils import parse_params
+from apps.notebooks.models import Notebook
+from apps.notebooks.slides_themes import SlidesThemes
+from apps.tasks.models import Task
+from apps.tasks.notify import validate_notify
 
 
 def process_nbconvert_errors(error_msg):

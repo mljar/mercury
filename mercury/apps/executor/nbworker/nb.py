@@ -1,17 +1,17 @@
-import sys
-import json
 import copy
-import threading
+import json
 import logging
-
-from execnb.nbio import read_nb, nb2dict
-
-from apps.executor.executor import Executor
-from apps.executor.nbworker.ws import WSClient
-from apps.executor.nbworker.utils import WorkerState, Purpose
-from apps.executor.utils import parse_params
+import sys
+import threading
 
 from django_drf_filepond.models import TemporaryUpload
+from execnb.nbio import nb2dict, read_nb
+
+from apps.executor.executor import Executor
+from apps.executor.nbworker.utils import Purpose, WorkerState
+from apps.executor.nbworker.ws import WSClient
+from apps.executor.utils import parse_params
+from apps.storage.storage import StorageManager
 
 log = logging.getLogger(__name__)
 
@@ -99,6 +99,11 @@ class NBWorker(WSClient):
                     f'set_update("{model_id}", field="filename", new_value="{value[0]}")\n'
                     f'set_update("{model_id}", field="filepath", new_value="{value[1]}")\n'
                 )
+            if widget_type == "OutputDir":
+
+                sm = StorageManager(self.session_id, self.worker_id)
+                output_dir = sm.worker_output_dir()
+                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{output_dir}")'
 
             elif isinstance(value, str):
                 code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'

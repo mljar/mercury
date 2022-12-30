@@ -3,14 +3,13 @@ import time
 
 import nbformat as nbf
 from django.test import TestCase
-from execnb.nbio import read_nb, dict2nb
+from execnb.nbio import dict2nb, read_nb
 
 from apps.executor.executor import Executor
 from apps.executor.exporter import Exporter
 
 # python manage.py test apps
-from apps.executor.utils import one_cell_notebook, get_test_notebook
-
+from apps.executor.utils import get_test_notebook, one_cell_notebook
 
 # python manage.py test apps.executor -v 2
 

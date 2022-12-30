@@ -1,13 +1,12 @@
-import sys
 import json
+import logging
+import sys
+from queue import Queue
 
 import websocket
 
-import logging
-from queue import Queue
-
-from apps.executor.nbworker.utils import WorkerState, Purpose
 from apps.executor.nbworker.db import DBClient
+from apps.executor.nbworker.utils import Purpose, WorkerState
 
 log = logging.getLogger(__name__)
 

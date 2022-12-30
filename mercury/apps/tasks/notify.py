@@ -1,9 +1,11 @@
 import os
+
 from django.conf import settings
-from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
-from apps.tasks.tasks_export import export_to_pdf
+from django.core.mail import EmailMessage
+
 from apps.notebooks.models import Notebook
+from apps.tasks.tasks_export import export_to_pdf
 
 
 def validate_notify(config: dict) -> str:

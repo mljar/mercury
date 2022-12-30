@@ -38,7 +38,7 @@ class WorkerProxy(WebsocketConsumer):
         )
 
     def receive(self, text_data):
-        print(f"Worker ({self.worker_id}) received:", text_data)
+        # print(f"Worker ({self.worker_id}) received:", text_data)
 
         json_data = json.loads(text_data)
 

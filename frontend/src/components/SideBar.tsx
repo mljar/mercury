@@ -26,6 +26,7 @@ import {
   isTextWidget,
   isMarkdownWidget,
   IWidget,
+  isOutputFilesWidget,
 } from "./Widgets/Types";
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
@@ -102,6 +103,8 @@ export default function SideBar({
         } else if (isMarkdownWidget(widgetParams)) {
           // do nothing
           // dont put value into store
+        } else if (isOutputFilesWidget(widgetParams)) {
+          dispatch(setWidgetValue({ key, value: "output-dir" }));
         } else {
           dispatch(setWidgetValue({ key, value: widgetParams.value }));
         }
@@ -229,6 +232,8 @@ export default function SideBar({
   }
 
   const ws = useContext(WebSocketContext);
+  console.log(widgetsValues);
+  console.log(JSON.stringify(widgetsValues));
 
   return (
     <nav

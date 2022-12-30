@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.db import transaction
-from django.utils.timezone import make_aware
 from django.db.models import Q
+from django.utils.timezone import make_aware
 
 from apps.executor.consumers.utils import get_client_group, get_worker_group
 from apps.executor.models import Worker

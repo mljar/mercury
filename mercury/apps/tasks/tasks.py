@@ -14,11 +14,11 @@ from django.conf import settings
 from django_drf_filepond.models import TemporaryUpload
 
 from apps.notebooks.models import Notebook
+from apps.notebooks.slides_themes import SlidesThemes
 from apps.notebooks.tasks import get_jupyter_bin_path, process_nbconvert_errors
 from apps.tasks.clean_service import clean_service
-from apps.tasks.models import Task
-from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.export_pdf import to_pdf
+from apps.tasks.models import Task
 from apps.tasks.notify import notify
 
 
