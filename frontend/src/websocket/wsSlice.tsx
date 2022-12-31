@@ -20,8 +20,9 @@ export enum WorkerState {
 }
 
 const initialState = {
-  WebSocketState: WebSocketState.Unknown,
-  WorkerState: WorkerState.Unknown,
+  webSocketState: WebSocketState.Unknown,
+  workerState: WorkerState.Unknown,
+  workerId: undefined as undefined | number,
   notebookSrc: "",
 };
 
@@ -30,10 +31,13 @@ const wsSlice = createSlice({
   initialState,
   reducers: {
     setWebSocketState(state, action: PayloadAction<WebSocketState>) {
-      state.WebSocketState = action.payload;
+      state.webSocketState = action.payload;
     },
     setWorkerState(state, action: PayloadAction<WorkerState>) {
-      state.WorkerState = action.payload;
+      state.workerState = action.payload;
+    },
+    setWorkerId(state, action: PayloadAction<undefined | number>) {
+      state.workerId = action.payload;
     },
     setNotebookSrc(state, action: PayloadAction<string>) {
       state.notebookSrc = action.payload;
@@ -46,12 +50,14 @@ export default wsSlice.reducer;
 export const {
   setWebSocketState,
   setWorkerState,
+  setWorkerId,
   setNotebookSrc,
 } = wsSlice.actions;
 
 export const getWebSocketState = (state: RootState) =>
-  state.ws.WebSocketState;
-export const getWorkerState = (state: RootState) => state.ws.WorkerState;
+  state.ws.webSocketState;
+export const getWorkerState = (state: RootState) => state.ws.workerState;
+export const getWorkerId = (state: RootState) => state.ws.workerId;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
 
 export const runNotebook = (widgets_params: string) => {

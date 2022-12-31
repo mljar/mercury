@@ -42,7 +42,6 @@ def parse_params(nb, params={}):
                         and "application/mercury+json" in output["data"]
                     ):
                         view = output["data"]["application/mercury+json"]
-                        print(view)
                         view = json.loads(view)
 
                         # check model_id duplicates
@@ -57,6 +56,8 @@ def parse_params(nb, params={}):
                         widget_type = view.get("widget")
                         if widget_type is None:
                             continue
+                        else:
+                            params["version"] = "2"
                         widget_number = None
                         if widget_type == "App":
                             if view.get("title") is not None:
@@ -176,3 +177,4 @@ def parse_params(nb, params={}):
 
         cell_counter += 1
     return widget_number_to_model_id, widget_number_to_cell_index, widget_types
+

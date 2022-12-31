@@ -30,6 +30,7 @@ export interface INotebookParams {
   author: string | null;
   "show-code": boolean | null;
   params: IWidget[];
+  version: string;
 }
 
 export interface INotebook {

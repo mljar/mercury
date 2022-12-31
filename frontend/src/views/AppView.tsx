@@ -26,6 +26,7 @@ import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
   fetchOutputFiles,
+  fetchWorkerOutputFiles,
   getOutputFiles,
   getOutputFilesState,
   getShowSideBar,
@@ -40,7 +41,7 @@ import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
-
+import { getWorkerId } from "../websocket/wsSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -64,6 +65,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const slidesHash = useSelector(getSlidesHash);
   const showSideBar = useSelector(getShowSideBar);
   const exportingToPDF = useSelector(getExportingToPDF);
+  const workerId = useSelector(getWorkerId);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
@@ -105,17 +107,28 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [dispatch, notebook, watchModeCounter]);
 
+  console.log("version", notebook?.params?.version);
+
+  // version 1
   useEffect(() => {
     if (
       appView === "files" &&
       task.id &&
       task.state &&
       task.state === "DONE" &&
-      task.result
+      task.result &&
+      notebook?.params?.version === "1"
     ) {
       dispatch(fetchOutputFiles(task.id));
     }
-  }, [dispatch, appView, task.id, task.state, task.result]);
+  }, [dispatch, appView, task.id, task.state, task.result, notebook]);
+
+  // version 2
+  useEffect(() => {
+    if (appView === "files" && notebook?.params?.version === "2" && workerId !== undefined) {
+      dispatch(fetchWorkerOutputFiles(workerId));
+    }
+  }, [dispatch, appView, notebook, workerId]);
 
   let notebookPath = notebook.default_view_path;
   if (task.state && task.state === "DONE" && task.result) {
@@ -168,7 +181,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     showRestApi = true;
   }
 
-  console.log("AppView")
+  console.log("AppView");
 
   return (
     <div className="App">

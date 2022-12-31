@@ -1,14 +1,16 @@
 import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
-import { getSelectedNotebookId, updateWidgetsParams } from "../components/Notebooks/notebooksSlice";
 import {
-
+  getSelectedNotebookId,
+  updateWidgetsParams,
+} from "../components/Notebooks/notebooksSlice";
+import {
   setNotebookSrc,
   setWebSocketState,
   setWorkerState,
+  setWorkerId,
   WebSocketState,
   WorkerState,
-
 } from "./wsSlice";
 
 import { useSelector } from "react-redux";
@@ -48,6 +50,7 @@ export default function WebSocketProvider({
     if ("purpose" in response) {
       if (response.purpose === "worker-state") {
         dispatch(setWorkerState(response.state));
+        dispatch(setWorkerId(response.workerId));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
       } else if (response.purpose === "update-widgets") {
@@ -64,6 +67,7 @@ export default function WebSocketProvider({
   function onClose(event: any): void {
     dispatch(setWebSocketState(WebSocketState.Disconnected));
     dispatch(setWorkerState(WorkerState.Unknown));
+    dispatch(setWorkerId(undefined));
     connection = undefined;
     setTimeout(() => connect(), 5000);
   }
@@ -80,16 +84,11 @@ export default function WebSocketProvider({
   }
 
   function connect() {
-    console.log("connect")
-    if (
-      selectedNotebookId !== undefined &&
-      connection === undefined 
-    ) {
-      console.log("connecting ...")
+    console.log("connect");
+    if (selectedNotebookId !== undefined && connection === undefined) {
+      console.log("connecting ...");
       connection = new WebSocket(
-        `ws://127.0.0.1:8000/ws/client/${
-          selectedNotebookId
-        }/${getSessionId()}/`
+        `ws://127.0.0.1:8000/ws/client/${selectedNotebookId}/${getSessionId()}/`
       );
       connection.onopen = onOpen;
       connection.onmessage = onMessage;

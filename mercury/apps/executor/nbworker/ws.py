@@ -69,7 +69,11 @@ class WSClient(DBClient):
             log.debug(f"Send state {self.worker_state()}")
             self.ws.send(
                 json.dumps(
-                    {"purpose": Purpose.WorkerState, "state": self.worker_state()}
+                    {
+                        "purpose": Purpose.WorkerState,
+                        "state": self.worker_state(),
+                        "workerId": self.worker_id,
+                    }
                 )
             )
         except Exception as e:
