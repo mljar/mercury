@@ -7,10 +7,10 @@ import threading
 from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
 
-from apps.executor.executor import Executor
-from apps.executor.nbworker.utils import Purpose, WorkerState
-from apps.executor.nbworker.ws import WSClient
-from apps.executor.utils import parse_params
+from apps.nb.executor import Executor
+from apps.nbworker.utils import Purpose, WorkerState
+from apps.nbworker.ws import WSClient
+from apps.ws.utils import parse_params
 from apps.storage.storage import StorageManager
 
 log = logging.getLogger(__name__)

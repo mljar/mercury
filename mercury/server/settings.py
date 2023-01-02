@@ -114,7 +114,7 @@ INSTALLED_APPS = [
     "django_drf_filepond",
     "apps.tasks",
     "apps.notebooks",
-    "apps.executor",
+    "apps.ws",
     "apps.storage",
 ]
 

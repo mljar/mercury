@@ -5,9 +5,9 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.db import transaction
 
-from apps.executor.consumers.utils import get_client_group, get_worker_group
-from apps.executor.models import Worker
-from apps.executor.tasks import task_start_websocket_worker
+from apps.ws.utils import get_client_group, get_worker_group
+from apps.ws.models import Worker
+from apps.ws.tasks import task_start_websocket_worker
 from apps.notebooks.models import Notebook
 
 

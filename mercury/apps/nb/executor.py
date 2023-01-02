@@ -14,8 +14,8 @@ import copy
 
 from execnb.nbio import _dict2obj, dict2nb
 
-from apps.executor.exporter import Exporter
-from apps.executor.utils import get_test_notebook, one_cell_notebook
+from apps.nb.exporter import Exporter
+from apps.ws.utils import get_test_notebook, one_cell_notebook
 
 
 class Executor:

@@ -1,7 +1,7 @@
 from django.urls import re_path
 
-from .consumers.client import ClientProxy
-from .consumers.worker import WorkerProxy
+from apps.ws.client import ClientProxy
+from apps.ws.worker import WorkerProxy
 
 websocket_urlpatterns = [
     re_path(

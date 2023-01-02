@@ -15,7 +15,7 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
-from apps.executor.utils import parse_params
+from apps.ws.utils import parse_params
 from apps.notebooks.models import Notebook
 from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.models import Task
