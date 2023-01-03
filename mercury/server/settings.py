@@ -306,3 +306,5 @@ LOGGING = {
         },
     },
 }
+
+NBWORKERS_PER_MACHINE = 1

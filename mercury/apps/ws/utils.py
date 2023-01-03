@@ -1,5 +1,6 @@
 import json
 import logging
+import platform
 
 log = logging.getLogger(__name__)
 
@@ -7,6 +8,8 @@ log = logging.getLogger(__name__)
 CLIENT_SITE = "client"
 WORKER_SITE = "worker"
 
+def machine_uuid():
+    return platform.node()
 
 def client_group(notebook_id, session_id):
     return f"{CLIENT_SITE}-{notebook_id}-{session_id}"

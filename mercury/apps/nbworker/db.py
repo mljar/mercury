@@ -1,5 +1,7 @@
 import logging
 import sys
+import json
+import uuid
 from datetime import datetime, timedelta
 
 from django.utils.timezone import make_aware
@@ -39,7 +41,7 @@ class DBClient:
     def show_code(self):
         try:
             log.debug("Check if show code from notebook")
-            return self.notebook.params.get("show-code", "False") == "True"
+            return json.loads(self.notebook.params).get("show-code", "False") == "True"
         except Exception:
             log.exception("Exception when check if show code from notebook")
         return False
@@ -47,7 +49,7 @@ class DBClient:
     def show_prompt(self):
         try:
             log.debug("Check if show prompt from notebook")
-            return self.notebook.params.get("show-prompt", "False") == "True"
+            return json.loads(self.notebook.params).get("show-prompt", "False") == "True"
         except Exception:
             log.exception("Exception when check if show promtp from notebook")
         return False
@@ -61,10 +63,14 @@ class DBClient:
 
     def set_worker_state(self, new_state):
         try:
-            log.debug(f"Worker id={self.worker_id} set state {new_state}")
+            log.debug(f"Worker id={self.worker_id} set state {new_state} uuid {str(uuid.getnode())}")
             self.state = new_state
             if self.worker_exists() and self.worker is not None:
                 self.worker.state = new_state
+                # set worker machine id 
+                # to control number of workers 
+                # in the single machine
+                self.worker.machine_id = str(uuid.getnode())
                 self.worker.save()
         except Exception:
             log.exception("Exception when set worker state")
