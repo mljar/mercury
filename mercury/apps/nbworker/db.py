@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from django.utils.timezone import make_aware
 
-from apps.ws.models import Worker
 from apps.nbworker.utils import WorkerState
 from apps.notebooks.models import Notebook
+from apps.ws.models import Worker
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +35,26 @@ class DBClient:
         except Exception:
             log.exception("Exception when check if notebook is presentation")
         return False
+
+    def show_code(self):
+        try:
+            log.debug("Check if show code from notebook")
+            return self.notebook.params.get("show-code", "False") == "True"
+        except Exception:
+            log.exception("Exception when check if show code from notebook")
+        return False
+
+    def show_prompt(self):
+        try:
+            log.debug("Check if show prompt from notebook")
+            return self.notebook.params.get("show-prompt", "False") == "True"
+        except Exception:
+            log.exception("Exception when check if show promtp from notebook")
+        return False
+
+    def reveal_theme(self):
+        # TODO: get reveal theme
+        return "simple"
 
     def worker_state(self):
         return self.state

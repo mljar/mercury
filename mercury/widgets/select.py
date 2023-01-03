@@ -1,15 +1,13 @@
-import ipywidgets
 import json
 
+import ipywidgets
 from IPython.display import display
 
 from .manager import add_widget, get_widget_by_index, widget_index_exists
 
 
 class Select:
-    def __init__(
-        self, value=None, choices=[], label=""
-    ):
+    def __init__(self, value=None, choices=[], label=""):
         if value is None and len(choices) > 1:
             value = choices[0]
 
@@ -28,7 +26,6 @@ class Select:
             add_widget(self.dropdown.model_id, self.dropdown)
         display(self)
 
-
     @property
     def value(self):
         return self.dropdown.value
@@ -43,7 +40,6 @@ class Select:
             else:
                 self.dropdown.value = None
 
-
     def __str__(self):
         return "m.Select"
 
@@ -56,7 +52,7 @@ class Select:
         # data["text/plain"] = repr(self)
         # return data
         data = self.dropdown._repr_mimebundle_()
-        
+
         if len(data) > 1:
             view = {
                 "widget": "Select",
@@ -68,5 +64,5 @@ class Select:
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
-                
+
             return data

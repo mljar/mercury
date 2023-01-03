@@ -1,20 +1,28 @@
-import ipywidgets
 import json
 
+import ipywidgets
 from IPython.display import display
 
-from .manager import WidgetException, add_widget, get_widget, get_widget_by_index, widget_index_exists
+from .manager import (
+    WidgetException,
+    add_widget,
+    get_widget,
+    get_widget_by_index,
+    widget_index_exists,
+)
 
 
 class Range:
-    def __init__(
-        self, value=[0,1], min_value=0, max_value=10, label="", step=1
-    ):
-        for i in [0,1]:
+    def __init__(self, value=[0, 1], min_value=0, max_value=10, label="", step=1):
+        for i in [0, 1]:
             if value[i] < min_value:
-                raise WidgetException(f"value[{i}] should be equal or larger than min_value")
+                raise WidgetException(
+                    f"value[{i}] should be equal or larger than min_value"
+                )
             if value[i] > max_value:
-                raise WidgetException(f"value[{i}] should be equal or smaller than max_value")
+                raise WidgetException(
+                    f"value[{i}] should be equal or smaller than max_value"
+                )
 
         if len(value) != 2:
             raise WidgetException("Range accepts list with length 2 as value")
@@ -62,7 +70,7 @@ class Range:
         # data["text/plain"] = repr(self)
         # return data
         data = self.range._repr_mimebundle_()
-        
+
         if len(data) > 1:
             view = {
                 "widget": "Range",
@@ -76,5 +84,5 @@ class Range:
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
-                
+
             return data

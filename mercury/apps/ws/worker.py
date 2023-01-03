@@ -1,15 +1,12 @@
 import json
-from cgitb import text
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from django.db import transaction
 
-from apps.ws.utils import get_client_group, get_worker_group
-from apps.ws.models import Worker
-from apps.ws.tasks import task_start_websocket_worker
-from apps.notebooks.models import Notebook
+from apps.ws.utils import client_group, worker_group
 
+log = logging.getLogger(__name__)
 
 class WorkerProxy(WebsocketConsumer):
     def connect(self):
@@ -17,14 +14,12 @@ class WorkerProxy(WebsocketConsumer):
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
         self.worker_id = self.scope["url_route"]["kwargs"]["worker_id"]
 
-        print(
+        log.debug(
             f"Worker ({self.worker_id}) connect to {self.session_id}, notebook id {self.notebook_id}"
         )
 
-        self.client_group = get_client_group(self.notebook_id, self.session_id)
-        self.worker_group = get_worker_group(self.notebook_id, self.session_id)
-
-        print("worker add", self.worker_group)
+        self.client_group = client_group(self.notebook_id, self.session_id)
+        self.worker_group = worker_group(self.notebook_id, self.session_id)
 
         async_to_sync(self.channel_layer.group_add)(
             self.worker_group, self.channel_name
@@ -38,11 +33,8 @@ class WorkerProxy(WebsocketConsumer):
         )
 
     def receive(self, text_data):
-        # print(f"Worker ({self.worker_id}) received:", text_data)
-
         json_data = json.loads(text_data)
-
-        # send to all clients
+        # broadcast to all clients
         async_to_sync(self.channel_layer.group_send)(
             self.client_group, {"type": "broadcast_message", "payload": json_data}
         )

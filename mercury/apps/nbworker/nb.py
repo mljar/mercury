@@ -7,11 +7,11 @@ import threading
 from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
 
-from apps.nb.executor import Executor
+from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, WorkerState
 from apps.nbworker.ws import WSClient
-from apps.ws.utils import parse_params
 from apps.storage.storage import StorageManager
+from apps.ws.utils import parse_params
 
 log = logging.getLogger(__name__)
 
@@ -62,13 +62,9 @@ class NBWorker(WSClient):
         self.update_nb(widgets)
 
         if self.is_presentation:
-            body = self.executor.export_html(
-                self.nb, full_header=True, show_code=self.show_code
-            )
+            body = self.nbrun.export_html(self.nb, full_header=True)
         else:
-            body = self.executor.export_html(
-                self.nb, full_header=False, show_code=self.show_code
-            )
+            body = self.nbrun.export_html(self.nb, full_header=False)
 
         # with open(f"test_{counter}.html", "w") as fout:
         #    fout.write(body)
@@ -112,7 +108,7 @@ class NBWorker(WSClient):
 
             log.debug(f"Execute code {code}")
 
-            r = self.executor.run(code)
+            r = self.nbrun.run_code(code)
 
             updated = "True" in str(r)
             log.debug(f"Update reponse {r}, updated={updated}")
@@ -152,12 +148,12 @@ class NBWorker(WSClient):
                     log.debug(f"Reset widgets counter {reset_widgets_counter}")
                     code = f"from widgets.manager import set_widgets_counter\nset_widgets_counter({reset_widgets_counter})"
                     log.debug(code)
-                    r = self.executor.run(code)
+                    r = self.nbrun.run_code(code)
                     log.debug(r)
                 else:
                     log.debug("Cell index={i} not found")
 
-                self.executor.run_cell(self.nb.cells[i], counter=i)
+                self.nbrun.run_cell(self.nb.cells[i], counter=i)
 
                 for output in self.nb.cells[i].get("outputs", []):
                     if "data" in output:
@@ -187,10 +183,15 @@ class NBWorker(WSClient):
         log.debug("Init notebook")
         self.update_worker_state(WorkerState.Busy)
 
-        self.executor = Executor(is_presentation=self.is_presentation())
+        self.nbrun = NbRun(
+            show_code=self.show_code(),
+            show_prompt=self.show_prompt(),
+            is_presentation=self.is_presentation(),
+            reveal_theme=self.reveal_theme(),
+        )
         self.nb_original = read_nb(self.notebook.path)
 
-        self.executor.run_notebook(self.nb_original, export_html=False)
+        self.nbrun.run_notebook(self.nb_original)
 
         # TODO: update params in db if needed"
         params = {}
@@ -203,6 +204,6 @@ class NBWorker(WSClient):
         log.debug(self.widgets_mapping)
         log.debug(self.widget_index_to_cell_index)
 
-        self.show_code = params.get("show-code", False)
+        # self.show_code = params.get("show-code", False)
 
         self.nb = copy.deepcopy(self.nb_original)

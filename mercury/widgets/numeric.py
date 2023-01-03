@@ -1,15 +1,19 @@
-import ipywidgets
 import json
 
+import ipywidgets
 from IPython.display import display
 
-from .manager import WidgetException, add_widget, get_widget, get_widget_by_index, widget_index_exists
+from .manager import (
+    WidgetException,
+    add_widget,
+    get_widget,
+    get_widget_by_index,
+    widget_index_exists,
+)
 
 
 class Numeric:
-    def __init__(
-        self, value=0, min_value=0, max_value=10, label="", step=1
-    ):
+    def __init__(self, value=0, min_value=0, max_value=10, label="", step=1):
         if value < min_value:
             raise WidgetException("value should be equal or larger than min_value")
         if value > max_value:
@@ -58,7 +62,7 @@ class Numeric:
         # data["text/plain"] = repr(self)
         # return data
         data = self.numeric._repr_mimebundle_()
-        
+
         if len(data) > 1:
             view = {
                 "widget": "Numeric",
@@ -72,5 +76,5 @@ class Numeric:
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
-                
+
             return data

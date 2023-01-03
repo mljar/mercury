@@ -1,8 +1,6 @@
 import json
 import logging
 
-import nbformat as nbf
-
 log = logging.getLogger(__name__)
 
 
@@ -10,29 +8,12 @@ CLIENT_SITE = "client"
 WORKER_SITE = "worker"
 
 
-def get_client_group(notebook_id, session_id):
+def client_group(notebook_id, session_id):
     return f"{CLIENT_SITE}-{notebook_id}-{session_id}"
 
 
-def get_worker_group(notebook_id, session_id):
+def worker_group(notebook_id, session_id):
     return f"{WORKER_SITE}-{notebook_id}-{session_id}"
-
-
-def get_test_notebook(markdown=[], code=[]):
-    nb = nbf.v4.new_notebook()
-    nb["cells"] = []
-    for m in markdown:
-        nb["cells"] += [nbf.v4.new_markdown_cell(m)]
-    for c in code:
-        nb["cells"] += [nbf.v4.new_code_cell(c)]
-
-    return nb
-
-
-def one_cell_notebook(code=""):
-    nb = nbf.v4.new_notebook()
-    nb["cells"] = [nbf.v4.new_code_cell(code)]
-    return nb
 
 
 def parse_params(nb, params={}):
@@ -189,4 +170,3 @@ def parse_params(nb, params={}):
 
         cell_counter += 1
     return widget_number_to_model_id, widget_number_to_cell_index, widget_types
-

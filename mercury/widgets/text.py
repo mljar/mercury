@@ -1,24 +1,25 @@
-import ipywidgets
 import json
 
+import ipywidgets
 from IPython.display import display
 
-from .manager import WidgetException, add_widget, get_widget, get_widget_by_index, widget_index_exists
+from .manager import (
+    WidgetException,
+    add_widget,
+    get_widget,
+    get_widget_by_index,
+    widget_index_exists,
+)
 
 
 class Text:
-    def __init__(
-        self, value="", label="", rows=1
-    ):
+    def __init__(self, value="", label="", rows=1):
         self.rows = rows
         if widget_index_exists():
             self.text = get_widget_by_index()
             self.text.description = label
         else:
-            self.text = ipywidgets.Textarea(
-                value=value,
-                description=label
-            )
+            self.text = ipywidgets.Textarea(value=value, description=label)
             add_widget(self.text.model_id, self.text)
         display(self)
 
@@ -42,7 +43,7 @@ class Text:
         # data["text/plain"] = repr(self)
         # return data
         data = self.text._repr_mimebundle_()
-        
+
         if len(data) > 1:
             view = {
                 "widget": "Text",
@@ -54,5 +55,5 @@ class Text:
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
-                
+
             return data

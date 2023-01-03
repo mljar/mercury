@@ -1,8 +1,8 @@
-import os
 import json
+import os
 import tempfile
-import ipywidgets
 
+import ipywidgets
 from IPython.display import display
 
 from .manager import (
@@ -18,6 +18,7 @@ class DirPath:
     def __init__(self, dir_path):
         self.value = dir_path
 
+
 class OutputDir:
     def __init__(self):
         if widget_index_exists():
@@ -27,16 +28,16 @@ class OutputDir:
             add_widget("output-dir", self.dir_path)
         display(self)
 
-    #@property
-    #def value(self):
+    # @property
+    # def value(self):
     #    return self.value
 
     @property
     def path(self):
         return self.dir_path.value
 
-    #@value.setter
-    #def value(self, v):
+    # @value.setter
+    # def value(self, v):
     #    if self.value != v:
     #        self.value = v
 
@@ -47,14 +48,10 @@ class OutputDir:
         return "mercury.OutputDir"
 
     def _repr_mimebundle_(self, **kwargs):
-        
+
         data = {}
-    
-        view = {
-            "widget": "OutputDir",        
-            "model_id": "output-dir"
-        }
+
+        view = {"widget": "OutputDir", "model_id": "output-dir"}
         data["application/mercury+json"] = json.dumps(view, indent=4)
-        
 
         return data

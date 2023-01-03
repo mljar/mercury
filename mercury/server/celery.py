@@ -4,10 +4,8 @@ import uuid
 
 from celery import Celery
 from celery.schedules import crontab
-
-from django.db import transaction
 from django.conf import settings
-
+from django.db import transaction
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, CURRENT_DIR)

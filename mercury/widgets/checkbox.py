@@ -1,23 +1,24 @@
-import ipywidgets
 import json
 
+import ipywidgets
 from IPython.display import display
 
-from .manager import WidgetException, add_widget, get_widget, get_widget_by_index, widget_index_exists
+from .manager import (
+    WidgetException,
+    add_widget,
+    get_widget,
+    get_widget_by_index,
+    widget_index_exists,
+)
 
 
 class Checkbox:
-    def __init__(
-        self, value=True, label=""
-    ):
+    def __init__(self, value=True, label=""):
         if widget_index_exists():
             self.checkbox = get_widget_by_index()
             self.checkbox.description = label
         else:
-            self.checkbox = ipywidgets.Checkbox(
-                value=value,
-                description=label
-            )
+            self.checkbox = ipywidgets.Checkbox(value=value, description=label)
             add_widget(self.checkbox.model_id, self.checkbox)
         display(self)
 
@@ -41,7 +42,7 @@ class Checkbox:
         # data["text/plain"] = repr(self)
         # return data
         data = self.checkbox._repr_mimebundle_()
-        
+
         if len(data) > 1:
             view = {
                 "widget": "Checkbox",
@@ -52,5 +53,5 @@ class Checkbox:
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
-                
+
             return data

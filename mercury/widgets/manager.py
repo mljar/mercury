@@ -1,4 +1,3 @@
-
 import logging
 
 log = logging.getLogger(__name__)
@@ -13,6 +12,7 @@ cell_index_to_widgets_index = {}
 
 class WidgetException(Exception):
     pass
+
 
 def set_widgets_counter(new_value):
     global widgets_counter

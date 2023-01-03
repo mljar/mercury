@@ -15,19 +15,25 @@ import copy
 from execnb.nbio import _dict2obj, dict2nb
 
 from apps.nb.exporter import Exporter
-from apps.ws.utils import get_test_notebook, one_cell_notebook
+from apps.nb.utils import one_cell_notebook, test_notebook
 
 
-class Executor:
-    def __init__(self, show_code=False, is_presentation=False):
-        self.exporter = Exporter(show_code, is_presentation)
+class NbRun:
+    def __init__(
+        self,
+        show_code=False,
+        show_prompt=False,
+        is_presentation=False,
+        reveal_theme="white",
+    ):
+        self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
         self.shell = CaptureShell()
         try:
             self.shell.enable_matplotlib()
         except Exception as e:
             pass
 
-    def run(self, code):
+    def run_code(self, code):
         return self.shell.run(code)
 
     def run_cell(self, cell, counter=None):
@@ -36,42 +42,28 @@ class Executor:
             if counter is not None:
                 cell.execution_count = counter
 
-    def run_notebook(self, nb, export_html=True, full_header=True, show_code=False):
+    def run_notebook(self, nb):
+        #
+        # nb is fastai format
+        #
         counter = 1
         for c in nb.cells:
-            self.shell.cell(c)
+            self.run_cell(c, counter)
             if c.cell_type == "code":
-                c.execution_count = counter
                 counter += 1
 
-        if export_html:
-            return self.export_html(nb, full_header, show_code)
+    def export_html(self, nb, full_header=True):
 
-    def export_html(self, nb, full_header=True, show_code=False):
-
-        body, _ = self.exporter.run(
-            nbformat.reads(nb2str(nb), as_version=4), show_code=show_code
+        body = self.exporter.export(
+            nbformat.reads(nb2str(nb), as_version=4), full_header
         )
-
-        if not full_header:
-            index_start = body.find("<head>")
-            index_end = body.find("</head>")
-
-            if index_start != -1 and index_end != -1:
-                body = body[:index_start] + "" + body[index_end + 7 :]
-
-                body = body.replace("<!DOCTYPE html>", "")
-                body = body.replace("<html>", "")
-                body = body.replace("<body ", "<div ")
-                body = body.replace("</body>", "</div>")
-                body = body.replace("</html>", "")
 
         return body
 
     def get_header(self):
         nb = one_cell_notebook("print(1)")
         nb = dict2nb(nb)
-        e = Executor()
+        e = NbRun()
         body = e.run_notebook(nb)
         index_start = body.find("<head>")
         index_end = body.find("</head>")
@@ -81,14 +73,16 @@ class Executor:
         return ""
 
 
+# run it to fill cache
+# other runs will be faster
 nb = one_cell_notebook("print(1)")
 nb = dict2nb(nb)
-e = Executor()
-b = e.run_notebook(nb, show_code=False)
+e = NbRun()
+e.run_notebook(nb)
 
-# executor = Executor(is_presentation=True)
+# NbRun = NbRun(is_presentation=True)
 # nb_original = read_nb("./slides.ipynb")
-# b = executor.run_notebook(nb_original, export_html=True)
+# b = NbRun.run_notebook(nb_original, export_html=True)
 
 # print(nb_original)
 # print(b)
@@ -97,7 +91,7 @@ b = e.run_notebook(nb, show_code=False)
 
 # nb = get_test_notebook(code=["import handcalcs.render", "\n%%render\na=1"])
 # nb = dict2nb(nb)
-# e = Executor()
+# e = NbRun()
 # b = e.run_notebook(nb)
 
 # # print(b)

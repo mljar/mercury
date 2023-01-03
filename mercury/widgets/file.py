@@ -1,8 +1,8 @@
-import os
 import json
+import os
 import tempfile
-import ipywidgets
 
+import ipywidgets
 from IPython.display import display
 
 from .manager import (
