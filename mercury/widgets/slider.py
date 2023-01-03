@@ -13,19 +13,19 @@ from .manager import (
 
 
 class Slider:
-    def __init__(self, value=0, min_value=0, max_value=10, label="", step=1):
-        if value < min_value:
-            raise WidgetException("value should be equal or larger than min_value")
-        if value > max_value:
-            raise WidgetException("value should be equal or smaller than max_value")
+    def __init__(self, value=0, min=0, max=10, label="", step=1):
+        if value < min:
+            raise WidgetException("value should be equal or larger than min")
+        if value > max:
+            raise WidgetException("value should be equal or smaller than max")
 
         if widget_index_exists():
             self.slider = get_widget_by_index()
-            if self.slider.min != min_value:
-                self.slider.min = min_value
+            if self.slider.min != min:
+                self.slider.min = min
                 self.slider.value = value
-            if self.slider.max != max_value:
-                self.slider.max = max_value
+            if self.slider.max != max:
+                self.slider.max = max
                 self.slider.value = value
             if self.slider.step != step:
                 self.slider.step = step
@@ -34,8 +34,8 @@ class Slider:
         else:
             self.slider = ipywidgets.IntSlider(
                 value=value,
-                min=min_value,
-                max=max_value,
+                min=min,
+                max=max,
                 description=label,
                 step=step,
             )
@@ -46,12 +46,12 @@ class Slider:
     def value(self):
         return self.slider.value
 
-    @value.setter
-    def value(self, v):
-        self.slider.value = v
+    #@value.setter
+    #def value(self, v):
+    #    self.slider.value = v
 
     def __str__(self):
-        return "m.Slider"
+        return "mercury.Slider"
 
     def __repr__(self):
 

@@ -13,19 +13,19 @@ from .manager import (
 
 
 class Numeric:
-    def __init__(self, value=0, min_value=0, max_value=10, label="", step=1):
-        if value < min_value:
-            raise WidgetException("value should be equal or larger than min_value")
-        if value > max_value:
-            raise WidgetException("value should be equal or smaller than max_value")
+    def __init__(self, value=0, min=0, max=10, label="", step=1):
+        if value < min:
+            raise WidgetException("value should be equal or larger than min")
+        if value > max:
+            raise WidgetException("value should be equal or smaller than max")
 
         if widget_index_exists():
             self.numeric = get_widget_by_index()
-            if self.numeric.min != min_value:
-                self.numeric.min = min_value
+            if self.numeric.min != min:
+                self.numeric.min = min
                 self.numeric.value = value
-            if self.numeric.max != max_value:
-                self.numeric.max = max_value
+            if self.numeric.max != max:
+                self.numeric.max = max
                 self.numeric.value = value
             if self.numeric.step != step:
                 self.numeric.step = step
@@ -34,8 +34,8 @@ class Numeric:
         else:
             self.numeric = ipywidgets.BoundedFloatText(
                 value=value,
-                min=min_value,
-                max=max_value,
+                min=min,
+                max=max,
                 description=label,
                 step=step,
             )
@@ -46,12 +46,12 @@ class Numeric:
     def value(self):
         return self.numeric.value
 
-    @value.setter
-    def value(self, v):
-        self.numeric.value = v
+    #@value.setter
+    #def value(self, v):
+    #    self.numeric.value = v
 
     def __str__(self):
-        return "m.Numeric"
+        return "mercury.Numeric"
 
     def __repr__(self):
 

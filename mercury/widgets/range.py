@@ -13,15 +13,15 @@ from .manager import (
 
 
 class Range:
-    def __init__(self, value=[0, 1], min_value=0, max_value=10, label="", step=1):
+    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1):
         for i in [0, 1]:
-            if value[i] < min_value:
+            if value[i] < min:
                 raise WidgetException(
-                    f"value[{i}] should be equal or larger than min_value"
+                    f"value[{i}] should be equal or larger than min"
                 )
-            if value[i] > max_value:
+            if value[i] > max:
                 raise WidgetException(
-                    f"value[{i}] should be equal or smaller than max_value"
+                    f"value[{i}] should be equal or smaller than max"
                 )
 
         if len(value) != 2:
@@ -29,11 +29,11 @@ class Range:
 
         if widget_index_exists():
             self.range = get_widget_by_index()
-            if self.range.min != min_value:
-                self.range.min = min_value
+            if self.range.min != min:
+                self.range.min = min
                 self.range.value = value
-            if self.range.max != max_value:
-                self.range.max = max_value
+            if self.range.max != max:
+                self.range.max = max
                 self.range.value = value
             if self.range.step != step:
                 self.range.step = step
@@ -42,8 +42,8 @@ class Range:
         else:
             self.range = ipywidgets.IntRangeSlider(
                 value=value,
-                min=min_value,
-                max=max_value,
+                min=min,
+                max=max,
                 description=label,
                 step=step,
             )
@@ -54,12 +54,12 @@ class Range:
     def value(self):
         return self.range.value
 
-    @value.setter
-    def value(self, v):
-        self.range.value = v
+    #@value.setter
+    #def value(self, v):
+    #    self.range.value = v
 
     def __str__(self):
-        return "m.Range"
+        return "mercury.Range"
 
     def __repr__(self):
 
