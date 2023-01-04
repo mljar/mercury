@@ -110,7 +110,7 @@ def task_init_notebook(
         kernels = available_kernels()
 
         params = {
-            "title": "Please provide title",
+            "title": "",
             "author": "Please provide author",
             "description": "Please provide description",
             "share": "public",
@@ -157,15 +157,21 @@ def task_init_notebook(
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
                 nbformat.write(nb, f)
 
+        print(params)
+
         if "date" in params:
             params["date"] = str(params["date"])
 
-        notebook_title = params.get("title", nb_default_title(notebook_path))
+        notebook_title = params.get("title", "")
+        if notebook_title == "":
+            notebook_title = nb_default_title(notebook_path)
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
         notebook_notify = params.get("notify", {})
+
+        print(notebook_title, nb_default_title(notebook_path))
 
         if notebook_schedule != "":
             try:
@@ -184,6 +190,8 @@ def task_init_notebook(
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
+
+        print(notebook_slug, notebook_output_file)
 
         if render_html:
             command = [
