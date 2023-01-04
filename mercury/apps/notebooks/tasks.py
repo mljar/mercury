@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import uuid
+import logging
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
@@ -21,6 +22,7 @@ from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
 
+log = logging.getLogger(__name__)
 
 def process_nbconvert_errors(error_msg):
     known_warnings = [
@@ -88,6 +90,17 @@ def available_kernels():
     return kernels
 
 
+def nb_default_title(nb_path):
+    try:
+        fname = os.path.basename(nb_path)
+        if "." in fname:
+            return ".".join(fname.split(".")[:-1])
+        return fname
+    except Exception as e:
+        log.exception("Problem when get default title from notebook")
+
+    return "Please provide title"
+
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
@@ -147,9 +160,7 @@ def task_init_notebook(
         if "date" in params:
             params["date"] = str(params["date"])
 
-        notebook_title = params.get("title", "Please provide title")
-        if notebook_title is None or notebook_title == "":
-            notebook_title = "Please provide title"
+        notebook_title = params.get("title", nb_default_title(notebook_path))
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})

@@ -54,10 +54,6 @@ class Range:
     def value(self):
         return self.range.value
 
-    #@value.setter
-    #def value(self, v):
-    #    self.range.value = v
-
     def __str__(self):
         return "mercury.Range"
 

@@ -61,7 +61,7 @@ class NBWorker(WSClient):
 
         self.update_nb(widgets)
 
-        if self.is_presentation:
+        if self.is_presentation():
             body = self.nbrun.export_html(self.nb, full_header=True)
         else:
             body = self.nbrun.export_html(self.nb, full_header=False)

@@ -62,6 +62,18 @@ def parse_params(nb, params={}):
                                 params["description"] = view.get("description")
                             if view.get("show_code") is not None:
                                 params["show-code"] = view.get("show_code")
+                            if view.get("show_prompt") is not None:
+                                params["show-prompt"] = view.get("show_prompt")
+                            if view.get("share") is not None:
+                                params["share"] = view.get("share")
+                            if view.get("output") is not None:
+                                params["output"] = view.get("output")
+                            if view.get("slug") is not None:
+                                params["slug"] = view.get("slug")
+                            if view.get("schedule") is not None:
+                                params["schedule"] = view.get("schedule")
+                            if view.get("notify") is not None:
+                                params["notify"] = json.loads(view.get("notify"))
                         elif widget_type == "Slider":
                             widget_number = f"w{widget_counter}"
                             widget_counter += 1
