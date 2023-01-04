@@ -21,6 +21,7 @@ from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
+from apps.nb.exporter import Exporter
 
 log = logging.getLogger(__name__)
 
@@ -194,6 +195,18 @@ def task_init_notebook(
         print(notebook_slug, notebook_output_file)
 
         if render_html:
+
+            exporter = Exporter(show_code=params.get("show-code", False),
+                show_prompt=params.get("show-prompt", False),
+                is_presentation=notebook_output=="slides",
+                reveal_theme=notebook_format.get("theme", "white")
+                )
+            body = exporter.export(nb)
+
+            with open(os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w") as fout:
+                fout.write(body) 
+
+            '''
             command = [
                 get_jupyter_bin_path(),
                 "nbconvert",
@@ -224,7 +237,10 @@ def task_init_notebook(
             error_msg = process_nbconvert_errors(error_msg)
             if error_msg != "":
                 print(error_msg)
+            '''
+            error_msg = "" # TODO: handle errors
 
+            '''
             # change file name if needed
             if notebook_output == "slides":
                 expected_fpath = os.path.join(
@@ -235,8 +251,8 @@ def task_init_notebook(
                 )
                 if os.path.exists(slides_fpath):
                     os.rename(slides_fpath, expected_fpath)
-
-            if "--no-input" in command:
+            '''
+            if not params.get("show-code", False): # "--no-input" in command:
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     "a",
@@ -255,6 +271,7 @@ def task_init_notebook(
 </style>"""
                     )
 
+            '''
             if notebook_output == "slides":
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
@@ -263,6 +280,8 @@ def task_init_notebook(
                     errors="ignore",
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
+            '''
+
 
         parse_errors = validate_notify(notebook_notify)
 
