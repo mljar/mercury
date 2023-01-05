@@ -151,7 +151,7 @@ class NBWorker(WSClient):
                     r = self.nbrun.run_code(code)
                     log.debug(r)
                 else:
-                    log.debug("Cell index={i} not found")
+                    log.debug(f"Cell index={i} not found")
 
                 self.nbrun.run_cell(self.nb.cells[i], counter=i)
 
