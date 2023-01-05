@@ -102,6 +102,13 @@ def nb_default_title(nb_path):
 
     return "Please provide title"
 
+
+def is_presentation(nb):
+    for cell in nb.cells:
+        if "slideshow" in cell.get("metadata", {}):
+            return True
+    return False
+
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
@@ -154,6 +161,9 @@ def task_init_notebook(
             # check if nb in V2
             parse_params(nb, params)
 
+        if nb is None:
+            raise Exception(f"Cant read notebook from {notebook_path}")
+
         if update_notebook and nb is not None:
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
                 nbformat.write(nb, f)
@@ -171,6 +181,12 @@ def task_init_notebook(
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
         notebook_notify = params.get("notify", {})
+
+
+        if is_presentation(nb):
+            # automatically detect slides in cells            
+            # and set slides output
+            notebook_output = "slides"
 
         print(notebook_title, nb_default_title(notebook_path))
 
