@@ -15,9 +15,9 @@
 
 ## We are working on Mercury V2!
 
-We are working on Mercury Version 2. You will be able to add widgets with Python API. In V2 you will be able to cache cell execution results and have dynamic widgets.
+We are working on Mercury Version 2. You will be able to add widgets with Python API, cache cell execution results and have dynamic widgets.
 
-V2 will be available soon! Q1 2023, I hope it will be in January. 
+V2 will be available soon! Q1 2023 (I hope it will be in January) 
 
 We are working on new docs and public cloud offering. You will just upload notebook to create your own interactive website!
 
