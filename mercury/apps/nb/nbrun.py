@@ -32,13 +32,22 @@ class NbRun:
             self.shell.enable_matplotlib()
         except Exception as e:
             pass
+        self.shell.run("from mercury import WidgetsManager")
+
+    def run_set_cell_index(self, new_index):
+        if new_index is not None:
+            self.shell.run(f"WidgetsManager.set_cell_index({new_index})")
 
     def run_code(self, code):
         return self.shell.run(code)
 
     def run_cell(self, cell, counter=None):
         if cell.cell_type == "code":
+            
+            self.run_set_cell_index(counter)
+            
             self.shell.cell(cell)
+            
             if counter is not None:
                 cell.execution_count = counter
 

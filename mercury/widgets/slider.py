@@ -5,6 +5,7 @@ from IPython.display import display
 
 from .manager import (
     WidgetException,
+    WidgetsManager,
     add_widget,
     get_widget,
     get_widget_by_index,
@@ -19,8 +20,10 @@ class Slider:
         if value > max:
             raise WidgetException("value should be equal or smaller than max")
 
-        if widget_index_exists():
-            self.slider = get_widget_by_index()
+        code_uid = WidgetsManager.get_code_uid()
+
+        if WidgetsManager.widget_exists(code_uid):
+            self.slider = WidgetsManager.get_widget(code_uid)
             if self.slider.min != min:
                 self.slider.min = min
                 self.slider.value = value

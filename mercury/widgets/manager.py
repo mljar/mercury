@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 log = logging.getLogger(__name__)
 
@@ -12,6 +13,58 @@ cell_index_to_widgets_index = {}
 
 class WidgetException(Exception):
     pass
+
+class WidgetsManager:
+
+    widgets = {}        # model_id -> widget
+    code2model = {}     # code generated uid  -> model_id
+    cell_index = 0      # current cell index
+
+    
+
+    @staticmethod
+    def set_cell_index(new_index):
+        WidgetsManager.cell_index = new_index
+
+    @staticmethod
+    def get_code_uid():
+        uid = f"{WidgetsManager.cell_index}"
+        for frame in inspect.stack()[:7]:
+            info = inspect.getframeinfo(frame[0])
+            uid += f".{info.lineno}"
+        return uid
+
+    @staticmethod
+    def widget_exists(code_uid):
+        return code_uid in WidgetsManager.code2model
+
+    @staticmethod
+    def get_widget(code_uid):
+        model_id = WidgetsManager.code2model.get(code_uid)
+        if model_id is None:
+            return None 
+        return WidgetsManager.widgets.get(model_id)
+
+    @staticmethod
+    def add_widget(model_id, code_uid, widget):
+        WidgetsManager.widgets[model_id] = widget
+        WidgetsManager.code2model[code_uid] = model_id
+
+
+    @staticmethod
+    def update(model_id, field, new_value):
+        # returns
+        # True if there was update
+        # False if no update
+        w = WidgetsManager.widgets.get(model_id)
+        if w is not None:
+            if getattr(w, field) != new_value:
+                setattr(w, field, new_value)
+                return True
+
+        return False
+
+
 
 
 def set_widgets_counter(new_value):

@@ -28,18 +28,9 @@ class OutputDir:
             add_widget("output-dir", self.dir_path)
         display(self)
 
-    # @property
-    # def value(self):
-    #    return self.value
-
     @property
     def path(self):
         return self.dir_path.value
-
-    # @value.setter
-    # def value(self, v):
-    #    if self.value != v:
-    #        self.value = v
 
     def __str__(self):
         return "mercury.OutputDir"
