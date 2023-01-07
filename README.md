@@ -13,6 +13,15 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/platforms.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
+## We are working on Mercury V2!
+
+We are working on Mercury Version 2. You will be able to add widgets with Python API. In V2 you will be able to cache cell execution results and have dynamic widgets.
+
+V2 will be available soon! Q1 2023, I hope it will be in January. 
+
+We are working on new docs and public cloud offering. You will just upload notebook to create your own interactive website!
+
+
 # Share your Python notebook as web application
 
 Mercury is a perfect tool to convert Python notebook to interactive web application and share with non-programmers. 
