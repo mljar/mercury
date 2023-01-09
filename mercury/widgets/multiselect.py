@@ -3,16 +3,18 @@ import json
 import ipywidgets
 from IPython.display import display
 
-from .manager import add_widget, get_widget_by_index, widget_index_exists
+from .manager import WidgetsManager
 
 
 class MultiSelect:
-    def __init__(self, value=None, choices=[], label=""):
+    def __init__(self, value=[], choices=[], label=""):
         if value is None and len(choices) > 1:
             value = [choices[0]]
 
-        if widget_index_exists():
-            self.select = get_widget_by_index()
+        self.code_uid = WidgetsManager.get_code_uid("MultiSelect")
+
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.select = WidgetsManager.get_widget(self.code_uid)
             if list(self.select.options) != choices:
                 self.select.options = choices
                 self.select.value = value
@@ -23,7 +25,7 @@ class MultiSelect:
                 options=choices,
                 description=label,
             )
-            add_widget(self.select.model_id, self.select)
+            WidgetsManager.add_widget(self.select.model_id, self.code_uid, self.select)
         display(self)
 
     @property
@@ -60,6 +62,7 @@ class MultiSelect:
                 "choices": self.select.options,
                 "label": self.select.description,
                 "model_id": self.select.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

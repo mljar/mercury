@@ -20,19 +20,33 @@ class WidgetsManager:
     code2model = {}     # code generated uid  -> model_id
     cell_index = 0      # current cell index
 
-    
-
     @staticmethod
     def set_cell_index(new_index):
         WidgetsManager.cell_index = new_index
 
     @staticmethod
-    def get_code_uid():
-        uid = f"{WidgetsManager.cell_index}"
+    def get_code_uid(widget_type="widget", key=""):
+        uid = f"{widget_type}.{WidgetsManager.cell_index}"
         for frame in inspect.stack()[:7]:
             info = inspect.getframeinfo(frame[0])
             uid += f".{info.lineno}"
+        if key != "":
+            uid += f".{key}"
         return uid
+    
+    @staticmethod
+    def fix_cell_index(code_uid, correct_cell_index):
+        parts = code_uid.split(".")
+        parts[1] = f"{correct_cell_index}"
+        return ".".join(parts)
+
+    @staticmethod
+    def parse_cell_index(code_uid):
+        return code_uid.split(".")[1]
+
+    @staticmethod
+    def parse_widget_type(code_uid):
+        return code_uid.split(".")[0]
 
     @staticmethod
     def widget_exists(code_uid):
@@ -52,10 +66,13 @@ class WidgetsManager:
 
 
     @staticmethod
-    def update(model_id, field, new_value):
+    def update(code_uid, field, new_value):
         # returns
         # True if there was update
         # False if no update
+        model_id = WidgetsManager.code2model.get(code_uid)
+        if model_id is None:
+            return False
         w = WidgetsManager.widgets.get(model_id)
         if w is not None:
             if getattr(w, field) != new_value:

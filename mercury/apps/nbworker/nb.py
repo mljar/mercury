@@ -195,15 +195,8 @@ class NBWorker(WSClient):
 
         # TODO: update params in db if needed"
         params = {}
-        (
-            self.widgets_mapping,
-            self.widget_index_to_cell_index,
-            self.widget_types,
-        ) = parse_params(nb2dict(self.nb_original), params)
+        parse_params(nb2dict(self.nb_original), params)
         log.debug(params)
-        log.debug(self.widgets_mapping)
-        log.debug(self.widget_index_to_cell_index)
-
-        # self.show_code = params.get("show-code", False)
-
         self.nb = copy.deepcopy(self.nb_original)
+
+

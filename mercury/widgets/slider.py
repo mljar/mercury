@@ -5,11 +5,7 @@ from IPython.display import display
 
 from .manager import (
     WidgetException,
-    WidgetsManager,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
+    WidgetsManager
 )
 
 
@@ -20,10 +16,10 @@ class Slider:
         if value > max:
             raise WidgetException("value should be equal or smaller than max")
 
-        code_uid = WidgetsManager.get_code_uid()
+        self.code_uid = WidgetsManager.get_code_uid("Slider")
 
-        if WidgetsManager.widget_exists(code_uid):
-            self.slider = WidgetsManager.get_widget(code_uid)
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.slider = WidgetsManager.get_widget(self.code_uid)
             if self.slider.min != min:
                 self.slider.min = min
                 self.slider.value = value
@@ -42,7 +38,7 @@ class Slider:
                 description=label,
                 step=step,
             )
-            add_widget(self.slider.model_id, self.slider)
+            WidgetsManager.add_widget(self.slider.model_id, self.code_uid, self.slider)
         display(self)
 
     @property
@@ -75,6 +71,7 @@ class Slider:
                 "step": self.slider.step,
                 "label": self.slider.description,
                 "model_id": self.slider.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
