@@ -45,6 +45,7 @@ class NbRun:
         if cell.cell_type == "code":
             
             self.run_set_cell_index(counter)
+            
             cell.outputs = []
             self.shell.cell(cell)
             
