@@ -85,10 +85,10 @@ export default function SideBar({
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
         if (key in widgetsValues) {
-          console.log("skip set widget value");
+          console.log("skip set widget value", key);
           continue;
         } else {
-          console.log("set widget initial value");
+          console.log("set widget initial value", key);
         }
 
         if (widgetParams.input === "file") {
@@ -116,6 +116,7 @@ export default function SideBar({
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
   if (widgetsParams) {
     for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+      console.log("add widget", key)
       if (isSelectWidget(widgetParams)) {
         widgets.push(
           <SelectWidget
@@ -205,9 +206,13 @@ export default function SideBar({
         widgets.push(
           <MarkdownWidget value={widgetParams.value as string} key={key} />
         );
+      } else {
+        console.log("unknonw widget type", widgetParams);
       }
     }
   }
+
+  console.log(widgets)
 
   const allFilesUploaded = () => {
     if (fileKeys.length === 0) {

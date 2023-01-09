@@ -17,3 +17,4 @@ class Purpose(str, Enum):
 
     ExecutedNotebook = "executed-notebook"
     UpdateWidgets = "update-widgets"
+    HideWidgets = "hide-widgets"

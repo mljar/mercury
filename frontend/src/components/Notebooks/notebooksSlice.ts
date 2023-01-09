@@ -19,6 +19,7 @@ import {
   isRangeWidget,
   isCheckboxWidget,
   isNumericWidget,
+  ISliderWidget,
 } from "../Widgets/Types";
 //import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from "../WindowDimensions";
@@ -122,11 +123,15 @@ const notebooksSlice = createSlice({
 
       let updated = false;
 
+      console.log("update for", widgetKey);
+
+      let noMatch = true;
+
       for (let key of Object.keys(state.selectedNotebook.params.params)) {
         console.log(key);
         if (key === widgetKey) {
           console.log("** match **");
-
+          noMatch = false;
           let widget = { ...state.selectedNotebook.params.params[widgetKey] };
 
           if (isRangeWidget(widget)) {
@@ -222,6 +227,23 @@ const notebooksSlice = createSlice({
           }
         }
       }
+      console.log({ noMatch, widgetKey });
+      if (noMatch) {
+        console.log("there is no match");
+        state.selectedNotebook.params.params[widgetKey] = action.payload; // as ISliderWidget;
+        state.selectedNotebook.params.params[widgetKey].input = "slider";
+      }
+    },
+    hideWidgets(state, action: PayloadAction<any>) {
+      console.log("Hide widgets");
+      console.log(action.payload);
+      const { keys } = action.payload;
+      for (let key of keys) {
+        if (key in state.selectedNotebook.params.params) {
+          console.log("delete", key);
+          delete state.selectedNotebook.params.params[key];
+        }
+      }
     },
   },
 });
@@ -235,6 +257,7 @@ export const {
   setLoadingStateSelected,
   setSlidesHash,
   updateWidgetsParams,
+  hideWidgets,
   setWidgetValue,
   clearWidgets,
 } = notebooksSlice.actions;

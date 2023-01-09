@@ -27,8 +27,10 @@ class WidgetsManager:
     @staticmethod
     def get_code_uid(widget_type="widget", key=""):
         uid = f"{widget_type}.{WidgetsManager.cell_index}"
-        for frame in inspect.stack()[:7]:
+        for frame in inspect.stack():
             info = inspect.getframeinfo(frame[0])
+            if info.function == "run_code":
+                break
             uid += f".{info.lineno}"
         if key != "":
             uid += f".{key}"
@@ -42,7 +44,7 @@ class WidgetsManager:
 
     @staticmethod
     def parse_cell_index(code_uid):
-        return code_uid.split(".")[1]
+        return int(code_uid.split(".")[1])
 
     @staticmethod
     def parse_widget_type(code_uid):

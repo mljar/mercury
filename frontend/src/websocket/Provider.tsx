@@ -2,6 +2,7 @@ import React, { createContext } from "react";
 import { useDispatch } from "react-redux";
 import {
   getSelectedNotebookId,
+  hideWidgets,
   updateWidgetsParams,
 } from "../components/Notebooks/notebooksSlice";
 import {
@@ -55,6 +56,8 @@ export default function WebSocketProvider({
         dispatch(setNotebookSrc(response.body));
       } else if (response.purpose === "update-widgets") {
         dispatch(updateWidgetsParams(response));
+      } else if (response.purpose === "hide-widgets") {
+        dispatch(hideWidgets(response));
       }
     }
   }

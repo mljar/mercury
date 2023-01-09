@@ -13,6 +13,8 @@ from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
 from apps.ws.utils import parse_params
 
+from widgets.manager import WidgetsManager
+
 log = logging.getLogger(__name__)
 
 
@@ -74,14 +76,14 @@ class NBWorker(WSClient):
     def update_nb(self, widgets):
         log.debug(f"Update nb {widgets}")
 
-        index_execute_from = 0
+        index_execute_from = 1
         # fill notebook with widgets values
-        for w in widgets.keys():
-            value = widgets[w]
-            model_id = self.widgets_mapping[w]
-            widget_type = self.widget_types.get(w, "")
+        for widget_key in widgets.keys():
+            value = widgets[widget_key]
+
+            widget_type = WidgetsManager.parse_widget_type(widget_key) 
             log.debug(
-                f"Update widget id={w} model_id={model_id} value={value} widget type {widget_type}"
+                f"Update widget code_uid={widget_key} value={value} widget type {widget_type}"
             )
 
             if widget_type == "File" and len(value) == 2:
@@ -91,20 +93,19 @@ class NBWorker(WSClient):
                 log.debug(f"File path is {value[1]}")
 
                 code = (
-                    "from widgets.manager import set_update\n"
-                    f'set_update("{model_id}", field="filename", new_value="{value[0]}")\n'
-                    f'set_update("{model_id}", field="filepath", new_value="{value[1]}")\n'
+                    f'WidgetsManager.update("{widget_key}", field="filename", new_value="{value[0]}")\n'
+                    f'WidgetsManager.update("{widget_key}", field="filepath", new_value="{value[1]}")\n'
                 )
             if widget_type == "OutputDir":
 
                 sm = StorageManager(self.session_id, self.worker_id)
                 output_dir = sm.worker_output_dir()
-                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{output_dir}")'
+                code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{output_dir}")'
 
             elif isinstance(value, str):
-                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value="{value}")'
+                code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{value}")'
             else:
-                code = f'from widgets.manager import set_update\nset_update("{model_id}", field="value", new_value={value})'
+                code = f'WidgetsManager.update("{widget_key}", field="value", new_value={value})'
 
             log.debug(f"Execute code {code}")
 
@@ -114,66 +115,66 @@ class NBWorker(WSClient):
             log.debug(f"Update reponse {r}, updated={updated}")
 
             if updated:
-                cell_index = self.widget_index_to_cell_index[w]
+                cell_index = WidgetsManager.parse_cell_index(widget_key)
                 log.debug(f"Widget updated, update nb from {cell_index}")
 
-                if index_execute_from == 0:
+                if index_execute_from == 1:
                     index_execute_from = cell_index
                 else:
                     index_execute_from = min(index_execute_from, cell_index)
 
-        # cell index to smallest widget index
-        ci2wi = {}  # keeps the smallest widget index
-        for wi in self.widget_index_to_cell_index.keys():
-            ci = self.widget_index_to_cell_index[wi]
-            if ci in ci2wi:
-                ci2wi[ci] = min(ci2wi[ci], int(wi[1:]))
-            else:
-                ci2wi[ci] = int(wi[1:])
-
-        log.debug(f"Execute nb from {index_execute_from}")
-        log.debug(f"Cell index to smallest widget index {ci2wi}")
-
-        if index_execute_from != 0:
+        if index_execute_from != 1:
             if self.prev_nb is not None:
                 self.nb = copy.deepcopy(self.prev_nb)
             else:
                 self.nb = copy.deepcopy(self.nb_original)
-            for i in range(index_execute_from, len(self.nb.cells)):
 
-                log.debug(f"Execute cell index={i}")
+            for i in range(index_execute_from, len(self.nb.cells)+1):
 
-                if i in ci2wi:
-                    reset_widgets_counter = ci2wi[i]
-                    log.debug(f"Reset widgets counter {reset_widgets_counter}")
-                    code = f"from widgets.manager import set_widgets_counter\nset_widgets_counter({reset_widgets_counter})"
-                    log.debug(code)
-                    r = self.nbrun.run_code(code)
-                    log.debug(r)
-                else:
-                    log.debug(f"Cell index={i} not found")
+                log.debug(f"Execute cell index={i-1}")
 
-                self.nbrun.run_cell(self.nb.cells[i], counter=i)
+                self.nbrun.run_cell(self.nb.cells[i-1], counter=i)
 
-                for output in self.nb.cells[i].get("outputs", []):
+                print(self.nb.cells[i-1])
+
+                for output in self.nb.cells[i-1].get("outputs", []):
                     if "data" in output:
                         if "application/mercury+json" in output["data"]:
                             w = output["data"]["application/mercury+json"]
                             log.debug(w)
                             w = json.loads(w)
 
-                            wi = ""
-                            for k in self.widgets_mapping.keys():
-                                if self.widgets_mapping[k] == w.get("model_id", ""):
-                                    wi = k
-                            log.debug(f"Widget index {wi}")
-                            if wi == "":
-                                continue
                             # prepare msg to send by ws
                             msg = w
                             msg["purpose"] = Purpose.UpdateWidgets
-                            msg["widgetKey"] = wi
+                            msg["widgetKey"] = w.get("code_uid")
                             self.ws.send(json.dumps(msg))
+
+            # check if hide some widgets
+            nb_widgets_keys = []
+            for cell in self.nb.cells:
+                for output in cell.get("outputs", []):
+                    w = output.get("data",{}).get("application/mercury+json")
+                    if w is not None:
+                        w = json.loads(w)
+                        code_uid = w.get("code_uid")
+                        if code_uid is not None:
+                            nb_widgets_keys += [code_uid]
+
+            hide_widgets = []
+            for widget_key in widgets.keys():
+                if widget_key not in nb_widgets_keys:
+                    hide_widgets += [widget_key]
+            
+            log.debug(f"Hide widgets {hide_widgets}")
+            if hide_widgets:
+                msg = {
+                    "purpose": Purpose.HideWidgets,
+                    "keys": hide_widgets
+                }
+                self.ws.send(json.dumps(msg))
+
+
 
             self.prev_nb = copy.deepcopy(self.nb)
         else:
