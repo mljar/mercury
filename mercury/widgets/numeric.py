@@ -5,10 +5,7 @@ from IPython.display import display
 
 from .manager import (
     WidgetException,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
+    WidgetsManager
 )
 
 
@@ -19,8 +16,10 @@ class Numeric:
         if value > max:
             raise WidgetException("value should be equal or smaller than max")
 
-        if widget_index_exists():
-            self.numeric = get_widget_by_index()
+        self.code_uid = WidgetsManager.get_code_uid("Numeric")
+
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.numeric = WidgetsManager.get_widget(self.code_uid)
             if self.numeric.min != min:
                 self.numeric.min = min
                 self.numeric.value = value
@@ -39,7 +38,7 @@ class Numeric:
                 description=label,
                 step=step,
             )
-            add_widget(self.numeric.model_id, self.numeric)
+            WidgetsManager.add_widget(self.numeric.model_id, self.code_uid, self.numeric)
         display(self)
 
     @property
@@ -72,6 +71,7 @@ class Numeric:
                 "step": self.numeric.step,
                 "label": self.numeric.description,
                 "model_id": self.numeric.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

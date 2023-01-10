@@ -5,22 +5,22 @@ from IPython.display import display
 
 from .manager import (
     WidgetException,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
+    WidgetsManager
 )
 
 
 class Text:
     def __init__(self, value="", label="", rows=1):
         self.rows = rows
-        if widget_index_exists():
-            self.text = get_widget_by_index()
+
+        self.code_uid = WidgetsManager.get_code_uid("Text")
+
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.text = WidgetsManager.get_widget(self.code_uid)
             self.text.description = label
         else:
             self.text = ipywidgets.Textarea(value=value, description=label)
-            add_widget(self.text.model_id, self.text)
+            WidgetsManager.add_widget(self.text.model_id, self.code_uid, self.text)
         display(self)
 
     @property
@@ -51,6 +51,7 @@ class Text:
                 "rows": self.rows,
                 "label": self.text.description,
                 "model_id": self.text.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

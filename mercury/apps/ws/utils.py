@@ -39,12 +39,11 @@ def parse_params(nb, params={}):
                 view = output["data"]["application/mercury+json"]
                 view = json.loads(view)
 
-                # check model_id duplicates
-
                 #print(
                 #    f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}'
                 #)
 
+                # check model_id duplicates
                 if view.get("model_id", "") in all_model_ids:
                     continue
 
@@ -53,7 +52,9 @@ def parse_params(nb, params={}):
                     continue
                 else:
                     params["version"] = "2"
-                
+                    if "params" not in params:
+                        params["params"] = {}
+
                 widget_key = view.get("code_uid")
                 if widget_key is None:
                     continue
@@ -80,10 +81,6 @@ def parse_params(nb, params={}):
                     if view.get("notify") is not None:
                         params["notify"] = json.loads(view.get("notify"))
                 elif widget_type == "Slider":
-                    
-                    if "params" not in params:
-                        params["params"] = {}
-                    
                     params["params"][widget_key] = {
                         "input": "slider",
                         "value": view.get("value", 0),
@@ -92,11 +89,7 @@ def parse_params(nb, params={}):
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "Select":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "select",
                         "value": view.get("value", ""),
                         "choices": view.get("choices", []),
@@ -104,9 +97,6 @@ def parse_params(nb, params={}):
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "MultiSelect":
-                    
-                    if "params" not in params:
-                        params["params"] = {}
                     params["params"][widget_key] = {
                         "input": "select",
                         "value": view.get("value", []),
@@ -115,11 +105,7 @@ def parse_params(nb, params={}):
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "Range":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "range",
                         "value": view.get("value", [0, 1]),
                         "min": view.get("min", 0),
@@ -127,50 +113,30 @@ def parse_params(nb, params={}):
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "Text":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "text",
                         "value": view.get("value", ""),
                         "rows": view.get("rows", 1),
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "File":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "file",
                         "maxFileSize": view.get("max_file_size", 1),
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "OutputDir":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "output": "dir",
                     }
                 elif widget_type == "Checkbox":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "checkbox",
                         "value": view.get("value", True),
                         "label": view.get("label", ""),
                     }
                 elif widget_type == "Numeric":
-                    widget_number = f"w{widget_counter}"
-                    widget_counter += 1
-                    if "params" not in params:
-                        params["params"] = {}
-                    params["params"][widget_number] = {
+                    params["params"][widget_key] = {
                         "input": "numeric",
                         "value": view.get("value", 0),
                         "min": view.get("min", 0),
@@ -183,11 +149,8 @@ def parse_params(nb, params={}):
 
         cell_counter += 1
 
-
     if params.get("version", "") == "2":
         if params.get("show-code") is None:
             params["show-code"] = False
         if params.get("show-prompt") is None:
             params["show-prompt"] = False
-        #if params.get("output") is None:
-        #    params["output"] = "app"

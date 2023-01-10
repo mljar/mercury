@@ -1,5 +1,5 @@
 import json
-
+from .manager import WidgetsManager
 from IPython.display import display
 
 
@@ -7,6 +7,7 @@ class App:
     def __init__(self, title, description, 
         show_code=False, show_prompt=False, share="",
         output="app", slug="", schedule="", notify={}):
+        self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
         self.description = description
         self.show_code = show_code
@@ -36,6 +37,7 @@ class App:
             "schedule": self.schedule,
             "notify": json.dumps(self.notify),
             "model_id": "mercury-app",
+            "code_uid": self.code_uid,
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
         return data

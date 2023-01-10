@@ -5,10 +5,7 @@ from IPython.display import display
 
 from .manager import (
     WidgetException,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
+    WidgetsManager
 )
 
 
@@ -27,8 +24,10 @@ class Range:
         if len(value) != 2:
             raise WidgetException("Range accepts list with length 2 as value")
 
-        if widget_index_exists():
-            self.range = get_widget_by_index()
+        self.code_uid = WidgetsManager.get_code_uid("Range")
+
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.range = WidgetsManager.get_widget(self.code_uid)
             if self.range.min != min:
                 self.range.min = min
                 self.range.value = value
@@ -47,7 +46,7 @@ class Range:
                 description=label,
                 step=step,
             )
-            add_widget(self.range.model_id, self.range)
+            WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)
 
     @property
@@ -76,6 +75,7 @@ class Range:
                 "step": self.range.step,
                 "label": self.range.description,
                 "model_id": self.range.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

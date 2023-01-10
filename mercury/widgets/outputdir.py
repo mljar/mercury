@@ -5,13 +5,8 @@ import tempfile
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetException,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
-)
+from .manager import WidgetsManager
+
 
 
 class DirPath:
@@ -21,11 +16,12 @@ class DirPath:
 
 class OutputDir:
     def __init__(self):
-        if widget_index_exists():
-            self.dir_path = get_widget_by_index()
+        self.code_uid = WidgetsManager.get_code_uid("OutputDir")
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.dir_path = WidgetsManager.get_widget(self.code_uid)
         else:
             self.dir_path = DirPath(".")
-            add_widget("output-dir", self.dir_path)
+            WidgetsManager.add_widget("output-dir", self.code_uid, self.dir_path)
         display(self)
 
     @property
@@ -42,7 +38,11 @@ class OutputDir:
 
         data = {}
 
-        view = {"widget": "OutputDir", "model_id": "output-dir"}
+        view = {
+            "widget": "OutputDir", 
+            "model_id": "output-dir",
+            "code_uid": self.code_uid
+        }
         data["application/mercury+json"] = json.dumps(view, indent=4)
 
         return data

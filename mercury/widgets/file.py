@@ -6,25 +6,23 @@ import ipywidgets
 from IPython.display import display
 
 from .manager import (
-    WidgetException,
-    add_widget,
-    get_widget,
-    get_widget_by_index,
-    widget_index_exists,
+    WidgetsManager
 )
 
 
 class File:
     def __init__(self, label="File upload", max_file_size="100MB"):
         self.max_file_size = max_file_size
-        if widget_index_exists():
-            self.file = get_widget_by_index()
+        self.code_uid = WidgetsManager.get_code_uid("File")
+
+        if WidgetsManager.widget_exists(self.code_uid):
+            self.file = WidgetsManager.get_widget(self.code_uid)
             self.file.description = label
         else:
             self.file = ipywidgets.FileUpload(description=label)
             self.file.filepath = None
             self.file.filename = None
-            add_widget(self.file.model_id, self.file)
+            WidgetsManager.add_widget(self.file.model_id, self.code_uid, self.file)
         display(self)
 
     @property
@@ -76,7 +74,7 @@ class File:
         self.file.filename = filename
 
     def __str__(self):
-        return "m.File"
+        return "mercury.File"
 
     def __repr__(self):
 
@@ -94,6 +92,7 @@ class File:
                 "max_file_size": self.max_file_size,
                 "label": self.file.description,
                 "model_id": self.file.model_id,
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
