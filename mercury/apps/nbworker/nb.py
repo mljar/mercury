@@ -180,6 +180,41 @@ class NBWorker(WSClient):
         else:
             log.debug("Skip nb execution, no changes in widgets")
 
+    def send_widgets(self, nb, expected_widgets_keys):
+        nb_widgets_keys = []
+        for cell in nb.cells:
+            for output in cell.get("outputs", []):
+                if "data" in output:
+                    if "application/mercury+json" in output["data"]:
+                        w = output["data"]["application/mercury+json"]
+                        log.debug(w)
+                        w = json.loads(w)
+
+                        # prepare msg to send by ws
+                        msg = w
+                        msg["purpose"] = Purpose.UpdateWidgets
+                        msg["widgetKey"] = w.get("code_uid")
+                        self.ws.send(json.dumps(msg))
+
+                        code_uid = w.get("code_uid")
+                        if code_uid is not None:
+                            nb_widgets_keys += [code_uid]
+
+        # check if hide some widgets
+        hide_widgets = []
+        for widget_key in expected_widgets_keys:
+            if widget_key not in nb_widgets_keys:
+                hide_widgets += [widget_key]
+        
+        log.debug(f"Hide widgets {hide_widgets}")
+        if hide_widgets:
+            msg = {
+                "purpose": Purpose.HideWidgets,
+                "keys": hide_widgets
+            }
+            self.ws.send(json.dumps(msg))
+
+
     def init_notebook(self):
         log.debug("Init notebook")
         self.update_worker_state(WorkerState.Busy)
@@ -201,3 +236,4 @@ class NBWorker(WSClient):
         self.nb = copy.deepcopy(self.nb_original)
 
 
+        self.send_widgets(self.nb, expected_widgets_keys=[])

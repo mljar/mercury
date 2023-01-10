@@ -28,6 +28,8 @@ def parse_params(nb, params={}):
     
     cell_counter = 1
 
+    no_outputs = True
+
     for cell in nb["cells"]:
     
         for output in cell.get("outputs",[]):
@@ -36,6 +38,7 @@ def parse_params(nb, params={}):
                 "data" in output
                 and "application/mercury+json" in output["data"]
             ):
+                no_outputs = False
                 view = output["data"]["application/mercury+json"]
                 view = json.loads(view)
 
@@ -154,3 +157,11 @@ def parse_params(nb, params={}):
             params["show-code"] = False
         if params.get("show-prompt") is None:
             params["show-prompt"] = False
+
+    if no_outputs:
+        params["version"] = "2"
+        params["show-code"] = False
+        params["show-prompt"] = False
+        params["params"] = {}
+        params["output"] = "app"
+        
