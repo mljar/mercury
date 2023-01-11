@@ -5,6 +5,7 @@ from IPython.display import display
 
 from .manager import WidgetsManager
 
+
 class Select:
     def __init__(self, value=None, choices=[], label=""):
         if value is None and len(choices) > 1:
@@ -23,8 +24,11 @@ class Select:
                 value=value,
                 options=choices,
                 description=label,
+                style={"description_width": "initial"},
             )
-            WidgetsManager.add_widget(self.dropdown.model_id, self.code_uid, self.dropdown)
+            WidgetsManager.add_widget(
+                self.dropdown.model_id, self.code_uid, self.dropdown
+            )
         display(self)
 
     @property
@@ -50,7 +54,7 @@ class Select:
                 "choices": self.dropdown.options,
                 "label": self.dropdown.description,
                 "model_id": self.dropdown.model_id,
-                "code_uid": self.code_uid
+                "code_uid": self.code_uid,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

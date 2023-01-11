@@ -10,8 +10,10 @@ log = logging.getLogger(__name__)
 CLIENT_SITE = "client"
 WORKER_SITE = "worker"
 
+
 def machine_uuid():
     return platform.node()
+
 
 def client_group(notebook_id, session_id):
     return f"{CLIENT_SITE}-{notebook_id}-{session_id}"
@@ -25,26 +27,23 @@ def parse_params(nb, params={}):
     # nb in nbformat
 
     all_model_ids = []
-    
+
     cell_counter = 1
 
     no_outputs = True
 
     for cell in nb["cells"]:
-    
-        for output in cell.get("outputs",[]):
 
-            if (
-                "data" in output
-                and "application/mercury+json" in output["data"]
-            ):
+        for output in cell.get("outputs", []):
+
+            if "data" in output and "application/mercury+json" in output["data"]:
                 no_outputs = False
                 view = output["data"]["application/mercury+json"]
                 view = json.loads(view)
 
-                #print(
+                # print(
                 #    f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}'
-                #)
+                # )
 
                 # check model_id duplicates
                 if view.get("model_id", "") in all_model_ids:
@@ -63,7 +62,7 @@ def parse_params(nb, params={}):
                     continue
                 # fix cell index, cell index is not set in Jupyter Notebook mode
                 widget_key = WidgetsManager.fix_cell_index(widget_key, cell_counter)
-                
+
                 if widget_type == "App":
                     if view.get("title") is not None:
                         params["title"] = view.get("title")
@@ -85,7 +84,7 @@ def parse_params(nb, params={}):
                         params["notify"] = json.loads(view.get("notify"))
                 else:
                     params["params"][widget_key] = WidgetsManager.frontend_format(view)
-                
+
                 all_model_ids += [view.get("model_id", "")]
 
         cell_counter += 1

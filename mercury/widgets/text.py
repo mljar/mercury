@@ -3,10 +3,7 @@ import json
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetException,
-    WidgetsManager
-)
+from .manager import WidgetException, WidgetsManager
 
 
 class Text:

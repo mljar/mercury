@@ -14,6 +14,7 @@ from apps.ws.utils import client_group, worker_group
 
 log = logging.getLogger(__name__)
 
+
 class ClientProxy(WebsocketConsumer):
     def connect(self):
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
@@ -52,13 +53,13 @@ class ClientProxy(WebsocketConsumer):
 
         if json_data.get("purpose", "") == "worker-ping":
             self.worker_ping()
-        
+
         if json_data.get("purpose", "") == "run-notebook":
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
                 {"type": "broadcast_message", "payload": json_data},
             )
-        
+
     def broadcast_message(self, event):
         payload = event["payload"]
         self.send(text_data=json.dumps(payload))
@@ -112,4 +113,3 @@ class ClientProxy(WebsocketConsumer):
             updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
         )
         workers.delete()
-

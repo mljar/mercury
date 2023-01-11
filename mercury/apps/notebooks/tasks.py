@@ -25,6 +25,7 @@ from apps.nb.exporter import Exporter
 
 log = logging.getLogger(__name__)
 
+
 def process_nbconvert_errors(error_msg):
     known_warnings = [
         "warn(",
@@ -109,6 +110,7 @@ def is_presentation(nb):
             return True
     return False
 
+
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
@@ -182,9 +184,8 @@ def task_init_notebook(
         notebook_schedule = params.get("schedule", "")
         notebook_notify = params.get("notify", {})
 
-
         if is_presentation(nb):
-            # automatically detect slides in cells            
+            # automatically detect slides in cells
             # and set slides output
             notebook_output = "slides"
 
@@ -212,17 +213,20 @@ def task_init_notebook(
 
         if render_html:
 
-            exporter = Exporter(show_code=params.get("show-code", False),
+            exporter = Exporter(
+                show_code=params.get("show-code", False),
                 show_prompt=params.get("show-prompt", False),
-                is_presentation=notebook_output=="slides",
-                reveal_theme=notebook_format.get("theme", "white")
-                )
+                is_presentation=notebook_output == "slides",
+                reveal_theme=notebook_format.get("theme", "white"),
+            )
             body = exporter.export(nb)
 
-            with open(os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w") as fout:
-                fout.write(body) 
+            with open(
+                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w"
+            ) as fout:
+                fout.write(body)
 
-            '''
+            """
             command = [
                 get_jupyter_bin_path(),
                 "nbconvert",
@@ -253,10 +257,10 @@ def task_init_notebook(
             error_msg = process_nbconvert_errors(error_msg)
             if error_msg != "":
                 print(error_msg)
-            '''
-            error_msg = "" # TODO: handle errors
+            """
+            error_msg = ""  # TODO: handle errors
 
-            '''
+            """
             # change file name if needed
             if notebook_output == "slides":
                 expected_fpath = os.path.join(
@@ -267,8 +271,8 @@ def task_init_notebook(
                 )
                 if os.path.exists(slides_fpath):
                     os.rename(slides_fpath, expected_fpath)
-            '''
-            if not params.get("show-code", False): # "--no-input" in command:
+            """
+            if not params.get("show-code", False):  # "--no-input" in command:
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     "a",
@@ -287,7 +291,7 @@ def task_init_notebook(
 </style>"""
                     )
 
-            '''
+            """
             if notebook_output == "slides":
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
@@ -296,8 +300,7 @@ def task_init_notebook(
                     errors="ignore",
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
-            '''
-
+            """
 
         parse_errors = validate_notify(notebook_notify)
 

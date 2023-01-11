@@ -24,6 +24,7 @@ class MultiSelect:
                 value=value,
                 options=choices,
                 description=label,
+                style={"description_width": "initial"},
             )
             WidgetsManager.add_widget(self.select.model_id, self.code_uid, self.select)
         display(self)

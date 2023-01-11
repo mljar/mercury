@@ -8,6 +8,7 @@ from apps.ws.utils import client_group, worker_group
 
 log = logging.getLogger(__name__)
 
+
 class WorkerProxy(WebsocketConsumer):
     def connect(self):
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])

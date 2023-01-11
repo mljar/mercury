@@ -8,7 +8,6 @@ from IPython.display import display
 from .manager import WidgetsManager
 
 
-
 class DirPath:
     def __init__(self, dir_path):
         self.value = dir_path
@@ -39,9 +38,9 @@ class OutputDir:
         data = {}
 
         view = {
-            "widget": "OutputDir", 
+            "widget": "OutputDir",
             "model_id": "output-dir",
-            "code_uid": self.code_uid
+            "code_uid": self.code_uid,
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
 

@@ -6,7 +6,7 @@ from apps.notebooks.models import Notebook
 class Worker(models.Model):
     # machine unique id
     machine_id = models.CharField(max_length=128, blank=True)
-    
+
     # web browser session id
     session_id = models.CharField(max_length=128)
 

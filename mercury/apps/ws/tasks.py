@@ -12,6 +12,7 @@ from apps.ws.utils import machine_uuid
 
 log = logging.getLogger(__name__)
 
+
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):
 
@@ -34,4 +35,3 @@ def task_start_websocket_worker(self, job_params):
         ]
         log.debug("Start " + " ".join(command))
         worker = subprocess.Popen(command)
-    

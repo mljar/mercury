@@ -14,11 +14,12 @@ cell_index_to_widgets_index = {}
 class WidgetException(Exception):
     pass
 
+
 class WidgetsManager:
 
-    widgets = {}        # model_id -> widget
-    code2model = {}     # code generated uid  -> model_id
-    cell_index = 0      # current cell index
+    widgets = {}  # model_id -> widget
+    code2model = {}  # code generated uid  -> model_id
+    cell_index = 0  # current cell index
 
     @staticmethod
     def set_cell_index(new_index):
@@ -35,7 +36,7 @@ class WidgetsManager:
         if key != "":
             uid += f".{key}"
         return uid
-    
+
     @staticmethod
     def fix_cell_index(code_uid, correct_cell_index):
         parts = code_uid.split(".")
@@ -58,14 +59,13 @@ class WidgetsManager:
     def get_widget(code_uid):
         model_id = WidgetsManager.code2model.get(code_uid)
         if model_id is None:
-            return None 
+            return None
         return WidgetsManager.widgets.get(model_id)
 
     @staticmethod
     def add_widget(model_id, code_uid, widget):
         WidgetsManager.widgets[model_id] = widget
         WidgetsManager.code2model[code_uid] = model_id
-
 
     @staticmethod
     def update(code_uid, field, new_value):
@@ -83,12 +83,11 @@ class WidgetsManager:
 
         return False
 
-
     @staticmethod
     def frontend_format(output):
 
         widget_type = output.get("widget", "unknown")
-        
+
         if widget_type == "Slider":
             return {
                 "input": "slider",
@@ -157,8 +156,7 @@ class WidgetsManager:
         return {}
 
 
-
-'''
+"""
 def set_widgets_counter(new_value):
     global widgets_counter
     widgets_counter = new_value
@@ -217,4 +215,4 @@ def set_update(model_id, field, new_value):
             return True
 
     return False
-'''
+"""

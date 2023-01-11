@@ -81,7 +81,7 @@ class NBWorker(WSClient):
         for widget_key in widgets.keys():
             value = widgets[widget_key]
 
-            widget_type = WidgetsManager.parse_widget_type(widget_key) 
+            widget_type = WidgetsManager.parse_widget_type(widget_key)
             log.debug(
                 f"Update widget code_uid={widget_key} value={value} widget type {widget_type}"
             )
@@ -129,15 +129,15 @@ class NBWorker(WSClient):
             else:
                 self.nb = copy.deepcopy(self.nb_original)
 
-            for i in range(index_execute_from, len(self.nb.cells)+1):
+            for i in range(index_execute_from, len(self.nb.cells) + 1):
 
                 log.debug(f"Execute cell index={i-1}")
 
-                self.nbrun.run_cell(self.nb.cells[i-1], counter=i)
+                self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
 
-                print(self.nb.cells[i-1])
+                print(self.nb.cells[i - 1])
 
-                for output in self.nb.cells[i-1].get("outputs", []):
+                for output in self.nb.cells[i - 1].get("outputs", []):
                     if "data" in output:
                         if "application/mercury+json" in output["data"]:
                             w = output["data"]["application/mercury+json"]
@@ -145,7 +145,7 @@ class NBWorker(WSClient):
                             w = json.loads(w)
 
                             # prepare msg to send by ws
-                            msg =  WidgetsManager.frontend_format(w)
+                            msg = WidgetsManager.frontend_format(w)
                             if msg:
                                 msg["purpose"] = Purpose.UpdateWidgets
                                 msg["widgetKey"] = w.get("code_uid")
@@ -156,7 +156,7 @@ class NBWorker(WSClient):
             nb_widgets_keys = []
             for cell in self.nb.cells:
                 for output in cell.get("outputs", []):
-                    w = output.get("data",{}).get("application/mercury+json")
+                    w = output.get("data", {}).get("application/mercury+json")
                     if w is not None:
                         w = json.loads(w)
                         code_uid = w.get("code_uid")
@@ -167,16 +167,11 @@ class NBWorker(WSClient):
             for widget_key in widgets.keys():
                 if widget_key not in nb_widgets_keys:
                     hide_widgets += [widget_key]
-            
+
             log.debug(f"Hide widgets {hide_widgets}")
             if hide_widgets:
-                msg = {
-                    "purpose": Purpose.HideWidgets,
-                    "keys": hide_widgets
-                }
+                msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
                 self.ws.send(json.dumps(msg))
-
-
 
             self.prev_nb = copy.deepcopy(self.nb)
         else:
@@ -193,13 +188,12 @@ class NBWorker(WSClient):
                         w = json.loads(w)
 
                         # prepare msg to send by ws
-                        msg =  WidgetsManager.frontend_format(w)
+                        msg = WidgetsManager.frontend_format(w)
                         if msg:
                             msg["purpose"] = Purpose.UpdateWidgets
                             msg["widgetKey"] = w.get("code_uid")
                             log.debug(f"Update widget {msg}")
                             self.ws.send(json.dumps(msg))
-
 
                         code_uid = w.get("code_uid")
                         if code_uid is not None:
@@ -210,15 +204,11 @@ class NBWorker(WSClient):
         for widget_key in expected_widgets_keys:
             if widget_key not in nb_widgets_keys:
                 hide_widgets += [widget_key]
-        
+
         log.debug(f"Hide widgets {hide_widgets}")
         if hide_widgets:
-            msg = {
-                "purpose": Purpose.HideWidgets,
-                "keys": hide_widgets
-            }
+            msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
             self.ws.send(json.dumps(msg))
-
 
     def init_notebook(self):
         log.debug("Init notebook")
@@ -239,6 +229,5 @@ class NBWorker(WSClient):
         parse_params(nb2dict(self.nb_original), params)
         log.debug(params)
         self.nb = copy.deepcopy(self.nb_original)
-
 
         self.send_widgets(self.nb, expected_widgets_keys=[])

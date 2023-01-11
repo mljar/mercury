@@ -4,15 +4,24 @@ from IPython.display import display
 
 
 class App:
-    def __init__(self, title, description, 
-        show_code=False, show_prompt=False, share="",
-        output="app", slug="", schedule="", notify={}):
+    def __init__(
+        self,
+        title,
+        description,
+        show_code=False,
+        show_prompt=False,
+        share="",
+        output="app",
+        slug="",
+        schedule="",
+        notify={},
+    ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
         self.description = description
         self.show_code = show_code
         self.show_prompt = show_prompt
-        self.share = share 
+        self.share = share
         self.output = output
         self.slug = slug
         self.schedule = schedule
@@ -20,7 +29,7 @@ class App:
         display(self)
 
     def __repr__(self):
-        return f'mercury.App'
+        return f"mercury.App"
 
     def _repr_mimebundle_(self, **kwargs):
         data = {}

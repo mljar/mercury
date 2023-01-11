@@ -3,9 +3,7 @@ import json
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetsManager
-)
+from .manager import WidgetsManager
 
 
 class Checkbox:
@@ -15,8 +13,12 @@ class Checkbox:
             self.checkbox = WidgetsManager.get_widget(self.code_uid)
             self.checkbox.description = label
         else:
-            self.checkbox = ipywidgets.Checkbox(value=value, description=label)
-            WidgetsManager.add_widget(self.checkbox.model_id, self.code_uid, self.checkbox)
+            self.checkbox = ipywidgets.Checkbox(
+                value=value, description=label, style={"description_width": "initial"}
+            )
+            WidgetsManager.add_widget(
+                self.checkbox.model_id, self.code_uid, self.checkbox
+            )
         display(self)
 
     @property

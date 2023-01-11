@@ -5,9 +5,7 @@ import tempfile
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetsManager
-)
+from .manager import WidgetsManager
 
 
 class File:

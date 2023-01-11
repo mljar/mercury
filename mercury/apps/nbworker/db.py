@@ -49,7 +49,9 @@ class DBClient:
     def show_prompt(self):
         try:
             log.debug("Check if show prompt from notebook")
-            return json.loads(self.notebook.params).get("show-prompt", "False") == "True"
+            return (
+                json.loads(self.notebook.params).get("show-prompt", "False") == "True"
+            )
         except Exception:
             log.exception("Exception when check if show promtp from notebook")
         return False
@@ -63,12 +65,14 @@ class DBClient:
 
     def set_worker_state(self, new_state):
         try:
-            log.debug(f"Worker id={self.worker_id} set state {new_state} uuid {machine_uuid()}")
+            log.debug(
+                f"Worker id={self.worker_id} set state {new_state} uuid {machine_uuid()}"
+            )
             self.state = new_state
             if self.worker_exists() and self.worker is not None:
                 self.worker.state = new_state
-                # set worker machine id 
-                # to control number of workers 
+                # set worker machine id
+                # to control number of workers
                 # in the single machine
                 self.worker.machine_id = machine_uuid()
                 self.worker.save()

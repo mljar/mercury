@@ -3,23 +3,16 @@ import json
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetException,
-    WidgetsManager
-)
+from .manager import WidgetException, WidgetsManager
 
 
 class Range:
     def __init__(self, value=[0, 1], min=0, max=10, label="", step=1):
         for i in [0, 1]:
             if value[i] < min:
-                raise WidgetException(
-                    f"value[{i}] should be equal or larger than min"
-                )
+                raise WidgetException(f"value[{i}] should be equal or larger than min")
             if value[i] > max:
-                raise WidgetException(
-                    f"value[{i}] should be equal or smaller than max"
-                )
+                raise WidgetException(f"value[{i}] should be equal or smaller than max")
 
         if len(value) != 2:
             raise WidgetException("Range accepts list with length 2 as value")
@@ -45,6 +38,7 @@ class Range:
                 max=max,
                 description=label,
                 step=step,
+                style={"description_width": "initial"},
             )
             WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)

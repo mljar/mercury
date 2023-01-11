@@ -3,10 +3,7 @@ import json
 import ipywidgets
 from IPython.display import display
 
-from .manager import (
-    WidgetException,
-    WidgetsManager
-)
+from .manager import WidgetException, WidgetsManager
 
 
 class Numeric:
@@ -37,16 +34,19 @@ class Numeric:
                 max=max,
                 description=label,
                 step=step,
+                style={"description_width": "initial"},
             )
-            WidgetsManager.add_widget(self.numeric.model_id, self.code_uid, self.numeric)
+            WidgetsManager.add_widget(
+                self.numeric.model_id, self.code_uid, self.numeric
+            )
         display(self)
 
     @property
     def value(self):
         return self.numeric.value
 
-    #@value.setter
-    #def value(self, v):
+    # @value.setter
+    # def value(self, v):
     #    self.numeric.value = v
 
     def __str__(self):
