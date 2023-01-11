@@ -84,8 +84,81 @@ class WidgetsManager:
         return False
 
 
+    @staticmethod
+    def frontend_format(output):
+
+        widget_type = output.get("widget", "unknown")
+        
+        if widget_type == "Slider":
+            return {
+                "input": "slider",
+                "value": output.get("value", 0),
+                "min": output.get("min", 0),
+                "max": output.get("max", 10),
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "Select":
+            return {
+                "input": "select",
+                "value": output.get("value", ""),
+                "choices": output.get("choices", []),
+                "multi": False,
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "MultiSelect":
+            return {
+                "input": "select",
+                "value": output.get("value", []),
+                "choices": output.get("choices", []),
+                "multi": True,
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "Range":
+            return {
+                "input": "range",
+                "value": output.get("value", [0, 1]),
+                "min": output.get("min", 0),
+                "max": output.get("max", 10),
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "Text":
+            return {
+                "input": "text",
+                "value": output.get("value", ""),
+                "rows": output.get("rows", 1),
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "File":
+            return {
+                "input": "file",
+                "maxFileSize": output.get("max_file_size", 1),
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "OutputDir":
+            return {
+                "output": "dir",
+            }
+        elif widget_type == "Checkbox":
+            return {
+                "input": "checkbox",
+                "value": output.get("value", True),
+                "label": output.get("label", ""),
+            }
+        elif widget_type == "Numeric":
+            return {
+                "input": "numeric",
+                "value": output.get("value", 0),
+                "min": output.get("min", 0),
+                "max": output.get("max", 10),
+                "step": output.get("step", 1),
+                "label": output.get("label", ""),
+            }
+
+        return {}
 
 
+
+'''
 def set_widgets_counter(new_value):
     global widgets_counter
     widgets_counter = new_value
@@ -144,3 +217,4 @@ def set_update(model_id, field, new_value):
             return True
 
     return False
+'''

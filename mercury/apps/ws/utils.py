@@ -83,71 +83,9 @@ def parse_params(nb, params={}):
                         params["schedule"] = view.get("schedule")
                     if view.get("notify") is not None:
                         params["notify"] = json.loads(view.get("notify"))
-                elif widget_type == "Slider":
-                    params["params"][widget_key] = {
-                        "input": "slider",
-                        "value": view.get("value", 0),
-                        "min": view.get("min", 0),
-                        "max": view.get("max", 10),
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "Select":
-                    params["params"][widget_key] = {
-                        "input": "select",
-                        "value": view.get("value", ""),
-                        "choices": view.get("choices", []),
-                        "multi": False,
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "MultiSelect":
-                    params["params"][widget_key] = {
-                        "input": "select",
-                        "value": view.get("value", []),
-                        "choices": view.get("choices", []),
-                        "multi": True,
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "Range":
-                    params["params"][widget_key] = {
-                        "input": "range",
-                        "value": view.get("value", [0, 1]),
-                        "min": view.get("min", 0),
-                        "max": view.get("max", 10),
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "Text":
-                    params["params"][widget_key] = {
-                        "input": "text",
-                        "value": view.get("value", ""),
-                        "rows": view.get("rows", 1),
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "File":
-                    params["params"][widget_key] = {
-                        "input": "file",
-                        "maxFileSize": view.get("max_file_size", 1),
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "OutputDir":
-                    params["params"][widget_key] = {
-                        "output": "dir",
-                    }
-                elif widget_type == "Checkbox":
-                    params["params"][widget_key] = {
-                        "input": "checkbox",
-                        "value": view.get("value", True),
-                        "label": view.get("label", ""),
-                    }
-                elif widget_type == "Numeric":
-                    params["params"][widget_key] = {
-                        "input": "numeric",
-                        "value": view.get("value", 0),
-                        "min": view.get("min", 0),
-                        "max": view.get("max", 10),
-                        "step": view.get("step", 1),
-                        "label": view.get("label", ""),
-                    }
-
+                else:
+                    params["params"][widget_key] = WidgetsManager.frontend_format(view)
+                
                 all_model_ids += [view.get("model_id", "")]
 
         cell_counter += 1
@@ -164,4 +102,3 @@ def parse_params(nb, params={}):
         params["show-prompt"] = False
         params["params"] = {}
         params["output"] = "app"
-        

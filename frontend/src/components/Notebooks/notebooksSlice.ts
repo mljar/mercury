@@ -230,9 +230,9 @@ const notebooksSlice = createSlice({
       console.log({ noMatch, widgetKey });
       if (noMatch) {
         console.log("there is no match");
-        console.log(action.payload)
-        state.selectedNotebook.params.params[widgetKey] = action.payload; // as ISliderWidget;
-        state.selectedNotebook.params.params[widgetKey].input = "slider";
+        console.log(action.payload);
+        state.selectedNotebook.params.params[widgetKey] = action.payload; 
+        
       }
     },
     hideWidgets(state, action: PayloadAction<any>) {

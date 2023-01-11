@@ -145,10 +145,12 @@ class NBWorker(WSClient):
                             w = json.loads(w)
 
                             # prepare msg to send by ws
-                            msg = w
-                            msg["purpose"] = Purpose.UpdateWidgets
-                            msg["widgetKey"] = w.get("code_uid")
-                            self.ws.send(json.dumps(msg))
+                            msg =  WidgetsManager.frontend_format(w)
+                            if msg:
+                                msg["purpose"] = Purpose.UpdateWidgets
+                                msg["widgetKey"] = w.get("code_uid")
+                                log.debug(f"Update widget {msg}")
+                                self.ws.send(json.dumps(msg))
 
             # check if hide some widgets
             nb_widgets_keys = []
@@ -191,10 +193,13 @@ class NBWorker(WSClient):
                         w = json.loads(w)
 
                         # prepare msg to send by ws
-                        msg = w
-                        msg["purpose"] = Purpose.UpdateWidgets
-                        msg["widgetKey"] = w.get("code_uid")
-                        self.ws.send(json.dumps(msg))
+                        msg =  WidgetsManager.frontend_format(w)
+                        if msg:
+                            msg["purpose"] = Purpose.UpdateWidgets
+                            msg["widgetKey"] = w.get("code_uid")
+                            log.debug(f"Update widget {msg}")
+                            self.ws.send(json.dumps(msg))
+
 
                         code_uid = w.get("code_uid")
                         if code_uid is not None:
