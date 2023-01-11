@@ -114,7 +114,16 @@ export default function SideBar({
 
   let widgets = [];
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
+  
   if (widgetsParams) {
+    // sort them here :)
+    let widgetKeys = [];
+    for (let key of Object.keys(widgetsParams)) {
+      widgetKeys.push([key, 0])
+    }
+    console.log("Widget keys *********");
+    console.log(widgetKeys);
+
     for (let [key, widgetParams] of Object.entries(widgetsParams)) {
       console.log("add widget", key)
       if (isSelectWidget(widgetParams)) {
