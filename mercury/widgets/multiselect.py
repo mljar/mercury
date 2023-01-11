@@ -31,7 +31,7 @@ class MultiSelect:
 
     @property
     def value(self):
-        return self.select.value
+        return list(self.select.value)
 
     @value.setter
     def value(self, v):
