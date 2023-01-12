@@ -53,7 +53,7 @@ type SideBarProps = {
   taskCreatedAt: Date;
   loadingState: string;
   waiting: boolean;
-  widgetsParams: Array<IWidget>;
+  widgetsParams: Record<string, IWidget>;
   watchMode: boolean;
   notebookPath: string;
   displayEmbed: boolean;
@@ -114,18 +114,27 @@ export default function SideBar({
 
   let widgets = [];
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
-  
+
   if (widgetsParams) {
-    // sort them here :)
+
+    // sort widgets keys based on cell index and code line number
     let widgetKeys = [];
     for (let key of Object.keys(widgetsParams)) {
-      widgetKeys.push([key, 0])
+      const parts = key.split(".");
+      widgetKeys.push([key, parseFloat(`${parts[1]}.${parts[2]}`)]);
     }
-    console.log("Widget keys *********");
-    console.log(widgetKeys);
+    widgetKeys.sort(function (a, b) {
+      const a1 = a[1] as number;
+      const b1 = b[1] as number;
+      return a1 - b1;
+    });
 
-    for (let [key, widgetParams] of Object.entries(widgetsParams)) {
-      console.log("add widget", key)
+
+    for (let wKey of widgetKeys) {
+      const key = wKey[0] as string;
+      const widgetParams = widgetsParams[key];
+
+      console.log("add widget", key);
       if (isSelectWidget(widgetParams)) {
         widgets.push(
           <SelectWidget
@@ -221,7 +230,7 @@ export default function SideBar({
     }
   }
 
-  console.log(widgets)
+  console.log(widgets);
 
   const allFilesUploaded = () => {
     if (fileKeys.length === 0) {

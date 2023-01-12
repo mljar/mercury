@@ -3,12 +3,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { IWidget } from "./Widgets/Types";
 import { useSelector } from "react-redux";
-// import { getWidgetsValues } from "./Widgets/widgetsSlice";
 import { getWidgetsValues } from "./Notebooks/notebooksSlice";
 
 type Props = {
   slug: string;
-  widgetsParams: Array<IWidget>;
+  widgetsParams: Record<string, IWidget>;  
   notebookPath: string;
   columnsWidth: number;
   taskSessionId: string | undefined;

@@ -165,7 +165,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     notebookPath = previousTask.result;
   }
 
-  const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
+  const areOutputFilesAvailable = (widgetsParams: Record<string, IWidget>): boolean => {
     if (widgetsParams) {
       for (let [, widgetParams] of Object.entries(widgetsParams)) {
         if (isOutputFilesWidget(widgetParams)) {
