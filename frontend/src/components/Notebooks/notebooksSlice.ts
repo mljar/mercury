@@ -24,6 +24,9 @@ import {
 //import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from "../WindowDimensions";
 
+export const RUN_DELAY = 600; // ms
+export const RUN_DELAY_FAST = 100; // ms
+
 export interface INotebookParams {
   title: string | null;
   description: string | null;
@@ -82,8 +85,9 @@ const notebooksSlice = createSlice({
       action: PayloadAction<{ key: string; value: WidgetValueType }>
     ) {
       const { key, value } = action.payload;
-      console.log("set widget value", key, value);
       state.widgets[key] = value;
+
+      console.log({ key, value });
     },
     clearWidgets(state) {
       state.widgets = {};
@@ -116,21 +120,14 @@ const notebooksSlice = createSlice({
       state.slidesHash = action.payload;
     },
     updateWidgetsParams(state, action: PayloadAction<any>) {
-      console.log("udapte widgets params");
-      console.log(action.payload);
-
       const { widgetKey } = action.payload;
 
       let updated = false;
 
-      console.log("update for", widgetKey);
-
       let noMatch = true;
 
       for (let key of Object.keys(state.selectedNotebook.params.params)) {
-        console.log(key);
         if (key === widgetKey) {
-          console.log("** match **");
           noMatch = false;
           let widget = { ...state.selectedNotebook.params.params[widgetKey] };
 
@@ -227,21 +224,14 @@ const notebooksSlice = createSlice({
           }
         }
       }
-      console.log({ noMatch, widgetKey });
       if (noMatch) {
-        console.log("there is no match");
-        console.log(action.payload);
-        state.selectedNotebook.params.params[widgetKey] = action.payload; 
-        
+        state.selectedNotebook.params.params[widgetKey] = action.payload;
       }
     },
     hideWidgets(state, action: PayloadAction<any>) {
-      console.log("Hide widgets");
-      console.log(action.payload);
       const { keys } = action.payload;
       for (let key of keys) {
         if (key in state.selectedNotebook.params.params) {
-          console.log("delete", key);
           delete state.selectedNotebook.params.params[key];
         }
       }

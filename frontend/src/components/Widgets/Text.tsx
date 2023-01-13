@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../Notebooks/notebooksSlice";
+import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type TextProps = {
   widgetKey: string;
@@ -24,6 +24,13 @@ export default function TextWidget({
     return input_string.replace(/["'(){}[\]`^]/gim, "");
   };
 
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      console.log(value);
+    }, RUN_DELAY);
+    return () => clearTimeout(timeOutId);
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`textarea-${label}`}>{label}</label>
@@ -32,7 +39,7 @@ export default function TextWidget({
           className="form-control"
           type="text"
           id={`text-${label}`}
-          value={value? value: ""}
+          value={value ? value : ""}
           onChange={(e) => {
             dispatch(
               setWidgetValue({
@@ -49,7 +56,7 @@ export default function TextWidget({
           className="form-control"
           id={`text-area-${label}`}
           rows={rowsValue}
-          value={value? value: ""}
+          value={value ? value : ""}
           onChange={(e) => {
             dispatch(
               setWidgetValue({

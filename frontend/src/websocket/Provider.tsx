@@ -87,9 +87,7 @@ export default function WebSocketProvider({
   }
 
   function connect() {
-    console.log("connect");
     if (selectedNotebookId !== undefined && connection === undefined) {
-      console.log("connecting ...");
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${selectedNotebookId}/${getSessionId()}/`
       );

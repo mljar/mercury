@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Select, { MultiValue } from "react-select";
-import { setWidgetValue } from "../Notebooks/notebooksSlice";
+import { RUN_DELAY_FAST, setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 type MultiOption = MultiValue<{ value: string; label: string } | undefined>;
@@ -59,6 +59,13 @@ export default function SelectWidget({
     });
   }
 
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      console.log(value);
+    }, RUN_DELAY_FAST);
+    return () => clearTimeout(timeOutId);
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`select-${label}`}>{label}</label>
@@ -71,7 +78,6 @@ export default function SelectWidget({
         options={options}
         isMulti={multi}
         onChange={(e) => {
-
           if (e) {
             if (isSingleOption(e)) {
               dispatch(setWidgetValue({ key: widgetKey, value: e.value }));

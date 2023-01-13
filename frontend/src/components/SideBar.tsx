@@ -81,14 +81,20 @@ export default function SideBar({
   const widgetsValues = useSelector(getWidgetsValues);
   const workerState = useSelector(getWorkerState);
 
+  const ws = useContext(WebSocketContext);
+
+  const runNb = () => {
+    const slidesHash = scrapeSlidesHash();
+    dispatch(setSlidesHash(slidesHash));
+
+    ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(widgetsValues))));
+  };
+
   useEffect(() => {
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
         if (key in widgetsValues) {
-          console.log("skip set widget value", key);
           continue;
-        } else {
-          console.log("set widget initial value", key);
         }
 
         if (widgetParams.input === "file") {
@@ -116,7 +122,6 @@ export default function SideBar({
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
 
   if (widgetsParams) {
-
     // sort widgets keys based on cell index and code line number
     let widgetKeys = [];
     for (let key of Object.keys(widgetsParams)) {
@@ -129,12 +134,10 @@ export default function SideBar({
       return a1 - b1;
     });
 
-
     for (let wKey of widgetKeys) {
       const key = wKey[0] as string;
       const widgetParams = widgetsParams[key];
 
-      console.log("add widget", key);
       if (isSelectWidget(widgetParams)) {
         widgets.push(
           <SelectWidget
@@ -182,6 +185,7 @@ export default function SideBar({
             step={widgetParams?.step}
             vertical={widgetParams?.vertical}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isRangeWidget(widgetParams)) {
@@ -225,12 +229,10 @@ export default function SideBar({
           <MarkdownWidget value={widgetParams.value as string} key={key} />
         );
       } else {
-        console.log("unknonw widget type", widgetParams);
+        console.log("Unknown widget type", widgetParams);
       }
     }
   }
-
-  console.log(widgets);
 
   const allFilesUploaded = () => {
     if (fileKeys.length === 0) {
@@ -254,9 +256,7 @@ export default function SideBar({
     additionalStyle = { padding: "0px" };
   }
 
-  const ws = useContext(WebSocketContext);
-  console.log(widgetsValues);
-  console.log(JSON.stringify(widgetsValues));
+  
 
   return (
     <nav
@@ -299,13 +299,13 @@ export default function SideBar({
                   // execute the notebook with new parameters
                   //  dispatch(executeNotebook(notebookId));
 
-                  const slidesHash = scrapeSlidesHash();
-                  dispatch(setSlidesHash(slidesHash));
-                  console.log({ slidesHash });
+                  // const slidesHash = scrapeSlidesHash();
+                  // dispatch(setSlidesHash(slidesHash));
 
-                  ws.sendMessage(
-                    JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
-                  );
+                  // ws.sendMessage(
+                  //   JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
+                  // );
+                  runNb();
                 }}
                 disabled={
                   waiting ||

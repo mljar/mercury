@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
+import { RUN_DELAY } from "../Notebooks/notebooksSlice";
 
 type SliderProps = {
   widgetKey: string;
@@ -12,6 +13,7 @@ type SliderProps = {
   step: number | null;
   vertical: boolean | null;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function SliderWidget({
@@ -23,6 +25,7 @@ export default function SliderWidget({
   step,
   vertical,
   disabled,
+  runNb,
 }: SliderProps) {
   const dispatch = useDispatch();
 
@@ -39,6 +42,15 @@ export default function SliderWidget({
     stepValue = step;
   }
   const vals: number[] = [value !== null ? value : maxValue];
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      console.log(value);
+      runNb();
+    }, RUN_DELAY);
+    return () => clearTimeout(timeOutId);
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`slider-${label}`}>{label}</label>

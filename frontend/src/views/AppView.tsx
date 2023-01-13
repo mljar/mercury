@@ -107,8 +107,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [dispatch, notebook, watchModeCounter]);
 
-  console.log("version", notebook?.params?.version);
-
   // version 1
   useEffect(() => {
     if (
@@ -180,8 +178,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   if (notebook.output && notebook.output.toLowerCase().startsWith("rest")) {
     showRestApi = true;
   }
-
-  console.log("AppView");
 
   return (
     <div className="App">
