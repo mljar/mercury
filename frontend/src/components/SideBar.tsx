@@ -222,6 +222,7 @@ export default function SideBar({
             value={widgetsValues[key] as string}
             rows={widgetParams?.rows}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {

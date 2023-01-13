@@ -8,6 +8,7 @@ type TextProps = {
   value: string | undefined;
   rows: number | null;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function TextWidget({
@@ -16,6 +17,7 @@ export default function TextWidget({
   value,
   rows,
   disabled,
+  runNb,
 }: TextProps) {
   const dispatch = useDispatch();
   let rowsValue: number = rows ? rows : 1;
@@ -27,6 +29,7 @@ export default function TextWidget({
   useEffect(() => {
     const timeOutId = setTimeout(() => {
       console.log(value);
+      runNb();
     }, RUN_DELAY);
     return () => clearTimeout(timeOutId);
   }, [value]);
