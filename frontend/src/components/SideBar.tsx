@@ -27,6 +27,7 @@ import {
   isMarkdownWidget,
   IWidget,
   isOutputFilesWidget,
+  isButtonWidget,
 } from "./Widgets/Types";
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
@@ -45,6 +46,7 @@ import SelectExecutionHistory from "./SelectExecutionHistory";
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
 import { getWorkerState, runNotebook, WorkerState } from "../websocket/wsSlice";
+import ButtonWidget from "./Widgets/Button";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -138,8 +140,6 @@ export default function SideBar({
       
       const key = wKey[0] as string;
       const widgetParams = widgetsParams[key];
-      
-      console.log(key);
 
       if (isSelectWidget(widgetParams)) {
         widgets.push(
@@ -231,6 +231,18 @@ export default function SideBar({
       } else if (isMarkdownWidget(widgetParams)) {
         widgets.push(
           <MarkdownWidget value={widgetParams.value as string} key={key} />
+        );
+      } else if (isButtonWidget(widgetParams)) {
+        widgets.push(
+          <ButtonWidget
+            widgetKey={key}
+            disabled={waiting}
+            label={widgetParams?.label}
+            value={widgetsValues[key] as boolean}
+            style={widgetParams?.style}
+            key={key}
+            runNb={runNb}
+          />
         );
       } else {
         console.log("Unknown widget type", widgetParams);

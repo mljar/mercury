@@ -28,6 +28,7 @@ from widgets.numeric import Numeric
 from widgets.multiselect import MultiSelect
 from widgets.outputdir import OutputDir
 from widgets.note import Note
+from widgets.button import Button
 
 
 def main():

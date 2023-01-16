@@ -32,6 +32,7 @@ export default function TextWidget({
       runNb();
     }, RUN_DELAY);
     return () => clearTimeout(timeOutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (

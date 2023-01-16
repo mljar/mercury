@@ -6,7 +6,6 @@ import {
   Dispatch,
 } from "@reduxjs/toolkit";
 import axios from "axios";
-import { createEmitAndSemanticDiagnosticsBuilderProgram } from "typescript";
 
 import { RootState } from "../../store";
 import { clearExecutionHistory } from "../../tasks/tasksSlice";
@@ -20,8 +19,8 @@ import {
   isCheckboxWidget,
   isNumericWidget,
   isMarkdownWidget,
+  isButtonWidget,
 } from "../Widgets/Types";
-//import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from "../WindowDimensions";
 
 export const RUN_DELAY = 600; // ms
@@ -102,7 +101,7 @@ const notebooksSlice = createSlice({
       if (
         action.payload.state.startsWith("WATCH") &&
         state.selectedNotebook.file_updated_at ===
-          action.payload.file_updated_at
+        action.payload.file_updated_at
       ) {
         // console.log("skip notebook update")
       } else {
@@ -222,6 +221,18 @@ const notebooksSlice = createSlice({
               widget.value = action.payload.value;
               updated = true;
             }
+          } else if (isButtonWidget(widget)) {
+            
+            state.widgets[key] = action.payload.value;
+
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
+              updated = true;
+            }
+            if (widget.style !== action.payload.style) {
+              widget.style = action.payload.style;
+              updated = true;
+            }
           }
 
           if (updated) {
@@ -298,37 +309,37 @@ export const fetchNotebooks = () => async (dispatch: Dispatch<AnyAction>) => {
 
 export const fetchNotebook =
   (id: number, silent = false) =>
-  async (dispatch: Dispatch<AnyAction>) => {
-    try {
-      if (!silent) {
-        dispatch(setSlidesHash(""));
-        dispatch(clearExecutionHistory());
-      }
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        if (!silent) {
+          dispatch(setSlidesHash(""));
+          dispatch(clearExecutionHistory());
+        }
 
-      const { width } = getWindowDimensions();
-      dispatch(setShowSideBar(width > 992));
+        const { width } = getWindowDimensions();
+        dispatch(setShowSideBar(width > 992));
 
-      if (!silent) {
-        dispatch(setLoadingStateSelected("loading"));
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loading"));
+        }
+        const url = `/api/v1/notebooks/${id}/`;
+        const { data } = await axios.get(url);
+        const parsedParams = JSON.parse(data.params);
+        dispatch(
+          setSelectedNotebook({
+            ...data,
+            params: parsedParams as INotebookParams,
+          })
+        );
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loaded"));
+        }
+      } catch (error) {
+        if (!silent) {
+          dispatch(setLoadingStateSelected("error"));
+        }
+        console.error(
+          `Problem during loading selected notebook (${id}). ${error}`
+        );
       }
-      const url = `/api/v1/notebooks/${id}/`;
-      const { data } = await axios.get(url);
-      const parsedParams = JSON.parse(data.params);
-      dispatch(
-        setSelectedNotebook({
-          ...data,
-          params: parsedParams as INotebookParams,
-        })
-      );
-      if (!silent) {
-        dispatch(setLoadingStateSelected("loaded"));
-      }
-    } catch (error) {
-      if (!silent) {
-        dispatch(setLoadingStateSelected("error"));
-      }
-      console.error(
-        `Problem during loading selected notebook (${id}). ${error}`
-      );
-    }
-  };
+    };

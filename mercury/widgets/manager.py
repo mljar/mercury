@@ -157,7 +157,13 @@ class WidgetsManager:
                 "output": "markdown",
                 "value": output.get("value", ""),
             }
-
+        elif widget_type == "Button":
+            return {
+                "input": "button",
+                "value": output.get("value", False),
+                "label": output.get("label", ""),
+                "style": output.get("style", "primary"),
+            }
 
         return {}
 
