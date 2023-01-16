@@ -24,8 +24,8 @@ class Text:
     def value(self):
         return self.text.value
 
-    #@value.setter
-    #def value(self, v):
+    # @value.setter
+    # def value(self, v):
     #    self.text.value = v
 
     def __str__(self):

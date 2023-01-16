@@ -8,10 +8,10 @@ from .manager import WidgetException, WidgetsManager
 
 class Button:
     def __init__(self, label="", style="primary"):
-        
+
         self.code_uid = WidgetsManager.get_code_uid("Button")
-        
-        if style not in ['primary', 'success', 'info', 'warning', 'danger', '']:
+
+        if style not in ["primary", "success", "info", "warning", "danger", ""]:
             style = "primary"
 
         if WidgetsManager.widget_exists(self.code_uid):
@@ -21,6 +21,7 @@ class Button:
         else:
             self.button = ipywidgets.Button(description=label, button_style=style)
             self.button.value = False
+
             def on_button_clicked(b):
                 self.button.value = True
 

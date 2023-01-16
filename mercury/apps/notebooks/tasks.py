@@ -1,9 +1,9 @@
 import json
+import logging
 import os
 import subprocess
 import sys
 import uuid
-import logging
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
@@ -16,12 +16,12 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
+from apps.nb.exporter import Exporter
 from apps.notebooks.models import Notebook
 from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
-from apps.nb.exporter import Exporter
 
 log = logging.getLogger(__name__)
 
@@ -204,12 +204,14 @@ def task_init_notebook(
             "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
         )
 
-        notebook_slug = params.get("slug", slugify(notebook_title))
+        notebook_slug = params.get("slug", "")
+        if notebook_slug == "":
+            notebook_slug = slugify(notebook_title)
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
 
-        print(notebook_slug, notebook_output_file)
+        print("slug:", notebook_slug, "output file:", notebook_output_file)
 
         if render_html:
 

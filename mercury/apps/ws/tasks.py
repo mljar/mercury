@@ -1,10 +1,9 @@
+import logging
 import os
 import subprocess
 import sys
-import logging
 
 from celery import shared_task
-
 from django.conf import settings
 
 from apps.ws.models import Worker

@@ -67,6 +67,12 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const exportingToPDF = useSelector(getExportingToPDF);
   const workerId = useSelector(getWorkerId);
 
+  console.log("**********");
+  if (notebook) {
+    console.log(notebook?.params?.continuous_update);
+    console.log(notebook?.params?.static_notebook);
+  }
+
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
     if (task.state && task.state === "RECEIVED") return true;
@@ -123,7 +129,11 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
 
   // version 2
   useEffect(() => {
-    if (appView === "files" && notebook?.params?.version === "2" && workerId !== undefined) {
+    if (
+      appView === "files" &&
+      notebook?.params?.version === "2" &&
+      workerId !== undefined
+    ) {
       dispatch(fetchWorkerOutputFiles(workerId));
     }
   }, [dispatch, appView, notebook, workerId]);
@@ -163,7 +173,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     notebookPath = previousTask.result;
   }
 
-  const areOutputFilesAvailable = (widgetsParams: Record<string, IWidget>): boolean => {
+  const areOutputFilesAvailable = (
+    widgetsParams: Record<string, IWidget>
+  ): boolean => {
     if (widgetsParams) {
       for (let [, widgetParams] of Object.entries(widgetsParams)) {
         if (isOutputFilesWidget(widgetParams)) {
@@ -212,6 +224,8 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                   notebook.output !== undefined && notebook.output === "slides"
                 }
                 notebookParseErrors={notebook.errors}
+                continuousUpdate={notebook?.params?.continuous_update}
+                staticNotebook={notebook?.params?.static_notebook}
               />
             )}
 

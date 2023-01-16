@@ -12,7 +12,6 @@ from apps.nbworker.utils import Purpose, WorkerState
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
 from apps.ws.utils import parse_params
-
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -211,7 +210,7 @@ class NBWorker(WSClient):
             self.ws.send(json.dumps(msg))
 
     def init_notebook(self):
-        log.debug("Init notebook")
+        log.debug(f"Init notebook, show_code={self.show_code()}")
         self.update_worker_state(WorkerState.Busy)
 
         self.nbrun = NbRun(

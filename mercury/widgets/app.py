@@ -1,20 +1,24 @@
 import json
-from .manager import WidgetsManager
+
 from IPython.display import display
+
+from .manager import WidgetsManager
 
 
 class App:
     def __init__(
         self,
-        title,
-        description,
+        title="",
+        description="",
         show_code=False,
         show_prompt=False,
-        share="",
+        share="public",
         output="app",
         slug="",
         schedule="",
         notify={},
+        continuous_update=True,
+        static_notebook=False,
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
@@ -26,6 +30,8 @@ class App:
         self.slug = slug
         self.schedule = schedule
         self.notify = notify
+        self.continuous_update = continuous_update
+        self.static_notebook = static_notebook
         display(self)
 
     def __repr__(self):
@@ -45,6 +51,8 @@ class App:
             "slug": self.slug,
             "schedule": self.schedule,
             "notify": json.dumps(self.notify),
+            "continuous_update": self.continuous_update,
+            "static_notebook": self.static_notebook,
             "model_id": "mercury-app",
             "code_uid": self.code_uid,
         }

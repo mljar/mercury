@@ -1,5 +1,5 @@
-import logging
 import inspect
+import logging
 
 log = logging.getLogger(__name__)
 

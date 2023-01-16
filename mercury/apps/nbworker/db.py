@@ -1,6 +1,6 @@
+import json
 import logging
 import sys
-import json
 from datetime import datetime, timedelta
 
 from django.utils.timezone import make_aware
@@ -32,7 +32,7 @@ class DBClient:
 
     def is_presentation(self):
         try:
-            log.debug("Check if notebook is presentation")
+            log.debug(f"Check if notebook is presentation {self.notebook.output}")
             return self.notebook.output == "slides"
         except Exception:
             log.exception("Exception when check if notebook is presentation")
@@ -40,18 +40,22 @@ class DBClient:
 
     def show_code(self):
         try:
-            log.debug("Check if show code from notebook")
-            return json.loads(self.notebook.params).get("show-code", "False") == "True"
+            show_it = str(
+                json.loads(self.notebook.params).get("show-code", "false")
+            ).lower()
+            log.debug(f"Check if show code from notebook ({show_it})")
+            return show_it == "true"
         except Exception:
             log.exception("Exception when check if show code from notebook")
         return False
 
     def show_prompt(self):
         try:
-            log.debug("Check if show prompt from notebook")
-            return (
-                json.loads(self.notebook.params).get("show-prompt", "False") == "True"
-            )
+            show_it = str(
+                json.loads(self.notebook.params).get("show-prompt", "false")
+            ).lower()
+            log.debug(f"Check if show prompt from notebook ({show_it})")
+            return show_it == "true"
         except Exception:
             log.exception("Exception when check if show promtp from notebook")
         return False

@@ -34,6 +34,8 @@ export interface INotebookParams {
   "show-code": boolean | null;
   params: Record<string, IWidget>; //IWidget[];
   version: string;
+  continuous_update: boolean;
+  static_notebook: boolean;
 }
 
 export interface INotebook {

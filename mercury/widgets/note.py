@@ -1,8 +1,8 @@
 import json
 
 import ipywidgets
-from IPython.display import display
-from IPython.display import Markdown
+from IPython.display import Markdown, display
+
 from .manager import WidgetException, WidgetsManager
 
 
@@ -18,7 +18,7 @@ class Note:
 
         if WidgetsManager.widget_exists(self.code_uid):
             self.note = WidgetsManager.get_widget(self.code_uid)
-            if self.note.value != text: 
+            if self.note.value != text:
                 self.note.value = text
         else:
             self.note = NoteText(text)
@@ -36,7 +36,7 @@ class Note:
         return "mercury.Note"
 
     def _repr_mimebundle_(self, **kwargs):
-        
+
         data = {}
 
         view = {
@@ -48,5 +48,5 @@ class Note:
         data["application/mercury+json"] = json.dumps(view, indent=4)
 
         data["text/markdown"] = self.note.value
-        
+
         return data

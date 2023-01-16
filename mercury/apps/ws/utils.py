@@ -82,6 +82,12 @@ def parse_params(nb, params={}):
                         params["schedule"] = view.get("schedule")
                     if view.get("notify") is not None:
                         params["notify"] = json.loads(view.get("notify"))
+                    if view.get("continuous_update") is not None:
+                        params["continuous_update"] = view.get("continuous_update")
+                    if view.get("static_notebook") is not None:
+                        params["static_notebook"] = view.get("static_notebook")
+                        
+
                 else:
                     params["params"][widget_key] = WidgetsManager.frontend_format(view)
 
@@ -94,6 +100,12 @@ def parse_params(nb, params={}):
             params["show-code"] = False
         if params.get("show-prompt") is None:
             params["show-prompt"] = False
+        if params.get("continuous_update") is None:
+            params["continuous_update"] = True
+        if params.get("static_notebook") is None:
+            params["static_notebook"] = False
+        if params.get("share") is None:
+            params["share"] = "public"
 
     if no_outputs:
         params["version"] = "2"
