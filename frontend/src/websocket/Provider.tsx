@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import {
   getSelectedNotebookId,
   hideWidgets,
+  isStaticNotebook,
   updateWidgetsParams,
 } from "../components/Notebooks/notebooksSlice";
 import {
@@ -30,6 +31,8 @@ export default function WebSocketProvider({
 
   const dispatch = useDispatch();
   const selectedNotebookId = useSelector(getSelectedNotebookId);
+  const isStatic = useSelector(isStaticNotebook);
+
 
   let connection: WebSocket | undefined = undefined;
 
@@ -87,7 +90,11 @@ export default function WebSocketProvider({
   }
 
   function connect() {
-    if (selectedNotebookId !== undefined && connection === undefined) {
+    if (
+      !isStatic &&
+      selectedNotebookId !== undefined &&
+      connection === undefined
+    ) {
       connection = new WebSocket(
         `ws://127.0.0.1:8000/ws/client/${selectedNotebookId}/${getSessionId()}/`
       );

@@ -132,7 +132,7 @@ export default function SideBar({
   let widgets = [];
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
 
-  if (widgetsParams) {
+  if (widgetsParams && !staticNotebook) {
     // sort widgets keys based on cell index and code line number
     let widgetKeys = [];
     for (let key of Object.keys(widgetsParams)) {
@@ -474,18 +474,21 @@ export default function SideBar({
         <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
         <div>
           {!watchMode && <SelectExecutionHistory disabled={waiting} />}
-          <button
-            className="btn btn-sm btn-outline-danger"
-            onClick={() => {
-              dispatch(clearTasks(notebookId));
-              dispatch(fetchNotebook(notebookId));
-            }}
-            style={{ border: "none" }}
-            disabled={waiting}
-            title="Click to clear all previous runs of the notebook"
-          >
-            <i className="fa fa-times-circle" aria-hidden="true"></i> Clear runs
-          </button>
+          {!staticNotebook && (
+            <button
+              className="btn btn-sm btn-outline-danger"
+              onClick={() => {
+                dispatch(clearTasks(notebookId));
+                dispatch(fetchNotebook(notebookId));
+              }}
+              style={{ border: "none" }}
+              disabled={waiting}
+              title="Click to clear all previous runs of the notebook"
+            >
+              <i className="fa fa-times-circle" aria-hidden="true"></i> Clear
+              runs
+            </button>
+          )}
         </div>
         {showFiles && (
           <div>
@@ -518,7 +521,7 @@ export default function SideBar({
             </button>
           </div>
         )}
-        {notebookId !== undefined && (
+        {notebookId !== undefined && !staticNotebook && (
           <div>
             <hr />
             <div style={{ paddingLeft: "10px" }}>

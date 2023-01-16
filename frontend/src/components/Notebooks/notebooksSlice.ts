@@ -278,6 +278,13 @@ export const getSelectedNotebook = (state: RootState) =>
   state.notebooks.selectedNotebook;
 export const getSelectedNotebookId = (state: RootState) =>
   state.notebooks.selectedNotebookId;
+export const isStaticNotebook = (state: RootState) => {
+  let st = state.notebooks.selectedNotebook?.params?.static_notebook;
+  if(st === undefined) {
+    return false;
+  }
+  return st;
+}
 export const getLoadingStateSelected = (state: RootState) =>
   state.notebooks.loadingStateSelected;
 export const getWatchModeCounter = (state: RootState) =>
