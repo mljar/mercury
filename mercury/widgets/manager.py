@@ -152,6 +152,12 @@ class WidgetsManager:
                 "step": output.get("step", 1),
                 "label": output.get("label", ""),
             }
+        elif widget_type == "Note":
+            return {
+                "output": "markdown",
+                "value": output.get("value", ""),
+            }
+
 
         return {}
 

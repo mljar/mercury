@@ -51,7 +51,6 @@ class Range:
         return "mercury.Range"
 
     def __repr__(self):
-
         return "mercury.Range"
 
     def _repr_mimebundle_(self, **kwargs):

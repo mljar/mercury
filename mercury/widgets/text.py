@@ -24,12 +24,12 @@ class Text:
     def value(self):
         return self.text.value
 
-    @value.setter
-    def value(self, v):
-        self.text.value = v
+    #@value.setter
+    #def value(self, v):
+    #    self.text.value = v
 
     def __str__(self):
-        return "m.Text"
+        return "mercury.Text"
 
     def __repr__(self):
 

@@ -135,8 +135,11 @@ export default function SideBar({
     });
 
     for (let wKey of widgetKeys) {
+      
       const key = wKey[0] as string;
       const widgetParams = widgetsParams[key];
+      
+      console.log(key);
 
       if (isSelectWidget(widgetParams)) {
         widgets.push(

@@ -19,7 +19,7 @@ import {
   isRangeWidget,
   isCheckboxWidget,
   isNumericWidget,
-  ISliderWidget,
+  isMarkdownWidget,
 } from "../Widgets/Types";
 //import { setWidgetValue } from '../Widgets/widgetsSlice';
 import { getWindowDimensions } from "../WindowDimensions";
@@ -215,6 +215,11 @@ const notebooksSlice = createSlice({
             }
             if (widget.label !== action.payload.label) {
               widget.label = action.payload.label;
+              updated = true;
+            }
+          } else if (isMarkdownWidget(widget)) {
+            if (widget.value !== action.payload.value) {
+              widget.value = action.payload.value;
               updated = true;
             }
           }

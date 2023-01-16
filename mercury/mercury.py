@@ -27,6 +27,7 @@ from widgets.checkbox import Checkbox
 from widgets.numeric import Numeric
 from widgets.multiselect import MultiSelect
 from widgets.outputdir import OutputDir
+from widgets.note import Note
 
 
 def main():
