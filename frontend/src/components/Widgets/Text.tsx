@@ -39,7 +39,12 @@ export default function TextWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`textarea-${label}`}>{label}</label>
+      <label
+        htmlFor={`textarea-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
       {rowsValue === 1 && (
         <input
           className="form-control"

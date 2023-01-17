@@ -56,7 +56,12 @@ export default function SliderWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`slider-${label}`}>{label}</label>
+      <label
+        htmlFor={`slider-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
 
       <div
         style={{

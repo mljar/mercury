@@ -134,6 +134,7 @@ class NBWorker(WSClient):
 
                 self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
 
+            '''
                 print(self.nb.cells[i - 1])
 
                 for output in self.nb.cells[i - 1].get("outputs", []):
@@ -171,7 +172,8 @@ class NBWorker(WSClient):
             if hide_widgets:
                 msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
                 self.ws.send(json.dumps(msg))
-
+            '''
+            self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())    
             self.prev_nb = copy.deepcopy(self.nb)
         else:
             log.debug("Skip nb execution, no changes in widgets")

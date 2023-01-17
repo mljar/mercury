@@ -58,7 +58,12 @@ export default function RangeWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`range-slider-${label}`}>{label}</label>
+      <label
+        htmlFor={`range-slider-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
 
       <div
         style={{

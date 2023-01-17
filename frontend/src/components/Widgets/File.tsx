@@ -47,7 +47,12 @@ export default function FileWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`file-${label}`}>{label}</label>
+      <label
+        htmlFor={`file-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
       <div>
         <FilePond
           disabled={disabled}

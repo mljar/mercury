@@ -43,7 +43,11 @@ export default function CheckboxWidget({
         }}
         checked={value != null ? value : false}
       />
-      <label className="form-check-label" htmlFor={`checkbox-${label}`}>
+      <label
+        className="form-check-label"
+        htmlFor={`checkbox-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
         {label}
       </label>
     </div>

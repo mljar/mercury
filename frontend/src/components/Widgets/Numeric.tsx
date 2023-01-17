@@ -56,7 +56,12 @@ export default function NumericWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`checkbox-${label}`}>{label}</label>
+      <label
+        htmlFor={`checkbox-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
       <input
         className="form-control"
         type="number"

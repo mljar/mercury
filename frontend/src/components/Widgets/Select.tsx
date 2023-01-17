@@ -74,7 +74,12 @@ export default function SelectWidget({
 
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`select-${label}`}>{label}</label>
+      <label
+        htmlFor={`select-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
       <Select
         id={`select-${label}`}
         isDisabled={disabled}
