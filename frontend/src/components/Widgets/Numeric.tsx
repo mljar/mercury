@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../Notebooks/notebooksSlice";
+import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type NumericProps = {
   widgetKey: string;
@@ -10,6 +10,7 @@ type NumericProps = {
   max: number | null;
   step: number | null;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function NumericWidget({
@@ -20,8 +21,10 @@ export default function NumericWidget({
   max,
   step,
   disabled,
+  runNb,
 }: NumericProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
 
   let minValue = undefined;
   let maxValue = undefined;
@@ -41,6 +44,16 @@ export default function NumericWidget({
     displayValue = value;
   }
 
+  useEffect(() => {
+    if (!updated) return;
+    const timeOutId = setTimeout(() => {
+      console.log("run from numeric");
+      runNb();
+    }, RUN_DELAY);
+    return () => clearTimeout(timeOutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`checkbox-${label}`}>{label}</label>
@@ -49,9 +62,11 @@ export default function NumericWidget({
         type="number"
         value={displayValue as number | string}
         onChange={(e) => {
+          userInteraction(true);
           dispatch(setWidgetValue({ key: widgetKey, value: e.target.value }));
         }}
         onBlur={(e) => {
+          userInteraction(true);
           if (min && value && value < min) {
             dispatch(setWidgetValue({ key: widgetKey, value: min }));
           }

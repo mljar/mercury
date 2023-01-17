@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
 
@@ -20,6 +20,7 @@ export default function TextWidget({
   runNb,
 }: TextProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
   let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (input_string: string) => {
@@ -27,12 +28,13 @@ export default function TextWidget({
   };
 
   useEffect(() => {
+    if (!updated) return;
     const timeOutId = setTimeout(() => {
-      console.log(value);
+      // console.log("run from text");
       runNb();
     }, RUN_DELAY);
     return () => clearTimeout(timeOutId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -51,6 +53,7 @@ export default function TextWidget({
                 value: sanitizeString(e.target.value),
               })
             );
+            userInteraction(true);
           }}
           disabled={disabled}
         />

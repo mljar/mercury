@@ -32,6 +32,7 @@ import {
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
   getWidgetsValues,
+  RUN_DELAY,
   setSlidesHash,
   setWidgetValue,
 } from "./Notebooks/notebooksSlice";
@@ -91,12 +92,19 @@ export default function SideBar({
 
   const ws = useContext(WebSocketContext);
 
+  // useEffect(() => {
+  //   const timeOutId = setTimeout(() => {
+  //     console.log("effect widgets values");
+  //   }, RUN_DELAY);
+  //   return () => clearTimeout(timeOutId);
+  // }, [widgetsValues]);
+
   const runNb = () => {
     if (!staticNotebook) {
       const slidesHash = scrapeSlidesHash();
       dispatch(setSlidesHash(slidesHash));
 
-      console.log("***** runNb *****");
+      console.log("***** runNb ***** ????????????????");
       ws.sendMessage(
         JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
       );
@@ -161,6 +169,7 @@ export default function SideBar({
             choices={widgetParams?.choices}
             multi={widgetParams?.multi}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isCheckboxWidget(widgetParams)) {
@@ -171,6 +180,7 @@ export default function SideBar({
             label={widgetParams?.label}
             value={widgetsValues[key] as boolean}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isNumericWidget(widgetParams)) {
@@ -184,6 +194,7 @@ export default function SideBar({
             max={widgetParams?.max}
             step={widgetParams?.step}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isSliderWidget(widgetParams)) {
@@ -213,6 +224,7 @@ export default function SideBar({
             step={widgetParams?.step}
             vertical={widgetParams?.vertical}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isFileWidget(widgetParams)) {
@@ -223,6 +235,8 @@ export default function SideBar({
             label={widgetParams?.label}
             maxFileSize={widgetParams?.maxFileSize}
             key={key}
+            value={widgetsValues[key] as string[]}
+            runNb={runNb}
           />
         );
         fileKeys.push(key);
@@ -240,7 +254,11 @@ export default function SideBar({
         );
       } else if (isMarkdownWidget(widgetParams)) {
         widgets.push(
-          <MarkdownWidget value={widgetParams.value as string} key={key} />
+          <MarkdownWidget
+            value={widgetParams.value as string}
+            disabled={waiting}
+            key={key}
+          />
         );
       } else if (isButtonWidget(widgetParams)) {
         widgets.push(
@@ -254,28 +272,30 @@ export default function SideBar({
             runNb={runNb}
           />
         );
+      } else if (isOutputFilesWidget(widgetParams)) {
+        // do nothing
       } else {
         console.log("Unknown widget type", widgetParams);
       }
     }
   }
 
-  const allFilesUploaded = () => {
-    if (fileKeys.length === 0) {
-      // no files at all, so OK
-      return true;
-    }
-    for (const key of fileKeys) {
-      if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
-        return false;
-      }
-      let files = widgetsValues[key] as string[];
-      if (files === undefined || files.length === 0) {
-        return false;
-      }
-    }
-    return true;
-  };
+  // const allFilesUploaded = () => {
+  //   if (fileKeys.length === 0) {
+  //     // no files at all, so OK
+  //     return true;
+  //   }
+  //   for (const key of fileKeys) {
+  //     if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
+  //       return false;
+  //     }
+  //     let files = widgetsValues[key] as string[];
+  //     if (files === undefined || files.length === 0) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
 
   let additionalStyle = {};
   if (displayEmbed) {
@@ -371,12 +391,12 @@ export default function SideBar({
                 </div>
               </div>
 
-              {fileKeys && !allFilesUploaded() && (
+              {/* {fileKeys && !allFilesUploaded() && (
                 <div className="alert alert-danger mb-3" role="alert">
                   <i className="fa fa-file" aria-hidden="true"></i> Please
                   upload all required files.
                 </div>
-              )}
+              )} */}
 
               {/* {notebookTitle === "Please provide title" && (
                 <div className="alert alert-warning mb-3" role="alert">

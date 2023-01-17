@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setWidgetValue } from "../Notebooks/notebooksSlice";
@@ -19,6 +19,8 @@ type FileProps = {
   label: string | null;
   maxFileSize: string | null;
   disabled: boolean;
+  value: string[];
+  runNb: () => void;
 };
 
 export default function FileWidget({
@@ -26,12 +28,23 @@ export default function FileWidget({
   label,
   maxFileSize,
   disabled,
+  value,
+  runNb,
 }: FileProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
   let fileSizeLimit = "100MB";
   if (maxFileSize) {
     fileSizeLimit = maxFileSize;
   }
+  useEffect(() => {
+    if (updated && value.length === 2) {
+      console.log("run from file");
+      runNb();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`file-${label}`}>{label}</label>
@@ -40,6 +53,7 @@ export default function FileWidget({
           disabled={disabled}
           maxFileSize={fileSizeLimit}
           onprocessfile={(error, file) => {
+            userInteraction(true);
             dispatch(
               setWidgetValue({
                 key: widgetKey,

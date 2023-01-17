@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../Notebooks/notebooksSlice";
+import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
 
 type RangeProps = {
@@ -12,6 +12,7 @@ type RangeProps = {
   step: number | null;
   vertical: boolean | null;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function RangeWidget({
@@ -23,9 +24,10 @@ export default function RangeWidget({
   step,
   vertical,
   disabled,
+  runNb,
 }: RangeProps) {
   const dispatch = useDispatch();
-
+  const [updated, userInteraction] = useState(false);
   let minValue = 0;
   let maxValue = 100;
   let stepValue = 1;
@@ -43,6 +45,17 @@ export default function RangeWidget({
     value != null && value !== undefined && value.length === 2
       ? value
       : [minValue, maxValue];
+
+  useEffect(() => {
+    if (!updated) return;
+    const timeOutId = setTimeout(() => {
+      // console.log("run from range");
+      runNb();
+    }, RUN_DELAY);
+    return () => clearTimeout(timeOutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
       <label htmlFor={`range-slider-${label}`}>{label}</label>
@@ -62,6 +75,7 @@ export default function RangeWidget({
           min={minValue}
           max={maxValue}
           onChange={(values) => {
+            userInteraction(true);
             dispatch(
               setWidgetValue({
                 key: widgetKey,

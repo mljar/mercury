@@ -95,7 +95,7 @@ class NBWorker(WSClient):
                     f'WidgetsManager.update("{widget_key}", field="filename", new_value="{value[0]}")\n'
                     f'WidgetsManager.update("{widget_key}", field="filepath", new_value="{value[1]}")\n'
                 )
-            if widget_type == "OutputDir":
+            elif widget_type == "OutputDir":
 
                 sm = StorageManager(self.session_id, self.worker_id)
                 output_dir = sm.worker_output_dir()

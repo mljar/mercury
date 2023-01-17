@@ -87,7 +87,6 @@ const notebooksSlice = createSlice({
     ) {
       const { key, value } = action.payload;
       state.widgets[key] = value;
-
       console.log({ key, value });
     },
     clearWidgets(state) {
@@ -224,7 +223,7 @@ const notebooksSlice = createSlice({
               updated = true;
             }
           } else if (isButtonWidget(widget)) {
-            
+
             state.widgets[key] = action.payload.value;
 
             if (widget.label !== action.payload.label) {
@@ -280,7 +279,7 @@ export const getSelectedNotebookId = (state: RootState) =>
   state.notebooks.selectedNotebookId;
 export const isStaticNotebook = (state: RootState) => {
   let st = state.notebooks.selectedNotebook?.params?.static_notebook;
-  if(st === undefined) {
+  if (st === undefined) {
     return false;
   }
   return st;

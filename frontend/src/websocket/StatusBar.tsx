@@ -80,8 +80,6 @@ export default function StatusBar() {
           </svg> Busy
         </span>
       )}
-      <p>{wsStatus}</p>
-      <p>{workerState}</p>
     </div>
   );
 }

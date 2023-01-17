@@ -37,12 +37,10 @@ export default function ButtonWidget({
   }
 
   useEffect(() => {
-
-    //runNb();
-    //const timeOutId = setTimeout(() => {
-    //  runNb();
-    //}, RUN_DELAY_FAST);
-    //return () => clearTimeout(timeOutId);
+    if (value) {
+      console.log("run from button");
+      runNb();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
@@ -59,7 +57,6 @@ export default function ButtonWidget({
               value: true,
             })
           );
-          runNb();
         }}
         disabled={disabled}
       >

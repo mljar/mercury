@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select, { MultiValue } from "react-select";
 import { RUN_DELAY_FAST, setWidgetValue } from "../Notebooks/notebooksSlice";
@@ -20,6 +20,7 @@ type SelectProps = {
   choices: string[];
   multi: boolean | undefined;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function SelectWidget({
@@ -29,8 +30,10 @@ export default function SelectWidget({
   choices,
   multi,
   disabled,
+  runNb,
 }: SelectProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
 
   const selectStyles = {
     menu: (base: any) => ({
@@ -60,10 +63,13 @@ export default function SelectWidget({
   }
 
   useEffect(() => {
+    if (!updated) return;
     const timeOutId = setTimeout(() => {
-      console.log(value);
+      // console.log("run from select");
+      runNb();
     }, RUN_DELAY_FAST);
     return () => clearTimeout(timeOutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -79,6 +85,7 @@ export default function SelectWidget({
         isMulti={multi}
         onChange={(e) => {
           if (e) {
+            userInteraction(true);
             if (isSingleOption(e)) {
               dispatch(setWidgetValue({ key: widgetKey, value: e.value }));
             } else {

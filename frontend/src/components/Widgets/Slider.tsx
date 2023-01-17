@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
@@ -28,6 +28,7 @@ export default function SliderWidget({
   runNb,
 }: SliderProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
 
   let minValue = 0;
   let maxValue = 100;
@@ -44,12 +45,13 @@ export default function SliderWidget({
   const vals: number[] = [value !== null ? value : maxValue];
 
   useEffect(() => {
+    if (!updated) return;
     const timeOutId = setTimeout(() => {
-      console.log(value);
+      // console.log("run from slider");
       runNb();
     }, RUN_DELAY);
     return () => clearTimeout(timeOutId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -72,6 +74,7 @@ export default function SliderWidget({
           max={maxValue}
           onChange={(values) => {
             dispatch(setWidgetValue({ key: widgetKey, value: values[0] }));
+            userInteraction(true);
           }}
           renderTrack={({ props, children }) => (
             <div

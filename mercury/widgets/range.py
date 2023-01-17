@@ -45,7 +45,7 @@ class Range:
 
     @property
     def value(self):
-        return self.range.value
+        return list(self.range.value)
 
     def __str__(self):
         return "mercury.Range"
