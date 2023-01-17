@@ -67,15 +67,12 @@ class WSClient(DBClient):
     def send_state(self):
         try:
             log.debug(f"Send state {self.worker_state()}")
-            self.ws.send(
-                json.dumps(
-                    {
-                        "purpose": Purpose.WorkerState,
-                        "state": self.worker_state(),
-                        "workerId": self.worker_id,
-                    }
-                )
-            )
+            msg = {
+                "purpose": Purpose.WorkerState,
+                "state": self.worker_state(),
+                "workerId": self.worker_id,
+            }
+            self.ws.send(json.dumps(msg))
         except Exception as e:
             log.exception("Exception when send state")
 

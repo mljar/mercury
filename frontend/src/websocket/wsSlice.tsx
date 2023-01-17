@@ -2,8 +2,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-
-
 export enum WebSocketState {
   Connecting = "Connecting",
   Connected = "Connected",
@@ -17,6 +15,7 @@ export enum WorkerState {
   Running = "Running",
   Missing = "Missing",
   Busy = "Busy",
+  Queued = "Queued",
 }
 
 const initialState = {
@@ -54,14 +53,12 @@ export const {
   setNotebookSrc,
 } = wsSlice.actions;
 
-export const getWebSocketState = (state: RootState) =>
-  state.ws.webSocketState;
+export const getWebSocketState = (state: RootState) => state.ws.webSocketState;
 export const getWorkerState = (state: RootState) => state.ws.workerState;
 export const getWorkerId = (state: RootState) => state.ws.workerId;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
 
 export const runNotebook = (widgets_params: string) => {
-  
   return {
     purpose: "run-notebook",
     widgets: widgets_params,

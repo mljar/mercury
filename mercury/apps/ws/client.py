@@ -108,7 +108,7 @@ class ClientProxy(WebsocketConsumer):
                 },
             )
 
-        # clearn stale workers
+        # clear stale workers
         workers = Worker.objects.filter(
             updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
         )

@@ -32,7 +32,6 @@ class NBWorker(WSClient):
         while True:
             item = self.queue.get()
             log.debug(f"Porcess msg {item}")
-            self.update_worker_state(WorkerState.Running)
             json_data = json.loads(item)
 
             if json_data.get("purpose", "") == Purpose.InitNotebook:
@@ -47,10 +46,10 @@ class NBWorker(WSClient):
                 self.delete_worker()
                 sys.exit(1)
 
-            self.update_worker_state(WorkerState.Running)
             self.queue.task_done()
 
     def worker_pong(self):
+        self.update_worker_state(WorkerState.Running)
         if self.worker_exists():
             self.send_state()
 
@@ -71,6 +70,7 @@ class NBWorker(WSClient):
         #    fout.write(body)
 
         self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
+        self.update_worker_state(WorkerState.Running)
 
     def update_nb(self, widgets):
         log.debug(f"Update nb {widgets}")
@@ -230,3 +230,4 @@ class NBWorker(WSClient):
         self.nb = copy.deepcopy(self.nb_original)
 
         self.send_widgets(self.nb, expected_widgets_keys=[])
+        self.update_worker_state(WorkerState.Running)

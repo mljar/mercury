@@ -41,7 +41,7 @@ import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
-import { getWorkerId } from "../websocket/wsSlice";
+import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -66,17 +66,16 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const showSideBar = useSelector(getShowSideBar);
   const exportingToPDF = useSelector(getExportingToPDF);
   const workerId = useSelector(getWorkerId);
-
-  console.log("**********");
-  if (notebook) {
-    console.log(notebook?.params?.continuous_update);
-    console.log(notebook?.params?.static_notebook);
-  }
+  const workerState = useSelector(getWorkerState);
 
   const waitForTask = () => {
     if (task.state && task.state === "CREATED") return true;
     if (task.state && task.state === "RECEIVED") return true;
     return false;
+  };
+
+  const pleaseWait = () => {
+    return workerState !== WorkerState.Running;
   };
 
   const isWatchMode = () => {
@@ -214,7 +213,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 notebookSchedule={notebook.schedule}
                 taskCreatedAt={task.created_at}
                 loadingState={loadingState}
-                waiting={waitForTask()}
+                waiting={pleaseWait()} // {waitForTask()}
                 widgetsParams={notebook?.params?.params}
                 watchMode={isWatchMode()}
                 notebookPath={notebookPath}
@@ -264,7 +263,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 loadingState={loadingState}
                 notebookPath={notebookPath}
                 errorMsg={errorMsg}
-                waiting={waitForTask()}
+                waiting={pleaseWait()} // {waitForTask()}
                 watchMode={isWatchMode()}
                 displayEmbed={displayEmbed}
                 isPro={isPro}
@@ -280,7 +279,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               <FilesView
                 files={outputFiles}
                 filesState={outputFilesState}
-                waiting={waitForTask()}
+                waiting={pleaseWait()} // {waitForTask()}
               />
             )}
           </div>

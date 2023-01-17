@@ -96,6 +96,7 @@ export default function SideBar({
       const slidesHash = scrapeSlidesHash();
       dispatch(setSlidesHash(slidesHash));
 
+      console.log("***** runNb *****");
       ws.sendMessage(
         JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
       );
@@ -377,7 +378,7 @@ export default function SideBar({
                 </div>
               )}
 
-              {notebookTitle === "Please provide title" && (
+              {/* {notebookTitle === "Please provide title" && (
                 <div className="alert alert-warning mb-3" role="alert">
                   <i
                     className="fa fa-exclamation-triangle"
@@ -413,7 +414,7 @@ export default function SideBar({
                     <i className="fa fa-book" aria-hidden="true"></i> Read more
                   </button>
                 </div>
-              )}
+              )} */}
 
               {notebookSchedule !== "" && (
                 <div className="alert alert-success mb-3" role="alert">
@@ -436,14 +437,36 @@ export default function SideBar({
                 </div>
               )}
 
-              {waiting && (
-                <div className="alert alert-primary mb-3" role="alert">
+              {continuousUpdate && (
+                <div>
+                  {/* add some space */}
+                  <br />
+                </div>
+              )}
+
+              {waiting && workerState === WorkerState.Busy && (
+                <div className="alert alert-success mb-3 mt-3" role="alert">
                   <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is
                   executed. Please wait.
                 </div>
               )}
+
+              {waiting &&
+                (workerState === WorkerState.Unknown ||
+                  workerState === WorkerState.Queued) && (
+                  <div className="alert alert-warning mb-3 mt-3" role="alert">
+                    <i className="fa fa-cogs" aria-hidden="true"></i> Waiting
+                    for worker ...
+                  </div>
+                )}
+              {waiting && workerState === WorkerState.Starting && (
+                <div className="alert alert-success mb-3 mt-3" role="alert">
+                  <i className="fa fa-cogs" aria-hidden="true"></i> Initializing
+                  worker ...
+                </div>
+              )}
               {watchMode && (
-                <div className="alert alert-secondary mb-3" role="alert">
+                <div className="alert alert-secondary mb-3 mt-3" role="alert">
                   <i className="fa fa-refresh" aria-hidden="true"></i> Notebook
                   in watch mode. All changes to Notebook will be automatically
                   visible in Mercury.
@@ -476,7 +499,7 @@ export default function SideBar({
             </form>
           </div>
 
-          <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
+          <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
           <div>
             {!watchMode && <SelectExecutionHistory disabled={waiting} />}
             {!staticNotebook && (
