@@ -45,7 +45,11 @@ class NBWorker(WSClient):
                 self.prev_update_time is not None
                 and self.prev_update_time != current_update_time
             ):
-                log.debug("File update!")
+                log.debug("Notebook file changed!")
+                msg = json.dumps({
+                    "purpose": Purpose.InitNotebook
+                })
+                self.queue.put(msg)
 
             self.prev_update_time = current_update_time
             time.sleep(0.25)
