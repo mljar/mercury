@@ -40,6 +40,7 @@ class App:
     def _repr_mimebundle_(self, **kwargs):
         data = {}
         data["text/plain"] = repr(self)
+        data["text/html"] = "<h3>Mercury Application</h3><small>This output won't appear in the web app.</small>"
         view = {
             "widget": "App",
             "title": self.title,
