@@ -12,6 +12,7 @@ from apps.nbworker.utils import Purpose, WorkerState
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
 from apps.ws.utils import parse_params
+from apps.tasks.models import Task
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -23,10 +24,13 @@ class NBWorker(WSClient):
         super(NBWorker, self).__init__(ws_address, notebook_id, session_id, worker_id)
 
         self.prev_nb = None
+        self.prev_widgets = {}
+        self.prev_body = ""
 
         threading.Thread(target=self.process_msgs, daemon=True).start()
 
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
+
 
     def process_msgs(self):
         while True:
@@ -38,6 +42,10 @@ class NBWorker(WSClient):
                 self.init_notebook()
             elif json_data.get("purpose", "") == Purpose.RunNotebook:
                 self.run_notebook(json_data)
+            elif json_data.get("purpose", "") == Purpose.SaveNotebook:
+                self.save_notebook()
+            elif json_data.get("purpose", "") == Purpose.DisplayNotebook:
+                self.display_notebook(json_data)
             elif json_data.get("purpose", "") == Purpose.ClearSession:
                 self.init_notebook()
             elif json_data.get("purpose", "") == Purpose.WorkerPing:
@@ -71,12 +79,14 @@ class NBWorker(WSClient):
 
         self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
         self.update_worker_state(WorkerState.Running)
+        self.prev_body = copy.deepcopy(body)
 
     def update_nb(self, widgets):
         log.debug(f"Update nb {widgets}")
 
         index_execute_from = 1
         # fill notebook with widgets values
+        self.prev_widgets = copy.deepcopy(widgets)
         for widget_key in widgets.keys():
             value = widgets[widget_key]
 
@@ -134,7 +144,7 @@ class NBWorker(WSClient):
 
                 self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
 
-            '''
+            """
                 print(self.nb.cells[i - 1])
 
                 for output in self.nb.cells[i - 1].get("outputs", []):
@@ -172,8 +182,8 @@ class NBWorker(WSClient):
             if hide_widgets:
                 msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
                 self.ws.send(json.dumps(msg))
-            '''
-            self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())    
+            """
+            self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())
             self.prev_nb = copy.deepcopy(self.nb)
         else:
             log.debug("Skip nb execution, no changes in widgets")
@@ -233,3 +243,31 @@ class NBWorker(WSClient):
 
         self.send_widgets(self.nb, expected_widgets_keys=[])
         self.update_worker_state(WorkerState.Running)
+
+    def save_notebook(self):
+        log.debug(f"Save notebook")
+        # save nb in HTML
+        if self.is_presentation():
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+        else:
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+
+        sm = StorageManager(self.session_id, self.worker_id)
+        nb_path = sm.save_nb_html(nb_body)
+
+        # create task with path to HTML file
+        task = Task.objects.create(
+            task_id=f"worker-{self.worker_id}",
+            session_id=self.session_id,
+            notebook_id=self.notebook_id,
+            state="DONE",
+            params=json.dumps(self.prev_widgets),
+            result=nb_path,
+        )
+        log.debug(f"Task ({task.id}) created")
+
+        # send notice that nb saved
+        self.ws.send(json.dumps({"purpose": Purpose.SavedNotebook}))
+
+    def display_notebook(self, json_params):
+        log.debug(f"Display notebook ({json_params})")

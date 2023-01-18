@@ -12,6 +12,9 @@ class Purpose(str, Enum):
     WorkerState = "worker-state"
     InitNotebook = "init-notebook"
     RunNotebook = "run-notebook"
+    SaveNotebook = "save-notebook"
+    SavedNotebook = "saved-notebook"
+    DisplayNotebook = "display-notebook"
     ClearSession = "clear-session"
     CloseWorker = "close-worker"
 

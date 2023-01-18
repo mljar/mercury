@@ -59,6 +59,16 @@ class ClientProxy(WebsocketConsumer):
                 self.worker_group,
                 {"type": "broadcast_message", "payload": json_data},
             )
+        if json_data.get("purpose", "") == "save-notebook":
+            async_to_sync(self.channel_layer.group_send)(
+                self.worker_group,
+                {"type": "broadcast_message", "payload": json_data},
+            )
+        if json_data.get("purpose", "") == "display-notebook":
+            async_to_sync(self.channel_layer.group_send)(
+                self.worker_group,
+                {"type": "broadcast_message", "payload": json_data},
+            )
 
     def broadcast_message(self, event):
         payload = event["payload"]

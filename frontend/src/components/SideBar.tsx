@@ -46,7 +46,13 @@ import SelectExecutionHistory from "./SelectExecutionHistory";
 
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
-import { getWorkerState, runNotebook, WorkerState } from "../websocket/wsSlice";
+import {
+  displayNotebook,
+  getWorkerState,
+  runNotebook,
+  saveNotebook,
+  WorkerState,
+} from "../websocket/wsSlice";
 import ButtonWidget from "./Widgets/Button";
 import RunButton from "./RunButton";
 import BlockUi from "react-block-ui";
@@ -108,6 +114,20 @@ export default function SideBar({
       ws.sendMessage(
         JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
       );
+    }
+  };
+
+  const saveNb = () => {
+    if (!staticNotebook) {
+      console.log("$$$$$$$$$$$ saveNb $$$$$$$$$$$$$$$$$$$$$");
+      ws.sendMessage(JSON.stringify(saveNotebook()));
+    }
+  };
+
+  const displayNb = (taskId: number) => {
+    if (!staticNotebook) {
+      console.log(">>>>>>>>>>>> displayNb >>>>>>>>>>>>>>>>");
+      ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
     }
   };
 
@@ -521,21 +541,34 @@ export default function SideBar({
 
           <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
           <div>
-            {!watchMode && <SelectExecutionHistory disabled={waiting} />}
+            {!watchMode && <SelectExecutionHistory disabled={waiting} displayNb={displayNb} />}
             {!staticNotebook && (
-              <button
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => {
-                  dispatch(clearTasks(notebookId));
-                  dispatch(fetchNotebook(notebookId));
-                }}
-                style={{ border: "none" }}
-                disabled={waiting}
-                title="Click to clear all previous runs of the notebook"
-              >
-                <i className="fa fa-times-circle" aria-hidden="true"></i> Clear
-                runs
-              </button>
+              <div>
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => {
+                    saveNb();
+                  }}
+                  style={{ border: "none" }}
+                  disabled={waiting}
+                  title="Click to save current run"
+                >
+                  <i className="fa fa-floppy-o" aria-hidden="true"></i> Save run
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => {
+                    dispatch(clearTasks(notebookId));
+                    dispatch(fetchNotebook(notebookId));
+                  }}
+                  style={{ border: "none" }}
+                  disabled={waiting}
+                  title="Click to clear all previous runs of the notebook"
+                >
+                  <i className="fa fa-times-circle" aria-hidden="true"></i>{" "}
+                  Delete runs
+                </button>
+              </div>
             )}
           </div>
           {showFiles && (

@@ -17,6 +17,7 @@ import {
 
 import { useSelector } from "react-redux";
 import { getSessionId } from "../utils";
+import { fetchExecutionHistory } from "../tasks/tasksSlice";
 
 const WebSocketContext = createContext(undefined as any);
 
@@ -32,7 +33,6 @@ export default function WebSocketProvider({
   const dispatch = useDispatch();
   const selectedNotebookId = useSelector(getSelectedNotebookId);
   const isStatic = useSelector(isStaticNotebook);
-
 
   let connection: WebSocket | undefined = undefined;
 
@@ -58,6 +58,10 @@ export default function WebSocketProvider({
         dispatch(setWorkerId(response.workerId));
       } else if (response.purpose === "executed-notebook") {
         dispatch(setNotebookSrc(response.body));
+      } else if (response.purpose === "saved-notebook") {
+        if (selectedNotebookId !== undefined) {
+          dispatch(fetchExecutionHistory(selectedNotebookId, false));
+        }
       } else if (response.purpose === "update-widgets") {
         dispatch(updateWidgetsParams(response));
       } else if (response.purpose === "hide-widgets") {

@@ -64,3 +64,16 @@ export const runNotebook = (widgets_params: string) => {
     widgets: widgets_params,
   };
 };
+
+export const saveNotebook = () => {
+  return {
+    purpose: "save-notebook",
+  };
+};
+
+export const displayNotebook = (taskId: number) => {
+  return {
+    purpose: "display-notebook",
+    taskId,
+  };
+};

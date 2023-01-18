@@ -24,6 +24,7 @@ export interface ITask {
 const initialState = {
     currentTask: {} as ITask,
     historicTask: {} as ITask,
+    showCurrent: true,
     previousTask: {} as ITask,
     exportingToPDF: false,
     exportToPDFJobId: '',
@@ -35,6 +36,9 @@ const tasksSlice = createSlice({
     name: 'tasks',
     initialState,
     reducers: {
+        setShowCurrent(state, action: PayloadAction<boolean>) {
+            state.showCurrent = action.payload;
+        },
         setCurrentTask(state, action: PayloadAction<ITask>) {
             state.currentTask = action.payload;
         },
@@ -76,6 +80,7 @@ const tasksSlice = createSlice({
 export default tasksSlice.reducer;
 
 export const {
+    setShowCurrent,
     setCurrentTask,
     setHistoricTask,
     setPreviousTask,
@@ -89,6 +94,7 @@ export const {
     clearExecutionHistory,
 } = tasksSlice.actions;
 
+export const getShowCurrent = (state: RootState) => state.tasks.showCurrent;
 export const getCurrentTask = (state: RootState) => state.tasks.currentTask;
 export const getHistoricTask = (state: RootState) => state.tasks.historicTask;
 export const getPreviousTask = (state: RootState) => state.tasks.previousTask;
@@ -226,7 +232,7 @@ export const fetchExecutionHistory =
         async (dispatch: Dispatch<AnyAction>) => {
 
             dispatch(setHistoricTask({} as ITask));
-            if(clearPreviousHistory) {
+            if (clearPreviousHistory) {
                 dispatch(clearExecutionHistory());
             }
 

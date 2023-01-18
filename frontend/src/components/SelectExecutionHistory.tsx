@@ -6,6 +6,7 @@ import {
   getCurrentTask,
   getExecutionHistory,
   getHistoricTask,
+  getShowCurrent,
   setHistoricTask,
 } from "../tasks/tasksSlice";
 //import { setWidgetValue } from "./Widgets/widgetsSlice";
@@ -15,15 +16,18 @@ type SingleOption = { value: string; label: string };
 
 type Props = {
   disabled: boolean;
+  displayNb: (taskId: number) => void;
 };
 
-export default function SelectExecutionHistory({ disabled }: Props) {
+export default function SelectExecutionHistory({ disabled, displayNb }: Props) {
   const dispatch = useDispatch();
   const executionHistory = useSelector(getExecutionHistory);
   const historicTask = useSelector(getHistoricTask);
   const currentTask = useSelector(getCurrentTask);
+  const showCurrent = useSelector(getShowCurrent);
 
   useEffect(() => {
+    /*
     if (executionHistory.length > 0) {
       let lastHistoricTask = executionHistory[executionHistory.length - 1];
 
@@ -36,7 +40,7 @@ export default function SelectExecutionHistory({ disabled }: Props) {
           }
         }
       }
-    }
+    }*/
   }, [dispatch, executionHistory, historicTask, currentTask]);
 
   if (executionHistory.length === 0) return <div></div>;
@@ -55,16 +59,16 @@ export default function SelectExecutionHistory({ disabled }: Props) {
     (run) => {
       let choice = `Run ${count}`;
       count += 1;
-      if (historicTask.id) {
-        if (historicTask.id && historicTask.id === run.id) {
-          selectedValue = { value: `${count - 2}`, label: choice };
-        }
-      } else {
+      if (!showCurrent) {
         selectedValue = { value: `${count - 2}`, label: choice };
       }
       return { value: `${count - 2}`, label: choice };
     }
   );
+  options.push({ value: "current", label: "Current" });
+  if (showCurrent) {
+    selectedValue = { value: "current", label: "Current" };
+  }
 
   return (
     <div>
@@ -80,15 +84,25 @@ export default function SelectExecutionHistory({ disabled }: Props) {
           isMulti={false}
           onChange={(e) => {
             if (e) {
-              let historical = executionHistory[parseInt(e.value)];
-              dispatch(setHistoricTask(historical));
-              for (let [key, value] of Object.entries(
-                JSON.parse(historical.params)
-              )) {
-                if (value !== null) {
-                  dispatch(setWidgetValue({ key, value }));
-                }
+              if (e.value === "current") {
+                displayNb(0);
+              } else {
+                let historical = executionHistory[parseInt(e.value)];
+                console.log(historical.id);
+                console.log(historical.params);
+
+                displayNb(historical.id);
+
               }
+              // let historical = executionHistory[parseInt(e.value)];
+              // dispatch(setHistoricTask(historical));
+              // for (let [key, value] of Object.entries(
+              //   JSON.parse(historical.params)
+              // )) {
+              //   if (value !== null) {
+              //     dispatch(setWidgetValue({ key, value }));
+              //   }
+              // }
             }
           }}
         />

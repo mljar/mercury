@@ -59,16 +59,21 @@ class Exporter:
 
         # remove header
         if not full_header:
-            index_start = body.find("<head>")
-            index_end = body.find("</head>")
+            body = self.remove_header(body)
 
-            if index_start != -1 and index_end != -1:
-                body = body[:index_start] + "" + body[index_end + 7 :]
+        return body
 
-                body = body.replace("<!DOCTYPE html>", "")
-                body = body.replace("<html>", "")
-                body = body.replace("<body ", "<div ")
-                body = body.replace("</body>", "</div>")
-                body = body.replace("</html>", "")
+    def remove_header(self, nb_body):
+        body = copy.deepcopy(nb_body)
+        index_start = body.find("<head>")
+        index_end = body.find("</head>")
 
+        if index_start != -1 and index_end != -1:
+            body = body[:index_start] + "" + body[index_end + 7 :]
+
+            body = body.replace("<!DOCTYPE html>", "")
+            body = body.replace("<html>", "")
+            body = body.replace("<body ", "<div ")
+            body = body.replace("</body>", "</div>")
+            body = body.replace("</html>", "")
         return body

@@ -1,6 +1,8 @@
 import logging
 import os
 import shutil
+import uuid
+from execnb.nbio import write_nb
 
 from django.conf import settings
 
@@ -66,3 +68,27 @@ class StorageManager:
                         f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{f}"
                     ]
         return files_urls
+
+    def save_nb(self, nb):
+        fpath = None
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            fpath = os.path.join(
+                self.worker_output_dir(), f"nb-{self.some_hash()}.ipynb"
+            )
+            write_nb(nb, fpath)
+        return fpath
+
+    def save_nb_html(self, nb_html):
+        fpath = None
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            fpath = os.path.join(
+                self.worker_output_dir(), f"nb-{self.some_hash()}.html"
+            )
+            with open(fpath, "w") as fout:
+                fout.write(nb_html)
+        return fpath
+
+
+    def some_hash(self):
+        h = uuid.uuid4().hex.replace("-", "")
+        return h[:8]
