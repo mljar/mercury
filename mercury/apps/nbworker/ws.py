@@ -7,7 +7,7 @@ import websocket
 
 from apps.nbworker.db import DBClient
 from apps.nbworker.utils import Purpose, WorkerState
-
+from apps.nbworker.utils import stop_event
 log = logging.getLogger(__name__)
 
 
@@ -47,6 +47,8 @@ class WSClient(DBClient):
         self.delete_stale_workers()
 
     def on_close(self, ws, close_status_code, close_msg):
+        global stop_event
+        stop_event.set()
         log.info(f"WS close connection, status={close_status_code}, msg={close_msg}")
 
     def on_pong(self, wsapp, msg):

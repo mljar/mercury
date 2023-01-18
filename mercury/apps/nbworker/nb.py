@@ -3,7 +3,10 @@ import json
 import logging
 import sys
 import threading
+import time
+import os
 
+from datetime import datetime
 from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
 
@@ -14,6 +17,7 @@ from apps.storage.storage import StorageManager
 from apps.tasks.export_pdf import to_pdf
 from apps.tasks.models import Task
 from apps.ws.utils import parse_params
+from apps.nbworker.utils import stop_event
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -27,13 +31,28 @@ class NBWorker(WSClient):
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""
-
+        self.prev_update_time = None 
         threading.Thread(target=self.process_msgs, daemon=True).start()
-
+        threading.Thread(target=self.nb_file_watch, daemon=True).start()
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
 
+    def nb_file_watch(self):
+        while not stop_event.is_set():
+            current_update_time = datetime.fromtimestamp(
+                os.path.getmtime(self.notebook.path)
+            )
+            if (
+                self.prev_update_time is not None
+                and self.prev_update_time != current_update_time
+            ):
+                log.debug("File update!")
+
+            self.prev_update_time = current_update_time
+            time.sleep(0.25)
+
     def process_msgs(self):
-        while True:
+        global stop_event
+        while not stop_event.is_set():
             item = self.queue.get()
             log.debug(f"Porcess msg {item}")
             json_data = json.loads(item)
@@ -51,6 +70,7 @@ class NBWorker(WSClient):
             elif json_data.get("purpose", "") == Purpose.WorkerPing:
                 self.worker_pong()
             elif json_data.get("purpose", "") == Purpose.CloseWorker:
+                stop_event.set()
                 self.delete_worker()
                 sys.exit(1)
             elif json_data.get("purpose", "") == Purpose.DownloadHTML:
@@ -245,8 +265,17 @@ class NBWorker(WSClient):
         log.debug(params)
         self.nb = copy.deepcopy(self.nb_original)
 
+        if self.is_presentation():
+            body = self.nbrun.export_html(self.nb, full_header=True)
+        else:
+            body = self.nbrun.export_html(self.nb, full_header=False)
+
+        self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
+        self.prev_body = copy.deepcopy(body)
+
         self.send_widgets(self.nb, expected_widgets_keys=[])
         self.update_worker_state(WorkerState.Running)
+
 
     def save_notebook(self):
         log.debug(f"Save notebook")
@@ -320,5 +349,3 @@ class NBWorker(WSClient):
                 }
             )
         )
-
-

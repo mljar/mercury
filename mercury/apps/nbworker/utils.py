@@ -1,4 +1,7 @@
 from enum import Enum
+import threading
+
+stop_event = threading.Event()
 
 
 class WorkerState(str, Enum):
