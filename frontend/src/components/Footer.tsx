@@ -23,7 +23,7 @@ export default function Footer() {
             target="_blank"
             rel="noreferrer"
           >
-            MLJAR Sp. z o.o.
+            MLJAR
           </a>
         </span>
         <span className="text-muted" style={{ float: "right" }}>

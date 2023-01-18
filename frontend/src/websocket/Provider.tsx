@@ -16,8 +16,8 @@ import {
 } from "./wsSlice";
 
 import { useSelector } from "react-redux";
-import { getSessionId } from "../utils";
-import { fetchExecutionHistory } from "../tasks/tasksSlice";
+import { getSessionId, handleDownload } from "../utils";
+import { fetchExecutionHistory, setExportingToPDF } from "../tasks/tasksSlice";
 
 const WebSocketContext = createContext(undefined as any);
 
@@ -66,6 +66,14 @@ export default function WebSocketProvider({
         dispatch(updateWidgetsParams(response));
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
+      } else if (
+        response.purpose === "download-html" ||
+        response.purpose === "download-pdf"
+      ) {
+        if (response.url && response.filename) {
+          dispatch(setExportingToPDF(false));
+          handleDownload(response.url, response.filename);
+        }
       }
     }
   }

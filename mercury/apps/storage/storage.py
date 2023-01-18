@@ -2,9 +2,11 @@ import logging
 import os
 import shutil
 import uuid
-from execnb.nbio import write_nb
 
 from django.conf import settings
+from execnb.nbio import write_nb
+
+from apps.tasks.export_pdf import to_pdf
 
 log = logging.getLogger(__name__)
 
@@ -78,16 +80,33 @@ class StorageManager:
             write_nb(nb, fpath)
         return fpath
 
-    def save_nb_html(self, nb_html):
-        fpath = None
+    def save_nb_html(self, nb_html_body):
+        fpath, url = None, None
         if settings.STORAGE == settings.STORAGE_MEDIA:
-            fpath = os.path.join(
-                self.worker_output_dir(), f"nb-{self.some_hash()}.html"
-            )
+            fname = f"download-notebook-{self.some_hash()}.html"
+            fpath = os.path.join(self.worker_output_dir(), fname)
             with open(fpath, "w") as fout:
-                fout.write(nb_html)
-        return fpath
+                fout.write(nb_html_body)
+            url = f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
+        return fpath, url
 
+    def save_nb_pdf(self, nb_html_body, is_presentation):
+        pdf_path, pdf_url = None, None
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            # save HTML
+            html_path, html_url = self.save_nb_html(nb_html_body)
+
+            # check if we need postfix
+            slides_postfix = ""
+            if is_presentation == "slides":
+                slides_postfix = "?print-pdf"
+
+            # export to PDF
+            pdf_path = html_path.replace(".html", ".pdf")
+            pdf_url = html_url.replace(".html", ".pdf")
+            to_pdf(f"{html_path}{slides_postfix}", pdf_path)
+
+        return pdf_path, pdf_url
 
     def some_hash(self):
         h = uuid.uuid4().hex.replace("-", "")

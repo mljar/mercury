@@ -86,7 +86,6 @@ def parse_params(nb, params={}):
                         params["continuous_update"] = view.get("continuous_update")
                     if view.get("static_notebook") is not None:
                         params["static_notebook"] = view.get("static_notebook")
-                        
 
                 else:
                     params["params"][widget_key] = WidgetsManager.frontend_format(view)

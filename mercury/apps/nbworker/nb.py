@@ -11,8 +11,9 @@ from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, WorkerState
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
-from apps.ws.utils import parse_params
+from apps.tasks.export_pdf import to_pdf
 from apps.tasks.models import Task
+from apps.ws.utils import parse_params
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -30,7 +31,6 @@ class NBWorker(WSClient):
         threading.Thread(target=self.process_msgs, daemon=True).start()
 
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
-
 
     def process_msgs(self):
         while True:
@@ -53,6 +53,10 @@ class NBWorker(WSClient):
             elif json_data.get("purpose", "") == Purpose.CloseWorker:
                 self.delete_worker()
                 sys.exit(1)
+            elif json_data.get("purpose", "") == Purpose.DownloadHTML:
+                self.download_html()
+            elif json_data.get("purpose", "") == Purpose.DownloadPDF:
+                self.download_pdf()
 
             self.queue.task_done()
 
@@ -271,3 +275,50 @@ class NBWorker(WSClient):
 
     def display_notebook(self, json_params):
         log.debug(f"Display notebook ({json_params})")
+
+    def download_html(self):
+        log.debug(f"Download HTML")
+        # save nb in HTML with full header
+        if self.is_presentation():
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+        else:
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+
+        sm = StorageManager(self.session_id, self.worker_id)
+        _, nb_url = sm.save_nb_html(nb_body)
+
+        # send HTML url address
+        self.ws.send(
+            json.dumps(
+                {
+                    "purpose": Purpose.DownloadHTML,
+                    "url": nb_url,
+                    "filename": f"{self.notebook.slug}.html",
+                }
+            )
+        )
+
+    def download_pdf(self):
+        log.debug(f"Download PDF")
+        # save nb in HTML with full header
+        if self.is_presentation():
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+        else:
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+
+        # export to PDF
+        sm = StorageManager(self.session_id, self.worker_id)
+        _, pdf_url = sm.save_nb_pdf(nb_body, self.is_presentation())
+
+        # send PDF url
+        self.ws.send(
+            json.dumps(
+                {
+                    "purpose": Purpose.DownloadPDF,
+                    "url": pdf_url,
+                    "filename": f"{self.notebook.slug}.pdf",
+                }
+            )
+        )
+
+

@@ -9,6 +9,7 @@ import {
   executeNotebook,
   exportToPDF,
   scrapeSlidesHash,
+  setExportingToPDF,
 } from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
@@ -48,6 +49,8 @@ import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
 import {
   displayNotebook,
+  downloadHTML,
+  downloadPDF,
   getWorkerState,
   runNotebook,
   saveNotebook,
@@ -128,6 +131,20 @@ export default function SideBar({
     if (!staticNotebook) {
       console.log(">>>>>>>>>>>> displayNb >>>>>>>>>>>>>>>>");
       ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
+    }
+  };
+
+  const runDownloadHTML = () => {
+    if (!staticNotebook) {
+      console.log(">>>>>>>>>>>> ddownload HTML >>>>>>>>>>>>>>>>");
+      ws.sendMessage(JSON.stringify(downloadHTML()));
+    }
+  };
+
+  const runDownloadPDF = () => {
+    if (!staticNotebook) {
+      console.log(">>>>>>>>>>>> ddownload PDF >>>>>>>>>>>>>>>>");
+      ws.sendMessage(JSON.stringify(downloadPDF()));
     }
   };
 
@@ -382,10 +399,19 @@ export default function SideBar({
                         style={{ cursor: "pointer" }}
                         className="dropdown-item"
                         onClick={() => {
-                          handleDownload(
-                            `${axios.defaults.baseURL}${notebookPath}`,
-                            `${notebookTitle}.html`
-                          );
+                          if (staticNotebook) {
+                            handleDownload(
+                              `${axios.defaults.baseURL}${notebookPath}`,
+                              `${notebookTitle}.html`
+                            );
+                          } else {
+                            runDownloadHTML();
+
+                            //handleDownload(
+                            //  `${axios.defaults.baseURL}${notebookPath}`,
+                            //</li>  `${notebookTitle}.html`
+                            //);
+                          }
                         }}
                       >
                         <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
@@ -400,7 +426,12 @@ export default function SideBar({
                         type="button"
                         className="dropdown-item"
                         onClick={() => {
-                          dispatch(exportToPDF(notebookId, notebookPath));
+                          if(staticNotebook) {
+                            dispatch(exportToPDF(notebookId, notebookPath));
+                          } else {
+                            dispatch(setExportingToPDF(true));
+                            runDownloadPDF();
+                          }
                         }}
                       >
                         <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
@@ -525,7 +556,7 @@ export default function SideBar({
                 </div>
               )}
 
-              {notebookParseErrors && (
+              {/* {notebookParseErrors && (
                 <div className="alert alert-danger mb-3" role="alert">
                   <i
                     className="fa fa-exclamation-circle"
@@ -535,11 +566,11 @@ export default function SideBar({
                   <br />
                   {notebookParseErrors}
                 </div>
-              )}
+              )} */}
             </form>
           </div>
 
-          <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
+          {/* <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
           <div>
             {!watchMode && <SelectExecutionHistory disabled={waiting} displayNb={displayNb} />}
             {!staticNotebook && (
@@ -571,6 +602,7 @@ export default function SideBar({
               </div>
             )}
           </div>
+           */}
           {showFiles && (
             <div>
               <hr />

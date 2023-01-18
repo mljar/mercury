@@ -77,3 +77,15 @@ export const displayNotebook = (taskId: number) => {
     taskId,
   };
 };
+
+export const downloadHTML = () => {
+  return {
+    purpose: "download-html",
+  };
+};
+
+export const downloadPDF = () => {
+  return {
+    purpose: "download-pdf",
+  };
+};

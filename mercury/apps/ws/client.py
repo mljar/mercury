@@ -54,17 +54,17 @@ class ClientProxy(WebsocketConsumer):
         if json_data.get("purpose", "") == "worker-ping":
             self.worker_ping()
 
-        if json_data.get("purpose", "") == "run-notebook":
+        elif json_data.get("purpose", "") == "run-notebook":
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
                 {"type": "broadcast_message", "payload": json_data},
             )
-        if json_data.get("purpose", "") == "save-notebook":
-            async_to_sync(self.channel_layer.group_send)(
-                self.worker_group,
-                {"type": "broadcast_message", "payload": json_data},
-            )
-        if json_data.get("purpose", "") == "display-notebook":
+        elif json_data.get("purpose", "") in [
+            "save-notebook",
+            "display-notebook",
+            "download-html",
+            "download-pdf",
+        ]:
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
                 {"type": "broadcast_message", "payload": json_data},
