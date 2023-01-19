@@ -31,6 +31,7 @@ def task_start_websocket_worker(self, job_params):
             str(job_params["notebook_id"]),
             str(job_params["session_id"]),
             str(job_params["worker_id"]),
+            job_params["server_url"],
         ]
         log.debug("Start " + " ".join(command))
         worker = subprocess.Popen(command)

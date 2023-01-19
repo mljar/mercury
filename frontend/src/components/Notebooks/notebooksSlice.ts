@@ -254,8 +254,6 @@ const notebooksSlice = createSlice({
     },
     initWidgets(state, action: PayloadAction<any>) {
       const { widgets } = action.payload;
-      console.log("...................init widgets");
-      console.log(widgets);
       state.selectedNotebook.params.params = {}
       state.widgets = {}
       for (let widget of widgets) {

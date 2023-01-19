@@ -35,14 +35,14 @@ from apps.nbworker.utils import stop_event
 from apps.nbworker.db import DBClient
 from apps.nbworker.nb import NBWorker
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 5:
     log.error("Wrong number of input parameters")
     sys.exit(0)
 
 notebook_id = int(sys.argv[1])
 session_id = sys.argv[2]
 worker_id = int(sys.argv[3])
-
+server_url = sys.argv[4]
 
 def signal_handler(signal, frame):
     global stop_event
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     log.info(f"Start NBWorker with arguments {sys.argv}")
     for _ in range(CONNECT_MAX_TRIES):
         nb_worker = NBWorker(
-            f"ws://127.0.0.1:8000/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
+            f"{server_url}/ws/worker/{notebook_id}/{session_id}/{worker_id}/",
             notebook_id,
             session_id,
             worker_id,

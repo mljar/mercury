@@ -87,6 +87,7 @@ class ClientProxy(WebsocketConsumer):
                 "notebook_id": self.notebook_id,
                 "session_id": self.session_id,
                 "worker_id": worker.id,
+                "server_url": "ws://127.0.0.1:8000",
             }
             transaction.on_commit(lambda: task_start_websocket_worker.delay(job_params))
 
