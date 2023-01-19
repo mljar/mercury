@@ -216,8 +216,9 @@ class NBWorker(WSClient):
         else:
             log.debug("Skip nb execution, no changes in widgets")
 
-    def send_widgets(self, nb, expected_widgets_keys):
+    def send_widgets(self, nb, expected_widgets_keys, init_widgets=False):
         nb_widgets_keys = []
+        widgets_params = []
         for cell in nb.cells:
             for output in cell.get("outputs", []):
                 if "data" in output:
@@ -229,25 +230,38 @@ class NBWorker(WSClient):
                         # prepare msg to send by ws
                         msg = WidgetsManager.frontend_format(w)
                         if msg:
-                            msg["purpose"] = Purpose.UpdateWidgets
                             msg["widgetKey"] = w.get("code_uid")
                             log.debug(f"Update widget {msg}")
-                            self.ws.send(json.dumps(msg))
+                            if init_widgets:
+                                widgets_params += [msg]
+                            else:
+                                msg["purpose"] = Purpose.UpdateWidgets
+                                self.ws.send(json.dumps(msg))
 
                         code_uid = w.get("code_uid")
                         if code_uid is not None:
                             nb_widgets_keys += [code_uid]
 
-        # check if hide some widgets
-        hide_widgets = []
-        for widget_key in expected_widgets_keys:
-            if widget_key not in nb_widgets_keys:
-                hide_widgets += [widget_key]
-
-        log.debug(f"Hide widgets {hide_widgets}")
-        if hide_widgets:
-            msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
+        if init_widgets:
+            msg = {
+                "purpose": Purpose.InitWidgets, 
+                "widgets": widgets_params
+            }
+            log.debug("------------Init widgets")
+            log.debug(msg)
             self.ws.send(json.dumps(msg))
+        else:
+            # check if hide some widgets
+            # needed only when updating widgets
+            hide_widgets = []
+            for widget_key in expected_widgets_keys:
+                if widget_key not in nb_widgets_keys:
+                    hide_widgets += [widget_key]
+
+            log.debug(f"Hide widgets {hide_widgets}")
+            if hide_widgets:
+                msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
+                self.ws.send(json.dumps(msg))
 
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
@@ -277,7 +291,7 @@ class NBWorker(WSClient):
         self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
         self.prev_body = copy.deepcopy(body)
 
-        self.send_widgets(self.nb, expected_widgets_keys=[])
+        self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)
         self.update_worker_state(WorkerState.Running)
 
 

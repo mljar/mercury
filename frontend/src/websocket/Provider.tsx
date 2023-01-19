@@ -5,6 +5,7 @@ import {
   hideWidgets,
   isStaticNotebook,
   updateWidgetsParams,
+  initWidgets,
 } from "../components/Notebooks/notebooksSlice";
 import {
   setNotebookSrc,
@@ -66,6 +67,9 @@ export default function WebSocketProvider({
         dispatch(updateWidgetsParams(response));
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
+      } else if (response.purpose === "init-widgets") {
+        console.log("init-widgets")
+        dispatch(initWidgets(response));
       } else if (
         response.purpose === "download-html" ||
         response.purpose === "download-pdf"
