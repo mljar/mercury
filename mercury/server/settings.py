@@ -308,6 +308,3 @@ LOGGING = {
 }
 
 NBWORKERS_PER_MACHINE = 20
-
-# do we need to recompute the notebook on file change
-RERUN_ON_NOTEBOOK_CHANGE = None

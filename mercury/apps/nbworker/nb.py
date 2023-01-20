@@ -32,8 +32,10 @@ class NBWorker(WSClient):
         self.prev_widgets = {}
         self.prev_body = ""
         self.prev_update_time = None 
+        # monitor notebook file updates if running locally 
+        if "127.0.0.1" in ws_address:
+            threading.Thread(target=self.nb_file_watch, daemon=True).start()
         threading.Thread(target=self.process_msgs, daemon=True).start()
-        threading.Thread(target=self.nb_file_watch, daemon=True).start()
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
 
     def nb_file_watch(self):
