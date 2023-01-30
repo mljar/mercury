@@ -9,6 +9,7 @@ type TextProps = {
   rows: number | null;
   disabled: boolean;
   runNb: () => void;
+  staticNotebook: boolean;
 };
 
 export default function TextWidget({
@@ -18,24 +19,14 @@ export default function TextWidget({
   rows,
   disabled,
   runNb,
+  staticNotebook,
 }: TextProps) {
   const dispatch = useDispatch();
-  const [updated, userInteraction] = useState(false);
   let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (input_string: string) => {
     return input_string.replace(/["'(){}[\]`^]/gim, "");
   };
-
-  useEffect(() => {
-    if (!updated) return;
-    const timeOutId = setTimeout(() => {
-      // console.log("run from text");
-      runNb();
-    }, RUN_DELAY);
-    return () => clearTimeout(timeOutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
 
   return (
     <div className="form-group mb-3">
@@ -58,7 +49,12 @@ export default function TextWidget({
                 value: sanitizeString(e.target.value),
               })
             );
-            userInteraction(true);
+          }}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              runNb();
+              e.preventDefault();
+            }
           }}
           disabled={disabled}
         />
@@ -79,6 +75,44 @@ export default function TextWidget({
           }}
           disabled={disabled}
         />
+      )}
+
+      {!staticNotebook && rowsValue === 1 && (
+        <div
+          style={{
+            fontSize: "0.7em",
+            float: "right",
+            position: "relative",
+            top: "0px",
+            left: "-5px",
+            color: "#2684ff",
+          }}
+        >
+          Press enter to apply
+        </div>
+      )}
+      {!staticNotebook && rowsValue > 1 && (
+        <div
+          style={{
+            float: "right",
+            position: "relative",
+            top: "2px",
+            left: "0px",
+          }}
+        >
+          <button
+            className="btn btn-sm btn-outline-primary"
+            onClick={(e) => {
+              runNb();
+              e.preventDefault();
+            }}
+            style={{
+              fontSize: "0.7em",
+            }}
+          >
+            Apply
+          </button>
+        </div>
       )}
     </div>
   );

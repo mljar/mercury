@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import os
+import hashlib
 
 from datetime import datetime
 from django_drf_filepond.models import TemporaryUpload
@@ -31,12 +32,21 @@ class NBWorker(WSClient):
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""
-        self.prev_update_time = None 
-        # monitor notebook file updates if running locally 
+        self.prev_update_time = None
+        self.prev_md5 = None
+        # monitor notebook file updates if running locally
         if "127.0.0.1" in ws_address:
             threading.Thread(target=self.nb_file_watch, daemon=True).start()
         threading.Thread(target=self.process_msgs, daemon=True).start()
         self.ws.run_forever(ping_interval=5, ping_timeout=3)
+
+    @staticmethod
+    def md5(fname):
+        hash_md5 = hashlib.md5()
+        with open(fname, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
 
     def nb_file_watch(self):
         while not stop_event.is_set():
@@ -47,11 +57,17 @@ class NBWorker(WSClient):
                 self.prev_update_time is not None
                 and self.prev_update_time != current_update_time
             ):
-                log.debug("Notebook file changed!")
-                msg = json.dumps({
-                    "purpose": Purpose.InitNotebook
-                })
-                self.queue.put(msg)
+                checksum = NBWorker.md5(self.notebook.path)
+
+                log.debug(f"Checksum {checksum} prev {self.prev_md5}")
+
+                if self.prev_md5 is None or checksum != self.prev_md5:
+
+                    log.debug("Notebook file changed!")
+                    msg = json.dumps({"purpose": Purpose.InitNotebook})
+                    self.queue.put(msg)
+
+                self.prev_md5 = checksum
 
             self.prev_update_time = current_update_time
             time.sleep(0.25)
@@ -245,10 +261,7 @@ class NBWorker(WSClient):
                             nb_widgets_keys += [code_uid]
 
         if init_widgets:
-            msg = {
-                "purpose": Purpose.InitWidgets, 
-                "widgets": widgets_params
-            }
+            msg = {"purpose": Purpose.InitWidgets, "widgets": widgets_params}
             log.debug("------------Init widgets")
             log.debug(msg)
             self.ws.send(json.dumps(msg))
@@ -267,6 +280,11 @@ class NBWorker(WSClient):
 
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
+        
+        self.prev_nb = None
+        self.prev_widgets = {}
+        self.prev_body = ""
+
         self.update_worker_state(WorkerState.Busy)
 
         self.nbrun = NbRun(
@@ -295,7 +313,6 @@ class NBWorker(WSClient):
 
         self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)
         self.update_worker_state(WorkerState.Running)
-
 
     def save_notebook(self):
         log.debug(f"Save notebook")

@@ -59,8 +59,7 @@ class NbRun:
         counter = 1
         for c in nb.cells:
             self.run_cell(c, counter)
-            if c.cell_type == "code":
-                counter += 1
+            counter += 1
 
     def export_html(self, nb, full_header=True):
 

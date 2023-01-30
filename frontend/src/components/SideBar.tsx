@@ -109,11 +109,14 @@ export default function SideBar({
   // }, [widgetsValues]);
 
   const runNb = () => {
+    console.log("WTF??????????????????????");
     if (!staticNotebook) {
       const slidesHash = scrapeSlidesHash();
       dispatch(setSlidesHash(slidesHash));
 
-      console.log("***** runNb ***** ????????????????");
+      console.log(
+        "************************************************** runNb ***** "
+      );
       ws.sendMessage(
         JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
       );
@@ -287,6 +290,7 @@ export default function SideBar({
             rows={widgetParams?.rows}
             key={key}
             runNb={runNb}
+            staticNotebook={staticNotebook}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {
@@ -426,7 +430,7 @@ export default function SideBar({
                         type="button"
                         className="dropdown-item"
                         onClick={() => {
-                          if(staticNotebook) {
+                          if (staticNotebook) {
                             dispatch(exportToPDF(notebookId, notebookPath));
                           } else {
                             dispatch(setExportingToPDF(true));
@@ -515,12 +519,12 @@ export default function SideBar({
                 </div>
               )}
 
-              {waiting && workerState === WorkerState.Busy && (
+              {/* {waiting && workerState === WorkerState.Busy && (
                 <div className="alert alert-success mb-3 mt-3" role="alert">
                   <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is
                   executed. Please wait.
                 </div>
-              )}
+              )} */}
 
               {waiting &&
                 (workerState === WorkerState.Unknown ||
