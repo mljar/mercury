@@ -15,10 +15,10 @@ export default function Footer() {
       }}
     >
       <div className="container">
-        <span className="text-muted">
+        <span className="text-muted" style={{ color: "gray" }}>
           Mercury ©{" "}
           <a
-            style={{ textDecoration: "none" }}
+            style={{ textDecoration: "none", color: "gray" }}
             href="https://mljar.com"
             target="_blank"
             rel="noreferrer"
@@ -27,13 +27,14 @@ export default function Footer() {
           </a>
         </span>
         <span className="text-muted" style={{ float: "right" }}>
+          <i className="fa fa-github" aria-hidden="true"></i>{" "}
           <a
-            style={{ textDecoration: "none" }}
-            href="https://mljar.com/pricing"
+            style={{ textDecoration: "none", color: "gray" }}
+            href="https://github.com/mljar/mercury"
             target="_blank"
             rel="noreferrer"
           >
-            Check Mercury Pro
+            Mercury
           </a>
         </span>
       </div>
