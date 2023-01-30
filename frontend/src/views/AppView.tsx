@@ -75,6 +75,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   };
 
   const pleaseWait = () => {
+    if(notebook?.params?.static_notebook) {
+      return false;
+    }
     return workerState !== WorkerState.Running;
   };
 

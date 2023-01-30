@@ -24,6 +24,18 @@ const WebSocketContext = createContext(undefined as any);
 
 export { WebSocketContext };
 
+let wsServer = "ws://127.0.0.1:8000";
+let localServer = true;
+if (window.location.origin === "http://localhost:3000") {
+  wsServer = "ws://127.0.0.1:8000";
+  localServer = true;
+} else {
+  wsServer = window.location.origin
+    .replace("http://", "ws://")
+    .replace("https://", "wss://");
+  localServer = false;
+}
+
 export default function WebSocketProvider({
   children,
 }: {
@@ -68,7 +80,7 @@ export default function WebSocketProvider({
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
       } else if (response.purpose === "init-widgets") {
-        console.log("init-widgets")
+        console.log("init-widgets");
         dispatch(initWidgets(response));
       } else if (
         response.purpose === "download-html" ||
@@ -108,12 +120,12 @@ export default function WebSocketProvider({
 
   function connect() {
     if (
-      !isStatic &&
+      (localServer || !isStatic) &&
       selectedNotebookId !== undefined &&
       connection === undefined
     ) {
       connection = new WebSocket(
-        `ws://127.0.0.1:8000/ws/client/${selectedNotebookId}/${getSessionId()}/`
+        `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`
       );
       connection.onopen = onOpen;
       connection.onmessage = onMessage;

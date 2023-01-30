@@ -9,7 +9,7 @@ type TextProps = {
   rows: number | null;
   disabled: boolean;
   runNb: () => void;
-  staticNotebook: boolean;
+  continuousUpdate: boolean;
 };
 
 export default function TextWidget({
@@ -19,7 +19,7 @@ export default function TextWidget({
   rows,
   disabled,
   runNb,
-  staticNotebook,
+  continuousUpdate,
 }: TextProps) {
   const dispatch = useDispatch();
   const [apply, showApply] = useState(false);
@@ -81,7 +81,7 @@ export default function TextWidget({
         />
       )}
 
-      {apply && !staticNotebook && rowsValue === 1 && (
+      {apply && continuousUpdate && rowsValue === 1 && (
         <div
           style={{
             fontSize: "0.7em",
@@ -95,7 +95,7 @@ export default function TextWidget({
           Press enter to apply
         </div>
       )}
-      {apply && !staticNotebook && rowsValue > 1 && (
+      {apply && continuousUpdate && rowsValue > 1 && (
         <div
           style={{
             float: "right",

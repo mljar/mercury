@@ -109,44 +109,40 @@ export default function SideBar({
   // }, [widgetsValues]);
 
   const runNb = () => {
-    console.log("WTF??????????????????????");
-    if (!staticNotebook) {
-      const slidesHash = scrapeSlidesHash();
-      dispatch(setSlidesHash(slidesHash));
-
-      console.log(
-        "************************************************** runNb ***** "
-      );
-      ws.sendMessage(
-        JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
-      );
+    if (continuousUpdate) {
+      execNb();
     }
   };
 
+  const execNb = () => {
+    const slidesHash = scrapeSlidesHash();
+    dispatch(setSlidesHash(slidesHash));
+
+    ws.sendMessage(
+      JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
+    );
+  }
+
   const saveNb = () => {
     if (!staticNotebook) {
-      console.log("$$$$$$$$$$$ saveNb $$$$$$$$$$$$$$$$$$$$$");
       ws.sendMessage(JSON.stringify(saveNotebook()));
     }
   };
 
   const displayNb = (taskId: number) => {
     if (!staticNotebook) {
-      console.log(">>>>>>>>>>>> displayNb >>>>>>>>>>>>>>>>");
       ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
     }
   };
 
   const runDownloadHTML = () => {
     if (!staticNotebook) {
-      console.log(">>>>>>>>>>>> ddownload HTML >>>>>>>>>>>>>>>>");
       ws.sendMessage(JSON.stringify(downloadHTML()));
     }
   };
 
   const runDownloadPDF = () => {
     if (!staticNotebook) {
-      console.log(">>>>>>>>>>>> ddownload PDF >>>>>>>>>>>>>>>>");
       ws.sendMessage(JSON.stringify(downloadPDF()));
     }
   };
@@ -290,7 +286,7 @@ export default function SideBar({
             rows={widgetParams?.rows}
             key={key}
             runNb={runNb}
-            staticNotebook={staticNotebook}
+            continuousUpdate={continuousUpdate}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {
@@ -372,10 +368,10 @@ export default function SideBar({
           <div style={{ padding: "0px" }}>
             <form>
               {widgets}
-              <div className="form-group mb-3 pb-1">
+              <div className="form-group mb-3 pb-1 pt-2">
                 {!continuousUpdate && (
                   <RunButton
-                    runNb={runNb}
+                    runNb={execNb}
                     waiting={waiting}
                     workerState={workerState}
                   />
