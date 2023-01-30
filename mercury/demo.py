@@ -5,13 +5,11 @@ import nbformat as nbf
 def create_demo_notebook(filename = "demo.ipynb"):
     nb = nbf.v4.new_notebook()
     
-    imports = "import mercury as mr"
+    imports = "import mercury as mr\napp=mr.App(continuous_update=False)"
     text = "# 🚀 Demo notebook with greetings 👋"
     variables = '''year = mr.Slider(label="Please select the year", value=2023, min=2000, max=2050)
-greetings = mr.Select(label="Please select greetings", value="Hello", choices=["Cześć", "Hello", "Hi", "Ciao", "Salut"])
-name = mr.Text(label="What is your name?", value="Piotr")
-'''
-    code = '''print(f"{greetings.value} {name.value} in {year.value}")'''
+name = mr.Text(label="What is your name?", value="Piotr")'''
+    code = '''print(f"Hello {name.value} in {year.value}!")'''
     nb["cells"] = [ 
         nbf.v4.new_code_cell(imports), 
         nbf.v4.new_markdown_cell(text), 
