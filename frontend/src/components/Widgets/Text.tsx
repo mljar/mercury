@@ -22,6 +22,7 @@ export default function TextWidget({
   staticNotebook,
 }: TextProps) {
   const dispatch = useDispatch();
+  const [apply, showApply] = useState(false);
   let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (input_string: string) => {
@@ -43,6 +44,7 @@ export default function TextWidget({
           id={`text-${label}`}
           value={value ? value : ""}
           onChange={(e) => {
+            showApply(true);
             dispatch(
               setWidgetValue({
                 key: widgetKey,
@@ -53,6 +55,7 @@ export default function TextWidget({
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               runNb();
+              showApply(false);
               e.preventDefault();
             }
           }}
@@ -66,6 +69,7 @@ export default function TextWidget({
           rows={rowsValue}
           value={value ? value : ""}
           onChange={(e) => {
+            showApply(true);
             dispatch(
               setWidgetValue({
                 key: widgetKey,
@@ -77,7 +81,7 @@ export default function TextWidget({
         />
       )}
 
-      {!staticNotebook && rowsValue === 1 && (
+      {apply && !staticNotebook && rowsValue === 1 && (
         <div
           style={{
             fontSize: "0.7em",
@@ -91,7 +95,7 @@ export default function TextWidget({
           Press enter to apply
         </div>
       )}
-      {!staticNotebook && rowsValue > 1 && (
+      {apply && !staticNotebook && rowsValue > 1 && (
         <div
           style={{
             float: "right",
@@ -104,6 +108,7 @@ export default function TextWidget({
             className="btn btn-sm btn-outline-primary"
             onClick={(e) => {
               runNb();
+              showApply(false);
               e.preventDefault();
             }}
             style={{
