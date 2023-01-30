@@ -27,7 +27,7 @@ export default function RangeWidget({
   runNb,
 }: RangeProps) {
   const dispatch = useDispatch();
-  const [updated, userInteraction] = useState(false);
+  //const [updated, userInteraction] = useState(false);
   let minValue = 0;
   let maxValue = 100;
   let stepValue = 1;
@@ -46,15 +46,15 @@ export default function RangeWidget({
       ? value
       : [minValue, maxValue];
 
-  useEffect(() => {
-    if (!updated) return;
-    const timeOutId = setTimeout(() => {
-      // console.log("run from range");
-      runNb();
-    }, RUN_DELAY);
-    return () => clearTimeout(timeOutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  // useEffect(() => {
+  //   if (!updated) return;
+  //   const timeOutId = setTimeout(() => {
+  //     // console.log("run from range");
+  //     runNb();
+  //   }, RUN_DELAY);
+  //   return () => clearTimeout(timeOutId);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [value]);
 
   return (
     <div className="form-group mb-3">
@@ -80,13 +80,16 @@ export default function RangeWidget({
           min={minValue}
           max={maxValue}
           onChange={(values) => {
-            userInteraction(true);
+            //userInteraction(true);
             dispatch(
               setWidgetValue({
                 key: widgetKey,
                 value: values as [number, number],
               })
             );
+          }}
+          onFinalChange={(values) => {
+            runNb();
           }}
           renderTrack={({ props, children }) => (
             <div

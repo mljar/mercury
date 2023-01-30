@@ -171,3 +171,13 @@ div[role="slider"]:focus,
   right: 5px;
   /* border: 1px solid #e5e5e5; */
 }
+
+.btn-primary {
+  border-color: #2684ff !important;
+  background-color: #2684ff !important;
+}
+
+.btn-primary:hover {
+  border-color: #217BF1 !important;
+  background-color: #217BF1 !important;
+}
