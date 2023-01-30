@@ -93,18 +93,17 @@ def parse_params(nb, params={}):
                 all_model_ids += [view.get("model_id", "")]
 
         cell_counter += 1
-
-    if params.get("version", "") == "2":
-        if params.get("show-code") is None:
-            params["show-code"] = False
-        if params.get("show-prompt") is None:
-            params["show-prompt"] = False
-        if params.get("continuous_update") is None:
-            params["continuous_update"] = True
-        if params.get("static_notebook") is None:
-            params["static_notebook"] = False
-        if params.get("share") is None:
-            params["share"] = "public"
+    
+    if params.get("show-code") is None:
+        params["show-code"] = False
+    if params.get("show-prompt") is None:
+        params["show-prompt"] = False
+    if params.get("continuous_update") is None:
+        params["continuous_update"] = True
+    if params.get("static_notebook") is None:
+        params["static_notebook"] = False
+    if params.get("share") is None:
+        params["share"] = "public"
 
     if no_outputs:
         params["version"] = "2"
