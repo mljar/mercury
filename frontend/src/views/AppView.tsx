@@ -116,18 +116,18 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   // }, [dispatch, notebook, watchModeCounter]);
 
   // version 1
-  useEffect(() => {
-    if (
-      appView === "files" &&
-      task.id &&
-      task.state &&
-      task.state === "DONE" &&
-      task.result &&
-      notebook?.params?.version === "1"
-    ) {
-      dispatch(fetchOutputFiles(task.id));
-    }
-  }, [dispatch, appView, task.id, task.state, task.result, notebook]);
+  // useEffect(() => {
+  //   if (
+  //     appView === "files" &&
+  //     task.id &&
+  //     task.state &&
+  //     task.state === "DONE" &&
+  //     task.result &&
+  //     notebook?.params?.version === "1"
+  //   ) {
+  //     dispatch(fetchOutputFiles(task.id));
+  //   }
+  // }, [dispatch, appView, task.id, task.state, task.result, notebook]);
 
   // version 2
   useEffect(() => {

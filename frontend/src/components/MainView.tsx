@@ -113,7 +113,12 @@ export default function MainView({
   return (
     <main
       className={`ms-sm-auto col-lg-${columnsWidth}`}
-      style={{ paddingTop: "0px", paddingRight: "0px", paddingLeft: "0px" }}
+      style={{
+        paddingTop: "0px",
+        paddingRight: "0px",
+        paddingLeft: "0px",
+        //display: "none",
+      }}
     >
       <BlockUi tag="div" blocking={waiting}>
         <div>
@@ -180,8 +185,9 @@ export default function MainView({
                 srcDoc={notebookSrc}
                 title="display"
                 id="main-iframe"
-                onError={()=> {console.log("iframe error")}}
-                
+                onError={() => {
+                  console.log("iframe error");
+                }}
               ></iframe>
             )}
 
