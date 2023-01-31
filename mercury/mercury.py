@@ -5,6 +5,8 @@ import sys
 import django
 import json
 import subprocess
+import webbrowser
+
 from glob import glob
 from django.core.management.utils import get_random_secret_key
 
@@ -14,7 +16,7 @@ sys.path.insert(0, BACKEND_DIR)
 
 from demo import create_demo_notebook
 
-__version__ = "2.0.0"
+__version__ = "1.99.0"
 
 from widgets.manager import WidgetsManager
 from widgets.app import App
@@ -22,13 +24,15 @@ from widgets.slider import Slider
 from widgets.select import Select
 from widgets.range import Range
 from widgets.text import Text
-from widgets.file import File 
+from widgets.file import File
 from widgets.checkbox import Checkbox
 from widgets.numeric import Numeric
 from widgets.multiselect import MultiSelect
 from widgets.outputdir import OutputDir
 from widgets.note import Note
 from widgets.button import Button
+
+VERBOSE = 0  # can be 0,1,2,3; 0 is no output
 
 
 def main():
@@ -49,7 +53,7 @@ def main():
             os.environ["ALLOWED_HOSTS"] = "*"
         if os.environ.get("SERVE_STATIC") is None:
             os.environ["SERVE_STATIC"] = "True"
-        if os.environ.get("NOTEBOOKS")is None:
+        if os.environ.get("NOTEBOOKS") is None:
             os.environ["NOTEBOOKS"] = "*.ipynb"
         if os.environ.get("WELCOME") is None:
             os.environ["WELCOME"] = "welcome.md"
@@ -58,7 +62,8 @@ def main():
         i = sys.argv.index("run")
         sys.argv[i] = "runserver"
         sys.argv.append("--runworker")
-        logo = """                                                                                  
+        logo = """                            
+
      _ __ ___   ___ _ __ ___ _   _ _ __ _   _ 
     | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
     | | | | | |  __/ | | (__| |_| | |  | |_| |
@@ -67,8 +72,7 @@ def main():
                                         |___/ 
         """
         print(logo)
-        
-        
+
         if "demo" in sys.argv:
             create_demo_notebook("demo.ipynb")
             sys.argv.remove("demo")
@@ -79,7 +83,7 @@ def main():
                     run_add_notebook = l
 
     if "--noadditional" not in sys.argv:
-        execute_from_command_line(["mercury.py", "migrate"])
+        execute_from_command_line(["mercury.py", "migrate", "-v", 0])
 
         superuser_username = os.environ.get("DJANGO_SUPERUSER_USERNAME")
         if (
@@ -98,7 +102,9 @@ def main():
             except Exception as e:
                 print(str(e))
         if os.environ.get("SERVE_STATIC") is not None:
-            execute_from_command_line(["mercury.py", "collectstatic", "--noinput"])
+            execute_from_command_line(
+                ["mercury.py", "collectstatic", "--noinput", "-v", "0"]
+            )
         if os.environ.get("NOTEBOOKS") is not None and run_add_notebook is None:
             notebooks_str = os.environ.get("NOTEBOOKS")
             notebooks = []
@@ -127,15 +133,17 @@ def main():
                 "-A",
                 "mercury.server" if sys.argv[0].endswith("mercury") else "server",
                 "worker",
-                #"--loglevel=error", 
-                "--loglevel=debug", 
+                "--loglevel=error",
+                # "--loglevel=debug",
                 "-P",
                 "gevent",
                 "--concurrency",
                 "1",
                 "-E",
             ]
-            worker = subprocess.Popen(worker_command)
+            worker = subprocess.Popen(
+                worker_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
 
             # celery worker beat for periodic tasks
             beat_command = [
@@ -145,9 +153,11 @@ def main():
                 "beat",
                 "--loglevel=error",
                 "--max-interval",
-                "60", # sleep 60 seconds
+                "60",  # sleep 60 seconds
             ]
-            subprocess.Popen(beat_command)
+            subprocess.Popen(
+                beat_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
 
             if "--runworker" in sys.argv:
                 sys.argv.remove("--runworker")
@@ -158,6 +168,7 @@ def main():
         sys.argv.remove("--noadditional")
 
     try:
+
         arguments = sys.argv
         if (
             len(sys.argv) > 1
@@ -165,7 +176,15 @@ def main():
             and "--noreload" not in arguments
         ):
             arguments += ["--noreload"]
+            try:
+                # open web browser if we are running a server
+                url = "http://127.0.0.1:8000"
+                webbrowser.open(url)
+            except Exception as e:
+                pass
+
         execute_from_command_line(arguments)
+
     except KeyboardInterrupt:
         try:
             sys.exit(0)

@@ -25,9 +25,10 @@ def task_start_websocket_worker(self, job_params):
         log.debug("Defer task start ws worker")
         task_start_websocket_worker.s(job_params).apply_async(countdown=15)
     else:
+        directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         command = [
             sys.executable,
-            os.path.join("apps", "nbworker"),
+            os.path.join(directory, "nbworker"),
             str(job_params["notebook_id"]),
             str(job_params["session_id"]),
             str(job_params["worker_id"]),

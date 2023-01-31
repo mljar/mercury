@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import uuid
+
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
@@ -170,8 +171,6 @@ def task_init_notebook(
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
                 nbformat.write(nb, f)
 
-        print(params)
-
         if "date" in params:
             params["date"] = str(params["date"])
 
@@ -188,8 +187,6 @@ def task_init_notebook(
             # automatically detect slides in cells
             # and set slides output
             notebook_output = "slides"
-
-        print(notebook_title, nb_default_title(notebook_path))
 
         if notebook_schedule != "":
             try:
@@ -210,8 +207,6 @@ def task_init_notebook(
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
-
-        print("slug:", notebook_slug, "output file:", notebook_output_file)
 
         if render_html:
 

@@ -316,7 +316,6 @@ class NBWorker(WSClient):
             "continuous_update",
             "static_notebook",
         ]:
-            log.debug(property)
             if params.get(property) is not None and nb_params.get(
                 property
             ) != params.get(property):

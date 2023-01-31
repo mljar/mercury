@@ -12,8 +12,8 @@ def list_files(directory):
     return paths
 
 setup(
-    name="mljar-mercury",
-    version="1.1.6",
+    name="mercury",
+    version="1.99.0",
     maintainer="MLJAR Sp. z o.o.",
     maintainer_email="contact@mljar.com",
     description="Convert Python Notebook to web app and share with non-technical users",

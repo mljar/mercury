@@ -90,7 +90,8 @@ class DBClient:
             log.debug(f"Delete worker id={worker_id}")
             Worker.objects.get(pk=worker_id).delete()
         except Exception:
-            log.exception(f"Exception when delete worker")
+            pass
+            #log.exception(f"Exception when delete worker")
 
     def delete_worker(self):
         DBClient.delete_worker_in_db(self.worker_id)
@@ -119,7 +120,7 @@ class DBClient:
             log.debug(f"Worker id={self.worker_id} exists")
             self.worker = Worker.objects.get(pk=self.worker_id)
         except Worker.DoesNotExist as e:
-            log.exception(f"Worker id={self.worker_id} does not exists, quit")
+            #log.exception(f"Worker id={self.worker_id} does not exists, quit")
             sys.exit(1)
         return True
 

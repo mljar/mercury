@@ -23,7 +23,7 @@ django.setup()
 
 import logging
 
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.ERROR #DEBUG
 logging.basicConfig(
     # filename="nbworker.log", filemode="w",
     format="NB %(asctime)s %(message)s",
