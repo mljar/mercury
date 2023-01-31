@@ -5,7 +5,7 @@ import nbformat as nbf
 def create_demo_notebook(filename = "demo.ipynb"):
     nb = nbf.v4.new_notebook()
     
-    imports = "import mercury as mr\napp=mr.App(continuous_update=False)"
+    imports = "import mercury as mr"
     text = "# 🚀 Demo notebook with greetings 👋"
     variables = '''year = mr.Slider(label="Please select the year", value=2023, min=2000, max=2050)
 name = mr.Text(label="What is your name?", value="Piotr")'''
