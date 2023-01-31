@@ -16,7 +16,7 @@ sys.path.insert(0, BACKEND_DIR)
 
 from demo import create_demo_notebook
 
-__version__ = "1.99.1"
+__version__ = "1.99.2"
 
 from widgets.manager import WidgetsManager
 from widgets.app import App
@@ -32,8 +32,6 @@ from widgets.outputdir import OutputDir
 from widgets.note import Note
 from widgets.button import Button
 
-VERBOSE = 0  # can be 0,1,2,3; 0 is no output
-
 
 def main():
     """Run administrative tasks."""
@@ -46,6 +44,14 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
+    VERBOSE = 0  # can be 0,1,2,3; 0 is no output
+    if "--verbose" in sys.argv:
+        sys.argv.remove("--verbose")
+        VERBOSE = 3
+    os.environ["MERCURY_VERBOSE"] = str(VERBOSE)
+    os.environ["DJANGO_LOG_LEVEL"] = "ERROR" if VERBOSE == 0 else "INFO"
+
 
     run_add_notebook = None
     if "run" in sys.argv:
@@ -133,17 +139,21 @@ def main():
                 "-A",
                 "mercury.server" if sys.argv[0].endswith("mercury") else "server",
                 "worker",
-                "--loglevel=error",
-                # "--loglevel=debug",
+                f"--loglevel={'error' if VERBOSE == 0 else 'debug'}",
                 "-P",
                 "gevent",
                 "--concurrency",
                 "1",
                 "-E",
             ]
-            worker = subprocess.Popen(
-                worker_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            if VERBOSE == 0:
+                worker = subprocess.Popen(
+                    worker_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                )
+            else:
+                worker = subprocess.Popen(
+                    worker_command
+                )
 
             # celery worker beat for periodic tasks
             beat_command = [
@@ -158,6 +168,7 @@ def main():
             subprocess.Popen(
                 beat_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
+
 
             if "--runworker" in sys.argv:
                 sys.argv.remove("--runworker")

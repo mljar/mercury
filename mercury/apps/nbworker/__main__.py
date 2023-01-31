@@ -23,7 +23,8 @@ django.setup()
 
 import logging
 
-LOG_LEVEL = logging.ERROR #DEBUG
+LOG_LEVEL = logging.ERROR if os.environ.get("MERCURY_VERBOSE", "0") == "0" else logging.DEBUG
+
 logging.basicConfig(
     # filename="nbworker.log", filemode="w",
     format="NB %(asctime)s %(message)s",
