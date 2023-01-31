@@ -280,7 +280,7 @@ class NBWorker(WSClient):
 
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
-        
+
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""
@@ -300,7 +300,41 @@ class NBWorker(WSClient):
         # TODO: update params in db if needed"
         params = {}
         parse_params(nb2dict(self.nb_original), params)
+
+        # update database ...
+        log.debug(f"Executed params {json.dumps(params, indent=4)}")
+
+        update_database = False
+        if self.notebook.title != params.get("title", ""):
+            self.notebook.title = params.get("title", "")
+            update_database = True
+
+        nb_params = json.loads(self.notebook.params)
+        for property in [
+            "show-code",
+            "show-prompt",
+            "continuous_update",
+            "static_notebook",
+        ]:
+            log.debug(property)
+            if params.get(property) is not None and nb_params.get(
+                property
+            ) != params.get(property):
+                nb_params[property] = params.get(property)
+                update_database = True
+
+        if update_database:
+            self.notebook.params = json.dumps(nb_params)
+            self.notebook.save()
+
+        self.nbrun.set_show_code_and_prompt(
+            nb_params.get("show-code", False), nb_params.get("show-prompt", True)
+        )
+        self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
+
         log.debug(params)
+        log.debug(f"Exporter show_code {self.nbrun.exporter.show_code}")
+
         self.nb = copy.deepcopy(self.nb_original)
 
         if self.is_presentation():
@@ -308,7 +342,10 @@ class NBWorker(WSClient):
         else:
             body = self.nbrun.export_html(self.nb, full_header=False)
 
-        self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
+        msg = {"purpose": Purpose.ExecutedNotebook, "body": body}
+        if update_database:
+            msg["reloadNotebook"] = True
+        self.ws.send(json.dumps(msg))
         self.prev_body = copy.deepcopy(body)
 
         self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)

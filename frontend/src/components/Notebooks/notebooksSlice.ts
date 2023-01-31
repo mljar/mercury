@@ -70,7 +70,7 @@ const initialState = {
   notebooks: [] as INotebook[],
   loadingState: "loading",
   selectedNotebook: {} as INotebook,
-  selectedNotebookId: undefined as undefined | Number,
+  selectedNotebookId: undefined as undefined | number,
   loadingStateSelected: "loading",
   watchModeCounter: 0,
   slidesHash: "",

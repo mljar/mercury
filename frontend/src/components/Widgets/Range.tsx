@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
-import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
 
 type RangeProps = {
@@ -45,16 +45,6 @@ export default function RangeWidget({
     value != null && value !== undefined && value.length === 2
       ? value
       : [minValue, maxValue];
-
-  // useEffect(() => {
-  //   if (!updated) return;
-  //   const timeOutId = setTimeout(() => {
-  //     // console.log("run from range");
-  //     runNb();
-  //   }, RUN_DELAY);
-  //   return () => clearTimeout(timeOutId);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [value]);
 
   return (
     <div className="form-group mb-3">

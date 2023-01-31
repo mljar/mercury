@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
-import { RUN_DELAY } from "../Notebooks/notebooksSlice";
 
 type SliderProps = {
   widgetKey: string;

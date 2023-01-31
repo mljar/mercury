@@ -34,6 +34,16 @@ class NbRun:
             pass
         self.shell.run("from mercury import WidgetsManager")
 
+    def set_show_code_and_prompt(self, new_show_code, new_show_prompt):
+        self.exporter.set_show_prompt(new_show_prompt)
+        self.exporter.set_show_code(new_show_code)
+
+    def set_is_presentation(self, new_value):
+        self.exporter.set_is_presentation(new_value)
+
+    def set_reveal_theme(self, new_value):
+        self.exporter.set_reveal_theme(new_value)
+
     def run_set_cell_index(self, new_index):
         if new_index is not None:
             self.shell.run(f"WidgetsManager.set_cell_index({new_index})")

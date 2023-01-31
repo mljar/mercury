@@ -55,6 +55,9 @@ export default function MainView({
       showCode = nb.params["show-code"];
     }
   }
+
+  console.log("MainView", showCode);
+
   if (notebookSrc !== "" && !isPresentation) {
     notebookSrc = "<script>init_mathjax();</script>" + notebookSrc;
 

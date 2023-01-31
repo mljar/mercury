@@ -6,6 +6,7 @@ import {
   isStaticNotebook,
   updateWidgetsParams,
   initWidgets,
+  fetchNotebook,
 } from "../components/Notebooks/notebooksSlice";
 import {
   setNotebookSrc,
@@ -70,7 +71,13 @@ export default function WebSocketProvider({
         dispatch(setWorkerState(response.state));
         dispatch(setWorkerId(response.workerId));
       } else if (response.purpose === "executed-notebook") {
+        console.log(response?.reloadNotebook, selectedNotebookId);
+        if (response?.reloadNotebook && selectedNotebookId !== undefined) {
+          console.log("reload notebook ...........................");
+          dispatch(fetchNotebook(selectedNotebookId));
+        }
         dispatch(setNotebookSrc(response.body));
+        
       } else if (response.purpose === "saved-notebook") {
         if (selectedNotebookId !== undefined) {
           dispatch(fetchExecutionHistory(selectedNotebookId, false));

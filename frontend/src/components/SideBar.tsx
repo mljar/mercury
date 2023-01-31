@@ -1,12 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import {
-  clearTasks,
-  copyCurrentToPreviousTask,
-  executeNotebook,
   exportToPDF,
   scrapeSlidesHash,
   setExportingToPDF,
@@ -33,17 +30,14 @@ import {
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
   getWidgetsValues,
-  RUN_DELAY,
   setSlidesHash,
   setWidgetValue,
 } from "./Notebooks/notebooksSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
-import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
 import MarkdownWidget from "./Widgets/Markdown";
-import SelectExecutionHistory from "./SelectExecutionHistory";
 
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
@@ -118,10 +112,8 @@ export default function SideBar({
     const slidesHash = scrapeSlidesHash();
     dispatch(setSlidesHash(slidesHash));
 
-    ws.sendMessage(
-      JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
-    );
-  }
+    ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(widgetsValues))));
+  };
 
   const saveNb = () => {
     if (!staticNotebook) {

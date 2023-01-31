@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type TextProps = {
   widgetKey: string;

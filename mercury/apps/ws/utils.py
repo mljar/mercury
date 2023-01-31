@@ -97,7 +97,7 @@ def parse_params(nb, params={}):
     if params.get("show-code") is None:
         params["show-code"] = False
     if params.get("show-prompt") is None:
-        params["show-prompt"] = False
+        params["show-prompt"] = True
     if params.get("continuous_update") is None:
         params["continuous_update"] = True
     if params.get("static_notebook") is None:

@@ -20,6 +20,7 @@ class DBClient:
         self.worker_id = worker_id
         self.worker = None  # db object
         self.state = WorkerState.Unknown
+        self.notebook = None
         self.load_notebook()
 
     def load_notebook(self):

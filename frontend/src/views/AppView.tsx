@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 import NavBar from "../components/NavBar";
@@ -25,7 +25,6 @@ import {
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
-  fetchOutputFiles,
   fetchWorkerOutputFiles,
   getOutputFiles,
   getOutputFilesState,

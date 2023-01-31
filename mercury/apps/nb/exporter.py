@@ -17,7 +17,10 @@ class Exporter:
         self.is_presentation = is_presentation
         self.reveal_theme = reveal_theme
 
-        if is_presentation:
+        self.set_exporter()
+
+    def set_exporter(self):
+        if self.is_presentation:
             self.html_exporter = SlidesExporter(
                 template_name="reveal", reveal_theme=self.reveal_theme
             )
@@ -32,6 +35,27 @@ class Exporter:
         self.html_exporter.exclude_input = not self.show_code
         self.html_exporter.exclude_input_prompt = not self.show_code
         self.html_exporter.exclude_output_prompt = not self.show_code
+
+    def set_is_presentation(self, new_value):
+        if self.is_presentation != new_value:
+            self.is_presentation = new_value
+            self.set_exporter()
+
+    def set_reveal_theme(self, new_value):
+        if self.reveal_theme != new_value:
+            self.reveal_theme = new_value
+            self.set_exporter()
+
+    def set_show_code(self, new_value):
+        self.show_code = new_value
+        self.html_exporter.exclude_input = not self.show_code
+        self.html_exporter.exclude_input_prompt = not self.show_code
+        self.html_exporter.exclude_output_prompt = not self.show_code
+
+    def set_show_prompt(self, new_value):
+        self.show_prompt = new_value
+        self.html_exporter.exclude_input_prompt = not self.show_prompt
+        self.html_exporter.exclude_output_prompt = not self.show_prompt
 
     def export(self, notebook, full_header=True):
         #
