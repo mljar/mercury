@@ -75,7 +75,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   };
 
   const pleaseWait = () => {
-    if(notebook?.params?.static_notebook) {
+    if (notebook?.params?.static_notebook) {
       return false;
     }
     return workerState !== WorkerState.Running;
@@ -261,23 +261,24 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 taskSessionId={task.session_id}
               />
             )}
-            {appView === "app" && (
-              <MainView
-                loadingState={loadingState}
-                notebookPath={notebookPath}
-                errorMsg={errorMsg}
-                waiting={pleaseWait()} // {waitForTask()}
-                watchMode={isWatchMode()}
-                displayEmbed={displayEmbed}
-                isPro={isPro}
-                username={username}
-                slidesHash={slidesHash}
-                columnsWidth={showSideBar ? 9 : 12}
-                isPresentation={
-                  notebook.output !== undefined && notebook.output === "slides"
-                }
-              />
-            )}
+
+            <MainView
+              appView={appView}
+              loadingState={loadingState}
+              notebookPath={notebookPath}
+              errorMsg={errorMsg}
+              waiting={pleaseWait()} // {waitForTask()}
+              watchMode={isWatchMode()}
+              displayEmbed={displayEmbed}
+              isPro={isPro}
+              username={username}
+              slidesHash={slidesHash}
+              columnsWidth={showSideBar ? 9 : 12}
+              isPresentation={
+                notebook.output !== undefined && notebook.output === "slides"
+              }
+            />
+
             {appView === "files" && (
               <FilesView
                 files={outputFiles}

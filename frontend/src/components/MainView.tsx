@@ -11,6 +11,7 @@ import InnerHTML from "dangerously-set-html-content";
 import { getSelectedNotebook } from "./Notebooks/notebooksSlice";
 
 type MainViewProps = {
+  appView: string;
   loadingState: string;
   notebookPath: string;
   waiting: boolean;
@@ -25,6 +26,7 @@ type MainViewProps = {
 };
 
 export default function MainView({
+  appView,
   loadingState,
   notebookPath,
   waiting,
@@ -110,16 +112,15 @@ export default function MainView({
     }
   }, [dispatch, notebookPath, slidesHash, isPresentation]);
 
+  let mainStyle = {
+    paddingTop: "0px",
+    paddingRight: "0px",
+    paddingLeft: "0px",
+    display: appView === "files" ? "none" : "block",
+  };
+
   return (
-    <main
-      className={`ms-sm-auto col-lg-${columnsWidth}`}
-      style={{
-        paddingTop: "0px",
-        paddingRight: "0px",
-        paddingLeft: "0px",
-        //display: "none",
-      }}
-    >
+    <main className={`ms-sm-auto col-lg-${columnsWidth}`} style={mainStyle}>
       <BlockUi tag="div" blocking={waiting}>
         <div>
           {loadingState === "loading" && !watchMode && (
