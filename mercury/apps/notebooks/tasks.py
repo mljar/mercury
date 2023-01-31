@@ -219,7 +219,7 @@ def task_init_notebook(
             body = exporter.export(nb)
 
             with open(
-                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w"
+                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w", encoding="utf-8", errors="ignore"
             ) as fout:
                 fout.write(body)
 

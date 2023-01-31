@@ -85,7 +85,7 @@ class StorageManager:
         if settings.STORAGE == settings.STORAGE_MEDIA:
             fname = f"download-notebook-{self.some_hash()}.html"
             fpath = os.path.join(self.worker_output_dir(), fname)
-            with open(fpath, "w") as fout:
+            with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(nb_html_body)
             url = f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
         return fpath, url
