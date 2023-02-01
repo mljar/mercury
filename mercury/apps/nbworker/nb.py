@@ -43,7 +43,7 @@ class NBWorker(WSClient):
     @staticmethod
     def md5(fname):
         hash_md5 = hashlib.md5()
-        with open(fname, "rb", encoding="utf-8", errors="ignore") as f:
+        with open(fname, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
@@ -315,12 +315,17 @@ class NBWorker(WSClient):
             "show-prompt",
             "continuous_update",
             "static_notebook",
+            "description"
         ]:
             if params.get(property) is not None and nb_params.get(
                 property
             ) != params.get(property):
                 nb_params[property] = params.get(property)
                 update_database = True
+        # save widgets params
+        if json.dumps(nb_params.get("params", {})) != json.dumps(params.get("params", {})):
+            nb_params["params"] = params["params"]
+            update_database = True
 
         if update_database:
             self.notebook.params = json.dumps(nb_params)

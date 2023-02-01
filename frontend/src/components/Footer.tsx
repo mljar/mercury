@@ -27,7 +27,7 @@ export default function Footer() {
           </a>
         </span>
         <span className="text-muted" style={{ float: "right" }}>
-          <i className="fa fa-github" aria-hidden="true"></i>{" "}
+          
           <a
             style={{ textDecoration: "none", color: "gray" }}
             href="https://github.com/mljar/mercury"
@@ -36,6 +36,8 @@ export default function Footer() {
           >
             Mercury
           </a>
+          {" "}
+          <i className="fa fa-github" aria-hidden="true"></i>
         </span>
       </div>
     </footer>
