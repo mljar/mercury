@@ -308,3 +308,8 @@ LOGGING = {
 }
 
 NBWORKERS_PER_MACHINE = 20
+
+
+# delta time after which worker is considered as stale and deleted
+WORKER_STALE_TIME = 1 # in minutes
+

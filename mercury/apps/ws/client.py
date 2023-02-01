@@ -1,12 +1,13 @@
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.db import transaction
 from django.db.models import Q
-from django.utils.timezone import make_aware
+from django.utils import timezone
+from django.conf import settings
 
 from apps.ws.models import Worker
 from apps.ws.tasks import task_start_websocket_worker
@@ -121,6 +122,6 @@ class ClientProxy(WebsocketConsumer):
 
         # clear stale workers
         workers = Worker.objects.filter(
-            updated_at__lte=make_aware(datetime.now() - timedelta(minutes=1))
+            updated_at__lte=timezone.now() - timedelta(minutes=settings.WORKER_STALE_TIME)
         )
         workers.delete()

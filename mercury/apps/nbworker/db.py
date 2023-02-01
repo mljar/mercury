@@ -1,9 +1,10 @@
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from django.utils.timezone import make_aware
+from django.conf import settings
+from django.utils import timezone
 
 from apps.nbworker.utils import WorkerState
 from apps.notebooks.models import Notebook
@@ -128,9 +129,8 @@ class DBClient:
         try:
             log.debug(f"Check worker id={self.worker_id} is stale")
             self.worker = Worker.objects.get(pk=self.worker_id)
-            return self.worker.updated_at < make_aware(
-                datetime.now() - timedelta(minutes=1)
-            )
+            return self.worker.updated_at < timezone.now() - timedelta(minutes=settings.WORKER_STALE_TIME)
+           
         except Exception:
             log.exception(
                 f"Exception when check if worker id={self.worker_id} is stale"

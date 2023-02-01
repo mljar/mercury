@@ -16,7 +16,7 @@ sys.path.insert(0, BACKEND_DIR)
 
 from demo import create_demo_notebook
 
-__version__ = "1.99.3"
+__version__ = "1.99.4"
 
 from widgets.manager import WidgetsManager
 from widgets.app import App
