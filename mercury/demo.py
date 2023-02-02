@@ -49,7 +49,16 @@ app = mr.App(title="Hello demo 👋", description="Hello demo with Text widget",
 """),
         nbf.v4.new_markdown_cell(
             """# Mercury demo 👋
-Share your notebooks with everyone thanks to Mercury framework.
+
+Share your notebooks with everyone thanks to Mercury framework!
+
+Please write your name in the left side bar and press **Enter** ⌨️ 
+
+The notebook will be automatically recomputed. Only cells with widget definition and below are recomputed. That's why it is fast!
+
+You can download executed notebook as HTML or PDF (just click in the left side bar).
+
+You can edit this notebook in the Jupyter Notebook, and changes will appear instantly in the Mercury.
 """
         ),
         nbf.v4.new_code_cell(
@@ -193,6 +202,10 @@ Mercury features:
 - schedule automatic execution (comming soon!)
 
 Please check our documentation at <a href="https://runmercury.com" target="_blank">RunMercury.com</a> for more information 📚
+
+This text can be edited by changing `welcome.md` file. Demo notebooks can be edited in Jupyter. 
+
+All files created for demo are in the current directory.
 
 ## Demo applications
 
