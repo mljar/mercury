@@ -3,41 +3,29 @@ import os
 import tempfile
 import nbformat as nbf
 
+def info(package):
+    print("To run demo you need to have: pandas, numpy and matplotlib packages")
+    print()
+    print(f"Cant import {package} package")
+    print(f"Please install {package} with command:")
+    print()
+    print(f"pip install {package}")
+    print()
+    sys.exit(1)
 
 def check_needed_packages():
-
-    print("To run demo you need to have: pandas, numpy and matplotlib packages")
-    print("Demo notebooks are using those packages")
-
     try:
         import pandas
     except Exception as e:
-        print("Cant import pandas package")
-        print("Please install pandas with command")
-        print()
-        print("pip install pandas")
-        print()
-        sys.exit(1)
-
+        info("pandas")
     try:
         import numpy
     except Exception as e:
-        print("Cant import numpy package")
-        print("Please install numpy with command")
-        print()
-        print("pip install numpy")
-        print()
-        sys.exit(1)
-
+        info("numpy")
     try:
         import matplotlib
     except Exception as e:
-        print("Cant import matplotlib package")
-        print("Please install matplotlib with command")
-        print()
-        print("pip install matplotlib")
-        print()
-        sys.exit(1)
+        info("matplotlib")
 
 
 def create_simple_demo_notebook(filename="demo.ipynb"):

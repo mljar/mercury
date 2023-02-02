@@ -4,6 +4,7 @@ import os
 import sys
 import django
 import json
+import shutil
 import subprocess
 import webbrowser
 
@@ -85,6 +86,18 @@ def main():
                                         |___/ 
         """
         print(logo)
+
+        if "clear" in sys.argv:
+            for n in ["db.sqlite", "db.sqlite3"]:
+                db_path = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                    n
+                )
+                if os.path.exists(db_path):
+                    os.remove(db_path) 
+                    print("SQLite database deleted")
+            print("All clear")
+            sys.exit(1)
 
         if "demo" in sys.argv:
             check_needed_packages()
