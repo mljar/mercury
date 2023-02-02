@@ -64,7 +64,7 @@ class DBClient:
 
     def reveal_theme(self):
         # TODO: get reveal theme
-        return "simple"
+        return "white"
 
     def worker_state(self):
         return self.state
