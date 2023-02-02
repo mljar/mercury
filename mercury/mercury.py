@@ -14,7 +14,13 @@ CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "mercury")
 sys.path.insert(0, BACKEND_DIR)
 
-from demo import create_demo_notebook
+from demo import (
+    create_demo_notebook,
+    check_needed_packages,
+    create_simple_demo_notebook,
+    create_slides_demo_notebook,
+    create_welcome,
+)
 
 __version__ = "1.99.4"
 
@@ -31,6 +37,8 @@ from widgets.multiselect import MultiSelect
 from widgets.outputdir import OutputDir
 from widgets.note import Note
 from widgets.button import Button
+from widgets.md import Markdown
+from widgets.md import Markdown as Md
 
 
 def main():
@@ -51,7 +59,6 @@ def main():
         VERBOSE = 3
     os.environ["MERCURY_VERBOSE"] = str(VERBOSE)
     os.environ["DJANGO_LOG_LEVEL"] = "ERROR" if VERBOSE == 0 else "INFO"
-
 
     run_add_notebook = None
     if "run" in sys.argv:
@@ -80,9 +87,15 @@ def main():
         print(logo)
 
         if "demo" in sys.argv:
-            create_demo_notebook("demo.ipynb")
+            check_needed_packages()
+            create_welcome("welcome.md")
+            create_simple_demo_notebook("demo.ipynb")
+            create_demo_notebook("demo-dataframe-and-plots.ipynb")
+            create_slides_demo_notebook("demo-slides.ipynb")
+
             sys.argv.remove("demo")
-            run_add_notebook = "demo.ipynb"
+            os.environ["NOTEBOOKS"] = "*.ipynb"
+            # run_add_notebook = "demo.ipynb"
         else:
             for l in sys.argv:
                 if l.endswith(".ipynb"):
@@ -151,9 +164,7 @@ def main():
                     worker_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
                 )
             else:
-                worker = subprocess.Popen(
-                    worker_command
-                )
+                worker = subprocess.Popen(worker_command)
 
             # celery worker beat for periodic tasks
             beat_command = [
@@ -168,7 +179,6 @@ def main():
             subprocess.Popen(
                 beat_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-
 
             if "--runworker" in sys.argv:
                 sys.argv.remove("--runworker")

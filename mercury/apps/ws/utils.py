@@ -23,6 +23,13 @@ def worker_group(notebook_id, session_id):
     return f"{WORKER_SITE}-{notebook_id}-{session_id}"
 
 
+def is_presentation(nb):
+    for cell in nb["cells"]:
+        if "slideshow" in cell.get("metadata", {}):
+            return True
+    return False
+
+
 def parse_params(nb, params={}):
     # nb in nbformat
 
@@ -111,3 +118,6 @@ def parse_params(nb, params={}):
         params["show-prompt"] = False
         params["params"] = {}
         params["output"] = "app"
+
+    if is_presentation(nb):
+        params["output"] = "slides"
