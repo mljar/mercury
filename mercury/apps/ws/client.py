@@ -30,7 +30,7 @@ class ClientProxy(WebsocketConsumer):
             self.client_group, self.channel_name
         )
 
-        self.need_worker()
+        self.server_address = None
 
         self.accept()
 
@@ -54,7 +54,9 @@ class ClientProxy(WebsocketConsumer):
 
         if json_data.get("purpose", "") == "worker-ping":
             self.worker_ping()
-
+        elif json_data.get("purpose", "") == "server-address":
+            self.server_address = json_data.get("address")
+            self.need_worker()
         elif json_data.get("purpose", "") == "run-notebook":
             async_to_sync(self.channel_layer.group_send)(
                 self.worker_group,
@@ -76,6 +78,8 @@ class ClientProxy(WebsocketConsumer):
         self.send(text_data=json.dumps(payload))
 
     def need_worker(self):
+        if self.server_address is None:
+            return
         with transaction.atomic():
             log.debug("Create worker in db")
             worker = Worker(
@@ -88,7 +92,7 @@ class ClientProxy(WebsocketConsumer):
                 "notebook_id": self.notebook_id,
                 "session_id": self.session_id,
                 "worker_id": worker.id,
-                "server_url": "ws://127.0.0.1:8000",
+                "server_url": self.server_address
             }
             transaction.on_commit(lambda: task_start_websocket_worker.delay(job_params))
 

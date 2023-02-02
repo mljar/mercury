@@ -47,7 +47,7 @@ export default function NumericWidget({
   useEffect(() => {
     if (!updated) return;
     const timeOutId = setTimeout(() => {
-      console.log("run from numeric");
+      //console.log("run from numeric");
       runNb();
     }, RUN_DELAY);
     return () => clearTimeout(timeOutId);

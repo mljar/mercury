@@ -23,7 +23,7 @@ from demo import (
     create_welcome,
 )
 
-__version__ = "1.99.6"
+__version__ = "1.99.7"
 
 from widgets.manager import WidgetsManager
 from widgets.app import App
@@ -211,9 +211,14 @@ def main():
         ):
             arguments += ["--noreload"]
             try:
-                # open web browser if we are running a server
-                url = "http://127.0.0.1:8000"
-                webbrowser.open(url)
+                running_local = True 
+                for i in sys.argv:
+                    if "0.0.0.0" in i:
+                        running_local = False
+                if running_local:
+                    # open web browser if we are running a server
+                    url = "http://127.0.0.1:8000"
+                    webbrowser.open(url)
             except Exception as e:
                 pass
 

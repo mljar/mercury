@@ -39,7 +39,7 @@ export default function FileWidget({
   }
   useEffect(() => {
     if (updated && value.length === 2) {
-      console.log("run from file");
+      //console.log("run from file");
       runNb();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

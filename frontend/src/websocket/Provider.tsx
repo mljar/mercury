@@ -57,6 +57,12 @@ export default function WebSocketProvider({
   };
 
   function onOpen(event: any): void {
+    sendMessage(
+      JSON.stringify({
+        purpose: "server-address",
+        address: wsServer
+      })
+    );
     dispatch(setWebSocketState(WebSocketState.Connected));
     ping();
   }
@@ -67,13 +73,13 @@ export default function WebSocketProvider({
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
       if (response.purpose === "worker-state") {
-        console.log("worker-state", response.state);
+        //console.log("worker-state", response.state);
         dispatch(setWorkerState(response.state));
         dispatch(setWorkerId(response.workerId));
       } else if (response.purpose === "executed-notebook") {
-        console.log(response?.reloadNotebook, selectedNotebookId);
+        //console.log(response?.reloadNotebook, selectedNotebookId);
         if (response?.reloadNotebook && selectedNotebookId !== undefined) {
-          console.log("reload notebook ...........................");
+          //console.log("reload notebook ...........................");
           dispatch(fetchNotebook(selectedNotebookId));
         }
         dispatch(setNotebookSrc(response.body));
@@ -87,7 +93,7 @@ export default function WebSocketProvider({
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
       } else if (response.purpose === "init-widgets") {
-        console.log("init-widgets");
+        //console.log("init-widgets");
         dispatch(initWidgets(response));
       } else if (
         response.purpose === "download-html" ||

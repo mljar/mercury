@@ -56,8 +56,6 @@ export default function MainView({
     }
   }
 
-  console.log("MainView", showCode);
-
   if (notebookSrc !== "" && !isPresentation) {
     notebookSrc = "<script>init_mathjax();</script>" + notebookSrc;
 
