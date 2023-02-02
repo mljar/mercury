@@ -23,7 +23,7 @@ from demo import (
     create_welcome,
 )
 
-__version__ = "1.99.4"
+__version__ = "1.99.6"
 
 from widgets.manager import WidgetsManager
 from widgets.app import App
