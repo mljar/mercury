@@ -27,6 +27,7 @@ services:
             - media_volume:/app/mercury/media
         expose:
             - 8000     
+            - 9000
         environment:
             DEBUG: ${DEBUG}
             SERVE_STATIC: ${SERVE_STATIC}
@@ -47,6 +48,8 @@ services:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_PORT: 5432
+            MERCURY_VERBOSE: ${MERCURY_VERBOSE}
+            DJANGO_LOG_LEVEL: ${DJANGO_LOG_LEVEL}
         depends_on:
             - db
     db:
