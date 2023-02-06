@@ -92,7 +92,10 @@ class ClientProxy(WebsocketConsumer):
                 "notebook_id": self.notebook_id,
                 "session_id": self.session_id,
                 "worker_id": worker.id,
-                "server_url": self.server_address
+                #
+                # ugly hack for docker deployment
+                #
+                "server_url": self.server_address if "0.0.0.0" not in self.server_address else self.server_address + ":9000"
             }
             transaction.on_commit(lambda: task_start_websocket_worker.delay(job_params))
 

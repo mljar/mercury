@@ -23,8 +23,6 @@ from demo import (
     create_welcome,
 )
 
-__version__ = "1.99.7"
-
 from widgets.manager import WidgetsManager
 from widgets.app import App
 from widgets.slider import Slider
