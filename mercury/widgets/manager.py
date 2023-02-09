@@ -136,6 +136,7 @@ class WidgetsManager:
         elif widget_type == "OutputDir":
             return {
                 "output": "dir",
+                "value": "",
             }
         elif widget_type == "Checkbox":
             return {

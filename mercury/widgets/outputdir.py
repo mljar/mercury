@@ -19,7 +19,7 @@ class OutputDir:
         if WidgetsManager.widget_exists(self.code_uid):
             self.dir_path = WidgetsManager.get_widget(self.code_uid)
         else:
-            self.dir_path = DirPath(".")
+            self.dir_path = DirPath(os.environ.get("MERCURY_OUTPUTDIR", "."))
             WidgetsManager.add_widget("output-dir", self.code_uid, self.dir_path)
         display(self)
 
@@ -40,7 +40,7 @@ class OutputDir:
         view = {
             "widget": "OutputDir",
             "model_id": "output-dir",
-            "code_uid": self.code_uid,
+            "code_uid": self.code_uid
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
         data["text/html"] = "<h3>Output Directory</h3><small>This output won't appear in the web app.</small>"

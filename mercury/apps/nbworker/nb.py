@@ -278,6 +278,12 @@ class NBWorker(WSClient):
                 msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
                 self.ws.send(json.dumps(msg))
 
+    def initialize_outputdir(self):
+        sm = StorageManager(self.session_id, self.worker_id)
+        output_dir = sm.worker_output_dir()
+        self.nbrun.run_code(f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """)        
+
+
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
 
@@ -293,6 +299,10 @@ class NBWorker(WSClient):
             is_presentation=self.is_presentation(),
             reveal_theme=self.reveal_theme(),
         )
+        # we need to initialize the output dir always 
+        # even if there is no OutputDir in the notebook
+        self.initialize_outputdir()
+
         self.nb_original = read_nb(self.notebook.path)
 
         self.nbrun.run_notebook(self.nb_original)

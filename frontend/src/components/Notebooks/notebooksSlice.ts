@@ -257,7 +257,7 @@ const notebooksSlice = createSlice({
       state.selectedNotebook.params.params = {}
       state.widgets = {}
       for (let widget of widgets) {
-        //console.log(widget);
+        // console.log(widget);
         state.selectedNotebook.params.params[widget.widgetKey] = widget;
         state.widgets[widget.widgetKey] = widget.value;
 
