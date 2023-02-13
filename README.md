@@ -71,17 +71,21 @@ The command should be run in the same directory as notebooks.
 #### Example notebook
 
 <p align="center">
+<kbd>
   <img 
     alt="Web App from Notebook"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-notebook.png" width="600px" />  
+</kbd>
 </p>
 
 #### Example Mercury App
 
 <p align="center">
-  <img 
+<kbd>
+<img 
     alt="Web App from Notebook"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app.gif" width="600px" />  
+   </kbd>
 </p>
 
 
