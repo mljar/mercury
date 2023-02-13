@@ -7,6 +7,8 @@ import {
   updateWidgetsParams,
   initWidgets,
   fetchNotebook,
+  updateTitle,
+  updateShowCode,
 } from "../components/Notebooks/notebooksSlice";
 import {
   setNotebookSrc,
@@ -95,6 +97,10 @@ export default function WebSocketProvider({
       } else if (response.purpose === "init-widgets") {
         //console.log("init-widgets");
         dispatch(initWidgets(response));
+      }  else if (response.purpose === "update-title") {
+        dispatch(updateTitle(response.title));
+      }  else if (response.purpose === "update-show-code") {
+        dispatch(updateShowCode(response.showCode));
       } else if (
         response.purpose === "download-html" ||
         response.purpose === "download-pdf"

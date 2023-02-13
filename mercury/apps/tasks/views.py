@@ -25,7 +25,6 @@ from apps.tasks.tasks_export import export_to_pdf
 
 
 class TaskCreateView(CreateAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
@@ -46,7 +45,6 @@ class TaskCreateView(CreateAPIView):
 
 
 class GetLastTaskView(RetrieveAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
@@ -101,7 +99,6 @@ class ListWorkerOutputFilesView(APIView):
 
 class ClearTasksView(APIView):
     def post(self, request, notebook_id, session_id, format=None):
-
         try:
             tasks = Task.objects.filter(notebook_id=notebook_id, session_id=session_id)
 
@@ -216,7 +213,6 @@ class GetPDFAddress(APIView):
 
 
 class ExecutionHistoryView(ListAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 

@@ -40,9 +40,7 @@ def parse_params(nb, params={}):
     no_outputs = True
 
     for cell in nb["cells"]:
-
         for output in cell.get("outputs", []):
-
             if "data" in output and "application/mercury+json" in output["data"]:
                 no_outputs = False
                 view = output["data"]["application/mercury+json"]
@@ -100,7 +98,7 @@ def parse_params(nb, params={}):
                 all_model_ids += [view.get("model_id", "")]
 
         cell_counter += 1
-    
+
     if params.get("show-code") is None:
         params["show-code"] = False
     if params.get("show-prompt") is None:

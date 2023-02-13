@@ -1,4 +1,4 @@
 
-__version__ = "1.99.8"
+__version__ = "1.99.10"
 
 from mercury.mercury import *

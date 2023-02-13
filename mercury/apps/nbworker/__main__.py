@@ -23,7 +23,9 @@ django.setup()
 
 import logging
 
-LOG_LEVEL = logging.ERROR if os.environ.get("MERCURY_VERBOSE", "0") == "0" else logging.DEBUG
+LOG_LEVEL = (
+    logging.ERROR if os.environ.get("MERCURY_VERBOSE", "0") == "0" else logging.DEBUG
+)
 
 logging.basicConfig(
     # filename="nbworker.log", filemode="w",
@@ -44,6 +46,7 @@ notebook_id = int(sys.argv[1])
 session_id = sys.argv[2]
 worker_id = int(sys.argv[3])
 server_url = sys.argv[4]
+
 
 def signal_handler(signal, frame):
     global stop_event

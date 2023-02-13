@@ -26,7 +26,6 @@ log = logging.getLogger(__name__)
 
 class NBWorker(WSClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
-
         super(NBWorker, self).__init__(ws_address, notebook_id, session_id, worker_id)
 
         self.prev_nb = None
@@ -62,7 +61,6 @@ class NBWorker(WSClient):
                 log.debug(f"Checksum {checksum} prev {self.prev_md5}")
 
                 if self.prev_md5 is None or checksum != self.prev_md5:
-
                     log.debug("Notebook file changed!")
                     msg = json.dumps({"purpose": Purpose.InitNotebook})
                     self.queue.put(msg)
@@ -152,7 +150,6 @@ class NBWorker(WSClient):
                     f'WidgetsManager.update("{widget_key}", field="filepath", new_value="{value[1]}")\n'
                 )
             elif widget_type == "OutputDir":
-
                 sm = StorageManager(self.session_id, self.worker_id)
                 output_dir = sm.worker_output_dir()
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{output_dir}")'
@@ -185,7 +182,6 @@ class NBWorker(WSClient):
                 self.nb = copy.deepcopy(self.nb_original)
 
             for i in range(index_execute_from, len(self.nb.cells) + 1):
-
                 log.debug(f"Execute cell index={i-1}")
 
                 self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
@@ -260,6 +256,27 @@ class NBWorker(WSClient):
                         if code_uid is not None:
                             nb_widgets_keys += [code_uid]
 
+                        if w.get("widget", "") == "App":
+                            if w.get("title", "") != "":
+                                self.ws.send(
+                                    json.dumps(
+                                        {
+                                            "purpose": Purpose.UpdateTitle,
+                                            "title": w.get("title"),
+                                        }
+                                    )
+                                )
+                            if w.get("show_code") is not None:
+                                self.nbrun.set_show_code(w.get("show_code"))
+                                self.ws.send(
+                                    json.dumps(
+                                        {
+                                            "purpose": Purpose.UpdateShowCode,
+                                            "showCode": w.get("show_code"),
+                                        }
+                                    )
+                                )
+
         if init_widgets:
             msg = {"purpose": Purpose.InitWidgets, "widgets": widgets_params}
             log.debug("------------Init widgets")
@@ -281,8 +298,9 @@ class NBWorker(WSClient):
     def initialize_outputdir(self):
         sm = StorageManager(self.session_id, self.worker_id)
         output_dir = sm.worker_output_dir()
-        self.nbrun.run_code(f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """)        
-
+        self.nbrun.run_code(
+            f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """
+        )
 
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
@@ -299,7 +317,7 @@ class NBWorker(WSClient):
             is_presentation=self.is_presentation(),
             reveal_theme=self.reveal_theme(),
         )
-        # we need to initialize the output dir always 
+        # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook
         self.initialize_outputdir()
 
@@ -315,7 +333,9 @@ class NBWorker(WSClient):
         log.debug(f"Executed params {json.dumps(params, indent=4)}")
 
         update_database = False
-        if self.notebook.title != params.get("title", ""):
+        if params.get("title", "") != "" and self.notebook.title != params.get(
+            "title", ""
+        ):
             self.notebook.title = params.get("title", "")
             update_database = True
 
@@ -325,7 +345,7 @@ class NBWorker(WSClient):
             "show-prompt",
             "continuous_update",
             "static_notebook",
-            "description"
+            "description",
         ]:
             if params.get(property) is not None and nb_params.get(
                 property
@@ -333,7 +353,9 @@ class NBWorker(WSClient):
                 nb_params[property] = params.get(property)
                 update_database = True
         # save widgets params
-        if json.dumps(nb_params.get("params", {})) != json.dumps(params.get("params", {})):
+        if json.dumps(nb_params.get("params", {})) != json.dumps(
+            params.get("params", {})
+        ):
             nb_params["params"] = params["params"]
             update_database = True
 

@@ -34,6 +34,9 @@ class NbRun:
             pass
         self.shell.run("from mercury import WidgetsManager")
 
+    def set_show_code(self, new_show_code):
+        self.exporter.set_show_code(new_show_code)
+
     def set_show_code_and_prompt(self, new_show_code, new_show_prompt):
         self.exporter.set_show_prompt(new_show_prompt)
         self.exporter.set_show_code(new_show_code)
@@ -53,7 +56,6 @@ class NbRun:
 
     def run_cell(self, cell, counter=None):
         if cell.cell_type == "code":
-
             self.run_set_cell_index(counter)
 
             cell.outputs = []
@@ -72,7 +74,6 @@ class NbRun:
             counter += 1
 
     def export_html(self, nb, full_header=True):
-
         body = self.exporter.export(
             nbformat.reads(nb2str(nb), as_version=4), full_header
         )

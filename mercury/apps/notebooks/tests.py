@@ -40,7 +40,6 @@ def create_notebook_with_yaml(
 
 class InitNotebookTestCase(TestCase):
     def test_init_notebook_without_yaml(self):
-
         with tempfile.NamedTemporaryFile() as tmp:
             create_notebook_without_yaml(tmp.name + ".ipynb")
             task_init_notebook(tmp.name + ".ipynb")
@@ -59,7 +58,6 @@ class InitNotebookTestCase(TestCase):
         )
 
     def test_init_notebook_with_empty_title(self):
-
         with tempfile.NamedTemporaryFile() as tmp:
             yaml = """---
 title:
@@ -75,7 +73,6 @@ title:
 
 class ShareNotebookTestCase(TestCase):
     def test_share_public(self):
-
         yaml = """---
 share: public
 ---"""
@@ -88,7 +85,6 @@ share: public
         self.assertEqual(len(response.json()), 1)
 
     def test_share_private(self):
-
         self.assertEqual(Notebook.objects.all().count(), 0)
 
         yaml = """---
@@ -120,7 +116,6 @@ share: private
         self.assertEqual(len(response.json()), 1)
 
     def test_share_username(self):
-
         # create user and login
         user = {
             "username": "piotrek",
@@ -170,7 +165,6 @@ share: {user["username"]}
         self.assertEqual(len(response.json()), 0)
 
     def test_share_group(self):
-
         # create user and login
         user = {
             "username": "piotrek",

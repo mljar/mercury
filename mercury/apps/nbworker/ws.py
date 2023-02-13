@@ -8,12 +8,12 @@ import websocket
 from apps.nbworker.db import DBClient
 from apps.nbworker.utils import Purpose, WorkerState
 from apps.nbworker.utils import stop_event
+
 log = logging.getLogger(__name__)
 
 
 class WSClient(DBClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
-
         super(WSClient, self).__init__(notebook_id, session_id, worker_id)
 
         self.connect(ws_address)

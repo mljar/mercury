@@ -20,7 +20,6 @@ from apps.tasks.tasks import sanitize_string, task_execute
 
 class SanitizeTestCase(TestCase):
     def test_CJK(self):
-
         input_string = """テスト(){}
                         asdfasdf"()"[]''{}:"""
 
@@ -34,13 +33,11 @@ class SanitizeTestCase(TestCase):
 
 class ExecuteNotebookTestCase(TestCase):
     def setUp(self):
-
         task_init_notebook(
             "apps/notebooks/fixtures/third_notebook.ipynb", render_html=False
         )
 
     def test_task_execute_notebook(self):
-
         Task.objects.create(notebook_id=1, session_id="test")
 
         job_params = {
@@ -263,7 +260,6 @@ notify:
 ---"""
 
         with tempfile.NamedTemporaryFile() as tmp:
-
             create_notebook_with_yaml(
                 tmp.name + ".ipynb", yaml=config, code="print('hello')"
             )

@@ -119,7 +119,6 @@ def install_chromium():
 
 
 def to_pdf(html_input_file, pdf_output_file):
-
     # make sure chromium is installed
     # install_chromium()
 

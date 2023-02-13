@@ -11,7 +11,6 @@ class Exporter:
         is_presentation=False,
         reveal_theme="white",
     ):
-
         self.show_code = show_code
         self.show_prompt = show_prompt
         self.is_presentation = is_presentation

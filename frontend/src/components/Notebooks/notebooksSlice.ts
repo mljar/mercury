@@ -102,7 +102,7 @@ const notebooksSlice = createSlice({
       if (
         action.payload.state.startsWith("WATCH") &&
         state.selectedNotebook.file_updated_at ===
-          action.payload.file_updated_at
+        action.payload.file_updated_at
       ) {
         // console.log("skip notebook update")
       } else {
@@ -263,6 +263,12 @@ const notebooksSlice = createSlice({
 
       }
     },
+    updateTitle(state, action: PayloadAction<string>) {
+      state.selectedNotebook.title = action.payload;
+    },
+    updateShowCode(state, action: PayloadAction<boolean>) {
+      state.selectedNotebook.params["show-code"] = action.payload;
+    },
   },
 });
 
@@ -279,6 +285,8 @@ export const {
   setWidgetValue,
   clearWidgets,
   initWidgets,
+  updateTitle,
+  updateShowCode,
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;
@@ -328,37 +336,37 @@ export const fetchNotebooks = () => async (dispatch: Dispatch<AnyAction>) => {
 
 export const fetchNotebook =
   (id: number, silent = false) =>
-  async (dispatch: Dispatch<AnyAction>) => {
-    try {
-      if (!silent) {
-        dispatch(setSlidesHash(""));
-        dispatch(clearExecutionHistory());
-      }
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        if (!silent) {
+          dispatch(setSlidesHash(""));
+          dispatch(clearExecutionHistory());
+        }
 
-      const { width } = getWindowDimensions();
-      dispatch(setShowSideBar(width > 992));
+        const { width } = getWindowDimensions();
+        dispatch(setShowSideBar(width > 992));
 
-      if (!silent) {
-        dispatch(setLoadingStateSelected("loading"));
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loading"));
+        }
+        const url = `/api/v1/notebooks/${id}/`;
+        const { data } = await axios.get(url);
+        const parsedParams = JSON.parse(data.params);
+        dispatch(
+          setSelectedNotebook({
+            ...data,
+            params: parsedParams as INotebookParams,
+          })
+        );
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loaded"));
+        }
+      } catch (error) {
+        if (!silent) {
+          dispatch(setLoadingStateSelected("error"));
+        }
+        console.error(
+          `Problem during loading selected notebook (${id}). ${error}`
+        );
       }
-      const url = `/api/v1/notebooks/${id}/`;
-      const { data } = await axios.get(url);
-      const parsedParams = JSON.parse(data.params);
-      dispatch(
-        setSelectedNotebook({
-          ...data,
-          params: parsedParams as INotebookParams,
-        })
-      );
-      if (!silent) {
-        dispatch(setLoadingStateSelected("loaded"));
-      }
-    } catch (error) {
-      if (!silent) {
-        dispatch(setLoadingStateSelected("error"));
-      }
-      console.error(
-        `Problem during loading selected notebook (${id}). ${error}`
-      );
-    }
-  };
+    };

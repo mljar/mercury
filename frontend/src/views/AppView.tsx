@@ -13,14 +13,14 @@ import {
   // getWatchModeCounter,
 } from "../components/Notebooks/notebooksSlice";
 import {
-  fetchCurrentTask,
-  fetchExecutionHistory,
+  //fetchCurrentTask,
+  //fetchExecutionHistory,
   getCurrentTask,
   getExportingToPDF,
   getHistoricTask,
   getPreviousTask,
-  ITask,
-  setPreviousTask,
+  //ITask,
+  //setPreviousTask,
 } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
@@ -67,11 +67,11 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const workerId = useSelector(getWorkerId);
   const workerState = useSelector(getWorkerState);
 
-  const waitForTask = () => {
-    if (task.state && task.state === "CREATED") return true;
-    if (task.state && task.state === "RECEIVED") return true;
-    return false;
-  };
+  // const waitForTask = () => {
+  //   if (task.state && task.state === "CREATED") return true;
+  //   if (task.state && task.state === "RECEIVED") return true;
+  //   return false;
+  // };
 
   const pleaseWait = () => {
     if (notebook?.params?.static_notebook) {
@@ -90,20 +90,20 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
 
   useEffect(() => {
     dispatch(fetchNotebook(notebookId));
-    dispatch(fetchCurrentTask(notebookId));
-    dispatch(fetchExecutionHistory(notebookId));
-    dispatch(setPreviousTask({} as ITask));
+    //dispatch(fetchCurrentTask(notebookId));
+    //dispatch(fetchExecutionHistory(notebookId));
+    //dispatch(setPreviousTask({} as ITask));
   }, [dispatch, notebookId, token]);
 
-  useEffect(() => {
-    if (waitForTask()) {
-      setTimeout(() => {
-        dispatch(fetchCurrentTask(notebookId));
-        dispatch(fetchExecutionHistory(notebookId, false));
-      }, 1000);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, task, notebookId]);
+  // useEffect(() => {
+  //   if (waitForTask()) {
+  //     setTimeout(() => {
+  //       dispatch(fetchCurrentTask(notebookId));
+  //       dispatch(fetchExecutionHistory(notebookId, false));
+  //     }, 1000);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch, task, notebookId]);
 
   // useEffect(() => {
   //   if (isWatchMode()) {

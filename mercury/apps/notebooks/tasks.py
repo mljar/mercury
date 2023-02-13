@@ -115,9 +115,7 @@ def is_presentation(nb):
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
-
     try:
-
         kernels = available_kernels()
 
         params = {
@@ -209,7 +207,6 @@ def task_init_notebook(
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
 
         if render_html:
-
             exporter = Exporter(
                 show_code=params.get("show-code", False),
                 show_prompt=params.get("show-prompt", False),
@@ -219,7 +216,10 @@ def task_init_notebook(
             body = exporter.export(nb)
 
             with open(
-                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"), "w", encoding="utf-8", errors="ignore"
+                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
+                "w",
+                encoding="utf-8",
+                errors="ignore",
             ) as fout:
                 fout.write(body)
 
@@ -322,7 +322,6 @@ def task_init_notebook(
                 errors=parse_errors,
             )
         else:
-
             notebook = Notebook.objects.get(pk=notebook_id)
             notebook.title = notebook_title
             notebook.slug = notebook_slug
@@ -361,7 +360,6 @@ def task_init_notebook(
 
 @shared_task(bind=True)
 def task_watch(self, notebook_id):
-
     notebook = None
     try:
         notebook = Notebook.objects.get(pk=notebook_id)

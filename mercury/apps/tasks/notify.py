@@ -89,7 +89,6 @@ def notify(config, is_success, error_msg, notebook_id, notebook_url):
                 on_failure,
             )
         if email is not None:
-
             notebook_html_path = os.path.join(
                 *(
                     [settings.MEDIA_ROOT]

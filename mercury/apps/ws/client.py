@@ -95,12 +95,13 @@ class ClientProxy(WebsocketConsumer):
                 #
                 # ugly hack for docker deployment
                 #
-                "server_url": self.server_address if "0.0.0.0" not in self.server_address else self.server_address + ":9000"
+                "server_url": self.server_address
+                if "0.0.0.0" not in self.server_address
+                else self.server_address + ":9000",
             }
             transaction.on_commit(lambda: task_start_websocket_worker.delay(job_params))
 
     def worker_ping(self):
-
         workers = Worker.objects.filter(
             Q(state="Running") | Q(state="Queued") | Q(state="Busy"),
             session_id=self.session_id,
@@ -129,6 +130,7 @@ class ClientProxy(WebsocketConsumer):
 
         # clear stale workers
         workers = Worker.objects.filter(
-            updated_at__lte=timezone.now() - timedelta(minutes=settings.WORKER_STALE_TIME)
+            updated_at__lte=timezone.now()
+            - timedelta(minutes=settings.WORKER_STALE_TIME)
         )
         workers.delete()

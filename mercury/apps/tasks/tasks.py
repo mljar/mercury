@@ -27,7 +27,6 @@ def get_parameters_cell_index(cells, all_variables):
     for i in range(min(len(cells), 10)):
         cnt = 0
         if cells[i]["cell_type"] == "code" and not cells[i]["source"].startswith("---"):
-
             for v in all_variables:
                 if v in cells[i]["source"]:
                     cnt += 1
@@ -78,7 +77,6 @@ def task_execute(self, job_params):
                     use_default = False
 
                 elif v["input"] == "file":
-
                     file_server_id = task_params[k]
                     # Get the temporary upload record
                     tu = TemporaryUpload.objects.get(upload_id=file_server_id)
@@ -248,7 +246,6 @@ def task_execute(self, job_params):
             with open(notebook.path, encoding="utf-8", errors="ignore") as f:
                 nb = nbformat.read(f, as_version=4)
                 if "cells" in nb and len(nb["cells"]) > 0:
-
                     old_parameters_index = get_parameters_cell_index(
                         nb["cells"], all_variables
                     )

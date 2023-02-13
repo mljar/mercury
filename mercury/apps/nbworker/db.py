@@ -92,7 +92,7 @@ class DBClient:
             Worker.objects.get(pk=worker_id).delete()
         except Exception:
             pass
-            #log.exception(f"Exception when delete worker")
+            # log.exception(f"Exception when delete worker")
 
     def delete_worker(self):
         DBClient.delete_worker_in_db(self.worker_id)
@@ -121,7 +121,7 @@ class DBClient:
             log.debug(f"Worker id={self.worker_id} exists")
             self.worker = Worker.objects.get(pk=self.worker_id)
         except Worker.DoesNotExist as e:
-            #log.exception(f"Worker id={self.worker_id} does not exists, quit")
+            # log.exception(f"Worker id={self.worker_id} does not exists, quit")
             sys.exit(1)
         return True
 
@@ -129,8 +129,10 @@ class DBClient:
         try:
             log.debug(f"Check worker id={self.worker_id} is stale")
             self.worker = Worker.objects.get(pk=self.worker_id)
-            return self.worker.updated_at < timezone.now() - timedelta(minutes=settings.WORKER_STALE_TIME)
-           
+            return self.worker.updated_at < timezone.now() - timedelta(
+                minutes=settings.WORKER_STALE_TIME
+            )
+
         except Exception:
             log.exception(
                 f"Exception when check if worker id={self.worker_id} is stale"

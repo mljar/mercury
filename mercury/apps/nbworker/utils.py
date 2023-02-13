@@ -25,6 +25,8 @@ class Purpose(str, Enum):
     UpdateWidgets = "update-widgets"
     HideWidgets = "hide-widgets"
     InitWidgets = "init-widgets"
-    
+    UpdateTitle = "update-title"
+    UpdateShowCode = "update-show-code"
+
     DownloadHTML = "download-html"
     DownloadPDF = "download-pdf"
