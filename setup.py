@@ -12,11 +12,11 @@ def list_files(directory):
     return paths
 
 setup(
-    name="mljar-mercury",
-    version="1.1.6",
+    name="mercury",
+    version="2.0.0",
     maintainer="MLJAR Sp. z o.o.",
     maintainer_email="contact@mljar.com",
-    description="Convert Python Notebook to web app and share with non-technical users",
+    description="Turn Jupyter Notebook to Web App and share with non-technical users",
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=open("mercury/requirements.txt").readlines(),

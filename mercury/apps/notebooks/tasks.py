@@ -1,24 +1,30 @@
 import json
+import logging
 import os
 import subprocess
 import sys
 import uuid
-import nbformat
-import yaml
 
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen
-from croniter import croniter
+
+import nbformat
+import yaml
 from celery import shared_task
+from croniter import croniter
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
+from apps.nb.exporter import Exporter
 from apps.notebooks.models import Notebook
-from apps.tasks.models import Task
 from apps.notebooks.slides_themes import SlidesThemes
+from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
+from apps.ws.utils import parse_params
+
+log = logging.getLogger(__name__)
 
 
 def process_nbconvert_errors(error_msg):
@@ -87,16 +93,33 @@ def available_kernels():
     return kernels
 
 
+def nb_default_title(nb_path):
+    try:
+        fname = os.path.basename(nb_path)
+        if "." in fname:
+            return ".".join(fname.split(".")[:-1])
+        return fname
+    except Exception as e:
+        log.exception("Problem when get default title from notebook")
+
+    return "Please provide title"
+
+
+def is_presentation(nb):
+    for cell in nb.cells:
+        if "slideshow" in cell.get("metadata", {}):
+            return True
+    return False
+
+
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
-
     try:
-
         kernels = available_kernels()
 
         params = {
-            "title": "Please provide title",
+            "title": "",
             "author": "Please provide author",
             "description": "Please provide description",
             "share": "public",
@@ -136,6 +159,12 @@ def task_init_notebook(
                         )
                         return
 
+            # check if nb in V2
+            parse_params(nb, params)
+
+        if nb is None:
+            raise Exception(f"Cant read notebook from {notebook_path}")
+
         if update_notebook and nb is not None:
             with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
                 nbformat.write(nb, f)
@@ -143,14 +172,19 @@ def task_init_notebook(
         if "date" in params:
             params["date"] = str(params["date"])
 
-        notebook_title = params.get("title", "Please provide title")
-        if notebook_title is None or notebook_title == "":
-            notebook_title = "Please provide title"
+        notebook_title = params.get("title", "")
+        if notebook_title == "":
+            notebook_title = nb_default_title(notebook_path)
         notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
         notebook_notify = params.get("notify", {})
+
+        if is_presentation(nb):
+            # automatically detect slides in cells
+            # and set slides output
+            notebook_output = "slides"
 
         if notebook_schedule != "":
             try:
@@ -165,12 +199,31 @@ def task_init_notebook(
             "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
         )
 
-        notebook_slug = params.get("slug", slugify(notebook_title))
+        notebook_slug = params.get("slug", "")
+        if notebook_slug == "":
+            notebook_slug = slugify(notebook_title)
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
 
         if render_html:
+            exporter = Exporter(
+                show_code=params.get("show-code", False),
+                show_prompt=params.get("show-prompt", False),
+                is_presentation=notebook_output == "slides",
+                reveal_theme=notebook_format.get("theme", "white"),
+            )
+            body = exporter.export(nb)
+
+            with open(
+                os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
+                "w",
+                encoding="utf-8",
+                errors="ignore",
+            ) as fout:
+                fout.write(body)
+
+            """
             command = [
                 get_jupyter_bin_path(),
                 "nbconvert",
@@ -201,7 +254,10 @@ def task_init_notebook(
             error_msg = process_nbconvert_errors(error_msg)
             if error_msg != "":
                 print(error_msg)
+            """
+            error_msg = ""  # TODO: handle errors
 
+            """
             # change file name if needed
             if notebook_output == "slides":
                 expected_fpath = os.path.join(
@@ -212,8 +268,8 @@ def task_init_notebook(
                 )
                 if os.path.exists(slides_fpath):
                     os.rename(slides_fpath, expected_fpath)
-
-            if "--no-input" in command:
+            """
+            if not params.get("show-code", False):  # "--no-input" in command:
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     "a",
@@ -232,6 +288,7 @@ def task_init_notebook(
 </style>"""
                     )
 
+            """
             if notebook_output == "slides":
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
@@ -240,6 +297,7 @@ def task_init_notebook(
                     errors="ignore",
                 ) as fout:
                     fout.write(SlidesThemes.additional_css(notebook_format))
+            """
 
         parse_errors = validate_notify(notebook_notify)
 
@@ -264,7 +322,6 @@ def task_init_notebook(
                 errors=parse_errors,
             )
         else:
-
             notebook = Notebook.objects.get(pk=notebook_id)
             notebook.title = notebook_title
             notebook.slug = notebook_slug
@@ -303,7 +360,6 @@ def task_init_notebook(
 
 @shared_task(bind=True)
 def task_watch(self, notebook_id):
-
     notebook = None
     try:
         notebook = Notebook.objects.get(pk=notebook_id)

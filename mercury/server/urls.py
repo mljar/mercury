@@ -1,17 +1,14 @@
 from django.conf import settings
-from django.contrib import admin
-from django.urls import path, re_path
-from django.conf.urls import url, include
-from django.shortcuts import render
+from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.shortcuts import render
+from django.urls import path, re_path
 
-from apps.tasks.urls import tasks_urlpatterns
 from apps.notebooks.urls import notebooks_urlpatterns
-
-from server.views import VersionInfo
-from server.views import WelcomeMessage
-
+from apps.tasks.urls import tasks_urlpatterns
 from server.settings import is_pro
+from server.views import VersionInfo, WelcomeMessage
 
 urlpatterns = []
 

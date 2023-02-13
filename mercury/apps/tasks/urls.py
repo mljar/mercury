@@ -4,13 +4,14 @@ from rest_framework.routers import DefaultRouter
 from apps.tasks.views import (
     ClearTasksView,
     CreateRestAPITask,
-    GetPDFAddress,
+    ExecutionHistoryView,
+    ExportPDF,
     GetLastTaskView,
+    GetPDFAddress,
     GetRestAPITask,
     ListOutputFilesView,
+    ListWorkerOutputFilesView,
     TaskCreateView,
-    ExportPDF,
-    ExecutionHistoryView,
 )
 
 tasks_urlpatterns = [
@@ -22,6 +23,10 @@ tasks_urlpatterns = [
     url(
         "api/v1/output_files/(?P<session_id>.+)/(?P<task_id>.+)",
         ListOutputFilesView.as_view(),
+    ),
+    url(
+        "api/v1/worker_output_files/(?P<session_id>.+)/(?P<worker_id>.+)",
+        ListWorkerOutputFilesView.as_view(),
     ),
     url(
         "api/v1/clear_tasks/(?P<notebook_id>.+)/(?P<session_id>.+)",

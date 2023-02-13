@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "./widgetsSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
 
 type SliderProps = {
@@ -12,6 +12,7 @@ type SliderProps = {
   step: number | null;
   vertical: boolean | null;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function SliderWidget({
@@ -23,6 +24,7 @@ export default function SliderWidget({
   step,
   vertical,
   disabled,
+  runNb,
 }: SliderProps) {
   const dispatch = useDispatch();
 
@@ -39,9 +41,15 @@ export default function SliderWidget({
     stepValue = step;
   }
   const vals: number[] = [value !== null ? value : maxValue];
+
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`slider-${label}`}>{label}</label>
+      <label
+        htmlFor={`slider-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
 
       <div
         style={{
@@ -59,6 +67,9 @@ export default function SliderWidget({
           max={maxValue}
           onChange={(values) => {
             dispatch(setWidgetValue({ key: widgetKey, value: values[0] }));
+          }}
+          onFinalChange={(values) => {
+            runNb();
           }}
           renderTrack={({ props, children }) => (
             <div

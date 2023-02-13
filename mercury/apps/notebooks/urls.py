@@ -1,6 +1,5 @@
 from django.conf.urls import url
 
-
 from apps.notebooks.views import ListNotebooks, RetrieveNotebook
 
 notebooks_urlpatterns = [

@@ -21,6 +21,9 @@ RUN pip install --upgrade pip
 RUN pip install gunicorn
 RUN pip install -r mercury/requirements.txt
 RUN pip install psycopg2 
+RUN pip install daphne
+RUN pip install mercury
+
 
 # install Pro features if GITHUB_TOKEN is set
 RUN if [ -z "${GITHUB_TOKEN}" ] ; then \
@@ -33,7 +36,8 @@ RUN if [ -z "${GITHUB_TOKEN}" ] ; then \
 
 ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
-ADD ./mercury/manage.py /app/mercury/
+ADD ./mercury/*.py /app/mercury/
+ADD ./mercury/widgets /app/mercury/widgets
 ADD ./docker /app/docker
 
 RUN chmod +x /app/docker/mercury/entrypoint.sh

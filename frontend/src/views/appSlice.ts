@@ -28,7 +28,7 @@ const appSlice = createSlice({
     setFilesState(state, action: PayloadAction<string>) {
       state.filesState = action.payload;
     },
-    setFiles(state, action: PayloadAction<string []>) {
+    setFiles(state, action: PayloadAction<string[]>) {
       state.files = action.payload;
     },
     setShowSideBar(state, action: PayloadAction<boolean>) {
@@ -69,6 +69,24 @@ export const fetchOutputFiles =
       } catch (error) {
         dispatch(setFilesState("error"))
         console.error(`Problem during loading output files. ${error}`);
+      }
+
+    };
+
+export const fetchWorkerOutputFiles =
+  (workerId: number) =>
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        dispatch(setFilesState("loading"))
+        dispatch(setFiles([]));
+        const sessionId = getSessionId();
+        const url = `/api/v1/worker_output_files/${sessionId}/${workerId}`;
+        const { data } = await axios.get(url);
+        dispatch(setFiles(data));
+        dispatch(setFilesState("loaded"))
+      } catch (error) {
+        dispatch(setFilesState("error"))
+        console.error(`Problem during loading worker output files. ${error}`);
       }
 
     };

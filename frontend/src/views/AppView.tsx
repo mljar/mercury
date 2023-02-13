@@ -13,19 +13,19 @@ import {
   // getWatchModeCounter,
 } from "../components/Notebooks/notebooksSlice";
 import {
-  fetchCurrentTask,
-  fetchExecutionHistory,
+  //fetchCurrentTask,
+  //fetchExecutionHistory,
   getCurrentTask,
   getExportingToPDF,
   getHistoricTask,
   getPreviousTask,
-  ITask,
-  setPreviousTask,
+  //ITask,
+  //setPreviousTask,
 } from "../tasks/tasksSlice";
 import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
-  fetchOutputFiles,
+  fetchWorkerOutputFiles,
   getOutputFiles,
   getOutputFilesState,
   getShowSideBar,
@@ -40,6 +40,7 @@ import RestAPIView from "../components/RestAPIView";
 import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
+import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -63,11 +64,20 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const slidesHash = useSelector(getSlidesHash);
   const showSideBar = useSelector(getShowSideBar);
   const exportingToPDF = useSelector(getExportingToPDF);
+  const workerId = useSelector(getWorkerId);
+  const workerState = useSelector(getWorkerState);
 
-  const waitForTask = () => {
-    if (task.state && task.state === "CREATED") return true;
-    if (task.state && task.state === "RECEIVED") return true;
-    return false;
+  // const waitForTask = () => {
+  //   if (task.state && task.state === "CREATED") return true;
+  //   if (task.state && task.state === "RECEIVED") return true;
+  //   return false;
+  // };
+
+  const pleaseWait = () => {
+    if (notebook?.params?.static_notebook) {
+      return false;
+    }
+    return workerState !== WorkerState.Running;
   };
 
   const isWatchMode = () => {
@@ -80,20 +90,20 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
 
   useEffect(() => {
     dispatch(fetchNotebook(notebookId));
-    dispatch(fetchCurrentTask(notebookId));
-    dispatch(fetchExecutionHistory(notebookId));
-    dispatch(setPreviousTask({} as ITask));
+    //dispatch(fetchCurrentTask(notebookId));
+    //dispatch(fetchExecutionHistory(notebookId));
+    //dispatch(setPreviousTask({} as ITask));
   }, [dispatch, notebookId, token]);
 
-  useEffect(() => {
-    if (waitForTask()) {
-      setTimeout(() => {
-        dispatch(fetchCurrentTask(notebookId));
-        dispatch(fetchExecutionHistory(notebookId, false));
-      }, 1000);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, task, notebookId]);
+  // useEffect(() => {
+  //   if (waitForTask()) {
+  //     setTimeout(() => {
+  //       dispatch(fetchCurrentTask(notebookId));
+  //       dispatch(fetchExecutionHistory(notebookId, false));
+  //     }, 1000);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch, task, notebookId]);
 
   // useEffect(() => {
   //   if (isWatchMode()) {
@@ -104,17 +114,30 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [dispatch, notebook, watchModeCounter]);
 
+  // version 1
+  // useEffect(() => {
+  //   if (
+  //     appView === "files" &&
+  //     task.id &&
+  //     task.state &&
+  //     task.state === "DONE" &&
+  //     task.result &&
+  //     notebook?.params?.version === "1"
+  //   ) {
+  //     dispatch(fetchOutputFiles(task.id));
+  //   }
+  // }, [dispatch, appView, task.id, task.state, task.result, notebook]);
+
+  // version 2
   useEffect(() => {
     if (
       appView === "files" &&
-      task.id &&
-      task.state &&
-      task.state === "DONE" &&
-      task.result
+      notebook?.params?.version === "2" &&
+      workerId !== undefined
     ) {
-      dispatch(fetchOutputFiles(task.id));
+      dispatch(fetchWorkerOutputFiles(workerId));
     }
-  }, [dispatch, appView, task.id, task.state, task.result]);
+  }, [dispatch, appView, notebook, workerId]);
 
   let notebookPath = notebook.default_view_path;
   if (task.state && task.state === "DONE" && task.result) {
@@ -151,7 +174,9 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     notebookPath = previousTask.result;
   }
 
-  const areOutputFilesAvailable = (widgetsParams: IWidget[]): boolean => {
+  const areOutputFilesAvailable = (
+    widgetsParams: Record<string, IWidget>
+  ): boolean => {
     if (widgetsParams) {
       for (let [, widgetParams] of Object.entries(widgetsParams)) {
         if (isOutputFilesWidget(widgetParams)) {
@@ -190,7 +215,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 notebookSchedule={notebook.schedule}
                 taskCreatedAt={task.created_at}
                 loadingState={loadingState}
-                waiting={waitForTask()}
+                waiting={pleaseWait()} // {waitForTask()}
                 widgetsParams={notebook?.params?.params}
                 watchMode={isWatchMode()}
                 notebookPath={notebookPath}
@@ -200,6 +225,8 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                   notebook.output !== undefined && notebook.output === "slides"
                 }
                 notebookParseErrors={notebook.errors}
+                continuousUpdate={notebook?.params?.continuous_update}
+                staticNotebook={notebook?.params?.static_notebook}
               />
             )}
 
@@ -233,25 +260,29 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 taskSessionId={task.session_id}
               />
             )}
-            {appView === "app" && (
-              <MainView
-                loadingState={loadingState}
-                notebookPath={notebookPath}
-                errorMsg={errorMsg}
-                waiting={waitForTask()}
-                watchMode={isWatchMode()}
-                displayEmbed={displayEmbed}
-                isPro={isPro}
-                username={username}
-                slidesHash={slidesHash}
-                columnsWidth={showSideBar ? 9 : 12}
-              />
-            )}
+
+            <MainView
+              appView={appView}
+              loadingState={loadingState}
+              notebookPath={notebookPath}
+              errorMsg={errorMsg}
+              waiting={pleaseWait()} // {waitForTask()}
+              watchMode={isWatchMode()}
+              displayEmbed={displayEmbed}
+              isPro={isPro}
+              username={username}
+              slidesHash={slidesHash}
+              columnsWidth={showSideBar ? 9 : 12}
+              isPresentation={
+                notebook.output !== undefined && notebook.output === "slides"
+              }
+            />
+
             {appView === "files" && (
               <FilesView
                 files={outputFiles}
                 filesState={outputFilesState}
-                waiting={waitForTask()}
+                waiting={pleaseWait()} // {waitForTask()}
               />
             )}
           </div>

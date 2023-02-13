@@ -28,7 +28,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-
             self.stdout.write(
                 self.style.HTTP_INFO(f'Watching notebook {options["notebook_path"]}')
             )
