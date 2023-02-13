@@ -10,20 +10,7 @@
 [![PyPI version](https://badge.fury.io/py/mercury.svg)](https://badge.fury.io/py/mercury)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
-<<<<<<< HEAD
-## We are working on Mercury V2!
-
-We are working on Mercury Version 2. You will be able to add widgets with Python API, cache cell execution results and have dynamic widgets.
-
-V2 will be available soon! Q1 2023 (I hope it will be in January) 
-
-We are working on new docs and public cloud offering. You will just upload notebook to create your own interactive website!
-
-
-# Share your Python notebook as web application
-=======
 # Build Web Apps in Jupyter Notebook
->>>>>>> v2
 
 Mercury allows you to add interactive widgets in Python notebooks, so you canshare notebooks as web applications. Forget about rewriting notebooks to web frameworks just to share your results. Mercury offers set of widgets with simple re-execution of cells.
 
