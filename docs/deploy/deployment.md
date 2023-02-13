@@ -20,7 +20,7 @@ Please remember to add the above `Procfile` to the GitHub repository.
 
 !!! important "Required packages"
 
-    Before deployement, you need to add `requrements.txt` file with needed packages to the repository.
+    Before deployement, you need to add `requirements.txt` file with needed packages to the repository.
 
 ## Deploy with `docker-compose`
 
