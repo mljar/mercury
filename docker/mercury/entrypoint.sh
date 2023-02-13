@@ -30,11 +30,13 @@ python manage.py collectstatic --noinput
 
 python manage.py createsuperuser --noinput
 
-celery -A server worker --loglevel=error -P gevent --concurrency 4 -E &
+celery -A server worker --loglevel=info -P gevent --concurrency 4 -E &
 
 celery -A server beat --loglevel=error --max-interval 60 &
+
+daphne server.asgi:application --bind 0.0.0.0 --port 9000 &
 
 gunicorn server.wsgi --bind 0.0.0.0:8000 --workers 4 --threads 4
 
 # for debug
-# python manage.py runserver 0.0.0.0:8000
+#python manage.py runserver 0.0.0.0:9000

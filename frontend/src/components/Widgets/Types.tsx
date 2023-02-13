@@ -67,6 +67,14 @@ export interface IMarkdownWidget {
   value: string;
 }
 
+export interface IButtonWidget {
+  label: string | null;
+  style: string;
+  input: string;
+  value: string | boolean | null;
+}
+
+
 export type IWidget =
   | ISelectWidget
   | ICheckboxWidget
@@ -76,7 +84,8 @@ export type IWidget =
   | IFileWidget
   | ITextWidget
   | IOutputFilesWidget
-  | IMarkdownWidget;
+  | IMarkdownWidget
+  | IButtonWidget;
 
 export function isSelectWidget(widget: IWidget): widget is ISelectWidget {
   return (widget as ISelectWidget).input === "select";
@@ -112,4 +121,8 @@ export function isOutputFilesWidget(widget: IWidget): widget is IOutputFilesWidg
 
 export function isMarkdownWidget(widget: IWidget): widget is IMarkdownWidget {
   return (widget as IMarkdownWidget).output === "markdown";
+}
+
+export function isButtonWidget(widget: IWidget): widget is IButtonWidget {
+  return (widget as IButtonWidget).input === "button";
 }

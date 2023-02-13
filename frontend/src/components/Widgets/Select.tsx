@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select, { MultiValue } from "react-select";
-import { setWidgetValue } from "./widgetsSlice";
+import { RUN_DELAY_FAST, setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 type MultiOption = MultiValue<{ value: string; label: string } | undefined>;
@@ -20,6 +20,7 @@ type SelectProps = {
   choices: string[];
   multi: boolean | undefined;
   disabled: boolean;
+  runNb: () => void;
 };
 
 export default function SelectWidget({
@@ -29,8 +30,10 @@ export default function SelectWidget({
   choices,
   multi,
   disabled,
+  runNb,
 }: SelectProps) {
   const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
 
   const selectStyles = {
     menu: (base: any) => ({
@@ -59,9 +62,24 @@ export default function SelectWidget({
     });
   }
 
+  useEffect(() => {
+    if (!updated) return;
+    const timeOutId = setTimeout(() => {
+      // console.log("run from select");
+      runNb();
+    }, RUN_DELAY_FAST);
+    return () => clearTimeout(timeOutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <div className="form-group mb-3">
-      <label htmlFor={`select-${label}`}>{label}</label>
+      <label
+        htmlFor={`select-${label}`}
+        style={{ color: disabled ? "#555" : "#212529" }}
+      >
+        {label}
+      </label>
       <Select
         id={`select-${label}`}
         isDisabled={disabled}
@@ -71,8 +89,8 @@ export default function SelectWidget({
         options={options}
         isMulti={multi}
         onChange={(e) => {
-
           if (e) {
+            userInteraction(true);
             if (isSingleOption(e)) {
               dispatch(setWidgetValue({ key: widgetKey, value: e.value }));
             } else {

@@ -1,9 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { clearTasks, copyCurrentToPreviousTask, executeNotebook, exportToPDF } from "../tasks/tasksSlice";
+import {
+  exportToPDF,
+  scrapeSlidesHash,
+  setExportingToPDF,
+} from "../tasks/tasksSlice";
 import CheckboxWidget from "./Widgets/Checkbox";
 import NumericWidget from "./Widgets/Numeric";
 import RangeWidget from "./Widgets/Range";
@@ -20,15 +24,35 @@ import {
   isTextWidget,
   isMarkdownWidget,
   IWidget,
+  isOutputFilesWidget,
+  isButtonWidget,
 } from "./Widgets/Types";
-import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+//import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+import {
+  getWidgetsValues,
+  setSlidesHash,
+  setWidgetValue,
+} from "./Notebooks/notebooksSlice";
 import FileWidget from "./Widgets/File";
 import TextWidget from "./Widgets/Text";
-import { fetchNotebook } from "./Notebooks/notebooksSlice";
 import { setShowSideBar, setView } from "../views/appSlice";
 import { handleDownload } from "../utils";
 import MarkdownWidget from "./Widgets/Markdown";
-import SelectExecutionHistory from "./SelectExecutionHistory";
+
+import { WebSocketContext } from "../websocket/Provider";
+import WebSocketStateBar from "../websocket/StatusBar";
+import {
+  displayNotebook,
+  downloadHTML,
+  downloadPDF,
+  getWorkerState,
+  runNotebook,
+  saveNotebook,
+  WorkerState,
+} from "../websocket/wsSlice";
+import ButtonWidget from "./Widgets/Button";
+import RunButton from "./RunButton";
+import BlockUi from "react-block-ui";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -37,13 +61,15 @@ type SideBarProps = {
   taskCreatedAt: Date;
   loadingState: string;
   waiting: boolean;
-  widgetsParams: Array<IWidget>;
+  widgetsParams: Record<string, IWidget>;
   watchMode: boolean;
   notebookPath: string;
   displayEmbed: boolean;
   showFiles: boolean;
   isPresentation: boolean;
   notebookParseErrors: string;
+  continuousUpdate: boolean;
+  staticNotebook: boolean;
 };
 
 export default function SideBar({
@@ -60,13 +86,66 @@ export default function SideBar({
   showFiles,
   isPresentation,
   notebookParseErrors,
+  continuousUpdate,
+  staticNotebook,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
+  const workerState = useSelector(getWorkerState);
+
+  const ws = useContext(WebSocketContext);
+
+  // useEffect(() => {
+  //   const timeOutId = setTimeout(() => {
+  //     console.log("effect widgets values");
+  //   }, RUN_DELAY);
+  //   return () => clearTimeout(timeOutId);
+  // }, [widgetsValues]);
+
+  const runNb = () => {
+    if (continuousUpdate) {
+      execNb();
+    }
+  };
+
+  const execNb = () => {
+    const slidesHash = scrapeSlidesHash();
+    dispatch(setSlidesHash(slidesHash));
+
+    ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(widgetsValues))));
+  };
+
+  const saveNb = () => {
+    if (!staticNotebook) {
+      ws.sendMessage(JSON.stringify(saveNotebook()));
+    }
+  };
+
+  const displayNb = (taskId: number) => {
+    if (!staticNotebook) {
+      ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
+    }
+  };
+
+  const runDownloadHTML = () => {
+    if (!staticNotebook) {
+      ws.sendMessage(JSON.stringify(downloadHTML()));
+    }
+  };
+
+  const runDownloadPDF = () => {
+    if (!staticNotebook) {
+      ws.sendMessage(JSON.stringify(downloadPDF()));
+    }
+  };
 
   useEffect(() => {
     if (widgetsParams) {
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+        if (key in widgetsValues) {
+          continue;
+        }
+
         if (widgetParams.input === "file") {
           dispatch(setWidgetValue({ key, value: [] as string[] }));
         } else if (widgetParams.input === "text") {
@@ -79,17 +158,35 @@ export default function SideBar({
         } else if (isMarkdownWidget(widgetParams)) {
           // do nothing
           // dont put value into store
+        } else if (isOutputFilesWidget(widgetParams)) {
+          dispatch(setWidgetValue({ key, value: "output-dir" }));
         } else {
           dispatch(setWidgetValue({ key, value: widgetParams.value }));
         }
       }
     }
-  }, [dispatch, widgetsParams]);
+  }, [dispatch, widgetsParams, widgetsValues]);
 
   let widgets = [];
   let fileKeys = [] as string[]; // keys to file widgets, all need to be selected to enable RUN button
-  if (widgetsParams) {
-    for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+
+  if (widgetsParams && !staticNotebook) {
+    // sort widgets keys based on cell index and code line number
+    let widgetKeys = [];
+    for (let key of Object.keys(widgetsParams)) {
+      const parts = key.split(".");
+      widgetKeys.push([key, parseFloat(`${parts[1]}.${parts[2]}`)]);
+    }
+    widgetKeys.sort(function (a, b) {
+      const a1 = a[1] as number;
+      const b1 = b[1] as number;
+      return a1 - b1;
+    });
+
+    for (let wKey of widgetKeys) {
+      const key = wKey[0] as string;
+      const widgetParams = widgetsParams[key];
+
       if (isSelectWidget(widgetParams)) {
         widgets.push(
           <SelectWidget
@@ -100,6 +197,7 @@ export default function SideBar({
             choices={widgetParams?.choices}
             multi={widgetParams?.multi}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isCheckboxWidget(widgetParams)) {
@@ -110,6 +208,7 @@ export default function SideBar({
             label={widgetParams?.label}
             value={widgetsValues[key] as boolean}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isNumericWidget(widgetParams)) {
@@ -123,6 +222,7 @@ export default function SideBar({
             max={widgetParams?.max}
             step={widgetParams?.step}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isSliderWidget(widgetParams)) {
@@ -137,6 +237,7 @@ export default function SideBar({
             step={widgetParams?.step}
             vertical={widgetParams?.vertical}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isRangeWidget(widgetParams)) {
@@ -151,6 +252,7 @@ export default function SideBar({
             step={widgetParams?.step}
             vertical={widgetParams?.vertical}
             key={key}
+            runNb={runNb}
           />
         );
       } else if (isFileWidget(widgetParams)) {
@@ -161,6 +263,8 @@ export default function SideBar({
             label={widgetParams?.label}
             maxFileSize={widgetParams?.maxFileSize}
             key={key}
+            value={widgetsValues[key] as string[]}
+            runNb={runNb}
           />
         );
         fileKeys.push(key);
@@ -173,32 +277,54 @@ export default function SideBar({
             value={widgetsValues[key] as string}
             rows={widgetParams?.rows}
             key={key}
+            runNb={runNb}
+            continuousUpdate={continuousUpdate}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {
         widgets.push(
-          <MarkdownWidget value={widgetParams.value as string} key={key} />
+          <MarkdownWidget
+            value={widgetParams.value as string}
+            disabled={waiting}
+            key={key}
+          />
         );
+      } else if (isButtonWidget(widgetParams)) {
+        widgets.push(
+          <ButtonWidget
+            widgetKey={key}
+            disabled={waiting}
+            label={widgetParams?.label}
+            value={widgetsValues[key] as boolean}
+            style={widgetParams?.style}
+            key={key}
+            runNb={runNb}
+          />
+        );
+      } else if (isOutputFilesWidget(widgetParams)) {
+        // do nothing
+      } else {
+        console.log("Unknown widget type", widgetParams);
       }
     }
   }
 
-  const allFilesUploaded = () => {
-    if (fileKeys.length === 0) {
-      // no files at all, so OK
-      return true;
-    }
-    for (const key of fileKeys) {
-      if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
-        return false;
-      }
-      let files = widgetsValues[key] as string[];
-      if (files.length === 0) {
-        return false;
-      }
-    }
-    return true;
-  };
+  // const allFilesUploaded = () => {
+  //   if (fileKeys.length === 0) {
+  //     // no files at all, so OK
+  //     return true;
+  //   }
+  //   for (const key of fileKeys) {
+  //     if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
+  //       return false;
+  //     }
+  //     let files = widgetsValues[key] as string[];
+  //     if (files === undefined || files.length === 0) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
 
   let additionalStyle = {};
   if (displayEmbed) {
@@ -211,247 +337,305 @@ export default function SideBar({
       className="col-lg-3 d-md-block bg-light sidebar"
       style={{ ...additionalStyle, overflowY: "auto" }}
     >
-      <div className="position-sticky p-3">
-        <h4>
-          {notebookTitle}
-          <button
-            className="btn btn-sm  btn-outline-primary"
-            type="button"
-            style={{
-              float: "right",
-              zIndex: "101",
-            }}
-            onClick={() => dispatch(setShowSideBar(false))}
-            data-toggle="tooltip"
-            data-placement="right"
-            title="Hide sidebar"
-          >
-            <i className="fa fa-chevron-left" aria-hidden="true" />
-          </button>
-        </h4>
+      <BlockUi blocking={false} message="">
+        <div className="position-sticky p-3">
+          <h4>
+            {notebookTitle}
+            <button
+              className="btn btn-sm  btn-outline-primary"
+              type="button"
+              style={{
+                float: "right",
+                zIndex: "101",
+              }}
+              onClick={() => dispatch(setShowSideBar(false))}
+              data-toggle="tooltip"
+              data-placement="right"
+              title="Hide sidebar"
+            >
+              <i className="fa fa-chevron-left" aria-hidden="true" />
+            </button>
+          </h4>
 
-        <div style={{ padding: "0px" }}>
-          <form>
-            {widgets}
-
-            <div className="form-group mb-3">
-              <button
-                type="button"
-                className="btn btn-success"
-                style={{ marginRight: "10px", width: "47%" }}
-                onClick={() => {
-                  // copy current task to previous task
-                  // previous task is used for display
-                  // during wait for new results
-                  dispatch(copyCurrentToPreviousTask());
-                  // execute the notebook with new parameters
-                  dispatch(executeNotebook(notebookId));
-                }}
-                disabled={waiting || !allFilesUploaded()}
-              >
-                <i className="fa fa-play" aria-hidden="true"></i> Run
-              </button>
-
-              <div
-                className="dropdown"
-                style={{ width: "47%", float: "right" }}
-              >
-                <button
-                  className="btn btn-primary dropdown-toggle"
-                  style={{ margin: "0px", width: "100%" }}
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  disabled={waiting}
-                >
-                  Download
-                </button>
-
-                <ul className="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <a
-                      style={{ cursor: "pointer" }}
-                      className="dropdown-item"
-                      onClick={() => {
-                        handleDownload(
-                          `${axios.defaults.baseURL}${notebookPath}`,
-                          `${notebookTitle}.html`
-                        );
-                      }}
-                    >
-                      <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
-                      Download as HTML
-                    </a>
-                  </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="dropdown-item"
-                      onClick={() => {
-                        dispatch(exportToPDF(notebookId, notebookPath));
-                      }}
-                    >
-                      <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
-                      Download as PDF
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {fileKeys && !allFilesUploaded() && (
-              <div className="alert alert-danger mb-3" role="alert">
-                <i className="fa fa-file" aria-hidden="true"></i> Please upload
-                all required files.
-              </div>
-            )}
-
-            {notebookTitle === "Please provide title" && (
-              <div className="alert alert-warning mb-3" role="alert">
-                <i
-                  className="fa fa-exclamation-triangle"
-                  aria-hidden="true"
-                ></i>{" "}
-                <b>
-                  Please add YAML config to your notebook as a first raw cell.
-                </b>
-                <br />
-                <br />
-                Example:
-                <pre>
-                  ---
-                  <br />
-                  title: Report title
-                  <br />
-                  author: Your name
-                  <br />
-                  description: My amazing report
-                  <br />
-                  ---
-                </pre>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() =>
-                    window.open(
-                      "https://github.com/mljar/mercury#convert-notebook-to-web-app-with-yaml",
-                      "_blank"
-                    )
-                  }
-                >
-                  <i className="fa fa-book" aria-hidden="true"></i> Read more
-                </button>
-              </div>
-            )}
-
-            {notebookSchedule !== "" && (
-              <div className="alert alert-success mb-3" role="alert">
-                <p>
-                  <i className="fa fa-clock-o" aria-hidden="true"></i> Scheduled
-                  notebook at '{notebookSchedule}'.
-                </p>
-
-                {taskCreatedAt && (
-                  <p>
-                    {" "}
-                    <i className="fa fa-calendar" aria-hidden="true"></i> Last
-                    execution at {taskCreatedAt}.
-                  </p>
+          <div style={{ padding: "0px" }}>
+            <form>
+              {widgets}
+              <div className="form-group mb-3 pb-1 pt-2">
+                {!continuousUpdate && (
+                  <RunButton
+                    runNb={execNb}
+                    waiting={waiting}
+                    workerState={workerState}
+                  />
                 )}
-                <div>
-                  <i className="fa fa-refresh" aria-hidden="true"></i> Website
-                  refresh every minute.
+                <div
+                  className="dropdown"
+                  style={{
+                    width: "47%",
+                    float: continuousUpdate ? "left" : "right",
+                  }}
+                >
+                  <button
+                    className="btn btn-primary dropdown-toggle"
+                    style={{ margin: "0px", width: "100%" }}
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    disabled={waiting}
+                  >
+                    Download
+                  </button>
+
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <a
+                        style={{ cursor: "pointer" }}
+                        className="dropdown-item"
+                        onClick={() => {
+                          if (staticNotebook) {
+                            handleDownload(
+                              `${axios.defaults.baseURL}${notebookPath}`,
+                              `${notebookTitle}.html`
+                            );
+                          } else {
+                            runDownloadHTML();
+
+                            //handleDownload(
+                            //  `${axios.defaults.baseURL}${notebookPath}`,
+                            //</li>  `${notebookTitle}.html`
+                            //);
+                          }
+                        }}
+                      >
+                        <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
+                        Download as HTML
+                      </a>
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => {
+                          if (staticNotebook) {
+                            dispatch(exportToPDF(notebookId, notebookPath));
+                          } else {
+                            dispatch(setExportingToPDF(true));
+                            runDownloadPDF();
+                          }
+                        }}
+                      >
+                        <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
+                        Download as PDF
+                      </button>
+                    </li>
+                  </ul>
                 </div>
               </div>
-            )}
 
-            {waiting && (
-              <div className="alert alert-primary mb-3" role="alert">
-                <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is
-                executed. Please wait.
-              </div>
-            )}
-            {watchMode && (
-              <div className="alert alert-secondary mb-3" role="alert">
-                <i className="fa fa-refresh" aria-hidden="true"></i> Notebook in
-                watch mode. All changes to Notebook will be automatically
-                visible in Mercury.
-              </div>
-            )}
+              {/* {fileKeys && !allFilesUploaded() && (
+                <div className="alert alert-danger mb-3" role="alert">
+                  <i className="fa fa-file" aria-hidden="true"></i> Please
+                  upload all required files.
+                </div>
+              )} */}
 
-            {isPresentation && (
-              <div className="alert alert-primary mb-3" role="alert">
-                <i className="fa fa-television" aria-hidden="true"></i> Click on
-                presentation and press <b>F</b> for full screen. Press{" "}
-                <b>Esc</b> to quit.
-                <br />
-                <br />
-                <i className="fa fa-arrows" aria-hidden="true"></i> Click on
-                presentation and press <b>Esc</b> to navigate slides.
-              </div>
-            )}
+              {/* {notebookTitle === "Please provide title" && (
+                <div className="alert alert-warning mb-3" role="alert">
+                  <i
+                    className="fa fa-exclamation-triangle"
+                    aria-hidden="true"
+                  ></i>{" "}
+                  <b>
+                    Please add YAML config to your notebook as a first raw cell.
+                  </b>
+                  <br />
+                  <br />
+                  Example:
+                  <pre>
+                    ---
+                    <br />
+                    title: Report title
+                    <br />
+                    author: Your name
+                    <br />
+                    description: My amazing report
+                    <br />
+                    ---
+                  </pre>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() =>
+                      window.open(
+                        "https://github.com/mljar/mercury#convert-notebook-to-web-app-with-yaml",
+                        "_blank"
+                      )
+                    }
+                  >
+                    <i className="fa fa-book" aria-hidden="true"></i> Read more
+                  </button>
+                </div>
+              )} */}
 
-            {notebookParseErrors && (
-              <div className="alert alert-danger mb-3" role="alert">
-                <i className="fa fa-exclamation-circle" aria-hidden="true"></i>{" "}
-                <b>Errors in the YAML</b>
-                <br />
-                {notebookParseErrors}
-              </div>
-            )}
-          </form>
-        </div>
+              {notebookSchedule !== "" && (
+                <div className="alert alert-success mb-3" role="alert">
+                  <p>
+                    <i className="fa fa-clock-o" aria-hidden="true"></i>{" "}
+                    Scheduled notebook at '{notebookSchedule}'.
+                  </p>
 
-        <hr style={{ marginTop: "50px", marginBottom: "20px" }} />
-        <div>
-          {!watchMode && <SelectExecutionHistory disabled={waiting} />}
-          <button
-            className="btn btn-sm btn-outline-danger"
-            onClick={() => {
-              dispatch(clearTasks(notebookId));
-              dispatch(fetchNotebook(notebookId));
-            }}
-            style={{ border: "none" }}
-            disabled={waiting}
-            title="Click to clear all previous runs of the notebook"
-          >
-            <i className="fa fa-times-circle" aria-hidden="true"></i> Clear runs
-          </button>
-        </div>
-        {showFiles && (
-          <div>
-            <hr />
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              style={{
-                border: "none",
-                //fontWeight: 500,
-              }}
-              onClick={() => {
-                dispatch(setView("app"));
-              }}
-            >
-              <i className="fa fa-laptop" aria-hidden="true"></i> App
-            </button>
+                  {taskCreatedAt && (
+                    <p>
+                      {" "}
+                      <i className="fa fa-calendar" aria-hidden="true"></i> Last
+                      execution at {taskCreatedAt}.
+                    </p>
+                  )}
+                  <div>
+                    <i className="fa fa-refresh" aria-hidden="true"></i> Website
+                    refresh every minute.
+                  </div>
+                </div>
+              )}
 
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              style={{
-                border: "none",
-                //fontWeight: 500,
-              }}
-              onClick={() => {
-                dispatch(setView("files"));
-              }}
-            >
-              <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output
-              Files
-            </button>
+              {continuousUpdate && (
+                <div>
+                  {/* add some space */}
+                  <br />
+                </div>
+              )}
+
+              {/* {waiting && workerState === WorkerState.Busy && (
+                <div className="alert alert-success mb-3 mt-3" role="alert">
+                  <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is
+                  executed. Please wait.
+                </div>
+              )} */}
+
+              {waiting &&
+                (workerState === WorkerState.Unknown ||
+                  workerState === WorkerState.Queued) && (
+                  <div className="alert alert-warning mb-3 mt-3" role="alert">
+                    <i className="fa fa-cogs" aria-hidden="true"></i> Waiting
+                    for worker ...
+                  </div>
+                )}
+              {waiting && workerState === WorkerState.Starting && (
+                <div className="alert alert-success mb-3 mt-3" role="alert">
+                  <i className="fa fa-cogs" aria-hidden="true"></i> Initializing
+                  worker ...
+                </div>
+              )}
+              {watchMode && (
+                <div className="alert alert-secondary mb-3 mt-3" role="alert">
+                  <i className="fa fa-refresh" aria-hidden="true"></i> Notebook
+                  in watch mode. All changes to Notebook will be automatically
+                  visible in Mercury.
+                </div>
+              )}
+
+              {isPresentation && (
+                <div className="alert alert-primary mb-3" role="alert">
+                  <i className="fa fa-television" aria-hidden="true"></i> Click
+                  on presentation and press <b>F</b> for full screen. Press{" "}
+                  <b>Esc</b> to quit.
+                  <br />
+                  <br />
+                  <i className="fa fa-arrows" aria-hidden="true"></i> Click on
+                  presentation and press <b>Esc</b> to navigate slides.
+                </div>
+              )}
+
+              {/* {notebookParseErrors && (
+                <div className="alert alert-danger mb-3" role="alert">
+                  <i
+                    className="fa fa-exclamation-circle"
+                    aria-hidden="true"
+                  ></i>{" "}
+                  <b>Errors in the YAML</b>
+                  <br />
+                  {notebookParseErrors}
+                </div>
+              )} */}
+            </form>
           </div>
-        )}
-      </div>
+
+          {/* <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
+          <div>
+            {!watchMode && <SelectExecutionHistory disabled={waiting} displayNb={displayNb} />}
+            {!staticNotebook && (
+              <div>
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => {
+                    saveNb();
+                  }}
+                  style={{ border: "none" }}
+                  disabled={waiting}
+                  title="Click to save current run"
+                >
+                  <i className="fa fa-floppy-o" aria-hidden="true"></i> Save run
+                </button>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => {
+                    dispatch(clearTasks(notebookId));
+                    dispatch(fetchNotebook(notebookId));
+                  }}
+                  style={{ border: "none" }}
+                  disabled={waiting}
+                  title="Click to clear all previous runs of the notebook"
+                >
+                  <i className="fa fa-times-circle" aria-hidden="true"></i>{" "}
+                  Delete runs
+                </button>
+              </div>
+            )}
+          </div>
+           */}
+          {showFiles && (
+            <div>
+              <hr />
+              <button
+                className="btn btn-sm btn-outline-secondary"
+                style={{
+                  border: "none",
+                  //fontWeight: 500,
+                }}
+                onClick={() => {
+                  dispatch(setView("app"));
+                }}
+              >
+                <i className="fa fa-laptop" aria-hidden="true"></i> App
+              </button>
+
+              <button
+                className="btn btn-sm btn-outline-secondary"
+                style={{
+                  border: "none",
+                  //fontWeight: 500,
+                }}
+                onClick={() => {
+                  dispatch(setView("files"));
+                }}
+              >
+                <i className="fa fa-folder-open-o" aria-hidden="true"></i>{" "}
+                Output Files
+              </button>
+            </div>
+          )}
+          {notebookId !== undefined && !staticNotebook && (
+            <div>
+              <hr />
+              <div style={{ paddingLeft: "10px" }}>
+                <WebSocketStateBar />{" "}
+              </div>
+            </div>
+          )}
+        </div>
+      </BlockUi>
     </nav>
   );
 }

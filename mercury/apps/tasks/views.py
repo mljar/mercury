@@ -1,23 +1,23 @@
-import os
 import json
+import os
 import shutil
 import uuid
 
+from celery.result import AsyncResult
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from requests import request
-from celery.result import AsyncResult
-
 from rest_framework import status
 from rest_framework.exceptions import APIException
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.notebooks.models import Notebook
 from apps.notebooks.views import notebooks_queryset
+from apps.storage.storage import StorageManager
 from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
 from apps.tasks.tasks import task_execute
@@ -25,7 +25,6 @@ from apps.tasks.tasks_export import export_to_pdf
 
 
 class TaskCreateView(CreateAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
@@ -46,7 +45,6 @@ class TaskCreateView(CreateAPIView):
 
 
 class GetLastTaskView(RetrieveAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
@@ -89,9 +87,18 @@ class ListOutputFilesView(APIView):
         return Response(files_urls)
 
 
+class ListWorkerOutputFilesView(APIView):
+    def get(self, request, session_id, worker_id, format=None):
+        files_urls = []
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            sm = StorageManager(session_id, worker_id)
+            files_urls = sm.list_worker_files_urls()
+
+        return Response(files_urls)
+
+
 class ClearTasksView(APIView):
     def post(self, request, notebook_id, session_id, format=None):
-
         try:
             tasks = Task.objects.filter(notebook_id=notebook_id, session_id=session_id)
 
@@ -206,7 +213,6 @@ class GetPDFAddress(APIView):
 
 
 class ExecutionHistoryView(ListAPIView):
-
     serializer_class = TaskSerializer
     queryset = Task.objects.all()
 

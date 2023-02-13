@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Please put your env variables in .env file in the main directory of your project.
@@ -64,7 +65,9 @@ else:
             with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(content)
 
-
+STORAGE_MEDIA = "media"
+STORAGE_S3 = "s3"
+STORAGE = STORAGE_MEDIA
 DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
 DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
 
@@ -100,6 +103,7 @@ if os.environ.get("ALLOWED_HOSTS") is not None:
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -111,6 +115,8 @@ INSTALLED_APPS = [
     "django_drf_filepond",
     "apps.tasks",
     "apps.notebooks",
+    "apps.ws",
+    "apps.storage",
 ]
 
 if is_pro:
@@ -260,3 +266,50 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 if EMAIL_HOST_USER is not None:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
+ASGI_APPLICATION = "server.asgi.application"
+
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "DJ {levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "DJ {levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": "django-errors.log",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "ERROR"),
+            "propagate": False,
+        },
+    },
+}
+
+NBWORKERS_PER_MACHINE = 20
+
+
+# delta time after which worker is considered as stale and deleted
+WORKER_STALE_TIME = 1 # in minutes
+

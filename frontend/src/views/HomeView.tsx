@@ -16,7 +16,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
-import rehypeRaw from 'rehype-raw'
+import rehypeRaw from "rehype-raw";
 import { getToken, getUsername } from "../components/authSlice";
 
 export default withRouter(function HomeView() {
@@ -34,6 +34,13 @@ export default withRouter(function HomeView() {
     // fetchNotebooks depends on token
     // if token is set then private notebooks are returned
   }, [dispatch, token]);
+
+  const firstLetters = (text: string | null, count: number): string => {
+    if (text !== null && text !== undefined) {
+      return text.slice(0, count) + (text.length > count ? " ..." : "");
+    }
+    return "";
+  };
 
   const notebookItems = notebooks.map((notebook, index) => {
     return (
@@ -60,14 +67,29 @@ export default withRouter(function HomeView() {
               scrolling="no"
             ></iframe>
           </div>
-          <hr />
-          <div className="card-body">
-            <h5 className="card-title">{notebook.title}</h5>
-            <p className="card-text">{notebook.params.description}</p>
-            <a href={`/app/${notebook.id}`} className="btn btn-primary">
+          <a
+            href={`/app/${notebook.id}`}
+            style={{ textDecoration: "none", color: "black" }}
+            className="title-card"
+          >
+            <div
+              className="card-body"
+              style={{
+                borderTop: "1px solid rgba(0,0,0,0.1)",
+                height: "110px",
+              }}
+            >
+              <h5 className="card-title">{firstLetters(notebook.title, 40)}</h5>
+
+              <p className="card-text">
+                {firstLetters(notebook.params.description, 100)}
+              </p>
+
+              {/* <a href={`/app/${notebook.id}`} className="btn btn-primary">
               Open <i className="fa fa-arrow-right" aria-hidden="true"></i>
-            </a>
-          </div>
+            </a> */}
+            </div>
+          </a>
         </div>
       </div>
     );
@@ -84,7 +106,9 @@ export default withRouter(function HomeView() {
         )}
         {welcome !== "" && (
           <div style={{ paddingTop: "20px", paddingBottom: "10px" }}>
-            <ReactMarkdown rehypePlugins={[remarkGfm, rehypeHighlight, emoji, rehypeRaw]}>
+            <ReactMarkdown
+              rehypePlugins={[remarkGfm, rehypeHighlight, emoji, rehypeRaw]}
+            >
               {welcome}
             </ReactMarkdown>
           </div>

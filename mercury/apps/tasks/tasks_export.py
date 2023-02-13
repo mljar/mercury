@@ -1,6 +1,8 @@
 import os
+
 from celery import shared_task
 from django.conf import settings
+
 from apps.notebooks.models import Notebook
 from apps.tasks.export_pdf import to_pdf
 
