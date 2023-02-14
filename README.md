@@ -89,6 +89,7 @@ Install with `pip`:
 pip install mercury
 ```
 
+
 ## Demo
 
 Run Mercury with demo notebooks
@@ -108,27 +109,7 @@ To run Mercury with your notebook please execute:
 mercury run
 ```
 
-The command should be run in the same directory as notebooks.
-
-#### Example notebook
-
-<p align="center">
-<kbd>
-  <img 
-    alt="Web App from Notebook"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-notebook.png"  />  
-</kbd>
-</p>
-
-#### Example Mercury App
-
-<p align="center">
-<kbd>
-<img 
-    alt="Web App from Notebook"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app.gif"  />  
-   </kbd>
-</p>
+The command should be run in the same directory as notebooks. You can change code in Jupyter Notebook, and Mercury will **instantly** update web app.
 
 
 ## Mercury License
