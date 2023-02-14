@@ -33,6 +33,7 @@ class NbRun:
         except Exception as e:
             pass
         self.shell.run("from mercury import WidgetsManager")
+        self.shell.run("import os\nos.environ['RUN_MERCURY']='1'")
 
     def set_show_code(self, new_show_code):
         self.exporter.set_show_code(new_show_code)

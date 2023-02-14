@@ -1,3 +1,5 @@
+import os
+import uuid
 import inspect
 import logging
 
@@ -22,6 +24,13 @@ class WidgetsManager:
     cell_index = 0  # current cell index
 
     @staticmethod
+    def rand_uid():
+        if os.environ.get("RUN_MERCURY") is None:
+            h = uuid.uuid4().hex.replace("-", "")
+            return f"-rand{h[:8]}"
+        return ""
+
+    @staticmethod
     def set_cell_index(new_index):
         WidgetsManager.cell_index = new_index
 
@@ -35,10 +44,14 @@ class WidgetsManager:
             uid += f".{info.lineno}"
         if key != "":
             uid += f".{key}"
+        uid += WidgetsManager.rand_uid()
         return uid
 
     @staticmethod
     def fix_cell_index(code_uid, correct_cell_index):
+        # remove rand uid 
+        code_uid = code_uid.split("-rand")[0]
+        # fix cell index
         parts = code_uid.split(".")
         parts[1] = f"{correct_cell_index}"
         return ".".join(parts)
