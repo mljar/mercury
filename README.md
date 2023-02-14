@@ -35,7 +35,7 @@ Mercury features:
 
 ## Example
 
-Simple code example that creates a widget and displays its value.
+Simple code example that creates a widget and displays its value. You can interact with widget in the Jupyter Notebook. Its value will be updated. However, to see update in other cells you need to **manually execute** them.
 
 Import package:
 ```python
@@ -51,8 +51,6 @@ Print widget value:
 ```python
 print(f"Hello {name.value}")
 ```
-
-You can interact with widget in the Jupyter Notebook. Its value will be updated. However, to see update in other cells you need to **manually execute** them.
 
 #### Code in Jupyter Notebook
 
