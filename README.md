@@ -35,6 +35,8 @@ Mercury features:
 
 ## Example
 
+Simple code example that creates a widget and displays its value.
+
 Import package:
 ```python
 import mercury as mr
@@ -50,6 +52,8 @@ Print widget value:
 print(f"Hello {name.value}")
 ```
 
+You can interact with widget in the Jupyter Notebook. Its value will be updated. However, to see update in other cells you need to **manually execute** them.
+
 #### Code in Jupyter Notebook
 
 <p align="center">
@@ -62,7 +66,7 @@ print(f"Hello {name.value}")
 
 #### Mercury App
 
-Use Mercury to run notebook as web application:
+Use Mercury to run notebook as web application. **Cells are automatically re-executed** after widget change. Mercury re-executes only cells with widget definition and below it. In the example, cell 2 and 3 are re-executed after widget update. 
 
 <p align="center">
 <kbd>
@@ -71,7 +75,6 @@ Use Mercury to run notebook as web application:
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app-ola.gif"  />  
    </kbd>
 </p>
-
 
 
 ## Documentation
