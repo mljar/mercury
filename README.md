@@ -33,6 +33,47 @@ Mercury features:
 - add authentication to notebooks (coming soon),
 - schedule automatic notebook execution (coming soon).
 
+## Example
+
+Import package:
+```python
+import mercury as mr
+```
+
+Create a [`Text`](https://runmercury.com/docs/input-widgets/text/) widget:
+```python
+name = mr.Text(value="Piotr", label="What is your name?")
+```
+
+Print widget value:
+```python
+print(f"Hello {name.value}")
+```
+
+#### Code in Jupyter Notebook
+
+<p align="center">
+<kbd>
+<img 
+    alt="Web App from Notebook"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-notebook-ola.png"  />  
+</kbd>
+</p>
+
+#### Mercury App
+
+Use Mercury to run notebook as web application:
+
+<p align="center">
+<kbd>
+<img 
+    alt="Web App from Notebook"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app-ola.gif"  />  
+   </kbd>
+</p>
+
+
+
 ## Documentation
 
 📚 Read more about Mercury on [RunMercury.com](https://RunMercury.com).
@@ -74,7 +115,7 @@ The command should be run in the same directory as notebooks.
 <kbd>
   <img 
     alt="Web App from Notebook"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-notebook.png" width="600px" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-notebook.png"  />  
 </kbd>
 </p>
 
@@ -84,7 +125,7 @@ The command should be run in the same directory as notebooks.
 <kbd>
 <img 
     alt="Web App from Notebook"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app.gif" width="600px" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/hello-world-app.gif"  />  
    </kbd>
 </p>
 
