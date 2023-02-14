@@ -12,7 +12,7 @@
 
 # Build Web Apps in Jupyter Notebook
 
-Mercury allows you to add interactive widgets in Python notebooks, so you can share notebooks as web applications. Forget about rewriting notebooks to web frameworks just to share your results. Mercury offers set of widgets with simple re-execution of cells.
+Mercury allows you to add interactive widgets in Python notebooks, so you can share notebooks as web applications. Forget about rewriting notebooks to web frameworks just to share your results. Mercury offers a set of widgets with simple re-execution of cells.
 
 You can build with Mercury:
 - Turn your notebook into beautiful [Web Apps](https://runmercury.com/tutorials/web-app-python-jupyter-notebook/),
@@ -29,13 +29,13 @@ Mercury features:
 - export executed notebook to PDF or HTML,
 - share muplitple notebooks - no limits!
 - embed notebook on any website,
-- easy file upload and download from notebook,
+- easy file upload and download from the notebook,
 - add authentication to notebooks (coming soon),
 - schedule automatic notebook execution (coming soon).
 
 ## Example
 
-Simple code example that creates a widget and displays its value. You can interact with widget in the Jupyter Notebook. Its value will be updated. However, to see update in other cells you need to **manually execute** them.
+Simple code example that creates a widget and displays its value. You can interact with a widget in the Jupyter Notebook. Its value will be updated. However, to see the update in other cells you need to **manually execute** them.
 
 Import package:
 ```python
@@ -64,7 +64,7 @@ print(f"Hello {name.value}")
 
 #### Mercury App
 
-Use Mercury to run notebook as web application. **Cells are automatically re-executed** after widget change. Mercury re-executes only cells with widget definition and below it. In the example, cell 2 and 3 are re-executed after widget update. 
+Use Mercury to run notebook as web application. **Cells are automatically re-executed** after widget change. Mercury re-executes only cells with widget definition and below it. In the example, cells 2 and 3 are re-executed after widget update. 
 
 <p align="center">
 <kbd>
@@ -92,7 +92,7 @@ pip install mercury
 
 ## Demo
 
-Run Mercury with demo notebooks
+Run Mercury with demo notebooks.
 
 ```
 mercury run demo
@@ -103,7 +103,7 @@ Please check [127.0.0.1:8000](http://127.0.0.1:8000) to see demo notebooks.
 
 ## Mercury with your notebooks
 
-To run Mercury with your notebook please execute:
+To run Mercury with your notebook, please execute the following:
 
 ```
 mercury run
