@@ -12,7 +12,7 @@
 
 # Build Web Apps in Jupyter Notebook
 
-Mercury allows you to add interactive widgets in Python notebooks, so you canshare notebooks as web applications. Forget about rewriting notebooks to web frameworks just to share your results. Mercury offers set of widgets with simple re-execution of cells.
+Mercury allows you to add interactive widgets in Python notebooks, so you can share notebooks as web applications. Forget about rewriting notebooks to web frameworks just to share your results. Mercury offers set of widgets with simple re-execution of cells.
 
 You can build with Mercury:
 - Turn your notebook into beautiful [Web Apps](https://runmercury.com/tutorials/web-app-python-jupyter-notebook/),
