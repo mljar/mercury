@@ -58,7 +58,7 @@ class File:
             temp_dir = tempfile.TemporaryDirectory()
             self.file.filepath = os.path.join(temp_dir.name, self.filename)
 
-            with open(self.file.filepath, "wb", encoding="utf-8", errors="ignore") as fout:
+            with open(self.file.filepath, "wb") as fout:
                 fout.write(self.value)
 
             return self.file.filepath
