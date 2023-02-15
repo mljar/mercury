@@ -29,7 +29,7 @@ class NbRun:
         self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
         self.shell = CaptureShell()
         try:
-            self.shell.enable_matplotlib()
+            self.shell.enable_matplotlib("inline")
         except Exception as e:
             pass
         self.shell.run("from mercury import WidgetsManager")
