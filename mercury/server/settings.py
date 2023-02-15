@@ -35,8 +35,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # if HF_SPACE is defined we will use single notebook frontend
 HF_SPACE = os.environ.get("HF_SPACE")
 if HF_SPACE is None:
-    FRONTEND_BUILD_DIR = BASE_DIR / "frontend-dist"
-    FRONTEND_STATIC_DIR = BASE_DIR / "frontend-dist" / "static"
+    FRONTEND_BUILD_DIR = str(BASE_DIR / "frontend-dist")
+    FRONTEND_STATIC_DIR = str(BASE_DIR / "frontend-dist" / "static")
 else:
     FRONTEND_BUILD_DIR = BASE_DIR / "frontend-single-site-dist"
     FRONTEND_STATIC_DIR = BASE_DIR / "frontend-single-site-dist" / "static"
@@ -235,12 +235,12 @@ if DEBUG or SERVE_STATIC:
     STATIC_URL = "/static/"
     STATICFILES_DIRS = [FRONTEND_BUILD_DIR, FRONTEND_STATIC_DIR]
     if SERVE_STATIC:
-        STATIC_ROOT = BASE_DIR / "static"
+        STATIC_ROOT = str(BASE_DIR / "static")
 else:
     STATIC_URL = "/django_static/"
-    STATIC_ROOT = BASE_DIR / "django_static"
+    STATIC_ROOT = str(BASE_DIR / "django_static")
 
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = str(BASE_DIR / "media")
 
 if not os.path.exists(MEDIA_ROOT):
     try:
