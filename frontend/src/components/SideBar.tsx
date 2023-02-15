@@ -42,12 +42,10 @@ import MarkdownWidget from "./Widgets/Markdown";
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
 import {
-  displayNotebook,
   downloadHTML,
   downloadPDF,
   getWorkerState,
   runNotebook,
-  saveNotebook,
   WorkerState,
 } from "../websocket/wsSlice";
 import ButtonWidget from "./Widgets/Button";
@@ -115,17 +113,17 @@ export default function SideBar({
     ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(widgetsValues))));
   };
 
-  const saveNb = () => {
-    if (!staticNotebook) {
-      ws.sendMessage(JSON.stringify(saveNotebook()));
-    }
-  };
+  // const saveNb = () => {
+  //   if (!staticNotebook) {
+  //     ws.sendMessage(JSON.stringify(saveNotebook()));
+  //   }
+  // };
 
-  const displayNb = (taskId: number) => {
-    if (!staticNotebook) {
-      ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
-    }
-  };
+  // const displayNb = (taskId: number) => {
+  //   if (!staticNotebook) {
+  //     ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
+  //   }
+  // };
 
   const runDownloadHTML = () => {
     if (!staticNotebook) {
@@ -223,6 +221,7 @@ export default function SideBar({
             step={widgetParams?.step}
             key={key}
             runNb={runNb}
+            continuousUpdate={continuousUpdate}
           />
         );
       } else if (isSliderWidget(widgetParams)) {

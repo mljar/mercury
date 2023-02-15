@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { RUN_DELAY, setWidgetValue } from "../Notebooks/notebooksSlice";
+import { setWidgetValue } from "../Notebooks/notebooksSlice";
 
 type NumericProps = {
   widgetKey: string;
@@ -11,6 +11,7 @@ type NumericProps = {
   step: number | null;
   disabled: boolean;
   runNb: () => void;
+  continuousUpdate: boolean;
 };
 
 export default function NumericWidget({
@@ -22,9 +23,10 @@ export default function NumericWidget({
   step,
   disabled,
   runNb,
+  continuousUpdate,
 }: NumericProps) {
   const dispatch = useDispatch();
-  const [updated, userInteraction] = useState(false);
+  const [apply, showApply] = useState(false);
 
   let minValue = undefined;
   let maxValue = undefined;
@@ -44,15 +46,14 @@ export default function NumericWidget({
     displayValue = value;
   }
 
-  useEffect(() => {
-    if (!updated) return;
-    const timeOutId = setTimeout(() => {
-      //console.log("run from numeric");
-      runNb();
-    }, RUN_DELAY);
-    return () => clearTimeout(timeOutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  const validateValue = () => {
+    if (min && value && value < min) {
+      dispatch(setWidgetValue({ key: widgetKey, value: min }));
+    }
+    if (max && value && value > max) {
+      dispatch(setWidgetValue({ key: widgetKey, value: max }));
+    }
+  };
 
   return (
     <div className="form-group mb-3">
@@ -67,22 +68,50 @@ export default function NumericWidget({
         type="number"
         value={displayValue as number | string}
         onChange={(e) => {
-          userInteraction(true);
+          showApply(true);
           dispatch(setWidgetValue({ key: widgetKey, value: e.target.value }));
         }}
         onBlur={(e) => {
-          userInteraction(true);
-          if (min && value && value < min) {
-            dispatch(setWidgetValue({ key: widgetKey, value: min }));
-          }
-          if (max && value && value > max) {
-            dispatch(setWidgetValue({ key: widgetKey, value: max }));
+          validateValue();
+        }}
+        onKeyPress={(e) => {
+          if (e.key === "Enter") {
+            validateValue();
+            runNb();
+            showApply(false);
+            e.preventDefault();
           }
         }}
         min={minValue}
         max={maxValue}
         step={stepValue}
       />
+      {apply && continuousUpdate && (
+        <div
+          style={{
+            float: "right",
+            position: "relative",
+            top: "0px",
+            left: "0px",
+          }}
+        >
+          <button
+            className="btn btn-sm btn-outline-primary"
+            onClick={(e) => {
+              validateValue();
+              runNb();
+              showApply(false);
+              e.preventDefault();
+            }}
+            style={{
+              fontSize: "0.7em",
+              border: "none",
+            }}
+          >
+            Press enter or click to apply
+          </button>
+        </div>
+      )}
     </div>
   );
 }
