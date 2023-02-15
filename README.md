@@ -89,6 +89,12 @@ Install with `pip`:
 pip install mercury
 ```
 
+Install with `conda`:
+
+```
+conda install -c conda-forge mercury
+```
+
 
 ## Demo
 
