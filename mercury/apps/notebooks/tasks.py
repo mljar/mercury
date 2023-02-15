@@ -67,32 +67,6 @@ def get_jupyter_bin_path():
         return os.path.join(os.path.dirname(sys.executable), "Scripts", "jupyter.exe")
     return os.path.join(os.path.dirname(sys.executable), "jupyter")
 
-
-def available_kernels():
-    command = [
-        get_jupyter_bin_path(),
-        "kernelspec",
-        "list",
-    ]
-    msg = []
-    with Popen(command, stdout=PIPE) as proc:
-        msg = proc.stdout.read().decode("utf-8").split("\n")
-    if not msg:
-        return []
-    kernels = []
-    start_parsing = False
-    for m in msg:
-        if start_parsing:
-            parts = m.split(" ")
-            parts = [p for p in parts if p != ""]
-            if len(parts) == 2:
-                kernels += [parts[0]]  # parts[1] is a kernel path
-        if "Available kernels:" in m:
-            start_parsing = True
-    # list of kernels name
-    return kernels
-
-
 def nb_default_title(nb_path):
     try:
         fname = os.path.basename(nb_path)
@@ -116,7 +90,6 @@ def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
     try:
-        kernels = available_kernels()
 
         params = {
             "title": "",
@@ -132,34 +105,6 @@ def task_init_notebook(
         update_notebook = False
         with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
-            if "cells" in nb and len(nb["cells"]) > 0:
-                first_cell = nb["cells"][0]["source"]
-                if first_cell.startswith("---") and first_cell.endswith("---"):
-                    params = yaml.safe_load(first_cell[3:-3])
-
-            if (
-                "metadata" in nb
-                and "kernelspec" in nb["metadata"]
-                and "name" in nb["metadata"]["kernelspec"]
-            ):
-                kernel_name = nb["metadata"]["kernelspec"]["name"]
-                if kernel_name not in kernels:
-                    print("*" * 42)
-                    print(f"Your notebook kernel name is set to '{kernel_name}'.")
-                    print(f"In this system available kernels are {kernels}.")
-
-                    if len(kernels) > 0:
-                        print(f"The script will change the kernel name to {kernels[0]}")
-                        new_kernel_name = kernels[0]
-                        nb["metadata"]["kernelspec"]["name"] = new_kernel_name
-                        update_notebook = True
-                    else:
-                        print(
-                            "Sorry, cant automatically update the kernel name in the notebook."
-                        )
-                        return
-
-            # check if nb in V2
             parse_params(nb, params)
 
         if nb is None:
@@ -223,52 +168,8 @@ def task_init_notebook(
             ) as fout:
                 fout.write(body)
 
-            """
-            command = [
-                get_jupyter_bin_path(),
-                "nbconvert",
-                "--RegexRemovePreprocessor.patterns=^---",
-                notebook_path,
-                "--output",
-                notebook_output_file,
-                "--output-dir",
-                settings.MEDIA_ROOT,
-                "--to",
-                "slides" if notebook_output == "slides" else "html",
-                "--Application.log_level=40",  # 30 is default, 40 is ERROR, 50 is Critical
-            ]
-            if "show-code" in params and not params["show-code"]:
-                command += ["--no-input"]
-            if "show-prompt" in params and not params["show-prompt"]:
-                command += ["--no-prompt"]
-
-            if notebook_output == "slides":
-                command += SlidesThemes.nbconvert_options(notebook_format)
-
-            error_msg = ""
-            with Popen(command, stdout=PIPE, stderr=PIPE) as proc:
-                # print(proc.stdout.read())
-                # print(proc.stderr.read())
-                error_msg = proc.stderr.read()
-
-            error_msg = process_nbconvert_errors(error_msg)
-            if error_msg != "":
-                print(error_msg)
-            """
             error_msg = ""  # TODO: handle errors
 
-            """
-            # change file name if needed
-            if notebook_output == "slides":
-                expected_fpath = os.path.join(
-                    settings.MEDIA_ROOT, f"{notebook_output_file}.html"
-                )
-                slides_fpath = os.path.join(
-                    settings.MEDIA_ROOT, f"{notebook_output_file}.slides.html"
-                )
-                if os.path.exists(slides_fpath):
-                    os.rename(slides_fpath, expected_fpath)
-            """
             if not params.get("show-code", False):  # "--no-input" in command:
                 with open(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
@@ -288,16 +189,6 @@ def task_init_notebook(
 </style>"""
                     )
 
-            """
-            if notebook_output == "slides":
-                with open(
-                    os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
-                    "a",
-                    encoding="utf-8",
-                    errors="ignore",
-                ) as fout:
-                    fout.write(SlidesThemes.additional_css(notebook_format))
-            """
 
         parse_errors = validate_notify(notebook_notify)
 
