@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import uuid
+import traceback
 
 from datetime import datetime
 from shutil import which
@@ -247,7 +248,8 @@ def task_init_notebook(
             raise e
         else:
             print("Error during notebook initialization.", str(e))
-
+            print(traceback.format_exc())
+            
 
 @shared_task(bind=True)
 def task_watch(self, notebook_id):

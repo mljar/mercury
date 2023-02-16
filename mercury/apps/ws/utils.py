@@ -1,6 +1,7 @@
 import json
 import logging
 import platform
+import nbformat  
 
 from widgets.manager import WidgetsManager
 
@@ -44,7 +45,11 @@ def parse_params(nb, params={}):
             if "data" in output and "application/mercury+json" in output["data"]:
                 no_outputs = False
                 view = output["data"]["application/mercury+json"]
-                view = json.loads(view)
+
+                if isinstance(view, nbformat.notebooknode.NotebookNode):
+                    view = view.dict()
+                else:
+                    view = json.loads(str(view))
 
                 # print(
                 #    f'model_id={view.get("model_id", "")} in all models ids {all_model_ids}'
