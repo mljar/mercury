@@ -38,6 +38,7 @@ from widgets.note import Note
 from widgets.button import Button
 from widgets.md import Markdown
 from widgets.md import Markdown as Md
+from widgets.json import JSON
 
 
 def main():
