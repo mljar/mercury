@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status    
 
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
@@ -54,4 +55,15 @@ class RetrieveNotebook(APIView):
         if notebook.state.startswith("WATCH"):
             task_watch.delay(notebook.id)
 
+        return JsonResponse(serializer.data, safe=False)
+
+class RetrieveNotebookWithSlug(APIView):
+    def get(self, request, notebook_slug, format=None):
+        
+        notebooks = notebooks_queryset(request).filter(slug=notebook_slug)
+        if not notebooks:
+            return JsonResponse({}, status=status.HTTP_404_NOT_FOUND)
+
+        # get the first one - it should be only one :)
+        serializer = NotebookSerializer(notebooks[0])
         return JsonResponse(serializer.data, safe=False)
