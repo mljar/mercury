@@ -86,6 +86,16 @@ def is_presentation(nb):
             return True
     return False
 
+def make_unique(slug):
+    previous_slugs = Notebook.objects.values_list("slug", flat=True)
+    if slug not in previous_slugs:
+        return slug 
+    for i in range(10000):
+        slug_unique = f"{slug}-{i}"
+        if slug_unique not in previous_slugs:
+            return slug_unique
+        
+    return slug
 
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
@@ -103,17 +113,13 @@ def task_init_notebook(
             "notify": {},
         }
         nb = None
-        update_notebook = False
+        
         with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
             parse_params(nb, params)
 
         if nb is None:
             raise Exception(f"Cant read notebook from {notebook_path}")
-
-        if update_notebook and nb is not None:
-            with open(notebook_path, "w", encoding="utf-8", errors="ignore") as f:
-                nbformat.write(nb, f)
 
         if "date" in params:
             params["date"] = str(params["date"])
@@ -145,13 +151,22 @@ def task_init_notebook(
             "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
         )
 
-        notebook_slug = params.get("slug", "")
-        if notebook_slug == "":
-            fname = os.path.basename(notebook_path)
-            fname = fname.replace(".ipynb", "")
-            notebook_slug = slugify(fname)
-            if notebook_slug is None or notebook_slug == "":
-                notebook_slug = f"nb-{get_hash()}"
+        notebook_slug = "some-slug"
+        if notebook_id is None:
+            notebook_slug = params.get("slug", "")
+            if notebook_slug == "":
+                fname = os.path.basename(notebook_path)
+                fname = fname.replace(".ipynb", "")
+                notebook_slug = slugify(fname)
+                if notebook_slug is None or notebook_slug == "":
+                    notebook_slug = f"nb-{get_hash()}"
+
+            notebook_slug = make_unique(notebook_slug)    
+        else:
+            tmp_nb = Notebook.objects.get(pk=notebook_id)
+            notebook_slug = tmp_nb.slug
+
+
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
