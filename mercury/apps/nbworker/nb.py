@@ -346,6 +346,9 @@ class NBWorker(WSClient):
             "continuous_update",
             "static_notebook",
             "description",
+            "show_sidebar",
+            "full_screen",
+            "allow_download"
         ]:
             if params.get(property) is not None and nb_params.get(
                 property

@@ -67,12 +67,6 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   const workerId = useSelector(getWorkerId);
   const workerState = useSelector(getWorkerState);
 
-  // const waitForTask = () => {
-  //   if (task.state && task.state === "CREATED") return true;
-  //   if (task.state && task.state === "RECEIVED") return true;
-  //   return false;
-  // };
-
   const pleaseWait = () => {
     if (notebook?.params?.static_notebook) {
       return false;
@@ -192,6 +186,27 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
     showRestApi = true;
   }
 
+  const isFullScreen = () => {
+    if (notebook !== undefined && notebook !== null) {
+      return notebook?.params?.full_screen !== undefined &&
+        notebook?.params?.full_screen !== null
+        ? notebook.params.full_screen
+        : true;
+    }
+    return true;
+  };
+
+
+  const doAllowDownload = () => {
+    if (notebook !== undefined && notebook !== null) {
+      return notebook?.params?.allow_download !== undefined &&
+        notebook?.params?.allow_download !== null
+        ? notebook.params.allow_download
+        : true;
+    }
+    return true;
+  };
+
   return (
     <div className="App">
       {!displayEmbed && <NavBar isPro={isPro} username={username} />}
@@ -227,6 +242,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
                 notebookParseErrors={notebook.errors}
                 continuousUpdate={notebook?.params?.continuous_update}
                 staticNotebook={notebook?.params?.static_notebook}
+                allowDownload={doAllowDownload()}
               />
             )}
 
@@ -276,6 +292,7 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
               isPresentation={
                 notebook.output !== undefined && notebook.output === "slides"
               }
+              fullScreen={isFullScreen()}
             />
 
             {appView === "files" && (

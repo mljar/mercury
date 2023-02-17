@@ -19,6 +19,9 @@ class App:
         notify={},
         continuous_update=True,
         static_notebook=False,
+        show_sidebar=True,
+        full_screen=True,
+        allow_download=True
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
@@ -32,6 +35,9 @@ class App:
         self.notify = notify
         self.continuous_update = continuous_update
         self.static_notebook = static_notebook
+        self.show_sidebar = show_sidebar
+        self.full_screen = full_screen
+        self.allow_download = allow_download
         display(self)
 
     def __repr__(self):
@@ -54,6 +60,9 @@ class App:
             "notify": json.dumps(self.notify),
             "continuous_update": self.continuous_update,
             "static_notebook": self.static_notebook,
+            "show_sidebar": self.show_sidebar,
+            "full_screen": self.full_screen,
+            "allow_download": self.allow_download,
             "model_id": "mercury-app",
             "code_uid": self.code_uid,
         }

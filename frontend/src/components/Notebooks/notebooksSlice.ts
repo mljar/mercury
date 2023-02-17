@@ -36,6 +36,9 @@ export interface INotebookParams {
   version: string;
   continuous_update: boolean;
   static_notebook: boolean;
+  show_sidebar: boolean;
+  full_screen: boolean;
+  allow_download: boolean;
 }
 
 export interface INotebook {
@@ -351,15 +354,18 @@ export const fetchNotebook =
         }
         const url = `/api/v1/notebooks/${id}/`;
         const { data } = await axios.get(url);
-        const parsedParams = JSON.parse(data.params);
+        const parsedParams = JSON.parse(data.params) as INotebookParams;
         dispatch(
           setSelectedNotebook({
             ...data,
-            params: parsedParams as INotebookParams,
+            params: parsedParams,
           })
         );
         if (!silent) {
           dispatch(setLoadingStateSelected("loaded"));
+        }
+        if (parsedParams?.show_sidebar !== null && parsedParams?.show_sidebar !== undefined) {
+          dispatch(setShowSideBar(parsedParams?.show_sidebar));
         }
       } catch (error) {
         if (!silent) {

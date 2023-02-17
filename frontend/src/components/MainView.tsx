@@ -23,6 +23,7 @@ type MainViewProps = {
   slidesHash: string;
   columnsWidth: number;
   isPresentation: boolean;
+  fullScreen: boolean;
 };
 
 export default function MainView({
@@ -38,6 +39,7 @@ export default function MainView({
   slidesHash,
   columnsWidth,
   isPresentation,
+  fullScreen,
 }: MainViewProps) {
   const { height } = useWindowDimensions();
 
@@ -116,14 +118,19 @@ export default function MainView({
   let mainStyle = {
     paddingTop: "0px",
     paddingRight: "0px",
-    paddingLeft: "0px",
+    paddingLeft: fullScreen ? "12px" : "0px",
     display: appView === "files" ? "none" : "block",
   };
 
+  let divStyle = {};
+  if (!fullScreen) {
+    divStyle = { maxWidth: "1140px", margin: "auto" };
+  }
+
   return (
-    <main className={`ms-sm-auto col-lg-${columnsWidth}`} style={mainStyle}>
+    <main className={`ms-sm-auto col-${columnsWidth}`} style={mainStyle}>
       <BlockUi tag="div" blocking={waiting}>
-        <div>
+        <div style={divStyle}>
           {loadingState === "loading" && !watchMode && (
             <p>Loading notebook. Please wait ...</p>
           )}

@@ -97,6 +97,11 @@ def parse_params(nb, params={}):
                     if view.get("static_notebook") is not None:
                         params["static_notebook"] = view.get("static_notebook")
 
+                    for property in ["show_sidebar", "full_screen", "allow_download"]:
+                        if view.get(property) is not None:
+                            params[property] = view.get(property)
+                    
+
                 else:
                     params["params"][widget_key] = WidgetsManager.frontend_format(view)
 
@@ -114,6 +119,12 @@ def parse_params(nb, params={}):
         params["static_notebook"] = False
     if params.get("share") is None:
         params["share"] = "public"
+    if params.get("show_sidebar") is None:
+        params["show_sidebar"] = True
+    if params.get("full_screen") is None:
+        params["full_screen"] = True
+    if params.get("allow_download") is None:
+        params["allow_download"] = True
 
     if no_outputs:
         params["version"] = "2"

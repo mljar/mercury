@@ -68,6 +68,7 @@ type SideBarProps = {
   notebookParseErrors: string;
   continuousUpdate: boolean;
   staticNotebook: boolean;
+  allowDownload: boolean;
 };
 
 export default function SideBar({
@@ -86,6 +87,7 @@ export default function SideBar({
   notebookParseErrors,
   continuousUpdate,
   staticNotebook,
+  allowDownload,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues = useSelector(getWidgetsValues);
@@ -367,116 +369,80 @@ export default function SideBar({
                     workerState={workerState}
                   />
                 )}
-                <div
-                  className="dropdown"
-                  style={{
-                    width: "47%",
-                    float: continuousUpdate ? "left" : "right",
-                  }}
-                >
-                  <button
-                    className="btn btn-primary dropdown-toggle"
-                    style={{ margin: "0px", width: "100%" }}
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    disabled={waiting}
+                {allowDownload && (
+                  <div
+                    className="dropdown"
+                    style={{
+                      width: "47%",
+                      float: continuousUpdate ? "left" : "right",
+                    }}
                   >
-                    Download
-                  </button>
+                    <button
+                      className="btn btn-primary dropdown-toggle"
+                      style={{ margin: "0px", width: "100%" }}
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      disabled={waiting}
+                    >
+                      Download
+                    </button>
 
-                  <ul className="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a
-                        style={{ cursor: "pointer" }}
-                        className="dropdown-item"
-                        onClick={() => {
-                          if (staticNotebook) {
-                            handleDownload(
-                              `${axios.defaults.baseURL}${notebookPath}`,
-                              `${notebookTitle}.html`
-                            );
-                          } else {
-                            runDownloadHTML();
+                    <ul className="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <a
+                          style={{ cursor: "pointer" }}
+                          className="dropdown-item"
+                          onClick={() => {
+                            if (staticNotebook) {
+                              handleDownload(
+                                `${axios.defaults.baseURL}${notebookPath}`,
+                                `${notebookTitle}.html`
+                              );
+                            } else {
+                              runDownloadHTML();
 
-                            //handleDownload(
-                            //  `${axios.defaults.baseURL}${notebookPath}`,
-                            //</li>  `${notebookTitle}.html`
-                            //);
-                          }
-                        }}
-                      >
-                        <i className="fa fa-file-code-o" aria-hidden="true"></i>{" "}
-                        Download as HTML
-                      </a>
-                    </li>
-                    <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li>
-                      <button
-                        type="button"
-                        className="dropdown-item"
-                        onClick={() => {
-                          if (staticNotebook) {
-                            dispatch(exportToPDF(notebookId, notebookPath));
-                          } else {
-                            dispatch(setExportingToPDF(true));
-                            runDownloadPDF();
-                          }
-                        }}
-                      >
-                        <i className="fa fa-file-pdf-o" aria-hidden="true"></i>{" "}
-                        Download as PDF
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                              //handleDownload(
+                              //  `${axios.defaults.baseURL}${notebookPath}`,
+                              //</li>  `${notebookTitle}.html`
+                              //);
+                            }
+                          }}
+                        >
+                          <i
+                            className="fa fa-file-code-o"
+                            aria-hidden="true"
+                          ></i>{" "}
+                          Download as HTML
+                        </a>
+                      </li>
+                      <li>
+                        <hr className="dropdown-divider" />
+                      </li>
+                      <li>
+                        <button
+                          type="button"
+                          className="dropdown-item"
+                          onClick={() => {
+                            if (staticNotebook) {
+                              dispatch(exportToPDF(notebookId, notebookPath));
+                            } else {
+                              dispatch(setExportingToPDF(true));
+                              runDownloadPDF();
+                            }
+                          }}
+                        >
+                          <i
+                            className="fa fa-file-pdf-o"
+                            aria-hidden="true"
+                          ></i>{" "}
+                          Download as PDF
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
 
-              {/* {fileKeys && !allFilesUploaded() && (
-                <div className="alert alert-danger mb-3" role="alert">
-                  <i className="fa fa-file" aria-hidden="true"></i> Please
-                  upload all required files.
-                </div>
-              )} */}
-
-              {/* {notebookTitle === "Please provide title" && (
-                <div className="alert alert-warning mb-3" role="alert">
-                  <i
-                    className="fa fa-exclamation-triangle"
-                    aria-hidden="true"
-                  ></i>{" "}
-                  <b>
-                    Please add YAML config to your notebook as a first raw cell.
-                  </b>
-                  <br />
-                  <br />
-                  Example:
-                  <pre>
-                    ---
-                    <br />
-                    title: Report title
-                    <br />
-                    author: Your name
-                    <br />
-                    description: My amazing report
-                    <br />
-                    ---
-                  </pre>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() =>
-                      window.open(
-                        "https://github.com/mljar/mercury#convert-notebook-to-web-app-with-yaml",
-                        "_blank"
-                      )
-                    }
-                  >
-                    <i className="fa fa-book" aria-hidden="true"></i> Read more
-                  </button>
-                </div>
-              )} */}
 
               {notebookSchedule !== "" && (
                 <div className="alert alert-success mb-3" role="alert">
