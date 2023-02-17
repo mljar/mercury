@@ -147,7 +147,11 @@ def task_init_notebook(
 
         notebook_slug = params.get("slug", "")
         if notebook_slug == "":
-            notebook_slug = slugify(notebook_title)
+            fname = os.path.basename(notebook_path)
+            fname = fname.replace(".ipynb", "")
+            notebook_slug = slugify(fname)
+            if notebook_slug is None or notebook_slug == "":
+                notebook_slug = f"nb-{get_hash()}"
         notebook_output_file = notebook_slug
         if notebook_id is not None:
             notebook_output_file = f"{notebook_slug}-{get_hash()}"
