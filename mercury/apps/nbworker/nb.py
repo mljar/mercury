@@ -186,45 +186,7 @@ class NBWorker(WSClient):
 
                 self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
 
-            """
-                print(self.nb.cells[i - 1])
 
-                for output in self.nb.cells[i - 1].get("outputs", []):
-                    if "data" in output:
-                        if "application/mercury+json" in output["data"]:
-                            w = output["data"]["application/mercury+json"]
-                            log.debug(w)
-                            w = json.loads(w)
-
-                            # prepare msg to send by ws
-                            msg = WidgetsManager.frontend_format(w)
-                            if msg:
-                                msg["purpose"] = Purpose.UpdateWidgets
-                                msg["widgetKey"] = w.get("code_uid")
-                                log.debug(f"Update widget {msg}")
-                                self.ws.send(json.dumps(msg))
-
-            # check if hide some widgets
-            nb_widgets_keys = []
-            for cell in self.nb.cells:
-                for output in cell.get("outputs", []):
-                    w = output.get("data", {}).get("application/mercury+json")
-                    if w is not None:
-                        w = json.loads(w)
-                        code_uid = w.get("code_uid")
-                        if code_uid is not None:
-                            nb_widgets_keys += [code_uid]
-
-            hide_widgets = []
-            for widget_key in widgets.keys():
-                if widget_key not in nb_widgets_keys:
-                    hide_widgets += [widget_key]
-
-            log.debug(f"Hide widgets {hide_widgets}")
-            if hide_widgets:
-                msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
-                self.ws.send(json.dumps(msg))
-            """
             self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())
             self.prev_nb = copy.deepcopy(self.nb)
         else:
