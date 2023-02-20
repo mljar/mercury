@@ -112,7 +112,7 @@ export default withRouter(function HomeView() {
                 }}
                 data-toggle="tooltip"
                 data-placement="right"
-                title="Open"
+                title={`Open ${notebook.title}`}
               >
                 <i className="fa fa-chevron-right" aria-hidden="true" />
               </button>
