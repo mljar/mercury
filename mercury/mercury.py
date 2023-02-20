@@ -39,6 +39,7 @@ from widgets.button import Button
 from widgets.md import Markdown
 from widgets.md import Markdown as Md
 from widgets.json import JSON
+from widgets.stop import StopExecution
 
 
 def main():

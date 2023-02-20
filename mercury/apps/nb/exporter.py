@@ -56,6 +56,10 @@ class Exporter:
         self.html_exporter.exclude_input_prompt = not self.show_prompt
         self.html_exporter.exclude_output_prompt = not self.show_prompt
 
+    def is_stop_execution_output(self, output):
+        return output.get("output_type", "") == "error" and "StopExecution" in output.get("ename", "")
+
+
     def export(self, notebook, full_header=True):
         #
         # notebook needs to be in nbformat
@@ -77,6 +81,15 @@ class Exporter:
                     for output in cell["outputs"]
                     if not "application/mercury+json" in output.get("data", {})
                 ]
+        # omit output with mercury StopExecution
+        for cell in n.cells:
+            if "outputs" in cell:
+                cell["outputs"] = [
+                    output
+                    for output in cell["outputs"]
+                    if not self.is_stop_execution_output(output)
+                ]
+        
 
         body, _ = self.html_exporter.from_notebook_node(n)
 
