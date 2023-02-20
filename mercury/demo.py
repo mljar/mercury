@@ -185,9 +185,9 @@ Mercury features:
 - share multiple notebooks,
 - executed notebook can be exported to HTML or PDF,
 - embed notebook apps on any website,
-- easily deploy (free & public Mercury cloud comming soon!)
-- easily add authentication to notebooks (comming soon!)
-- schedule automatic execution (comming soon!)
+- easily deploy (free & public Mercury cloud coming soon!)
+- easily add authentication to notebooks (coming soon!)
+- schedule automatic execution (coming soon!)
 
 Please check our documentation at <a href="https://runmercury.com" target="_blank">RunMercury.com</a> for more information 📚
 
