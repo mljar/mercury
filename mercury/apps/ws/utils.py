@@ -86,8 +86,6 @@ def parse_params(nb, params={}):
                         params["share"] = view.get("share")
                     if view.get("output") is not None:
                         params["output"] = view.get("output")
-                    if view.get("slug") is not None:
-                        params["slug"] = view.get("slug")
                     if view.get("schedule") is not None:
                         params["schedule"] = view.get("schedule")
                     if view.get("notify") is not None:

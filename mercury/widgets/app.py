@@ -14,7 +14,6 @@ class App:
         show_prompt=False,
         share="public",
         output="app",
-        slug="",
         schedule="",
         notify={},
         continuous_update=True,
@@ -30,7 +29,6 @@ class App:
         self.show_prompt = show_prompt
         self.share = share
         self.output = output
-        self.slug = slug
         self.schedule = schedule
         self.notify = notify
         self.continuous_update = continuous_update
@@ -55,7 +53,6 @@ class App:
             "show_prompt": self.show_prompt,
             "share": self.share,
             "output": self.output,
-            "slug": self.slug,
             "schedule": self.schedule,
             "notify": json.dumps(self.notify),
             "continuous_update": self.continuous_update,
