@@ -42,7 +42,7 @@ def notebooks_queryset(request):
 
 class ListNotebooks(APIView):
     def get(self, request, format=None):
-        notebooks = notebooks_queryset(request)
+        notebooks = notebooks_queryset(request).order_by("slug")
         serializer = NotebookSerializer(notebooks, many=True)
         return JsonResponse(serializer.data, safe=False)
 
