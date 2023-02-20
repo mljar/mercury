@@ -20,7 +20,7 @@ class App:
         static_notebook=False,
         show_sidebar=True,
         full_screen=True,
-        allow_download=True
+        allow_download=True,
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
@@ -44,7 +44,9 @@ class App:
     def _repr_mimebundle_(self, **kwargs):
         data = {}
         data["text/plain"] = repr(self)
-        data["text/html"] = "<h3>Mercury Application</h3><small>This output won't appear in the web app.</small>"
+        data[
+            "text/html"
+        ] = "<h3>Mercury Application</h3><small>This output won't appear in the web app.</small>"
         view = {
             "widget": "App",
             "title": self.title,

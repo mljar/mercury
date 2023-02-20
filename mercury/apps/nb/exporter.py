@@ -57,8 +57,9 @@ class Exporter:
         self.html_exporter.exclude_output_prompt = not self.show_prompt
 
     def is_stop_execution_output(self, output):
-        return output.get("output_type", "") == "error" and "StopExecution" in output.get("ename", "")
-
+        return output.get(
+            "output_type", ""
+        ) == "error" and "StopExecution" in output.get("ename", "")
 
     def export(self, notebook, full_header=True):
         #
@@ -89,7 +90,6 @@ class Exporter:
                     for output in cell["outputs"]
                     if not self.is_stop_execution_output(output)
                 ]
-        
 
         body, _ = self.html_exporter.from_notebook_node(n)
 

@@ -40,10 +40,11 @@ class OutputDir:
         view = {
             "widget": "OutputDir",
             "model_id": "output-dir",
-            "code_uid": self.code_uid
+            "code_uid": self.code_uid,
         }
         data["application/mercury+json"] = json.dumps(view, indent=4)
-        data["text/html"] = "<h3>Output Directory</h3><small>This output won't appear in the web app.</small>"
-        
+        data[
+            "text/html"
+        ] = "<h3>Output Directory</h3><small>This output won't appear in the web app.</small>"
 
         return data

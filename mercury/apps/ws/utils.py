@@ -1,7 +1,7 @@
 import json
 import logging
 import platform
-import nbformat  
+import nbformat
 
 from widgets.manager import WidgetsManager
 
@@ -98,7 +98,6 @@ def parse_params(nb, params={}):
                     for property in ["show_sidebar", "full_screen", "allow_download"]:
                         if view.get(property) is not None:
                             params[property] = view.get(property)
-                    
 
                 else:
                     params["params"][widget_key] = WidgetsManager.frontend_format(view)

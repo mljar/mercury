@@ -66,7 +66,9 @@ class NbRun:
                 cell.execution_count = counter
 
             for output in cell.outputs:
-                if output.get("output_type", "") == "error" and "StopExecution" in output.get("ename", ""):
+                if output.get(
+                    "output_type", ""
+                ) == "error" and "StopExecution" in output.get("ename", ""):
                     return False
         return True
 
@@ -74,7 +76,7 @@ class NbRun:
         #
         # nb is fastai format
         #
-        counter = start+1
+        counter = start + 1
         continue_computing = True
         for c in nb.cells[start:]:
             if continue_computing:

@@ -181,8 +181,7 @@ class NBWorker(WSClient):
             else:
                 self.nb = copy.deepcopy(self.nb_original)
 
-            self.nbrun.run_notebook(self.nb, start=index_execute_from-1)
-
+            self.nbrun.run_notebook(self.nb, start=index_execute_from - 1)
 
             self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())
             self.prev_nb = copy.deepcopy(self.nb)
@@ -307,7 +306,7 @@ class NBWorker(WSClient):
             "description",
             "show_sidebar",
             "full_screen",
-            "allow_download"
+            "allow_download",
         ]:
             if params.get(property) is not None and nb_params.get(
                 property

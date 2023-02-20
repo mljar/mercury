@@ -30,7 +30,9 @@ class File:
 
         if self.file.filepath is not None:
             # read that file
-            with open(self.file.filepath, "rb", encoding="utf-8", errors="ignore") as fin:
+            with open(
+                self.file.filepath, "rb", encoding="utf-8", errors="ignore"
+            ) as fin:
                 return fin.read()
 
         return None

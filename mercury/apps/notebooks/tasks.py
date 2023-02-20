@@ -68,6 +68,7 @@ def get_jupyter_bin_path():
         return os.path.join(os.path.dirname(sys.executable), "Scripts", "jupyter.exe")
     return os.path.join(os.path.dirname(sys.executable), "jupyter")
 
+
 def nb_default_title(nb_path):
     try:
         fname = os.path.basename(nb_path)
@@ -86,16 +87,18 @@ def is_presentation(nb):
             return True
     return False
 
+
 def make_unique(slug):
     previous_slugs = Notebook.objects.values_list("slug", flat=True)
     if slug not in previous_slugs:
-        return slug 
+        return slug
     for i in range(1000000):
         slug_unique = f"{slug}-{i}"
         if slug_unique not in previous_slugs:
             return slug_unique
-        
+
     return slug
+
 
 def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
@@ -113,7 +116,7 @@ def task_init_notebook(
             "notify": {},
         }
         nb = None
-        
+
         with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
             parse_params(nb, params)
@@ -161,11 +164,10 @@ def task_init_notebook(
                 if notebook_slug is None or notebook_slug == "":
                     notebook_slug = f"nb-{get_hash()}"
 
-            notebook_slug = make_unique(notebook_slug)    
+            notebook_slug = make_unique(notebook_slug)
         else:
             tmp_nb = Notebook.objects.get(pk=notebook_id)
             notebook_slug = tmp_nb.slug
-
 
         notebook_output_file = notebook_slug
         if notebook_id is not None:
@@ -208,7 +210,6 @@ def task_init_notebook(
 }
 </style>"""
                     )
-
 
         parse_errors = validate_notify(notebook_notify)
 
@@ -268,7 +269,7 @@ def task_init_notebook(
         else:
             print("Error during notebook initialization.", str(e))
             print(traceback.format_exc())
-            
+
 
 @shared_task(bind=True)
 def task_watch(self, notebook_id):

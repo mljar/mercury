@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status    
+from rest_framework import status
 
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
@@ -56,6 +56,7 @@ class RetrieveNotebook(APIView):
             task_watch.delay(notebook.id)
 
         return JsonResponse(serializer.data, safe=False)
+
 
 class RetrieveNotebookWithSlug(APIView):
     def get(self, request, notebook_slug, format=None):

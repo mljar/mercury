@@ -49,7 +49,7 @@ class WidgetsManager:
 
     @staticmethod
     def fix_cell_index(code_uid, correct_cell_index):
-        # remove rand uid 
+        # remove rand uid
         code_uid = code_uid.split("-rand")[0]
         # fix cell index
         parts = code_uid.split(".")
