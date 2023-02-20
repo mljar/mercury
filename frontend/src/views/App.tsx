@@ -4,9 +4,7 @@ import AppView from "./AppView";
 import WebSocketProvider from "../websocket/Provider";
 
 function MyApp() {
-  const { notebook_id } = useParams<{ notebook_id: string }>();
-  const notebookId = Number(notebook_id);
-
+  const { slug } = useParams<{ slug: string }>();
   const { embed } = useParams<{ embed: string }>();
   const displayEmbed = !!(embed && embed === "embed");
 
@@ -14,7 +12,7 @@ function MyApp() {
     <WebSocketProvider>
       <AppView
         isSingleApp={false}
-        notebookId={notebookId}
+        notebookSlug={slug}
         displayEmbed={displayEmbed}
       />
     </WebSocketProvider>

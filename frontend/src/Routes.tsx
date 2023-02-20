@@ -42,7 +42,7 @@ export default function Routes() {
           <Route exact path="/" component={HomeView} />
           <Route
             exact
-            path="/app/:notebook_id/:embed?"
+            path="/app/:slug/:embed?"
             component={MainApp}
           />
           <Route exact path="/login" component={LoginView} />

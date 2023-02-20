@@ -68,7 +68,7 @@ export default withRouter(function HomeView() {
             ></iframe>
           </div>
           <a
-            href={`/app/${notebook.id}`}
+            href={`/app/${notebook.slug}`}
             style={{ textDecoration: "none", color: "black" }}
             className="title-card"
           >

@@ -6,7 +6,7 @@ import SideBar from "../components/SideBar";
 import MainView from "../components/MainView";
 
 import {
-  fetchNotebook,
+  fetchNotebookWithSlug,
   getLoadingStateSelected,
   getSelectedNotebook,
   getSlidesHash,
@@ -22,7 +22,6 @@ import {
   //ITask,
   //setPreviousTask,
 } from "../tasks/tasksSlice";
-import WatchModeComponent from "../components/WatchMode";
 import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
 import {
   fetchWorkerOutputFiles,
@@ -37,18 +36,17 @@ import { getToken, getUsername } from "../components/authSlice";
 import { getIsPro } from "../components/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
-import AutoRefresh from "../components/AutoRefresh";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
 import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
 
 type AppProps = {
   isSingleApp: boolean;
-  notebookId: number;
+  notebookSlug: string;
   displayEmbed: boolean;
 };
 
-function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
+function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const dispatch = useDispatch();
   const notebook = useSelector(getSelectedNotebook);
   const loadingState = useSelector(getLoadingStateSelected);
@@ -83,11 +81,11 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
   };
 
   useEffect(() => {
-    dispatch(fetchNotebook(notebookId));
+    dispatch(fetchNotebookWithSlug(notebookSlug));
     //dispatch(fetchCurrentTask(notebookId));
     //dispatch(fetchExecutionHistory(notebookId));
     //dispatch(setPreviousTask({} as ITask));
-  }, [dispatch, notebookId, token]);
+  }, [dispatch, notebookSlug, token]);
 
   // useEffect(() => {
   //   if (waitForTask()) {
@@ -217,16 +215,14 @@ function App({ isSingleApp, notebookId, displayEmbed }: AppProps) {
         {exportingToPDF && <WaitPDFExport />}
         <div className="container-fluid">
           <div className="row">
-            <WatchModeComponent notebookId={notebookId} />
-
-            {notebook.schedule !== undefined && notebook.schedule !== "" && (
+            {/* {notebook.schedule !== undefined && notebook.schedule !== "" && (
               <AutoRefresh notebookId={notebookId} />
-            )}
+            )} */}
 
             {showSideBar && (
               <SideBar
                 notebookTitle={notebook.title}
-                notebookId={notebookId}
+                notebookId={notebook.id}
                 notebookSchedule={notebook.schedule}
                 taskCreatedAt={task.created_at}
                 loadingState={loadingState}

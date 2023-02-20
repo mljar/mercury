@@ -376,3 +376,43 @@ export const fetchNotebook =
         );
       }
     };
+
+export const fetchNotebookWithSlug =
+  (slug: string, silent = false) =>
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        if (!silent) {
+          dispatch(setSlidesHash(""));
+          dispatch(clearExecutionHistory());
+        }
+
+        const { width } = getWindowDimensions();
+        dispatch(setShowSideBar(width > 992));
+
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loading"));
+        }
+        const url = `/api/v1/getnb/${slug}/`;
+        const { data } = await axios.get(url);
+        const parsedParams = JSON.parse(data.params) as INotebookParams;
+        dispatch(
+          setSelectedNotebook({
+            ...data,
+            params: parsedParams,
+          })
+        );
+        if (!silent) {
+          dispatch(setLoadingStateSelected("loaded"));
+        }
+        if (parsedParams?.show_sidebar !== null && parsedParams?.show_sidebar !== undefined) {
+          dispatch(setShowSideBar(parsedParams?.show_sidebar));
+        }
+      } catch (error) {
+        if (!silent) {
+          dispatch(setLoadingStateSelected("error"));
+        }
+        console.error(
+          `Problem during loading selected notebook (${slug}). ${error}`
+        );
+      }
+    };

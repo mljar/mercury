@@ -51,7 +51,7 @@ export default function RunButton({
         </span>
       )}
       {workerState !== WorkerState.Busy &&
-        workerState !== WorkerState.Running && <span>Wait for worker ...</span>}
+        workerState !== WorkerState.Running && <span>Waiting ...</span>}
     </button>
   );
 }

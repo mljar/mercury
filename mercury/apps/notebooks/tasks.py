@@ -90,7 +90,7 @@ def make_unique(slug):
     previous_slugs = Notebook.objects.values_list("slug", flat=True)
     if slug not in previous_slugs:
         return slug 
-    for i in range(10000):
+    for i in range(1000000):
         slug_unique = f"{slug}-{i}"
         if slug_unique not in previous_slugs:
             return slug_unique

@@ -310,27 +310,15 @@ export default function SideBar({
     }
   }
 
-  // const allFilesUploaded = () => {
-  //   if (fileKeys.length === 0) {
-  //     // no files at all, so OK
-  //     return true;
-  //   }
-  //   for (const key of fileKeys) {
-  //     if (!Object.prototype.hasOwnProperty.call(widgetsValues, key)) {
-  //       return false;
-  //     }
-  //     let files = widgetsValues[key] as string[];
-  //     if (files === undefined || files.length === 0) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
-
   let additionalStyle = {};
   if (displayEmbed) {
     additionalStyle = { padding: "0px" };
   }
+
+  const addSpaceInsteadTitle =
+    notebookTitle === undefined ||
+    notebookTitle === null ||
+    notebookTitle === "";
 
   return (
     <nav
@@ -361,6 +349,7 @@ export default function SideBar({
           <div style={{ padding: "0px" }}>
             <form>
               {widgets}
+              {addSpaceInsteadTitle && <div style={{ padding: "15px" }}></div>}
               <div className="form-group mb-3 pb-1 pt-2">
                 {!continuousUpdate && (
                   <RunButton
@@ -443,8 +432,7 @@ export default function SideBar({
                 )}
               </div>
 
-
-              {notebookSchedule !== "" && (
+              {/* {notebookSchedule !== "" && (
                 <div className="alert alert-success mb-3" role="alert">
                   <p>
                     <i className="fa fa-clock-o" aria-hidden="true"></i>{" "}
@@ -463,7 +451,7 @@ export default function SideBar({
                     refresh every minute.
                   </div>
                 </div>
-              )}
+              )} */}
 
               {continuousUpdate && (
                 <div>
