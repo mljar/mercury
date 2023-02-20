@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { withRouter } from "react-router-dom";
@@ -18,6 +18,7 @@ import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
 import { getToken, getUsername } from "../components/authSlice";
+import { NonceProvider } from "react-select";
 
 export default withRouter(function HomeView() {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ export default withRouter(function HomeView() {
   const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
+  const [showButton, setShowButton] = useState("");
 
   useEffect(() => {
     dispatch(fetchNotebooks());
@@ -71,6 +73,12 @@ export default withRouter(function HomeView() {
             href={`/app/${notebook.slug}`}
             style={{ textDecoration: "none", color: "black" }}
             className="title-card"
+            onMouseEnter={() => {
+              setShowButton(notebook.slug);
+            }}
+            onMouseLeave={() => {
+              setShowButton("");
+            }}
           >
             <div
               className="card-body"
@@ -78,6 +86,7 @@ export default withRouter(function HomeView() {
                 borderTop: "1px solid rgba(0,0,0,0.1)",
                 height: "110px",
               }}
+              
             >
               <h5 className="card-title">{firstLetters(notebook.title, 40)}</h5>
 
@@ -89,6 +98,25 @@ export default withRouter(function HomeView() {
               Open <i className="fa fa-arrow-right" aria-hidden="true"></i>
             </a> */}
             </div>
+            {showButton === notebook.slug && (
+              <button
+                className="btn btn-outline-primary"
+                type="button"
+                style={{
+                  zIndex: "101",
+                  border: "none",
+                  margin: "5px",
+                  position: "absolute",
+                  right: "0px",
+                  bottom: "0px",
+                }}
+                data-toggle="tooltip"
+                data-placement="right"
+                title="Open"
+              >
+                <i className="fa fa-chevron-right" aria-hidden="true" />
+              </button>
+            )}
           </a>
         </div>
       </div>
