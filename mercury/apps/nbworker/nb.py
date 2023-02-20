@@ -181,10 +181,7 @@ class NBWorker(WSClient):
             else:
                 self.nb = copy.deepcopy(self.nb_original)
 
-            for i in range(index_execute_from, len(self.nb.cells) + 1):
-                log.debug(f"Execute cell index={i-1}")
-
-                self.nbrun.run_cell(self.nb.cells[i - 1], counter=i)
+            self.nbrun.run_notebook(self.nb, start=index_execute_from-1)
 
             """
                 print(self.nb.cells[i - 1])

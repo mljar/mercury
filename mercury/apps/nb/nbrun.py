@@ -65,14 +65,24 @@ class NbRun:
             if counter is not None:
                 cell.execution_count = counter
 
-    def run_notebook(self, nb):
+            for output in cell.outputs:
+                if output.get("output_type", "") == "error" and "StopExecution" in output.get("ename", ""):
+                    return False
+        return True
+
+    def run_notebook(self, nb, start=0):
         #
         # nb is fastai format
         #
-        counter = 1
-        for c in nb.cells:
-            self.run_cell(c, counter)
-            counter += 1
+        counter = start+1
+        continue_computing = True
+        for c in nb.cells[start:]:
+            if continue_computing:
+                continue_computing = self.run_cell(c, counter)
+                counter += 1
+            else:
+                if c.cell_type == "code":
+                    c.outputs = []
 
     def export_html(self, nb, full_header=True):
         body = self.exporter.export(

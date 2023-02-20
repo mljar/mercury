@@ -6,3 +6,5 @@ class StopExecution(Exception):
             return ["StopExecution"]
         pass
 
+def Stop():
+    raise StopExecution()
