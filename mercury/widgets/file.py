@@ -77,7 +77,6 @@ class File:
         return "mercury.File"
 
     def __repr__(self):
-
         return "mercury.File"
 
     def _repr_mimebundle_(self, **kwargs):

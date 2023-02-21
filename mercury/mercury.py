@@ -89,12 +89,9 @@ def main():
 
         if "clear" in sys.argv:
             for n in ["db.sqlite", "db.sqlite3"]:
-                db_path = os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    n
-                )
+                db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), n)
                 if os.path.exists(db_path):
-                    os.remove(db_path) 
+                    os.remove(db_path)
                     print("SQLite database deleted")
             print("All clear")
             sys.exit(1)
@@ -202,7 +199,6 @@ def main():
         sys.argv.remove("--noadditional")
 
     try:
-
         arguments = sys.argv
         if (
             len(sys.argv) > 1
@@ -211,7 +207,7 @@ def main():
         ):
             arguments += ["--noreload"]
             try:
-                running_local = True 
+                running_local = True
                 for i in sys.argv:
                     if "0.0.0.0" in i:
                         running_local = False

@@ -13,7 +13,6 @@ class NoteText:
 
 class Note:
     def __init__(self, text=""):
-
         self.code_uid = WidgetsManager.get_code_uid("Note")
 
         if WidgetsManager.widget_exists(self.code_uid):
@@ -36,7 +35,6 @@ class Note:
         return "mercury.Note"
 
     def _repr_mimebundle_(self, **kwargs):
-
         data = {}
 
         view = {

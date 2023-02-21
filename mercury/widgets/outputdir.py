@@ -34,7 +34,6 @@ class OutputDir:
         return "mercury.OutputDir"
 
     def _repr_mimebundle_(self, **kwargs):
-
         data = {}
 
         view = {

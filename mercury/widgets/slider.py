@@ -51,7 +51,6 @@ class Slider:
         return "mercury.Slider"
 
     def __repr__(self):
-
         return "mercury.Slider"
 
     def _repr_mimebundle_(self, **kwargs):

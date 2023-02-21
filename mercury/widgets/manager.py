@@ -18,7 +18,6 @@ class WidgetException(Exception):
 
 
 class WidgetsManager:
-
     widgets = {}  # model_id -> widget
     code2model = {}  # code generated uid  -> model_id
     cell_index = 0  # current cell index
@@ -98,7 +97,6 @@ class WidgetsManager:
 
     @staticmethod
     def frontend_format(output):
-
         widget_type = output.get("widget", "unknown")
 
         if widget_type == "Slider":

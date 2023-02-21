@@ -8,7 +8,6 @@ from .manager import WidgetException, WidgetsManager
 
 class Button:
     def __init__(self, label="", style="primary"):
-
         self.code_uid = WidgetsManager.get_code_uid("Button")
 
         if style not in ["primary", "success", "info", "warning", "danger", ""]:
@@ -42,7 +41,6 @@ class Button:
         return "mercury.Button"
 
     def __repr__(self):
-
         return "mercury.Button"
 
     def _repr_mimebundle_(self, **kwargs):

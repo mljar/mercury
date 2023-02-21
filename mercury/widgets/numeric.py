@@ -53,7 +53,6 @@ class Numeric:
         return "mercury.Numeric"
 
     def __repr__(self):
-
         return "mercury.Numeric"
 
     def _repr_mimebundle_(self, **kwargs):

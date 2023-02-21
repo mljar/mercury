@@ -61,9 +61,9 @@ class RetrieveNotebook(APIView):
 class RetrieveNotebookWithSlug(APIView):
     def get(self, request, notebook_slug, format=None):
         notebook_slug = notebook_slug.replace("/", "")
-        
+
         notebooks = notebooks_queryset(request).filter(slug=notebook_slug)
-        
+
         if not notebooks:
             return JsonResponse({}, status=status.HTTP_404_NOT_FOUND)
 

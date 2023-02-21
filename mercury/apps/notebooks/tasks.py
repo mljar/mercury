@@ -104,7 +104,6 @@ def task_init_notebook(
     notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
 ):
     try:
-
         params = {
             "title": "",
             "author": "Please provide author",

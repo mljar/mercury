@@ -33,7 +33,6 @@ class Checkbox:
         return "mercury.Checkbox"
 
     def __repr__(self):
-
         return "mercury.Checkbox"
 
     def _repr_mimebundle_(self, **kwargs):

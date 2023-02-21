@@ -66,7 +66,6 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task
 def execute_notebook(notebook_id):
-
     import django
 
     django.setup()

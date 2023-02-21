@@ -32,7 +32,6 @@ class Text:
         return "mercury.Text"
 
     def __repr__(self):
-
         return "mercury.Text"
 
     def _repr_mimebundle_(self, **kwargs):

@@ -47,7 +47,6 @@ class MultiSelect:
         return "m.MultiSelect"
 
     def __repr__(self):
-
         return "mercury.MultiSelect"
 
     def _repr_mimebundle_(self, **kwargs):
