@@ -61,8 +61,7 @@ class RetrieveNotebook(APIView):
 class RetrieveNotebookWithSlug(APIView):
     def get(self, request, notebook_slug, format=None):
         notebook_slug = notebook_slug.replace("/", "")
-        for n in notebooks_queryset(request):
-            print(n.id, n.title, n.slug)
+        
         notebooks = notebooks_queryset(request).filter(slug=notebook_slug)
         
         if not notebooks:
