@@ -16,18 +16,18 @@ load_dotenv(".env")
 
 
 is_pro = False
-try:
-    # try to import the Mercury pro features
-    # it is available only for commercial users
-    # you can check available license at https://mljar.com/pricing
-    import pro
+#try:
+#    # try to import the Mercury pro features
+#    # it is available only for commercial users
+#    # you can check available license at https://mljar.com/pricing
+#    import pro
 
-    is_pro = True
-except ImportError:
-    pass
+#    is_pro = True
+#except ImportError:
+#    pass
 
-if is_pro:
-    print("*** Running Mercury Pro ***")
+#if is_pro:
+#    print("*** Running Mercury Pro ***")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,24 +83,26 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "django_drf_filepond",
+    "dj_rest_auth",
     "apps.tasks",
     "apps.notebooks",
     "apps.ws",
     "apps.storage",
+    "apps.accounts",
 ]
 
-if is_pro:
-    # setup pro features
-    INSTALLED_APPS += [
-        "rest_framework.authtoken",
-        "pro.accounts",
-    ]
-    ACCOUNT_AUTHENTICATION_METHOD = "username"
-    REST_FRAMEWORK = {
-        "DEFAULT_AUTHENTICATION_CLASSES": (
-            "rest_framework.authentication.TokenAuthentication",
-        )
-    }
+# if is_pro:
+# setup pro features
+INSTALLED_APPS += [
+    "rest_framework.authtoken",
+    #"pro.accounts",
+]
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+    )
+}
 
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
