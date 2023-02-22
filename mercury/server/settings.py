@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     # 3rd party
     "rest_framework",
     "corsheaders",
@@ -96,7 +97,7 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-REST_AUTH_SERIALIZERS = {
+REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer"
 }
 

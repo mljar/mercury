@@ -7,27 +7,23 @@ from django.dispatch import receiver
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
 
-
 class MercurySite(models.Model):
     title = models.CharField(
-        max_length=200,
-        help_text="Name of Mercury Site",
-        blank=False,
-        null=False
+        max_length=200, help_text="Name of Mercury Site", blank=False, null=False
     )
     slug = models.CharField(
         max_length=200,
         help_text="Subdomain address",
         blank=False,
         null=False,
-        unique=True
+        unique=True,
     )
     share = models.CharField(
         max_length=200,
         help_text="Share as public or only with auth users (private)",
         blank=False,
         null=False,
-        default="public"
+        default="public",
     )
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
@@ -41,7 +37,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     # custom fields for user
     info = models.TextField(blank=True)
-    
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

@@ -17,45 +17,169 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='MercurySite',
+            name="MercurySite",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(help_text='Name of Mercury Site', max_length=200)),
-                ('slug', models.CharField(help_text='Subdomain address', max_length=200, unique=True)),
-                ('share', models.CharField(default='public', help_text='Share as public or only with auth users (private)', max_length=200)),
-                ('created_at', apps.accounts.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False)),
-                ('updated_at', apps.accounts.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(help_text="Name of Mercury Site", max_length=200),
+                ),
+                (
+                    "slug",
+                    models.CharField(
+                        help_text="Subdomain address", max_length=200, unique=True
+                    ),
+                ),
+                (
+                    "share",
+                    models.CharField(
+                        default="public",
+                        help_text="Share as public or only with auth users (private)",
+                        max_length=200,
+                    ),
+                ),
+                (
+                    "created_at",
+                    apps.accounts.fields.AutoCreatedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "updated_at",
+                    apps.accounts.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UsersGroup',
+            name="UsersGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='Group of users in Mercury', max_length=200)),
-                ('rights', models.CharField(help_text='Rights for group of users', max_length=200)),
-                ('created_at', apps.accounts.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False)),
-                ('updated_at', apps.accounts.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('site', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.mercurysite')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="Group of users in Mercury", max_length=200
+                    ),
+                ),
+                (
+                    "rights",
+                    models.CharField(
+                        help_text="Rights for group of users", max_length=200
+                    ),
+                ),
+                (
+                    "created_at",
+                    apps.accounts.fields.AutoCreatedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "updated_at",
+                    apps.accounts.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "site",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="accounts.mercurysite",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UserProfile',
+            name="UserProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('info', models.TextField(blank=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("info", models.TextField(blank=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', apps.accounts.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False)),
-                ('updated_at', apps.accounts.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False)),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.usersgroup')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    apps.accounts.fields.AutoCreatedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "updated_at",
+                    apps.accounts.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="accounts.usersgroup",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]
