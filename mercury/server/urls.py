@@ -7,7 +7,6 @@ from django.urls import path, re_path
 
 from apps.notebooks.urls import notebooks_urlpatterns
 from apps.tasks.urls import tasks_urlpatterns
-from server.settings import is_pro
 from server.views import VersionInfo, WelcomeMessage
 
 urlpatterns = []
@@ -43,10 +42,6 @@ urlpatterns += [
 urlpatterns += tasks_urlpatterns
 urlpatterns += notebooks_urlpatterns
 
-if is_pro:
-    from pro.accounts.urls import auth_urlpatterns
-
-    urlpatterns += auth_urlpatterns
 
 
 admin.site.site_header = "Mercury Admin Panel"

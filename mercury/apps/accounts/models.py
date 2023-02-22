@@ -9,9 +9,15 @@ from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
 
 class MercurySite(models.Model):
-    name = models.CharField(
+    title = models.CharField(
         max_length=200,
         help_text="Name of Mercury Site",
+        blank=False,
+        null=False
+    )
+    slug = models.CharField(
+        max_length=200,
+        help_text="Subdomain address",
         blank=False,
         null=False,
         unique=True
@@ -34,10 +40,8 @@ class MercurySite(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     # custom fields for user
-    plan = models.CharField(max_length=200, default="free", blank=True)
     info = models.TextField(blank=True)
-    subscription_id = models.CharField(max_length=200, blank=True)
-
+    
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -50,7 +54,7 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-class MercuryGroup(models.Model):
+class UsersGroup(models.Model):
     name = models.CharField(
         max_length=200,
         help_text="Group of users in Mercury",
@@ -70,7 +74,7 @@ class MercuryGroup(models.Model):
         on_delete=models.CASCADE,
     )
     site = models.ForeignKey(
-        User,
+        MercurySite,
         on_delete=models.CASCADE,
     )
 
@@ -80,10 +84,6 @@ class MercuryGroup(models.Model):
 
 class Membership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(MercuryGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(UsersGroup, on_delete=models.CASCADE)
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-    )

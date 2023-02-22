@@ -10,10 +10,8 @@ from rest_framework import status
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch
-from server.settings import is_pro
 
-if is_pro:
-    from pro.accounts.models import Membership
+from apps.accounts.models import Membership
 
 
 def in_commas(word):
@@ -21,8 +19,6 @@ def in_commas(word):
 
 
 def notebooks_queryset(request):
-    if not is_pro:
-        return Notebook.objects.all()
 
     user = request.user
     if user.is_anonymous:

@@ -15,20 +15,6 @@ from dotenv import load_dotenv
 load_dotenv(".env")
 
 
-is_pro = False
-#try:
-#    # try to import the Mercury pro features
-#    # it is available only for commercial users
-#    # you can check available license at https://mljar.com/pricing
-#    import pro
-
-#    is_pro = True
-#except ImportError:
-#    pass
-
-#if is_pro:
-#    print("*** Running Mercury Pro ***")
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -80,10 +66,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # 3rd party
     "rest_framework",
     "corsheaders",
     "django_drf_filepond",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "rest_framework.authtoken",
+    # Mercury apps
     "apps.tasks",
     "apps.notebooks",
     "apps.ws",
@@ -91,18 +84,44 @@ INSTALLED_APPS = [
     "apps.accounts",
 ]
 
-# if is_pro:
-# setup pro features
-INSTALLED_APPS += [
-    "rest_framework.authtoken",
-    #"pro.accounts",
-]
-ACCOUNT_AUTHENTICATION_METHOD = "username"
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     )
 }
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+REST_AUTH_SERIALIZERS = {
+    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer"
+}
+
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+OLD_PASSWORD_FIELD_ENABLED = True # use old password when password change in the app
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+if os.environ.get("EMAIL_BACKEND", "console") != "console":
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = os.environ.get("EMAIL_HOST")  
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_TLS = True  # use TLS by default
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+
 
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
