@@ -8,9 +8,9 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
+from apps.accounts.models import Site, UsersGroup, Membership
 
 class AccountsTestCase(APITestCase):
-
     register_url = "/api/v1/auth/register/"
     verify_email_url = "/api/v1/auth/register/verify-email/"
     login_url = "/api/v1/auth/login/"
@@ -21,6 +21,8 @@ class AccountsTestCase(APITestCase):
     reset_password_url = "/api/v1/auth/password/reset/"
     reset_password_confirm_url = "/api/v1/auth/password/reset/confirm/"
 
+    sites_url = "/api/v1/sites/"
+
     def setUp(self):
         self.user1_params = {
             "username": "user1",  # it is optional to pass username
@@ -28,17 +30,30 @@ class AccountsTestCase(APITestCase):
             "password": "verysecret",
         }
         # create user and verified email
-        user = User.objects.create_user(
+        self.user = User.objects.create_user(
             username=self.user1_params["username"],
             email=self.user1_params["email"],
             password=self.user1_params["password"],
         )
         EmailAddress.objects.create(
-            user=user, email=user.email, verified=True, primary=True
+            user=self.user, email=self.user.email, verified=True, primary=True
         )
 
-    def test_register(self):
+    def test_list_sites(self):
+        site = Site.objects.create(
+            title="First site",
+            slug="first-site",
+            created_by=self.user
+        )
+         # login to get token
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        
+        response = self.client.get(self.sites_url, **headers)
+        print(response.json())
 
+    def test_register(self):
         # register data
         data = {
             "email": "user2@example-email.com",
@@ -93,4 +108,3 @@ class AccountsTestCase(APITestCase):
         for k in ["username", "email", "profile"]:
             self.assertTrue(k in data)
         self.assertTrue("info" in data["profile"])
-        

@@ -19,7 +19,6 @@ def in_commas(word):
 
 
 def notebooks_queryset(request):
-
     user = request.user
     if user.is_anonymous:
         return Notebook.objects.filter(share=in_commas("public"))

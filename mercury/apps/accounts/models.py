@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
 
-class MercurySite(models.Model):
+class Site(models.Model):
     title = models.CharField(
         max_length=200, help_text="Name of Mercury Site", blank=False, null=False
     )
@@ -18,12 +18,14 @@ class MercurySite(models.Model):
         null=False,
         unique=True,
     )
+    PUBLIC = "PUBLIC"
+    PRIVATE = "PRIVATE"
+    SHARE_CHOICES = (
+        (PUBLIC, "Anyone can access notebooks and execute"),
+        (PRIVATE, "Only selected users have access to notebooks"),
+    )
     share = models.CharField(
-        max_length=200,
-        help_text="Share as public or only with auth users (private)",
-        blank=False,
-        null=False,
-        default="public",
+        default=PUBLIC, max_length=32, choices=SHARE_CHOICES, blank=True, null=True
     )
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
@@ -57,6 +59,7 @@ class UsersGroup(models.Model):
         blank=False,
         null=False,
     )
+    # view, edit, admin
     rights = models.CharField(
         max_length=200,
         help_text="Rights for group of users",
@@ -69,8 +72,8 @@ class UsersGroup(models.Model):
         User,
         on_delete=models.CASCADE,
     )
-    site = models.ForeignKey(
-        MercurySite,
+    hosted_on = models.ForeignKey(
+        Site,
         on_delete=models.CASCADE,
     )
 
@@ -83,3 +86,7 @@ class Membership(models.Model):
     group = models.ForeignKey(UsersGroup, on_delete=models.CASCADE)
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
+    hosted_on = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+    )

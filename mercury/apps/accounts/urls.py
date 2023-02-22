@@ -2,8 +2,15 @@ from django.conf.urls import include
 from django.urls import path, re_path
 from django.views.generic.base import TemplateView
 
+from apps.accounts.views import SiteViewSet
 
-accounts_urlpatterns = [
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r"api/v1/sites", SiteViewSet, basename="sites")
+accounts_urlpatterns = router.urls
+
+accounts_urlpatterns += [
     path("api/v1/auth/", include("dj_rest_auth.urls")),
     path("api/v1/auth/register/", include("dj_rest_auth.registration.urls")),
     # path to set verify email in the frontend
@@ -21,5 +28,8 @@ accounts_urlpatterns = [
         r"^reset-password/(?P<uid>[-:\w]+)/(?P<token>[-:\w]+)/$",
         TemplateView.as_view(),
         name="password_reset_confirm",
-    )
+    ),
+
+ 
+    
 ]
