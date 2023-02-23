@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.views import MembershipViewSet, SiteViewSet
+from apps.accounts.views import MembershipViewSet, SiteViewSet, InviteView
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
@@ -30,4 +30,6 @@ accounts_urlpatterns += [
         TemplateView.as_view(),
         name="password_reset_confirm",
     ),
+
+    re_path("api/v1/(?P<site_id>.+)/invite/", InviteView.as_view()),
 ]

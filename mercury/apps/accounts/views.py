@@ -5,13 +5,15 @@ from datetime import datetime, timedelta
 from django.db import transaction
 from django.db.models import Q
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import Membership, Site
+from apps.accounts.models import Membership, Site, Invitation
 from apps.accounts.serializers import MembershipSerializer, SiteSerializer
+from apps.accounts.tasks import task_send_invitation
 
 
 def some_random_slug():
@@ -81,12 +83,65 @@ class SiteViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class HasEditRights(permissions.BasePermission):
+    def has_permission(self, request, view):
+        site_id = view.kwargs.get("site_id")
+        if site_id is None:  # just in case
+            return False
+        return (
+            Membership.objects.filter(
+                host__id=site_id, user=request.user, rights=Membership.EDIT
+            )
+            or Site.objects.get(pk=site_id).created_by == request.user
+        )
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            Membership.objects.filter(
+                host=obj.host, user=request.user, rights=Membership.EDIT
+            )
+            or obj.host.created_by == request.user
+        )
+
+
 class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
 
     def get_queryset(self):
-        return Membership.objects.filter(
-            host__id=self.kwargs["site_id"]
-        )
-        
+        return Membership.objects.filter(host__id=self.kwargs["site_id"])
+
+    def perform_create(self, serializer):
+        try:
+            # create a database instance
+            with transaction.atomic():
+                site = Site.objects.get(pk=self.kwargs.get("site_id"))
+                user = User.objects.get(pk=self.request.data.get("user_id"))
+                instance = serializer.save(
+                    host=site, user=user, created_by=self.request.user
+                )
+                instance.save()
+        except Exception as e:
+            raise APIException(str(e))
+
+
+class InviteView(APIView):
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
+
+    def post(self, request, site_id, format=None):
+        try:
+            # create a database instance
+            with transaction.atomic():
+                address_email = request.data.get("email")
+                token = uuid.uuid4().hex.replace("-", "")[:8]
+
+                invitation = Invitation.objects.create(
+                    token=token, invited=address_email, created_by=request.user
+                )
+
+                job_params = {"db_id": invitation.id}
+                transaction.on_commit(lambda: task_send_invitation.delay(job_params))
+
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            raise APIException(str(e))

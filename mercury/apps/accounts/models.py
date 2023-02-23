@@ -53,7 +53,7 @@ def save_user_profile(sender, instance, **kwargs):
 
 
 class Membership(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="users")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     host = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="hosts")
     # view, edit, admin
     VIEW = "VIEW"
@@ -75,3 +75,10 @@ class Membership(models.Model):
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_by"
     )
+
+
+class Invitation(models.Model):
+    token = models.CharField(max_length=128, blank=False, null=False)
+    invited = models.CharField(max_length=256, blank=False, null=False)
+    created_at = AutoCreatedField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)

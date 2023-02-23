@@ -34,9 +34,9 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class MembershipSerializer(serializers.ModelSerializer):
-    user_details = UserDetailsSerializer()
+    user = UserDetailsSerializer(many=False, read_only=True)
 
     class Meta:
         model = Membership
         read_only_fields = ("id", "created_at", "created_by", "updated_at")
-        fields = read_only_fields + ("rights", "user_details")
+        fields = read_only_fields + ("rights", "user")

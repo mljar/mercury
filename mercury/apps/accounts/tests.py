@@ -23,7 +23,8 @@ class AccountsTestCase(APITestCase):
     reset_password_confirm_url = "/api/v1/auth/password/reset/confirm/"
 
     sites_url = "/api/v1/sites/"
-    members_url = "/api/v1/{}/members/" # need to set site_id
+    members_url = "/api/v1/{}/members/"  # need to set site_id
+    invite_url = "/api/v1/{}/invite/"
 
     def setUp(self):
         #
@@ -59,6 +60,20 @@ class AccountsTestCase(APITestCase):
             user=self.user2, email=self.user2.email, verified=True, primary=True
         )
 
+    def test_create_invitation(self):
+        site = Site.objects.create(
+            title="First site", slug="first-site", created_by=self.user
+        )
+        # login as first user to get token
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        new_data = {
+            "email": "some@exmaple.com"
+        }
+        response = self.client.post(self.invite_url.format(site.id), new_data, **headers)
+        print(response)
+
 
     def test_list_members(self):
         site = Site.objects.create(
@@ -71,7 +86,49 @@ class AccountsTestCase(APITestCase):
         response = self.client.get(self.members_url.format(site.id), **headers)
         self.assertEqual(len(response.json()), 0)
 
+        member = Membership.objects.create(
+            user=self.user2, host=site, rights=Membership.VIEW, created_by=self.user
+        )
 
+        response = self.client.get(self.members_url.format(site.id), **headers)
+        self.assertEqual(len(response.json()), 1)
+
+        # login as second user
+        response = self.client.post(self.login_url, self.user2_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        response = self.client.get(self.members_url.format(site.id), **headers)
+        # no members because second user has VIEW rights
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.json()["detail"],
+            "You do not have permission to perform this action.",
+        )
+        # change the rights
+        member.rights = Membership.EDIT
+        member.save()
+        # we get the list
+        response = self.client.get(self.members_url.format(site.id), **headers)
+        # no members because second user has VIEW rights
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        
+    def test_create_member(self):
+        site = Site.objects.create(
+            title="First site", slug="first-site", created_by=self.user
+        )
+        # login as first user to get token
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        new_data = {
+            "user_id": 2,
+            "rights": Membership.VIEW
+        }
+        response = self.client.post(self.members_url.format(site.id), new_data, **headers)
+        self.assertEqual(response.status_code, 201)
+        # example response
+        # {'id': 1, 'created_at': '2023-02-23T14:16:26.210009Z', 'created_by': 1, 'updated_at': '2023-02-23T14:16:26.210310Z', 'rights': 'VIEW', 'user': {'pk': 2, 'username': 'user2', 'email': 'piotr2@example.com', 'first_name': '', 'last_name': ''}}
 
 
     def test_list_sites(self):
