@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
 
@@ -27,6 +26,7 @@ class Site(models.Model):
     share = models.CharField(
         default=PUBLIC, max_length=32, choices=SHARE_CHOICES, blank=True, null=True
     )
+    active = models.BooleanField(default=True, blank=False, null=False)
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
     created_by = models.ForeignKey(
@@ -52,41 +52,26 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-class UsersGroup(models.Model):
-    name = models.CharField(
-        max_length=200,
-        help_text="Group of users in Mercury",
-        blank=False,
-        null=False,
-    )
+class Membership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="users")
+    host = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="hosts")
     # view, edit, admin
+    VIEW = "VIEW"
+    EDIT = "EDIT"
+    RIGHTS_CHOICES = (
+        (VIEW, "View and execute notebooks"),
+        (EDIT, "Edit and view site, files and execute notebooks"),
+    )
     rights = models.CharField(
-        max_length=200,
-        help_text="Rights for group of users",
+        default=VIEW,
+        choices=RIGHTS_CHOICES,
+        max_length=32,
+        help_text="Rights for user",
         blank=False,
         null=False,
     )
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()
     created_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-    )
-    hosted_on = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class Membership(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(UsersGroup, on_delete=models.CASCADE)
-    created_at = AutoCreatedField()
-    updated_at = AutoLastModifiedField()
-    hosted_on = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
+        User, on_delete=models.CASCADE, related_name="created_by"
     )

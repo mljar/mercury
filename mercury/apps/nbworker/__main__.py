@@ -34,9 +34,9 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-from apps.nbworker.utils import stop_event
 from apps.nbworker.db import DBClient
 from apps.nbworker.nb import NBWorker
+from apps.nbworker.utils import stop_event
 
 if len(sys.argv) != 5:
     log.error("Wrong number of input parameters")

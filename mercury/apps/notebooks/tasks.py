@@ -3,9 +3,8 @@ import logging
 import os
 import subprocess
 import sys
-import uuid
 import traceback
-
+import uuid
 from datetime import datetime
 from shutil import which
 from subprocess import PIPE, Popen

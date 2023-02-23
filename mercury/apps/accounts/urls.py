@@ -1,13 +1,14 @@
 from django.conf.urls import include
 from django.urls import path, re_path
 from django.views.generic.base import TemplateView
-
-from apps.accounts.views import SiteViewSet
-
 from rest_framework.routers import DefaultRouter
+
+from apps.accounts.views import MembershipViewSet, SiteViewSet
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
+router.register(r"api/v1/(?P<site_id>.+)/members", MembershipViewSet, basename="sites")
+
 accounts_urlpatterns = router.urls
 
 accounts_urlpatterns += [
@@ -29,7 +30,4 @@ accounts_urlpatterns += [
         TemplateView.as_view(),
         name="password_reset_confirm",
     ),
-
- 
-    
 ]

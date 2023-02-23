@@ -4,10 +4,10 @@ from datetime import timedelta
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
-from django.conf import settings
 
 from apps.ws.models import Worker
 from apps.ws.tasks import task_start_websocket_worker

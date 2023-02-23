@@ -2,16 +2,14 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 
+from apps.accounts.models import Membership
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch
-
-from apps.accounts.models import Membership
 
 
 def in_commas(word):

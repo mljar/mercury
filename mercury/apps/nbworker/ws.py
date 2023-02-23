@@ -6,8 +6,7 @@ from queue import Queue
 import websocket
 
 from apps.nbworker.db import DBClient
-from apps.nbworker.utils import Purpose, WorkerState
-from apps.nbworker.utils import stop_event
+from apps.nbworker.utils import Purpose, WorkerState, stop_event
 
 log = logging.getLogger(__name__)
 
