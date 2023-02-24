@@ -2,7 +2,7 @@ django==3.2.5
 djangorestframework==3.12.4
 django-filter==21.1
 markdown==3.3.6
-celery==5.1.2
+celery>=5.1.2
 sqlalchemy==1.4.27
 gevent
 nbconvert>=6.5.0
