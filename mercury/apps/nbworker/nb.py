@@ -258,6 +258,7 @@ class NBWorker(WSClient):
     def initialize_outputdir(self):
         sm = StorageManager(self.session_id, self.worker_id)
         output_dir = sm.worker_output_dir()
+        output_dir = output_dir.replace("\\", "\\\\")
         self.nbrun.run_code(
             f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """
         )
