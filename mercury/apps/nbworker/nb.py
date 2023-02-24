@@ -143,6 +143,7 @@ class NBWorker(WSClient):
                 log.debug(f"Get file {value[0]} from id={value[1]}")
                 tu = TemporaryUpload.objects.get(upload_id=value[1])
                 value[1] = tu.get_file_path()
+                value[1] = value[1].replace("\\", "\\\\")
                 log.debug(f"File path is {value[1]}")
 
                 code = (
@@ -152,6 +153,7 @@ class NBWorker(WSClient):
             elif widget_type == "OutputDir":
                 sm = StorageManager(self.session_id, self.worker_id)
                 output_dir = sm.worker_output_dir()
+                output_dir = output_dir.replace("\\", "\\\\")
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{output_dir}")'
 
             elif isinstance(value, str):
