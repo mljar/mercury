@@ -68,12 +68,11 @@ class AccountsTestCase(APITestCase):
         response = self.client.post(self.login_url, self.user1_params)
         token = response.json()["key"]
         headers = {"HTTP_AUTHORIZATION": "Token " + token}
-        new_data = {
-            "email": "some@exmaple.com"
-        }
-        response = self.client.post(self.invite_url.format(site.id), new_data, **headers)
+        new_data = {"email": "some@exmaple.com"}
+        response = self.client.post(
+            self.invite_url.format(site.id), new_data, **headers
+        )
         print(response)
-
 
     def test_list_members(self):
         site = Site.objects.create(
@@ -112,7 +111,7 @@ class AccountsTestCase(APITestCase):
         # no members because second user has VIEW rights
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
-        
+
     def test_create_member(self):
         site = Site.objects.create(
             title="First site", slug="first-site", created_by=self.user
@@ -121,15 +120,13 @@ class AccountsTestCase(APITestCase):
         response = self.client.post(self.login_url, self.user1_params)
         token = response.json()["key"]
         headers = {"HTTP_AUTHORIZATION": "Token " + token}
-        new_data = {
-            "user_id": 2,
-            "rights": Membership.VIEW
-        }
-        response = self.client.post(self.members_url.format(site.id), new_data, **headers)
+        new_data = {"user_id": 2, "rights": Membership.VIEW}
+        response = self.client.post(
+            self.members_url.format(site.id), new_data, **headers
+        )
         self.assertEqual(response.status_code, 201)
         # example response
         # {'id': 1, 'created_at': '2023-02-23T14:16:26.210009Z', 'created_by': 1, 'updated_at': '2023-02-23T14:16:26.210310Z', 'rights': 'VIEW', 'user': {'pk': 2, 'username': 'user2', 'email': 'piotr2@example.com', 'first_name': '', 'last_name': ''}}
-
 
     def test_list_sites(self):
         site = Site.objects.create(

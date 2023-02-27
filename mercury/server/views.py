@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 class VersionInfo(APIView):
     def get(self, request, format=None):
-        return Response({})
+        return Response({"isPro": True})
 
 
 # it will be used as really simple cache

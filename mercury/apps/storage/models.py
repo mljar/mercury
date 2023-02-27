@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from apps.accounts.models import Site
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
+from apps.accounts.models import Site
 
 
 # Create your models here.

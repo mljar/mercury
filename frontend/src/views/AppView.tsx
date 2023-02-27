@@ -39,6 +39,7 @@ import RestAPIView from "../components/RestAPIView";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
 import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
+import { isPublic } from "../components/Sites/sitesSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -64,6 +65,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const exportingToPDF = useSelector(getExportingToPDF);
   const workerId = useSelector(getWorkerId);
   const workerState = useSelector(getWorkerState);
+  const isSitePublic = useSelector(isPublic);
 
   const pleaseWait = () => {
     if (notebook?.params?.static_notebook) {
@@ -207,7 +209,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
 
   return (
     <div className="App">
-      {!displayEmbed && <NavBar isPro={isPro} username={username} />}
+      {!displayEmbed && <NavBar isSitePublic={true} isPro={isPro} username={username} />}
       <BlockUi
         blocking={exportingToPDF}
         message="Exporting to PDF. Please wait ..."

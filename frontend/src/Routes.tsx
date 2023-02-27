@@ -1,15 +1,21 @@
 /* eslint react/jsx-props-no-spreading: off */
 import React, { ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
+
 import { setToken, setUsername } from "./components/authSlice";
 import { fetchVersion } from "./components/versionSlice";
 import { getSessionId } from "./utils";
-import { BrowserRouter as Router } from "react-router-dom";
 import MainApp from "./views/App";
 import AccountView from "./views/AccountView";
 import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
+import { fetchSite } from "./components/Sites/sitesSlice";
 type Props = {
   children: ReactNode;
 };
@@ -19,7 +25,7 @@ function App(props: Props) {
   return <>{children}</>;
 }
 
-export default function Routes() {
+export default function AppRoutes() {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -32,22 +38,20 @@ export default function Routes() {
       dispatch(setUsername(localStorage.getItem("username")));
     }
 
+    dispatch(fetchSite());
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <Router>
       <App>
-        <Switch>
-          <Route exact path="/" component={HomeView} />
-          <Route
-            exact
-            path="/app/:slug/:embed?"
-            component={MainApp}
-          />
-          <Route exact path="/login" component={LoginView} />
-          <Route exact path="/account" component={AccountView} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<HomeView />} />
+          <Route path="/app/:slug/:embed?" element={<MainApp />} />
+          <Route path="/login" element={<LoginView />} />
+          <Route path="/account" element={<AccountView />} />
+        </Routes>
       </App>
     </Router>
   );

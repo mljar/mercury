@@ -2,16 +2,16 @@ import json
 import uuid
 from datetime import datetime, timedelta
 
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import Membership, Site, Invitation
+from apps.accounts.models import Invitation, Membership, Site
 from apps.accounts.serializers import MembershipSerializer, SiteSerializer
 from apps.accounts.tasks import task_send_invitation
 
@@ -145,3 +145,21 @@ class InviteView(APIView):
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:
             raise APIException(str(e))
+
+
+class GetSiteView(APIView):
+    def get(self, request, site_slug, format=None):
+        share = Site.PUBLIC if request.user.is_anonymous else Site.PRIVATE
+
+        sites = Site.objects.filter(slug=site_slug, share=share)
+
+        if not request.user.is_anonymous:
+            sites = sites.filter(
+                Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+                | Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+                | Q(created_by=self.request.user)
+            )
+
+        if not sites:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(SiteSerializer(sites[0]).data)

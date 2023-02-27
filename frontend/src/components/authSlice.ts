@@ -6,6 +6,7 @@ import {
   Dispatch,
 } from '@reduxjs/toolkit';
 import axios, { AxiosError } from 'axios';
+import { NavigateFunction } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { RootState } from '../store';
@@ -79,7 +80,7 @@ export const getUserInfo = (state: RootState) => state.auth.user;
 
 
 export const fetchToken =
-  (username: string, password: string, history: any) =>
+  (username: string, password: string, redirectPath: string, navigate: NavigateFunction) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         const url = '/api/v1/auth/login/';
@@ -88,7 +89,7 @@ export const fetchToken =
         dispatch(setUsername(username));
         toast.success("Log in successfull")
         // redirect ...
-        history.push("/");
+        navigate(redirectPath);
       } catch (error) {
         const err = error as AxiosError
         let msg = "Problem during authentication. "
@@ -101,7 +102,7 @@ export const fetchToken =
 
 
 export const logout =
-  (history: any) =>
+  (navigate: NavigateFunction) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         const url = '/api/v1/auth/logout/';
@@ -109,7 +110,7 @@ export const logout =
         toast.success("Log out successfull");
         dispatch(setToken(""));
         dispatch(setUsername(""));
-        history.push("/");
+        navigate("/");
       } catch (error) {
         toast.error("Problem during log out")
       }

@@ -1,18 +1,19 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
+import { Link } from "react-router-dom";
 import LoginButton from "./LoginButton";
 import UserButton from "./UserButton";
 
 type NavBarProps = {
+  isSitePublic: boolean;
   isPro: boolean;
   username: string;
 };
 
-export default function NavBar({ isPro, username }: NavBarProps) {
+export default function NavBar({ isSitePublic, isPro, username }: NavBarProps) {
   return (
     <header className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a className="navbar-brand col-md-3 col-lg-3 me-0 px-3" href="/">
-        {/* <i className="fa fa-home" aria-hidden="true"></i> {" "} */}
+      <Link className="navbar-brand col-md-3 col-lg-3 me-0 px-3" to="/">
         <img
           alt="Mercury"
           src={
@@ -22,9 +23,9 @@ export default function NavBar({ isPro, username }: NavBarProps) {
           }
           style={{ height: "28px", paddingLeft: "10px" }} // height was 24px
         />
-      </a>
+      </Link>
 
-      {isPro && username === "" && <LoginButton />}
+      {!isSitePublic && username === "" && <LoginButton />}
       {isPro && username !== "" && <UserButton username={username} />}
     </header>
   );

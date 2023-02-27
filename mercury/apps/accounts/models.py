@@ -24,7 +24,7 @@ class Site(models.Model):
         (PRIVATE, "Only selected users have access to notebooks"),
     )
     share = models.CharField(
-        default=PUBLIC, max_length=32, choices=SHARE_CHOICES, blank=True, null=True
+        default=PUBLIC, max_length=32, choices=SHARE_CHOICES, blank=False, null=False
     )
     active = models.BooleanField(default=True, blank=False, null=False)
     created_at = AutoCreatedField()

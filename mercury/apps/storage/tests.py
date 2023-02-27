@@ -2,15 +2,15 @@
 # python manage.py test apps.storage
 
 import uuid
+
 from allauth.account.admin import EmailAddress
 from django.contrib.auth.models import User
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import encode_multipart
+from django_drf_filepond.models import TemporaryUpload
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-from django_drf_filepond.models import TemporaryUpload
 
 from apps.accounts.models import Site
 
@@ -63,8 +63,6 @@ class StorageTestCase(APITestCase):
         print(response)
         print(response.data)
 
-
-
         tu = TemporaryUpload.objects.get(upload_id=response.data)
         print(tu)
-        #tu.delete()
+        # tu.delete()

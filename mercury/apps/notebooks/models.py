@@ -1,4 +1,7 @@
+from django.contrib.auth.models import User
 from django.db import models
+
+from apps.accounts.models import Site
 
 
 class Notebook(models.Model):
@@ -16,3 +19,6 @@ class Notebook(models.Model):
     schedule = models.CharField(max_length=128, blank=True)
     notify = models.TextField(blank=True)
     errors = models.TextField(blank=True)
+
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    hosted_on = models.ForeignKey(Site, on_delete=models.CASCADE)

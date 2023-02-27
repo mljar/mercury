@@ -11,12 +11,15 @@ from subprocess import PIPE, Popen
 
 import nbformat
 import yaml
+from allauth.account.admin import EmailAddress
 from celery import shared_task
 from croniter import croniter
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
+from apps.accounts.models import Site
 from apps.nb.exporter import Exporter
 from apps.notebooks.models import Notebook
 from apps.notebooks.slides_themes import SlidesThemes
@@ -212,6 +215,27 @@ def task_init_notebook(
         parse_errors = validate_notify(notebook_notify)
 
         if notebook_id is None:
+            site, user = None, None
+            if not Site.objects.all():
+                user = User.objects.create_user(
+                    username="developer",
+                    email="developer@example.com",
+                    password="developer",
+                )
+                EmailAddress.objects.create(
+                    user=user, email=user.email, verified=True, primary=True
+                )
+
+                site = Site.objects.create(
+                    title="Mercury",
+                    slug="single-site",
+                    share=Site.PRIVATE, #Site.PUBLIC,
+                    created_by=user,
+                )
+            else:
+                user = User.objects.get(username="developer")
+                site = Site.objects.get(pk=1)
+
             notebook = Notebook(
                 title=notebook_title,
                 slug=notebook_slug,
@@ -230,6 +254,8 @@ def task_init_notebook(
                 schedule=notebook_schedule,
                 notify=json.dumps(notebook_notify),
                 errors=parse_errors,
+                created_by=user,
+                hosted_on=site,
             )
         else:
             notebook = Notebook.objects.get(pk=notebook_id)

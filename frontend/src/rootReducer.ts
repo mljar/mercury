@@ -8,6 +8,7 @@ import versionReducer from './components/versionSlice';
 import appReducer from './views/appSlice';
 import authReducer from "./components/authSlice";
 import wsReducer from "./websocket/wsSlice";
+import sitesReducer from "./components/Sites/sitesSlice";
 
 export default function createRootReducer(history: History) {
     return combineReducers({
@@ -18,5 +19,6 @@ export default function createRootReducer(history: History) {
         app: appReducer,
         auth: authReducer,
         ws: wsReducer,
+        sites: sitesReducer,
     });
 }

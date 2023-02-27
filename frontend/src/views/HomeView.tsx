@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { withRouter } from "react-router-dom";
+
 import HomeNavBar from "../components/HomeNavBar";
 import Footer from "../components/Footer";
 import {
@@ -18,9 +18,9 @@ import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
 import { getToken, getUsername } from "../components/authSlice";
-import { NonceProvider } from "react-select";
+import { isPublic } from "../components/Sites/sitesSlice";
 
-export default withRouter(function HomeView() {
+export default function HomeView() {
   const dispatch = useDispatch();
   const notebooks = useSelector(getNotebooks);
   const loadingState = useSelector(getLoadingState);
@@ -29,6 +29,7 @@ export default withRouter(function HomeView() {
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const [showButton, setShowButton] = useState("");
+  const isSitePublic = useSelector(isPublic);
 
   useEffect(() => {
     dispatch(fetchNotebooks());
@@ -127,7 +128,7 @@ export default withRouter(function HomeView() {
 
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} username={username} />
+      <HomeNavBar isSitePublic={isSitePublic} isPro={isPro} username={username} />
       <div className="container" style={{ paddingBottom: "50px" }}>
         {welcome === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
@@ -202,4 +203,4 @@ export default withRouter(function HomeView() {
       <Footer />
     </div>
   );
-});
+};

@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { withRouter } from "react-router-dom";
 import {
   changePassword,
   fetchUserInfo,
@@ -12,8 +11,9 @@ import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
 import { getFetchingIsPro, getIsPro } from "../components/versionSlice";
 import ProFeatureAlert from "../components/ProFeatureAlert";
+import { isPublic } from "../components/Sites/sitesSlice";
 
-export default withRouter(function AccountView() {
+export default function AccountView() {
   const dispatch = useDispatch();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
@@ -22,7 +22,8 @@ export default withRouter(function AccountView() {
   const fetchingIsPro = useSelector(getFetchingIsPro);
   const username = useSelector(getUsername);
   const user = useSelector(getUserInfo);
-
+  const isSitePublic = useSelector(isPublic);
+  
   document.body.style.backgroundColor = "white";
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default withRouter(function AccountView() {
 
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} username={username} />
+      <HomeNavBar isSitePublic={isSitePublic} isPro={isPro} username={username} />
 
       {!isPro && !fetchingIsPro && (
         <ProFeatureAlert featureName={"account view"} />
@@ -135,4 +136,4 @@ export default withRouter(function AccountView() {
       <Footer />
     </div>
   );
-});
+};

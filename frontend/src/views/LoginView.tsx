@@ -1,27 +1,33 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { withRouter } from "react-router-dom";
 import { fetchToken } from "../components/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
 import { getFetchingIsPro, getIsPro } from "../components/versionSlice";
-import { useHistory } from "react-router-dom";
-import ProFeatureAlert from "../components/ProFeatureAlert";
 
-export default withRouter(function LoginView() {
-  let history = useHistory();
+import ProFeatureAlert from "../components/ProFeatureAlert";
+import { useNavigate } from "react-router-dom";
+import { isPublic } from "../components/Sites/sitesSlice";
+
+export default function LoginView() {
+  
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const isPro = useSelector(getIsPro);
   const fetchingIsPro = useSelector(getFetchingIsPro);
-
+  const isSitePublic = useSelector(isPublic);
+  
   document.body.style.backgroundColor = "#f5f5f5";
+
+
+  let redirectPath = "/";
+  const navigate = useNavigate();
 
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} username={""} />
+      <HomeNavBar isSitePublic={isSitePublic} isPro={isPro} username={""} />
 
       {!isPro && !fetchingIsPro && (
         <ProFeatureAlert featureName={"authentication"} />
@@ -33,7 +39,7 @@ export default withRouter(function LoginView() {
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              dispatch(fetchToken(username, password, history));
+              dispatch(fetchToken(username, password, redirectPath, navigate));
             }}
           >
             <h3 className="h3 mb-3 font-weight-normal">Please sign in</h3>
@@ -84,4 +90,4 @@ export default withRouter(function LoginView() {
       <Footer />
     </div>
   );
-});
+};
