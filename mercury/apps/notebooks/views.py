@@ -10,7 +10,7 @@ from apps.accounts.models import Membership
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch
-
+from apps.accounts.models import Site, Membership
 
 def in_commas(word):
     return "," + word + ","
@@ -19,7 +19,12 @@ def in_commas(word):
 def notebooks_queryset(request):
     user = request.user
     if user.is_anonymous:
-        return Notebook.objects.filter(share=in_commas("public"))
+        return Notebook.objects.filter(hosted_on__share=Site.PUBLIC)
+
+
+    Q(hosts__user=user, hosts__rights=Membership.EDIT)
+    | Q(hosts__user=user, hosts__rights=Membership.VIEW)
+    | Q(created_by=user)
 
     q_list = (
         Q(share=in_commas("public"))

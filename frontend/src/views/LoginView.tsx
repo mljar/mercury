@@ -11,16 +11,14 @@ import { useNavigate } from "react-router-dom";
 import { isPublic } from "../components/Sites/sitesSlice";
 
 export default function LoginView() {
-  
   const dispatch = useDispatch();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isPro = useSelector(getIsPro);
   const fetchingIsPro = useSelector(getFetchingIsPro);
   const isSitePublic = useSelector(isPublic);
-  
-  document.body.style.backgroundColor = "#f5f5f5";
 
+  document.body.style.backgroundColor = "#f5f5f5";
 
   let redirectPath = "/";
   const navigate = useNavigate();
@@ -39,19 +37,19 @@ export default function LoginView() {
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              dispatch(fetchToken(username, password, redirectPath, navigate));
+              dispatch(fetchToken(email, password, redirectPath, navigate));
             }}
           >
             <h3 className="h3 mb-3 font-weight-normal">Please sign in</h3>
-            <label className="sr-only">Username</label>
+            <label className="sr-only">Email</label>
             <input
-              type="username"
-              id="inputUsername"
+              type="email"
+              id="inputEmail"
               className="form-control"
-              placeholder="Username"
-              value={username}
+              placeholder="Email"
+              value={email}
               onChange={(e) => {
-                setUsername(e.target.value);
+                setEmail(e.target.value);
               }}
               required
             />
@@ -71,7 +69,7 @@ export default function LoginView() {
               className="btn btn-lg btn-primary btn-block"
               type="submit"
               style={{ margin: "5px" }}
-              disabled={username === "" || password === ""}
+              disabled={email === "" || password === ""}
             >
               <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
             </button>
@@ -81,8 +79,8 @@ export default function LoginView() {
             style={{ width: "400px", marginTop: "40px" }}
           >
             <p className="text-muted">
-              No account? Please contact the service administrator to create the
-              account for you.
+              No account? <br/> Please contact administrator to create account for
+              you.
             </p>
           </div>
         </div>
@@ -90,4 +88,4 @@ export default function LoginView() {
       <Footer />
     </div>
   );
-};
+}

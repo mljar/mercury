@@ -16,6 +16,7 @@ import AccountView from "./views/AccountView";
 import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
 import { fetchSite } from "./components/Sites/sitesSlice";
+import RequireAuth from "./components/RequireAuth";
 type Props = {
   children: ReactNode;
 };
@@ -23,6 +24,16 @@ type Props = {
 function App(props: Props) {
   const { children } = props;
   return <>{children}</>;
+}
+
+function AppLayout() {
+  return (
+    <RequireAuth>
+      <>
+        <Outlet />
+      </>
+    </RequireAuth>
+  );
 }
 
 export default function AppRoutes() {
@@ -47,10 +58,13 @@ export default function AppRoutes() {
     <Router>
       <App>
         <Routes>
-          <Route path="/" element={<HomeView />} />
-          <Route path="/app/:slug/:embed?" element={<MainApp />} />
+          <Route path="/" element={<AppLayout />}>
+            <Route path="/" element={<HomeView />} />
+            <Route path="/app/:slug/:embed?" element={<MainApp />} />
+            <Route path="/account" element={<AccountView />} />
+          </Route>
           <Route path="/login" element={<LoginView />} />
-          <Route path="/account" element={<AccountView />} />
+            
         </Routes>
       </App>
     </Router>
