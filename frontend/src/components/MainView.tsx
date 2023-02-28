@@ -18,7 +18,6 @@ type MainViewProps = {
   errorMsg: string;
   watchMode: boolean;
   displayEmbed: boolean;
-  isPro: boolean;
   username: string;
   slidesHash: string;
   columnsWidth: number;
@@ -34,7 +33,6 @@ export default function MainView({
   errorMsg,
   watchMode,
   displayEmbed,
-  isPro,
   username,
   slidesHash,
   columnsWidth,
@@ -134,14 +132,14 @@ export default function MainView({
           {loadingState === "loading" && !watchMode && (
             <p>Loading notebook. Please wait ...</p>
           )}
-          {loadingState === "error" && !isPro && (
+          {loadingState === "error" && (
             <p style={{ margin: "20px" }}>
               Problem while loading notebook. Please try again later or contact
               Mercury administrator.
             </p>
           )}
 
-          {loadingState === "error" && isPro && username === "" && (
+          {loadingState === "error" && username === "" && (
             <p style={{ margin: "20px" }}>
               <h5>Please log in to see the notebook</h5>
               <a href="/login" className="btn btn-primary btn-sm ">
@@ -150,38 +148,12 @@ export default function MainView({
             </p>
           )}
 
-          {loadingState === "error" && isPro && username !== "" && (
-            <p style={{ margin: "20px" }}>
-              Problem while loading notebook. Please try again later or contact
-              Mercury administrator.
-            </p>
-          )}
-          {/* {waiting && (
-          <div className="alert alert-primary mb-3" role="alert">
-            Notebook is executed. Default notebook is presented below. New
-            results will be loaded after execution.{" "}
-            <i className="fa fa-coffee" aria-hidden="true"></i> Please wait ...
-          </div>
-        )} */}
           {errorMsg && (
             <div className="alert alert-danger mb-3" role="alert">
               <b>Notebook is executed with errors.</b>
               <p>{errorMsg}</p>
             </div>
           )}
-
-          {/* {errorMsg === "" &&
-            loadingState !== "loading" &&
-            isPresentation && (
-              <iframe
-                width="100%"
-                height={iframeHeight}
-                key={notebookPath}
-                src={`${axios.defaults.baseURL}${notebookPath}${slidesHash}`}
-                title="display"
-                id="main-iframe"
-              ></iframe>
-            )}  */}
 
           {errorMsg === "" &&
             loadingState !== "loading" &&

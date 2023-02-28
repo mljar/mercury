@@ -33,7 +33,6 @@ import {
 } from "../slices/appSlice";
 import FilesView from "../components/FilesView";
 import { getToken, getUsername } from "../slices/authSlice";
-import { getIsPro } from "../slices/versionSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import BlockUi from "react-block-ui";
@@ -57,7 +56,6 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
   const outputFilesState = useSelector(getOutputFilesState);
-  const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const slidesHash = useSelector(getSlidesHash);
@@ -175,7 +173,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   return (
     <div className="App">
       {!displayEmbed && (
-        <NavBar isSitePublic={isSitePublic} isPro={isPro} username={username} />
+        <NavBar isSitePublic={isSitePublic} username={username} />
       )}
       <BlockUi
         blocking={exportingToPDF}
@@ -250,7 +248,6 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
               waiting={pleaseWait()} // {waitForTask()}
               watchMode={isWatchMode()}
               displayEmbed={displayEmbed}
-              isPro={isPro}
               username={username}
               slidesHash={slidesHash}
               columnsWidth={showSideBar ? 9 : 12}

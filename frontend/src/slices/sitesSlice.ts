@@ -8,10 +8,10 @@ import {
 import axios from "axios";
 
 import { RootState } from "../store";
+import { setLoadingState } from "./notebooksSlice";
 
 export const SITE_PUBLIC = "PUBLIC";
 export const SITE_PRIVATE = "PRIVATE";
-
 
 export interface Site {
   id: number;
@@ -25,40 +25,35 @@ export interface Site {
   created_by: number;
 }
 
-
 const initialState = {
   site: {} as Site,
+  loadingSite: false,
 };
 
 const sitesSlice = createSlice({
   name: "sites",
   initialState,
   reducers: {
-    setSite(
-      state,
-      action: PayloadAction<Site>
-    ) {
+    setSite(state, action: PayloadAction<Site>) {
       state.site = action.payload;
     },
-
   },
 });
 
 export default sitesSlice.reducer;
 
-export const {
-  setSite,
-} = sitesSlice.actions;
+export const { setSite } = sitesSlice.actions;
 
 export const getSite = (state: RootState) => state.sites.site;
 export const getSiteId = (state: RootState) => state.sites.site.id;
-export const isPublic = (state: RootState) => state.sites.site.share === SITE_PUBLIC;
-
+export const isPublic = (state: RootState) => {
+  return state.sites.site.share === SITE_PUBLIC;
+};
 export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
   try {
     dispatch(setSite({} as Site));
     const siteSlug = "single-site";
-    const url = `/api/v1/get-site/${siteSlug}`;
+    const url = `/api/v1/get-site/${siteSlug}/`;
     const { data } = await axios.get(url);
     dispatch(setSite(data as Site));
   } catch (error) {

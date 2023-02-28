@@ -10,7 +10,7 @@ import {
   getLoadingState,
   getNotebooks,
 } from "../slices/notebooksSlice";
-import { fetchWelcome, getIsPro, getWelcome } from "../slices/versionSlice";
+import { fetchWelcome, getWelcome } from "../slices/versionSlice";
 
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
@@ -25,7 +25,6 @@ export default function HomeView() {
   const notebooks = useSelector(getNotebooks);
   const loadingState = useSelector(getLoadingState);
   const welcome = useSelector(getWelcome);
-  const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const [showButton, setShowButton] = useState("");
@@ -131,11 +130,7 @@ export default function HomeView() {
 
   return (
     <div className="App">
-      <HomeNavBar
-        isSitePublic={isSitePublic}
-        isPro={isPro}
-        username={username}
-      />
+      <HomeNavBar isSitePublic={isSitePublic} username={username} />
       <div className="container" style={{ paddingBottom: "50px" }}>
         {welcome === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
@@ -155,24 +150,6 @@ export default function HomeView() {
             <p>Loading notebooks. Please wait ...</p>
           )}
 
-          {loadingState === "loaded" && isPro && notebooks.length === 0 && (
-            <div>
-              <div className="alert alert-success" role="alert">
-                <h5>
-                  <i className="fa fa-key" aria-hidden="true"></i> You are using
-                  Pro version
-                </h5>
-                <p>
-                  There are no public notebooks shared. Please login with your
-                  credentials to check private notebooks.
-                </p>
-
-                <a href="/login" className="btn btn-primary btn-sm ">
-                  <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
-                </a>
-              </div>
-            </div>
-          )}
           {loadingState === "loaded" && notebooks.length === 0 && (
             <div>
               <p>

@@ -110,7 +110,7 @@ export const fetchCurrentTask =
             const sessionId = getSessionId();
 
             try {
-                const url = `/api/v1/latest_task/${notebookId}/${sessionId}`;
+                const url = `/api/v1/latest_task/${notebookId}/${sessionId}/`;
                 const { data } = await axios.get(url);
                 dispatch(setCurrentTask(data))
 
@@ -147,7 +147,7 @@ export const executeNotebook =
                     session_id: sessionId,
                     params: JSON.stringify(widgets),
                 }
-                const url = `/api/v1/execute/${notebookId}`;
+                const url = `/api/v1/execute/${notebookId}/`;
                 const { data } = await axios.post(url, task);
                 dispatch(setCurrentTask(data))
 
@@ -163,7 +163,7 @@ export const clearTasks =
         async (dispatch: Dispatch<AnyAction>) => {
             try {
                 const sessionId = getSessionId();
-                const url = `/api/v1/clear_tasks/${notebookId}/${sessionId}`;
+                const url = `/api/v1/clear_tasks/${notebookId}/${sessionId}/`;
                 await axios.post(url);
                 dispatch(setCurrentTask({} as ITask));
                 dispatch(setHistoricTask({} as ITask));
@@ -204,7 +204,7 @@ export const getPDF =
     (jobId: String) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
-                const url = `/api/v1/get_pdf/${jobId}`;
+                const url = `/api/v1/get_pdf/${jobId}/`;
                 const { data } = await axios.get(url);
                 if (data.ready) {
                     dispatch(stopPDFExport());
@@ -239,7 +239,7 @@ export const fetchExecutionHistory =
             const sessionId = getSessionId();
 
             try {
-                const url = `/api/v1/execution_history/${notebookId}/${sessionId}`;
+                const url = `/api/v1/execution_history/${notebookId}/${sessionId}/`;
                 const { data } = await axios.get(url);
                 dispatch(setExecutionHistory(data))
             } catch (error) {

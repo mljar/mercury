@@ -6,11 +6,10 @@ import UserButton from "./UserButton";
 
 type NavBarProps = {
   isSitePublic: boolean;
-  isPro: boolean;
   username: string;
 };
 
-export default function NavBar({ isSitePublic, isPro, username }: NavBarProps) {
+export default function NavBar({ isSitePublic, username }: NavBarProps) {
   return (
     <header className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
       <Link className="navbar-brand col-md-3 col-lg-3 me-0 px-3" to="/">
@@ -26,7 +25,7 @@ export default function NavBar({ isSitePublic, isPro, username }: NavBarProps) {
       </Link>
 
       {!isSitePublic && username === "" && <LoginButton />}
-      {isPro && username !== "" && <UserButton username={username} />}
+      {username !== "" && <UserButton username={username} />}
     </header>
   );
 }

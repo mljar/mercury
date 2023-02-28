@@ -229,7 +229,7 @@ def task_init_notebook(
                 site = Site.objects.create(
                     title="Mercury",
                     slug="single-site",
-                    share=Site.PRIVATE, #Site.PUBLIC,
+                    share=Site.PUBLIC,
                     created_by=user,
                 )
             else:
