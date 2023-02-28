@@ -6,12 +6,12 @@ import {
   fetchUserInfo,
   getUserInfo,
   getUsername,
-} from "../components/authSlice";
+} from "../slices/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
-import { getFetchingIsPro, getIsPro } from "../components/versionSlice";
+import { getFetchingIsPro, getIsPro } from "../slices/versionSlice";
 import ProFeatureAlert from "../components/ProFeatureAlert";
-import { isPublic } from "../components/Sites/sitesSlice";
+import { isPublic } from "../slices/sitesSlice";
 
 export default function AccountView() {
   const dispatch = useDispatch();

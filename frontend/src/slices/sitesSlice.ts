@@ -7,7 +7,7 @@ import {
 } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { RootState } from "../../store";
+import { RootState } from "../store";
 
 export const SITE_PUBLIC = "PUBLIC";
 export const SITE_PRIVATE = "PRIVATE";
@@ -51,6 +51,7 @@ export const {
 } = sitesSlice.actions;
 
 export const getSite = (state: RootState) => state.sites.site;
+export const getSiteId = (state: RootState) => state.sites.site.id;
 export const isPublic = (state: RootState) => state.sites.site.share === SITE_PUBLIC;
 
 export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {

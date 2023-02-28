@@ -1,17 +1,24 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchToken } from "../components/authSlice";
+import { fetchToken } from "../slices/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
-import { getFetchingIsPro, getIsPro } from "../components/versionSlice";
+import { getFetchingIsPro, getIsPro } from "../slices/versionSlice";
 
 import ProFeatureAlert from "../components/ProFeatureAlert";
-import { useNavigate } from "react-router-dom";
-import { isPublic } from "../components/Sites/sitesSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { isPublic } from "../slices/sitesSlice";
+
+type LocationState = {
+  from: {
+    pathname: string;
+  };
+};
 
 export default function LoginView() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isPro = useSelector(getIsPro);
@@ -21,7 +28,12 @@ export default function LoginView() {
   document.body.style.backgroundColor = "#f5f5f5";
 
   let redirectPath = "/";
-  const navigate = useNavigate();
+  let location = useLocation();
+  if (location && location.state) {
+    // redirect from ...
+    const { from } = location.state as LocationState;
+    redirectPath = from.pathname;
+  }
 
   return (
     <div className="App">
@@ -79,8 +91,8 @@ export default function LoginView() {
             style={{ width: "400px", marginTop: "40px" }}
           >
             <p className="text-muted">
-              No account? <br/> Please contact administrator to create account for
-              you.
+              No account? <br /> Please contact administrator to create account
+              for you.
             </p>
           </div>
         </div>

@@ -1,12 +1,12 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../Notebooks/notebooksSlice";
+import { setWidgetValue } from "../slices/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
 
-type SliderProps = {
+type RangeProps = {
   widgetKey: string;
   label: string | null;
-  value: number | null;
+  value: [number, number] | null;
   min: number | null;
   max: number | null;
   step: number | null;
@@ -15,7 +15,7 @@ type SliderProps = {
   runNb: () => void;
 };
 
-export default function SliderWidget({
+export default function RangeWidget({
   widgetKey,
   label,
   value,
@@ -25,9 +25,9 @@ export default function SliderWidget({
   vertical,
   disabled,
   runNb,
-}: SliderProps) {
+}: RangeProps) {
   const dispatch = useDispatch();
-
+  //const [updated, userInteraction] = useState(false);
   let minValue = 0;
   let maxValue = 100;
   let stepValue = 1;
@@ -40,12 +40,16 @@ export default function SliderWidget({
   if (step) {
     stepValue = step;
   }
-  const vals: number[] = [value !== null ? value : maxValue];
+
+  const values =
+    value != null && value !== undefined && value.length === 2
+      ? value
+      : [minValue, maxValue];
 
   return (
     <div className="form-group mb-3">
       <label
-        htmlFor={`slider-${label}`}
+        htmlFor={`range-slider-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}
       >
         {label}
@@ -61,12 +65,18 @@ export default function SliderWidget({
       >
         <Range
           disabled={disabled}
-          values={vals}
+          values={values}
           step={stepValue}
           min={minValue}
           max={maxValue}
           onChange={(values) => {
-            dispatch(setWidgetValue({ key: widgetKey, value: values[0] }));
+            //userInteraction(true);
+            dispatch(
+              setWidgetValue({
+                key: widgetKey,
+                value: values as [number, number],
+              })
+            );
           }}
           onFinalChange={(values) => {
             runNb();
@@ -89,9 +99,10 @@ export default function SliderWidget({
                   width: "100%",
                   borderRadius: "4px",
                   background: getTrackBackground({
-                    values: vals,
+                    values,
                     colors: [
-                      disabled ? "rgba(0, 0, 0, 0.3)" : "#2684ff", // "#548BF4",
+                      "#ccc",
+                      disabled ? "rgba(0, 0, 0, 0.3)" : "#2684ff",
                       "#ccc",
                     ],
                     min: minValue,
@@ -116,14 +127,14 @@ export default function SliderWidget({
               </div>
             </div>
           )}
-          renderThumb={({ props, isDragged }) => (
+          renderThumb={({ index, props, isDragged }) => (
             <div
               {...props}
               style={{
                 ...props.style,
                 height: "18px",
                 width: "18px",
-                border: "None",
+                border: "None !important",
                 borderRadius: "4px",
                 backgroundColor: "#FFF",
                 display: "flex",
@@ -146,7 +157,7 @@ export default function SliderWidget({
                   backgroundColor: disabled ? "rgba(0, 0, 0, 0.3)" : "#2684ff",
                 }}
               >
-                {vals[0]}
+                {values[index]}
               </div>
               <div
                 style={{

@@ -16,39 +16,38 @@ def in_commas(word):
     return "," + word + ","
 
 
-def notebooks_queryset(request):
+def notebooks_queryset(request, site_id):
     user = request.user
     if user.is_anonymous:
-        return Notebook.objects.filter(hosted_on__share=Site.PUBLIC)
+        return Notebook.objects.filter(hosted_on__id=site_id, hosted_on__share=Site.PUBLIC)
 
+    # it can be optimized
+    site = Site.objects.get(pk=site_id)
+    if site.share == Site.PUBLIC:
+        return Notebook.objects.filter(hosted_on=site)
 
-    Q(hosts__user=user, hosts__rights=Membership.EDIT)
-    | Q(hosts__user=user, hosts__rights=Membership.VIEW)
-    | Q(created_by=user)
+    # admin can see all notebooks on site
+    if site.created_by == user:
+        return Notebook.objects.filter(hosted_on=site)    
 
-    q_list = (
-        Q(share=in_commas("public"))
-        | Q(share=in_commas("private"))
-        | Q(share__icontains=in_commas(user.username))
-    )
-
-    for m in Membership.objects.filter(user=user):
-        q_list |= Q(share__icontains=in_commas(m.group.name))
-
-    return Notebook.objects.filter(q_list)
-
+    # don't filter on rights because both VIEW and EDIT allows
+    # to see and execute notebooks
+    m = Membership.objects.filter(user=user, host=site)
+    if m:
+        return Notebook.objects.filter(hosted_on=site)
+    return Notebook.objects.filter(hosted_on=site, created_by=user)
 
 class ListNotebooks(APIView):
-    def get(self, request, format=None):
-        notebooks = notebooks_queryset(request).order_by("slug")
+    def get(self, request, site_id, format=None):
+        notebooks = notebooks_queryset(request, site_id).order_by("slug")
         serializer = NotebookSerializer(notebooks, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 
 class RetrieveNotebook(APIView):
-    def get(self, request, notebook_id, format=None):
+    def get(self, request, site_id, notebook_id, format=None):
         pk = int(notebook_id.replace("/", ""))
-        notebook = get_object_or_404(notebooks_queryset(request), pk=pk)
+        notebook = get_object_or_404(notebooks_queryset(request, site_id), pk=pk)
         serializer = NotebookSerializer(notebook)
         if notebook.state.startswith("WATCH"):
             task_watch.delay(notebook.id)
@@ -57,10 +56,10 @@ class RetrieveNotebook(APIView):
 
 
 class RetrieveNotebookWithSlug(APIView):
-    def get(self, request, notebook_slug, format=None):
+    def get(self, request, site_id, notebook_slug, format=None):
         notebook_slug = notebook_slug.replace("/", "")
 
-        notebooks = notebooks_queryset(request).filter(slug=notebook_slug)
+        notebooks = notebooks_queryset(request, site_id).filter(slug=notebook_slug)
 
         if not notebooks:
             return JsonResponse({}, status=status.HTTP_404_NOT_FOUND)

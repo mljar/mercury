@@ -7,12 +7,12 @@ import {
   exportToPDF,
   scrapeSlidesHash,
   setExportingToPDF,
-} from "../tasks/tasksSlice";
-import CheckboxWidget from "./Widgets/Checkbox";
-import NumericWidget from "./Widgets/Numeric";
-import RangeWidget from "./Widgets/Range";
-import SelectWidget from "./Widgets/Select";
-import SliderWidget from "./Widgets/Slider";
+} from "../slices/tasksSlice";
+import CheckboxWidget from "../widgets/Checkbox";
+import NumericWidget from "../widgets/Numeric";
+import RangeWidget from "../widgets/Range";
+import SelectWidget from "../widgets/Select";
+import SliderWidget from "../widgets/Slider";
 
 import {
   isCheckboxWidget,
@@ -26,18 +26,18 @@ import {
   IWidget,
   isOutputFilesWidget,
   isButtonWidget,
-} from "./Widgets/Types";
+} from "../widgets/Types";
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
   getWidgetsValues,
   setSlidesHash,
   setWidgetValue,
-} from "./Notebooks/notebooksSlice";
-import FileWidget from "./Widgets/File";
-import TextWidget from "./Widgets/Text";
-import { setShowSideBar, setView } from "../views/appSlice";
+} from "../slices/notebooksSlice";
+import FileWidget from "../widgets/File";
+import TextWidget from "../widgets/Text";
+import { setShowSideBar, setView } from "../slices/appSlice";
 import { handleDownload } from "../utils";
-import MarkdownWidget from "./Widgets/Markdown";
+import MarkdownWidget from "../widgets/Markdown";
 
 import { WebSocketContext } from "../websocket/Provider";
 import WebSocketStateBar from "../websocket/StatusBar";
@@ -48,7 +48,7 @@ import {
   runNotebook,
   WorkerState,
 } from "../websocket/wsSlice";
-import ButtonWidget from "./Widgets/Button";
+import ButtonWidget from "../widgets/Button";
 import RunButton from "./RunButton";
 import BlockUi from "react-block-ui";
 

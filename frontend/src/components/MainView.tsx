@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getNotebookSrc, setNotebookSrc } from "../websocket/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
-import { getSelectedNotebook } from "./Notebooks/notebooksSlice";
+import { getSelectedNotebook } from "../slices/notebooksSlice";
 
 type MainViewProps = {
   appView: string;

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Select, { MultiValue } from "react-select";
-import { RUN_DELAY_FAST, setWidgetValue } from "../Notebooks/notebooksSlice";
+import { RUN_DELAY_FAST, setWidgetValue } from "../slices/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 type MultiOption = MultiValue<{ value: string; label: string } | undefined>;

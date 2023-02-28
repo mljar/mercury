@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { IWidget } from "./Widgets/Types";
+import { IWidget } from "../widgets/Types";
 import { useSelector } from "react-redux";
-import { getWidgetsValues } from "./Notebooks/notebooksSlice";
+import { getWidgetsValues } from "../slices/notebooksSlice";
 
 type Props = {
   slug: string;

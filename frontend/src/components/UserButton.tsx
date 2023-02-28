@@ -2,7 +2,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "./authSlice";
+import { logout } from "../slices/authSlice";
 
 type UserButtonProps = {
   username: string;

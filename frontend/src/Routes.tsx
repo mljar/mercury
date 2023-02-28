@@ -8,14 +8,14 @@ import {
   Outlet,
 } from "react-router-dom";
 
-import { setToken, setUsername } from "./components/authSlice";
-import { fetchVersion } from "./components/versionSlice";
+import { setToken, setUsername } from "./slices/authSlice";
+import { fetchVersion } from "./slices/versionSlice";
 import { getSessionId } from "./utils";
 import MainApp from "./views/App";
 import AccountView from "./views/AccountView";
 import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
-import { fetchSite } from "./components/Sites/sitesSlice";
+import { fetchSite } from "./slices/sitesSlice";
 import RequireAuth from "./components/RequireAuth";
 type Props = {
   children: ReactNode;

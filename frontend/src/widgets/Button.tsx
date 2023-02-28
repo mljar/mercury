@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   setWidgetValue,
-} from "../Notebooks/notebooksSlice";
+} from "../slices/notebooksSlice";
 
 type ButtonProps = {
   widgetKey: string;

@@ -7,10 +7,10 @@ import {
   getExecutionHistory,
   getHistoricTask,
   getShowCurrent,
-  setHistoricTask,
-} from "../tasks/tasksSlice";
+  //setHistoricTask,
+} from "../slices/tasksSlice";
 //import { setWidgetValue } from "./Widgets/widgetsSlice";
-import { setWidgetValue } from "./Notebooks/notebooksSlice";
+//import { setWidgetValue } from "../slices/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 

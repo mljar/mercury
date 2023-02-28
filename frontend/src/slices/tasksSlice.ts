@@ -9,7 +9,7 @@ import axios from 'axios';
 import { RootState } from '../store';
 import { toast } from "react-toastify";
 import { getSessionId, handleDownload } from '../utils';
-import { setSlidesHash } from '../components/Notebooks/notebooksSlice';
+import { setSlidesHash } from './notebooksSlice';
 
 export interface ITask {
     id: number;

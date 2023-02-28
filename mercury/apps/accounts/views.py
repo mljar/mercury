@@ -150,7 +150,6 @@ class InviteView(APIView):
 class GetSiteView(APIView):
     def get(self, request, site_slug, format=None):
         share = Site.PUBLIC if request.user.is_anonymous else Site.PRIVATE
-
         sites = Site.objects.filter(slug=site_slug, share=share)
 
         if not request.user.is_anonymous:

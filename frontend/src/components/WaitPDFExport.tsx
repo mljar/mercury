@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { getExportingToPDF, getExportToPDFCounter, getExportToPDFJobId, getPDF, stopPDFExport } from "../tasks/tasksSlice";
+import { getExportingToPDF, getExportToPDFCounter, getExportToPDFJobId, getPDF, stopPDFExport } from "../slices/tasksSlice";
 
 export default function WaitPDFExport() {
   const dispatch = useDispatch();

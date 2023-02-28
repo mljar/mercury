@@ -9,7 +9,7 @@ import {
   fetchNotebook,
   updateTitle,
   updateShowCode,
-} from "../components/Notebooks/notebooksSlice";
+} from "../slices/notebooksSlice";
 import {
   setNotebookSrc,
   setWebSocketState,
@@ -21,7 +21,8 @@ import {
 
 import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";
-import { fetchExecutionHistory, setExportingToPDF } from "../tasks/tasksSlice";
+import { fetchExecutionHistory, setExportingToPDF } from "../slices/tasksSlice";
+import { getSiteId } from "../slices/sitesSlice";
 
 const WebSocketContext = createContext(undefined as any);
 
@@ -47,6 +48,7 @@ export default function WebSocketProvider({
   console.log("WebSocketProvider");
 
   const dispatch = useDispatch();
+  const siteId = useSelector(getSiteId);
   const selectedNotebookId = useSelector(getSelectedNotebookId);
   const isStatic = useSelector(isStaticNotebook);
 
@@ -62,7 +64,7 @@ export default function WebSocketProvider({
     sendMessage(
       JSON.stringify({
         purpose: "server-address",
-        address: wsServer
+        address: wsServer,
       })
     );
     dispatch(setWebSocketState(WebSocketState.Connected));
@@ -82,10 +84,9 @@ export default function WebSocketProvider({
         //console.log(response?.reloadNotebook, selectedNotebookId);
         if (response?.reloadNotebook && selectedNotebookId !== undefined) {
           //console.log("reload notebook ...........................");
-          dispatch(fetchNotebook(selectedNotebookId));
+          dispatch(fetchNotebook(siteId, selectedNotebookId));
         }
         dispatch(setNotebookSrc(response.body));
-        
       } else if (response.purpose === "saved-notebook") {
         if (selectedNotebookId !== undefined) {
           dispatch(fetchExecutionHistory(selectedNotebookId, false));
@@ -97,9 +98,9 @@ export default function WebSocketProvider({
       } else if (response.purpose === "init-widgets") {
         //console.log("init-widgets");
         dispatch(initWidgets(response));
-      }  else if (response.purpose === "update-title") {
+      } else if (response.purpose === "update-title") {
         dispatch(updateTitle(response.title));
-      }  else if (response.purpose === "update-show-code") {
+      } else if (response.purpose === "update-show-code") {
         dispatch(updateShowCode(response.showCode));
       } else if (
         response.purpose === "download-html" ||
