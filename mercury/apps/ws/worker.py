@@ -4,6 +4,7 @@ import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
+from apps.ws.models import Worker
 from apps.ws.utils import client_group, worker_group
 
 log = logging.getLogger(__name__)
@@ -14,6 +15,13 @@ class WorkerProxy(WebsocketConsumer):
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
         self.worker_id = self.scope["url_route"]["kwargs"]["worker_id"]
+
+        # check if there is such worker requested in database
+        workers = Worker.objects.filter(
+            pk=self.worker_id, notebook__id=self.notebook_id, session_id=self.session_id
+        )
+        if not workers:
+            self.close()
 
         log.debug(
             f"Worker ({self.worker_id}) connect to {self.session_id}, notebook id {self.notebook_id}"

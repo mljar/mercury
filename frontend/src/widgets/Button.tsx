@@ -36,7 +36,6 @@ export default function ButtonWidget({
 
   useEffect(() => {
     if (value) {
-      console.log("run from button");
       runNb();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

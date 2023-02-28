@@ -95,13 +95,6 @@ export default function SideBar({
 
   const ws = useContext(WebSocketContext);
 
-  // useEffect(() => {
-  //   const timeOutId = setTimeout(() => {
-  //     console.log("effect widgets values");
-  //   }, RUN_DELAY);
-  //   return () => clearTimeout(timeOutId);
-  // }, [widgetsValues]);
-
   const runNb = () => {
     if (continuousUpdate) {
       execNb();

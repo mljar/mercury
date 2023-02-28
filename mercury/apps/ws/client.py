@@ -9,6 +9,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from apps.accounts.models import Site, Membership
+from apps.notebooks.models import Notebook
 from apps.ws.models import Worker
 from apps.ws.tasks import task_start_websocket_worker
 from apps.ws.utils import client_group, worker_group
@@ -17,10 +19,22 @@ log = logging.getLogger(__name__)
 
 
 class ClientProxy(WebsocketConsumer):
+
     def connect(self):
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
 
+        self.user = self.scope["user"]
+        nb = Notebook.objects.get(pk=self.notebook_id)
+        if nb.hosted_on.share == Site.PRIVATE:
+            if self.user.is_anonymous:
+                self.close()
+            else:
+                member = Membership.objects.filter(user=self.user, host=nb.hosted_on)
+                owner = nb.hosted_on.created_by == self.user
+                if not member and not owner:
+                    self.close()
+            
         log.debug(f"Client connect to {self.notebook_id}/{self.session_id}")
 
         self.client_group = client_group(self.notebook_id, self.session_id)

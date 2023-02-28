@@ -56,12 +56,10 @@ export const isPublic = (state: RootState) => state.sites.site.share === SITE_PU
 
 export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
   try {
-    console.log("fetchSite")
     dispatch(setSite({} as Site));
     const siteSlug = "single-site";
     const url = `/api/v1/get-site/${siteSlug}`;
     const { data } = await axios.get(url);
-    console.log(data)
     dispatch(setSite(data as Site));
   } catch (error) {
     console.error(`Problem during loading site information. ${error}`);

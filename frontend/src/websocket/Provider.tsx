@@ -23,6 +23,7 @@ import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";
 import { fetchExecutionHistory, setExportingToPDF } from "../slices/tasksSlice";
 import { getSiteId } from "../slices/sitesSlice";
+import { getToken } from "../slices/authSlice";
 
 const WebSocketContext = createContext(undefined as any);
 
@@ -50,6 +51,7 @@ export default function WebSocketProvider({
   const dispatch = useDispatch();
   const siteId = useSelector(getSiteId);
   const selectedNotebookId = useSelector(getSelectedNotebookId);
+  const token = useSelector(getToken);
   const isStatic = useSelector(isStaticNotebook);
 
   let connection: WebSocket | undefined = undefined;
@@ -144,9 +146,11 @@ export default function WebSocketProvider({
       selectedNotebookId !== undefined &&
       connection === undefined
     ) {
-      connection = new WebSocket(
-        `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`
-      );
+      let url = `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`;
+      if (token !== undefined && token !== null && token !== "") {
+        url += `?token=${token}`;
+      }
+      connection = new WebSocket(url);
       connection.onopen = onOpen;
       connection.onmessage = onMessage;
       connection.onerror = onError;

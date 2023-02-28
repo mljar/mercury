@@ -84,7 +84,9 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   };
 
   useEffect(() => {
-    dispatch(fetchNotebookWithSlug(siteId, notebookSlug));
+    if (siteId !== undefined) {
+      dispatch(fetchNotebookWithSlug(siteId, notebookSlug));
+    }
   }, [dispatch, siteId, notebookSlug, token]);
 
   useEffect(() => {
