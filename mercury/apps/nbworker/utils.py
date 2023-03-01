@@ -1,5 +1,5 @@
-from enum import Enum
 import threading
+from enum import Enum
 
 stop_event = threading.Event()
 

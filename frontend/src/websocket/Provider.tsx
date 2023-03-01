@@ -9,7 +9,7 @@ import {
   fetchNotebook,
   updateTitle,
   updateShowCode,
-} from "../components/Notebooks/notebooksSlice";
+} from "../slices/notebooksSlice";
 import {
   setNotebookSrc,
   setWebSocketState,
@@ -17,11 +17,13 @@ import {
   setWorkerId,
   WebSocketState,
   WorkerState,
-} from "./wsSlice";
+} from "../slices/wsSlice";
 
 import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";
-import { fetchExecutionHistory, setExportingToPDF } from "../tasks/tasksSlice";
+import { fetchExecutionHistory, setExportingToPDF } from "../slices/tasksSlice";
+import { getSiteId } from "../slices/sitesSlice";
+import { getToken } from "../slices/authSlice";
 
 const WebSocketContext = createContext(undefined as any);
 
@@ -47,7 +49,9 @@ export default function WebSocketProvider({
   console.log("WebSocketProvider");
 
   const dispatch = useDispatch();
+  const siteId = useSelector(getSiteId);
   const selectedNotebookId = useSelector(getSelectedNotebookId);
+  const token = useSelector(getToken);
   const isStatic = useSelector(isStaticNotebook);
 
   let connection: WebSocket | undefined = undefined;
@@ -62,7 +66,7 @@ export default function WebSocketProvider({
     sendMessage(
       JSON.stringify({
         purpose: "server-address",
-        address: wsServer
+        address: wsServer,
       })
     );
     dispatch(setWebSocketState(WebSocketState.Connected));
@@ -82,10 +86,9 @@ export default function WebSocketProvider({
         //console.log(response?.reloadNotebook, selectedNotebookId);
         if (response?.reloadNotebook && selectedNotebookId !== undefined) {
           //console.log("reload notebook ...........................");
-          dispatch(fetchNotebook(selectedNotebookId));
+          dispatch(fetchNotebook(siteId, selectedNotebookId));
         }
         dispatch(setNotebookSrc(response.body));
-        
       } else if (response.purpose === "saved-notebook") {
         if (selectedNotebookId !== undefined) {
           dispatch(fetchExecutionHistory(selectedNotebookId, false));
@@ -97,9 +100,9 @@ export default function WebSocketProvider({
       } else if (response.purpose === "init-widgets") {
         //console.log("init-widgets");
         dispatch(initWidgets(response));
-      }  else if (response.purpose === "update-title") {
+      } else if (response.purpose === "update-title") {
         dispatch(updateTitle(response.title));
-      }  else if (response.purpose === "update-show-code") {
+      } else if (response.purpose === "update-show-code") {
         dispatch(updateShowCode(response.showCode));
       } else if (
         response.purpose === "download-html" ||
@@ -143,9 +146,11 @@ export default function WebSocketProvider({
       selectedNotebookId !== undefined &&
       connection === undefined
     ) {
-      connection = new WebSocket(
-        `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`
-      );
+      let url = `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`;
+      if (token !== undefined && token !== null && token !== "") {
+        url += `?token=${token}`;
+      }
+      connection = new WebSocket(url);
       connection.onopen = onOpen;
       connection.onmessage = onMessage;
       connection.onerror = onError;

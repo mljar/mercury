@@ -1,24 +1,23 @@
 import copy
+import hashlib
 import json
 import logging
+import os
 import sys
 import threading
 import time
-import os
-import hashlib
-
 from datetime import datetime
+
 from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
 
 from apps.nb.nbrun import NbRun
-from apps.nbworker.utils import Purpose, WorkerState
+from apps.nbworker.utils import Purpose, WorkerState, stop_event
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
 from apps.tasks.export_pdf import to_pdf
 from apps.tasks.models import Task
 from apps.ws.utils import parse_params
-from apps.nbworker.utils import stop_event
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)

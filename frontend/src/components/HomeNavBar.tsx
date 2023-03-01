@@ -4,11 +4,11 @@ import LoginButton from "./LoginButton";
 import UserButton from "./UserButton";
 
 type NavBarProps = {
-  isPro: boolean;
+  isSitePublic: boolean;
   username: string;
 };
 
-export default function NavBar({ isPro, username }: NavBarProps) {
+export default function NavBar({ isSitePublic, username }: NavBarProps) {
   return (
     <header
       className="navbar navbar-dark sticky-top bg-dark p-0"
@@ -32,8 +32,8 @@ export default function NavBar({ isPro, username }: NavBarProps) {
           className="col-4"
           style={{ marginRight: "0px", paddingRight: "0px" }}
         >
-          {isPro && username === "" && <LoginButton />}
-          {isPro && username !== "" && <UserButton username={username} />}
+          {!isSitePublic && username === "" && <LoginButton />}
+          {username !== "" && <UserButton username={username} />}
         </div>
       </div>
     </header>

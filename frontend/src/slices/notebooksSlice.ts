@@ -7,9 +7,9 @@ import {
 } from "@reduxjs/toolkit";
 import axios from "axios";
 
-import { RootState } from "../../store";
-import { clearExecutionHistory } from "../../tasks/tasksSlice";
-import { setShowSideBar } from "../../views/appSlice";
+import { RootState } from "../store";
+import { clearExecutionHistory } from "./tasksSlice";
+import { setShowSideBar } from "./appSlice";
 import {
   IWidget,
   isSelectWidget,
@@ -20,8 +20,8 @@ import {
   isNumericWidget,
   isMarkdownWidget,
   isButtonWidget,
-} from "../Widgets/Types";
-import { getWindowDimensions } from "../WindowDimensions";
+} from "../widgets/Types";
+import { getWindowDimensions } from "../components/WindowDimensions";
 
 export const RUN_DELAY = 600; // ms
 export const RUN_DELAY_FAST = 100; // ms
@@ -314,12 +314,12 @@ export const getSlidesHash = (state: RootState) => state.notebooks.slidesHash;
 
 export const getWidgetsValues = (state: RootState) => state.notebooks.widgets;
 
-export const fetchNotebooks = () => async (dispatch: Dispatch<AnyAction>) => {
+export const fetchNotebooks = (siteId: number) => async (dispatch: Dispatch<AnyAction>) => {
   try {
     dispatch(setSlidesHash(""));
     dispatch(setLoadingState("loading"));
     dispatch(clearExecutionHistory());
-    const url = "/api/v1/notebooks/";
+    const url = `/api/v1/${siteId}/notebooks/`;
     const { data } = await axios.get(url);
     const parsedNotebooks = data.map((notebook: any) => {
       const parsedParams = JSON.parse(notebook.params);
@@ -338,7 +338,7 @@ export const fetchNotebooks = () => async (dispatch: Dispatch<AnyAction>) => {
 };
 
 export const fetchNotebook =
-  (id: number, silent = false) =>
+  (siteId: number, id: number, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         if (!silent) {
@@ -352,7 +352,7 @@ export const fetchNotebook =
         if (!silent) {
           dispatch(setLoadingStateSelected("loading"));
         }
-        const url = `/api/v1/notebooks/${id}/`;
+        const url = `/api/v1/${siteId}/notebooks/${id}/`;
         const { data } = await axios.get(url);
         const parsedParams = JSON.parse(data.params) as INotebookParams;
         dispatch(
@@ -378,7 +378,7 @@ export const fetchNotebook =
     };
 
 export const fetchNotebookWithSlug =
-  (slug: string, silent = false) =>
+  (siteId: number, slug: string, silent = false) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         if (!silent) {
@@ -392,7 +392,7 @@ export const fetchNotebookWithSlug =
         if (!silent) {
           dispatch(setLoadingStateSelected("loading"));
         }
-        const url = `/api/v1/getnb/${slug}/`;
+        const url = `/api/v1/${siteId}/getnb/${slug}/`;
         const { data } = await axios.get(url);
         const parsedParams = JSON.parse(data.params) as INotebookParams;
         dispatch(

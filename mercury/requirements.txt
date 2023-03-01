@@ -21,4 +21,4 @@ channels[daphne]>=4.0.0
 websocket-client>=1.4.2
 execnb
 ipywidgets>=8.0.3
-
+dj-rest-auth[with_social]==3.0.0

@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import fileDownload from "js-file-download";
 import BlockUi from "react-block-ui";
-import { setView } from "../views/appSlice";
+import { setView } from "../slices/appSlice";
 
 type FilesViewProps = {
   files: string[];

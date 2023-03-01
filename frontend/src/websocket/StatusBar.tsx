@@ -6,7 +6,7 @@ import {
   WebSocketState,
   getWebSocketState,
   getWorkerState,
-} from "./wsSlice";
+} from "../slices/wsSlice";
 
 export default function StatusBar() {
   const wsStatus = useSelector(getWebSocketState);

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   setWidgetValue,
-} from "../Notebooks/notebooksSlice";
+} from "../slices/notebooksSlice";
 
 type ButtonProps = {
   widgetKey: string;
@@ -36,7 +36,6 @@ export default function ButtonWidget({
 
   useEffect(() => {
     if (value) {
-      console.log("run from button");
       runNb();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

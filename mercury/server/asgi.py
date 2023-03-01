@@ -11,12 +11,15 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
 django_asgi_app = get_asgi_application()
 
 import apps.ws.routing
+from apps.ws.middleware import TokenAuthMiddleware
 
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(apps.ws.routing.websocket_urlpatterns))
+            TokenAuthMiddleware(
+                AuthMiddlewareStack(URLRouter(apps.ws.routing.websocket_urlpatterns))
+            )
         ),
     }
 )

@@ -2,40 +2,44 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { withRouter } from "react-router-dom";
+
 import HomeNavBar from "../components/HomeNavBar";
 import Footer from "../components/Footer";
 import {
   fetchNotebooks,
   getLoadingState,
   getNotebooks,
-} from "../components/Notebooks/notebooksSlice";
-import { fetchWelcome, getIsPro, getWelcome } from "../components/versionSlice";
+} from "../slices/notebooksSlice";
+import { fetchWelcome, getWelcome } from "../slices/versionSlice";
 
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
-import { getToken, getUsername } from "../components/authSlice";
-import { NonceProvider } from "react-select";
+import { getToken, getUsername } from "../slices/authSlice";
+import { getSiteId, isPublic } from "../slices/sitesSlice";
 
-export default withRouter(function HomeView() {
+export default function HomeView() {
   const dispatch = useDispatch();
   const notebooks = useSelector(getNotebooks);
   const loadingState = useSelector(getLoadingState);
   const welcome = useSelector(getWelcome);
-  const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const [showButton, setShowButton] = useState("");
+  const siteId = useSelector(getSiteId);
+  const isSitePublic = useSelector(isPublic);
 
   useEffect(() => {
-    dispatch(fetchNotebooks());
-    dispatch(fetchWelcome());
+    if (siteId !== undefined) {
+      dispatch(fetchNotebooks(siteId));
+      dispatch(fetchWelcome());
+    }
+
     // fetchNotebooks depends on token
     // if token is set then private notebooks are returned
-  }, [dispatch, token]);
+  }, [dispatch, siteId, token]);
 
   const firstLetters = (text: string | null, count: number): string => {
     if (text !== null && text !== undefined) {
@@ -86,7 +90,6 @@ export default withRouter(function HomeView() {
                 borderTop: "1px solid rgba(0,0,0,0.1)",
                 height: "110px",
               }}
-              
             >
               <h5 className="card-title">{firstLetters(notebook.title, 40)}</h5>
 
@@ -127,7 +130,7 @@ export default withRouter(function HomeView() {
 
   return (
     <div className="App">
-      <HomeNavBar isPro={isPro} username={username} />
+      <HomeNavBar isSitePublic={isSitePublic} username={username} />
       <div className="container" style={{ paddingBottom: "50px" }}>
         {welcome === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
@@ -147,24 +150,6 @@ export default withRouter(function HomeView() {
             <p>Loading notebooks. Please wait ...</p>
           )}
 
-          {loadingState === "loaded" && isPro && notebooks.length === 0 && (
-            <div>
-              <div className="alert alert-success" role="alert">
-                <h5>
-                  <i className="fa fa-key" aria-hidden="true"></i> You are using
-                  Pro version
-                </h5>
-                <p>
-                  There are no public notebooks shared. Please login with your
-                  credentials to check private notebooks.
-                </p>
-
-                <a href="/login" className="btn btn-primary btn-sm ">
-                  <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
-                </a>
-              </div>
-            </div>
-          )}
           {loadingState === "loaded" && notebooks.length === 0 && (
             <div>
               <p>
@@ -202,4 +187,4 @@ export default withRouter(function HomeView() {
       <Footer />
     </div>
   );
-});
+}

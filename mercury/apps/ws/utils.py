@@ -1,6 +1,7 @@
 import json
 import logging
 import platform
+
 import nbformat
 
 from widgets.manager import WidgetsManager

@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
-import { logout } from "./authSlice";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../slices/authSlice";
 
 type UserButtonProps = {
   username: string;
@@ -10,7 +10,7 @@ type UserButtonProps = {
 
 export default function UserButton({ username }: UserButtonProps) {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
     <div>
       <div className="dropdown" style={{ float: "right" }}>
@@ -41,7 +41,7 @@ export default function UserButton({ username }: UserButtonProps) {
           <li>
             <a
               className="dropdown-item"
-              onClick={() => dispatch(logout(history))}
+              onClick={() => dispatch(logout(navigate))}
             >
               <i className="fa fa-sign-out" aria-hidden="true"></i> Log out
             </a>

@@ -62,7 +62,7 @@ export const fetchOutputFiles =
         dispatch(setFilesState("loading"))
         dispatch(setFiles([]));
         const sessionId = getSessionId();
-        const url = `/api/v1/output_files/${sessionId}/${taskId}`;
+        const url = `/api/v1/output_files/${sessionId}/${taskId}/`;
         const { data } = await axios.get(url);
         dispatch(setFiles(data));
         dispatch(setFilesState("loaded"))
@@ -80,7 +80,7 @@ export const fetchWorkerOutputFiles =
         dispatch(setFilesState("loading"))
         dispatch(setFiles([]));
         const sessionId = getSessionId();
-        const url = `/api/v1/worker_output_files/${sessionId}/${workerId}`;
+        const url = `/api/v1/worker_output_files/${sessionId}/${workerId}/`;
         const { data } = await axios.get(url);
         dispatch(setFiles(data));
         dispatch(setFilesState("loaded"))

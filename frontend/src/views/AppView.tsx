@@ -11,7 +11,7 @@ import {
   getSelectedNotebook,
   getSlidesHash,
   // getWatchModeCounter,
-} from "../components/Notebooks/notebooksSlice";
+} from "../slices/notebooksSlice";
 import {
   //fetchCurrentTask,
   //fetchExecutionHistory,
@@ -21,8 +21,8 @@ import {
   getPreviousTask,
   //ITask,
   //setPreviousTask,
-} from "../tasks/tasksSlice";
-import { isOutputFilesWidget, IWidget } from "../components/Widgets/Types";
+} from "../slices/tasksSlice";
+import { isOutputFilesWidget, IWidget } from "../widgets/Types";
 import {
   fetchWorkerOutputFiles,
   getOutputFiles,
@@ -30,15 +30,15 @@ import {
   getShowSideBar,
   getView,
   setShowSideBar,
-} from "./appSlice";
+} from "../slices/appSlice";
 import FilesView from "../components/FilesView";
-import { getToken, getUsername } from "../components/authSlice";
-import { getIsPro } from "../components/versionSlice";
+import { getToken, getUsername } from "../slices/authSlice";
 import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
-import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
+import { getWorkerId, getWorkerState, WorkerState } from "../slices/wsSlice";
+import { getSiteId, isPublic } from "../slices/sitesSlice";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -56,7 +56,6 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const appView = useSelector(getView);
   const outputFiles = useSelector(getOutputFiles);
   const outputFilesState = useSelector(getOutputFilesState);
-  const isPro = useSelector(getIsPro);
   const username = useSelector(getUsername);
   const token = useSelector(getToken);
   const slidesHash = useSelector(getSlidesHash);
@@ -64,6 +63,8 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const exportingToPDF = useSelector(getExportingToPDF);
   const workerId = useSelector(getWorkerId);
   const workerState = useSelector(getWorkerState);
+  const siteId = useSelector(getSiteId);
+  const isSitePublic = useSelector(isPublic);
 
   const pleaseWait = () => {
     if (notebook?.params?.static_notebook) {
@@ -81,46 +82,11 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   };
 
   useEffect(() => {
-    dispatch(fetchNotebookWithSlug(notebookSlug));
-    //dispatch(fetchCurrentTask(notebookId));
-    //dispatch(fetchExecutionHistory(notebookId));
-    //dispatch(setPreviousTask({} as ITask));
-  }, [dispatch, notebookSlug, token]);
+    if (siteId !== undefined) {
+      dispatch(fetchNotebookWithSlug(siteId, notebookSlug));
+    }
+  }, [dispatch, siteId, notebookSlug, token]);
 
-  // useEffect(() => {
-  //   if (waitForTask()) {
-  //     setTimeout(() => {
-  //       dispatch(fetchCurrentTask(notebookId));
-  //       dispatch(fetchExecutionHistory(notebookId, false));
-  //     }, 1000);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dispatch, task, notebookId]);
-
-  // useEffect(() => {
-  //   if (isWatchMode()) {
-  //     setTimeout(() => {
-  //       dispatch(fetchNotebook(notebookId));
-  //     }, 2000);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dispatch, notebook, watchModeCounter]);
-
-  // version 1
-  // useEffect(() => {
-  //   if (
-  //     appView === "files" &&
-  //     task.id &&
-  //     task.state &&
-  //     task.state === "DONE" &&
-  //     task.result &&
-  //     notebook?.params?.version === "1"
-  //   ) {
-  //     dispatch(fetchOutputFiles(task.id));
-  //   }
-  // }, [dispatch, appView, task.id, task.state, task.result, notebook]);
-
-  // version 2
   useEffect(() => {
     if (
       appView === "files" &&
@@ -194,7 +160,6 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
     return true;
   };
 
-
   const doAllowDownload = () => {
     if (notebook !== undefined && notebook !== null) {
       return notebook?.params?.allow_download !== undefined &&
@@ -207,7 +172,9 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
 
   return (
     <div className="App">
-      {!displayEmbed && <NavBar isPro={isPro} username={username} />}
+      {!displayEmbed && (
+        <NavBar isSitePublic={isSitePublic} username={username} />
+      )}
       <BlockUi
         blocking={exportingToPDF}
         message="Exporting to PDF. Please wait ..."
@@ -281,7 +248,6 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
               waiting={pleaseWait()} // {waitForTask()}
               watchMode={isWatchMode()}
               displayEmbed={displayEmbed}
-              isPro={isPro}
               username={username}
               slidesHash={slidesHash}
               columnsWidth={showSideBar ? 9 : 12}
