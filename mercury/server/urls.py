@@ -34,7 +34,7 @@ urlpatterns += [
         VersionInfo.as_view(),
     ),
     url(
-        "api/v1/welcome",
+        "api/v1/(?P<site_id>.+)/welcome",
         WelcomeMessage.as_view(),
     ),
     re_path(r"^api/v1/fp/", include("django_drf_filepond.urls")),
