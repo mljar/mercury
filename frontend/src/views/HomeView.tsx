@@ -34,7 +34,7 @@ export default function HomeView() {
   useEffect(() => {
     if (siteId !== undefined) {
       dispatch(fetchNotebooks(siteId));
-      dispatch(fetchWelcome());
+      dispatch(fetchWelcome(siteId));
     }
 
     // fetchNotebooks depends on token

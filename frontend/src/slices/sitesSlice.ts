@@ -31,7 +31,8 @@ export enum SiteStatus {
   Loaded = "Loaded",
   NotFound = "Not found",
   AccessForbidden = "Access forbidden",
-  NetworkError = "Network Error"
+  NetworkError = "Network Error",
+  PleaseRefresh = "Please refresh"
 }
 
 const initialState = {
@@ -86,6 +87,7 @@ export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
       // invalid token, clear token ...
       dispatch(setToken(""));
       dispatch(setUsername(""));
+      dispatch(setSiteStatus(SiteStatus.PleaseRefresh));
     } else {
       console.error(`Problem during loading site information. ${error}`);
     }

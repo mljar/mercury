@@ -216,7 +216,8 @@ def task_init_notebook(
 
         if notebook_id is None:
             site, user = None, None
-            if not Site.objects.all():
+
+            if not User.objects.filter(username="developer"):
                 user = User.objects.create_user(
                     username="developer",
                     email="developer@example.com",
@@ -225,7 +226,9 @@ def task_init_notebook(
                 EmailAddress.objects.create(
                     user=user, email=user.email, verified=True, primary=True
                 )
-
+            else:
+                user = User.objects.get(username="developer")
+            if not Site.objects.filter(slug="single-site"):
                 site = Site.objects.create(
                     title="Mercury",
                     slug="single-site",
@@ -233,8 +236,7 @@ def task_init_notebook(
                     created_by=user,
                 )
             else:
-                user = User.objects.get(username="developer")
-                site = Site.objects.get(pk=1)
+                site = Site.objects.get(slug="single-site")
 
             notebook = Notebook(
                 title=notebook_title,

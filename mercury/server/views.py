@@ -32,7 +32,6 @@ class WelcomeMessage(APIView):
                 user = request.user
 
                 site = Site.objects.get(pk=site_id)
-
                 if site.share == Site.PRIVATE:
                     if user.is_anonymous:
                         return Response({"msg": ""})

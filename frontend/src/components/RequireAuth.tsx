@@ -12,6 +12,7 @@ import SiteAccessForbiddenView from "../views/SiteAccessForbiddenView";
 import SiteLoadingView from "../views/SiteLoadingView";
 import SiteNetworkErrorView from "../views/SiteNetworkErrorView";
 import SiteNotFoundView from "../views/SiteNotFoundView";
+import SitePleaseRefreshView from "../views/SitePleaseRefreshView";
 
 export default function RequireAuth({ children }: { children: JSX.Element }) {
   const token = useSelector(getToken);
@@ -32,6 +33,8 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
     return <SiteAccessForbiddenView />;
   } else if (siteStatus === SiteStatus.NetworkError) {
     return <SiteNetworkErrorView />;
+  } else if (siteStatus === SiteStatus.PleaseRefresh) {
+    return <SitePleaseRefreshView />;
   }
 
   if (!isPublicSite && !token) {

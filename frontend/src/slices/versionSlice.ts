@@ -66,11 +66,11 @@ export const fetchVersion =
 
 
 export const fetchWelcome =
-  () =>
+  (siteId: number) =>
     async (dispatch: Dispatch<AnyAction>) => {
 
       try {
-        const url = '/api/v1/welcome/';
+        const url = `/api/v1/${siteId}/welcome/`;
         const { data } = await axios.get(url);
         dispatch(setWelcome(data.msg));
       } catch (error) {
