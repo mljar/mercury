@@ -17,7 +17,7 @@ import {
   setWorkerId,
   WebSocketState,
   WorkerState,
-} from "./wsSlice";
+} from "../slices/wsSlice";
 
 import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";

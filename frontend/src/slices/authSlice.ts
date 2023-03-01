@@ -80,25 +80,25 @@ export const fetchToken =
     redirectPath: string,
     navigate: NavigateFunction
   ) =>
-  async (dispatch: Dispatch<AnyAction>) => {
-    try {
-      const url = "/api/v1/auth/login/";
-      const { data } = await axios.post(url, { email, password });
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        const url = "/api/v1/auth/login/";
+        const { data } = await axios.post(url, { email, password });
 
-      dispatch(setToken(data.key));
-      dispatch(setUsername(email.split("@")[0]));
-      toast.success("Log in successfull");
-      // redirect ...
-      navigate(redirectPath);
-    } catch (error) {
-      const err = error as AxiosError;
-      let msg = "Problem during authentication. ";
-      if (err.response?.data?.non_field_errors !== undefined) {
-        msg += err.response?.data?.non_field_errors;
+        dispatch(setToken(data.key));
+        dispatch(setUsername(email.split("@")[0]));
+        toast.success("Log in successfull");
+        // redirect ...
+        navigate(redirectPath);
+      } catch (error) {
+        const err = error as AxiosError;
+        let msg = "Problem during authentication. ";
+        if (err.response?.data?.non_field_errors !== undefined) {
+          msg += err.response?.data?.non_field_errors;
+        }
+        toast.error(msg);
       }
-      toast.error(msg);
-    }
-  };
+    };
 
 export const logout =
   (navigate: NavigateFunction) => async (dispatch: Dispatch<AnyAction>) => {
@@ -126,16 +126,22 @@ export const fetchUserInfo = () => async (dispatch: Dispatch<AnyAction>) => {
 
 export const changePassword =
   (oldPassword: string, newPassword1: string, newPassword2: string) =>
-  async (dispatch: Dispatch<AnyAction>) => {
-    try {
-      const url = "/api/v1/auth/password/change/";
-      await axios.post(url, {
-        old_password: oldPassword,
-        new_password1: newPassword1,
-        new_password2: newPassword2,
-      });
-      toast.success("Password changed successfully");
-    } catch (error) {
-      toast.error("Password not changed. Problem during password change.");
-    }
-  };
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        const url = "/api/v1/auth/password/change/";
+        await axios.post(url, {
+          old_password: oldPassword,
+          new_password1: newPassword1,
+          new_password2: newPassword2,
+        });
+        toast.success("Password changed successfully");
+      } catch (error) {
+        const err = error as AxiosError;
+        if (err !== undefined && err.response !== undefined && err.response.data !== undefined) {
+          const msg = Object.values(err.response.data);
+          toast.error("Password not changed." + msg);
+        } else {
+          toast.error("Password not changed. Problem during password change.");
+        }
+      }
+    };

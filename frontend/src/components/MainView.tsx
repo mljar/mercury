@@ -5,7 +5,7 @@ import useWindowDimensions from "./WindowDimensions";
 
 import BlockUi from "react-block-ui";
 import { useDispatch, useSelector } from "react-redux";
-import { getNotebookSrc, setNotebookSrc } from "../websocket/wsSlice";
+import { getNotebookSrc, setNotebookSrc } from "../slices/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
 import { getSelectedNotebook } from "../slices/notebooksSlice";

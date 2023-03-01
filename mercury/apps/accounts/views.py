@@ -149,9 +149,14 @@ class InviteView(APIView):
 
 class GetSiteView(APIView):
     def get(self, request, site_slug, format=None):
-        share = Site.PUBLIC if request.user.is_anonymous else Site.PRIVATE
-        sites = Site.objects.filter(slug=site_slug, share=share)
+        
+        sites = Site.objects.filter(slug=site_slug)
+        if not sites:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
+        share = Site.PUBLIC if request.user.is_anonymous else Site.PRIVATE
+        sites = sites.filter(share=share)
+        
         if not request.user.is_anonymous:
             sites = sites.filter(
                 Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
@@ -160,5 +165,6 @@ class GetSiteView(APIView):
             )
 
         if not sites:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         return Response(SiteSerializer(sites[0]).data)

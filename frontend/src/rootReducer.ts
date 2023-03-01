@@ -6,7 +6,7 @@ import tasksReducer from './slices/tasksSlice';
 import versionReducer from './slices/versionSlice';
 import appReducer from './slices/appSlice';
 import authReducer from "./slices/authSlice";
-import wsReducer from "./websocket/wsSlice";
+import wsReducer from "./slices/wsSlice";
 import sitesReducer from "./slices/sitesSlice";
 
 export default function createRootReducer(history: History) {

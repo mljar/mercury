@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
-import { WorkerState } from "../websocket/wsSlice";
+import { WorkerState } from "../slices/wsSlice";
 
 type RunButtonProps = {
   runNb: () => void;

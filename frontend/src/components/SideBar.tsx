@@ -47,7 +47,7 @@ import {
   getWorkerState,
   runNotebook,
   WorkerState,
-} from "../websocket/wsSlice";
+} from "../slices/wsSlice";
 import ButtonWidget from "../widgets/Button";
 import RunButton from "./RunButton";
 import BlockUi from "react-block-ui";

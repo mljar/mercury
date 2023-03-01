@@ -37,7 +37,7 @@ import MadeWithDiv from "../components/MadeWithDiv";
 import RestAPIView from "../components/RestAPIView";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
-import { getWorkerId, getWorkerState, WorkerState } from "../websocket/wsSlice";
+import { getWorkerId, getWorkerState, WorkerState } from "../slices/wsSlice";
 import { getSiteId, isPublic } from "../slices/sitesSlice";
 
 type AppProps = {
