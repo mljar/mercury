@@ -15,7 +15,6 @@ from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, WorkerState, stop_event
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
-from apps.tasks.export_pdf import to_pdf
 from apps.tasks.models import Task
 from apps.ws.utils import parse_params
 from widgets.manager import WidgetsManager
@@ -403,10 +402,7 @@ class NBWorker(WSClient):
     def download_pdf(self):
         log.debug(f"Download PDF")
         # save nb in HTML with full header
-        if self.is_presentation():
-            nb_body = self.nbrun.export_html(self.nb, full_header=True)
-        else:
-            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+        nb_body = self.nbrun.export_html(self.nb, full_header=True)
 
         # export to PDF
         sm = StorageManager(self.session_id, self.worker_id)

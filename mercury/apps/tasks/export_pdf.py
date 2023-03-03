@@ -6,6 +6,7 @@ from subprocess import PIPE, Popen
 
 from pyppeteer import launch
 
+import logging
 
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
@@ -122,6 +123,10 @@ def to_pdf(html_input_file, pdf_output_file):
     # make sure chromium is installed
     # install_chromium()
 
+    # dont want to see DEBUG logs for chromium ...
+    prev_log_level =logging.getLogger().getEffectiveLevel()
+    logging.getLogger().setLevel(logging.ERROR)
+
     # convert notebook to PDF
     pool = concurrent.futures.ThreadPoolExecutor()
     pool.submit(
@@ -132,3 +137,6 @@ def to_pdf(html_input_file, pdf_output_file):
             # "slides2.slides.html?print-pdf", "slides-my.pdf"
         ),
     ).result()
+
+    # set previous log level
+    logging.getLogger().setLevel(prev_log_level)

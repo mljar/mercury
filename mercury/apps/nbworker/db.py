@@ -34,8 +34,9 @@ class DBClient:
 
     def is_presentation(self):
         try:
-            log.debug(f"Check if notebook is presentation {self.notebook.output}")
-            return self.notebook.output == "slides"
+            isIt = self.notebook.output == "slides"
+            log.debug(f"Check if notebook is presentation ({isIt})")
+            return isIt
         except Exception:
             log.exception("Exception when check if notebook is presentation")
         return False

@@ -97,13 +97,12 @@ class StorageManager:
             html_path, html_url = self.save_nb_html(nb_html_body)
 
             # check if we need postfix
-            slides_postfix = ""
-            if is_presentation == "slides":
-                slides_postfix = "?print-pdf"
+            slides_postfix = "?print-pdf" if is_presentation else ""
 
             # export to PDF
             pdf_path = html_path.replace(".html", ".pdf")
             pdf_url = html_url.replace(".html", ".pdf")
+            log.debug(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
         return pdf_path, pdf_url
