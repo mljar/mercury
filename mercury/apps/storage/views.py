@@ -12,6 +12,7 @@ class ListFiles(APIView):
 
 
 def link():
+    
     s3_client = boto3.client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -27,7 +28,7 @@ def link():
     url = s3_client.generate_presigned_url(
         ClientMethod=client_method, Params=method_parameters, ExpiresIn=expires_in
     )
-    print(url)
+    
     fname = "filename.txt"
     with open(fname, "w") as fout:
         fout.write("test")
