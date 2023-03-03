@@ -109,6 +109,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = False
 OLD_PASSWORD_FIELD_ENABLED = True # use old password when password change in the app
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -304,3 +305,9 @@ NBWORKERS_PER_MACHINE = 20
 
 # delta time after which worker is considered as stale and deleted
 WORKER_STALE_TIME = 1  # in minutes
+
+
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_REGION_NAME = os.environ.get("AWS_REGION_NAME")
+AWS_BUCKET_NAME = os.environ.get("AWS_BUCKET_NAME")

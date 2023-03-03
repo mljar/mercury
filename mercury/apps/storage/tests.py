@@ -66,3 +66,9 @@ class StorageTestCase(APITestCase):
         tu = TemporaryUpload.objects.get(upload_id=response.data)
         print(tu)
         # tu.delete()
+
+    def test_get_presigned_url(self):
+        print("url")
+        from apps.storage.views import link 
+        link()
+        
