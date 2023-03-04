@@ -158,8 +158,8 @@ class GetSiteView(APIView):
 
         if not request.user.is_anonymous:
             sites = sites.filter(
-                Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
-                | Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+                # any Membership (VIEW or EDIT) or owner
+                Q(hosts__user=self.request.user)
                 | Q(created_by=self.request.user)
             )
 

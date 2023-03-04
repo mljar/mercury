@@ -5,7 +5,6 @@ from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.models import Site
 
 
-# Create your models here.
 class UploadedFile(models.Model):
     filename = models.CharField(max_length=1024, blank=False, null=False)
     filepath = models.CharField(max_length=1024, blank=False, null=False)

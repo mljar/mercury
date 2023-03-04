@@ -1,9 +1,16 @@
 from django.http import JsonResponse
+from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
+from django.db.models import Q
 
-import boto3
-import requests
-from django.conf import settings
+from apps.accounts.models import Membership, Site
+from apps.storage.s3utils import S3
+from apps.storage.models import UploadedFile
+
+
+def get_bucket_key(user, site, filename):
+    return f"user-{user.id}/site-{site.id}/{filename}"
 
 
 class ListFiles(APIView):
@@ -11,33 +18,51 @@ class ListFiles(APIView):
         return JsonResponse([], safe=False)
 
 
-def link():
-    s3_client = boto3.client(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_REGION_NAME,
-    )
-    client_method = "put_object"
+class GetPutPresignedUrl(APIView):
+    def get(self, request, site_id, filename, format=None):
+        if request.user.is_anonymous:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
-    method_parameters = {"Bucket": settings.AWS_BUCKET_NAME, "Key": "filename.txt"}
+        sites = Site.objects.filter(pk=site_id)
+        sites = sites.filter(
+            Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+            | Q(created_by=self.request.user)
+        )
+        if not sites:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
-    expires_in = 100
-
-    url = s3_client.generate_presigned_url(
-        ClientMethod=client_method, Params=method_parameters, ExpiresIn=expires_in
-    )
-
-    fname = "filename.txt"
-    with open(fname, "w") as fout:
-        fout.write("test")
-    content = None
-    with open(fname, "rb") as fin:
-        content = fin.read()
-    # response = requests.put(url, content)
-    # print(response)
+        s3 = S3()
+        url = s3.get_presigned_url(
+            get_bucket_key(request.user, sites[0], filename), "put_object"
+        )
+        return Response({"url": "url"}, safe=False)
 
 
-class GetPresignedUrl(APIView):
-    def get(self, request, site_id, format=None):
-        return JsonResponse({}, safe=False)
+class FileUploaded(APIView):
+    def post(self, request, site_id, filename, format=None):
+        if request.use.is_anonymous:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        site_id = request.data.get("site_id")
+        filename = request.data.get("site_id")
+
+        sites = Site.objects.filter(pk=site_id)
+        sites = sites.filter(
+            Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+            | Q(created_by=self.request.user)
+        )
+        if not sites:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        bucket_key = get_bucket_key(request.user, sites[0], filename)
+
+        UploadedFile.objects.create(
+            filename=filename,
+            filepath=bucket_key,
+            filetype="aha",
+            filesize=1,
+            hosted_on=sites[0],
+            created_by=request.user,
+        )
+
+        return Response(status=status.HTTP_200_OK)
