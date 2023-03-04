@@ -7,6 +7,7 @@ from execnb.nbio import dict2nb, read_nb
 
 from apps.nb.exporter import Exporter
 from apps.nb.nbrun import NbRun
+
 # python manage.py test apps
 from apps.nb.utils import one_cell_notebook, test_notebook
 from apps.notebooks.models import Notebook

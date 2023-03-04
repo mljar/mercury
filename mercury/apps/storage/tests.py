@@ -13,6 +13,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from apps.accounts.models import Site
+from apps.storage.s3utils import S3
 
 
 class StorageTestCase(APITestCase):
@@ -67,8 +68,34 @@ class StorageTestCase(APITestCase):
         print(tu)
         # tu.delete()
 
-    def test_get_presigned_url(self):
-        print("url")
-        from apps.storage.views import link 
-        link()
-        
+    def test_s3_live(self):
+        fname = "test-file.txt"
+        with open(fname, "w") as fout:
+            fout.write("hello there")
+
+        s3 = S3()
+        bucket_key = "my-folder/test.txt"
+        s3.upload_file(fname, bucket_key)
+        new_fname = "test-file-2.txt"
+        s3.download_file(bucket_key, new_fname)
+
+        with open(new_fname, "r") as fin:
+            print(fin.read())
+
+        print(s3.list_files("my-folder"))
+
+        s3.delete_file(bucket_key)
+
+        print(s3.list_files("my-folder"))
+
+        url = s3.get_presigned_url(bucket_key, "put_object")
+        print(url)
+
+        content = None
+        with open(new_fname, "rb") as fin:
+            content = fin.read()
+
+        import requests
+
+        response = requests.put(url, content)
+        print(response)

@@ -12,6 +12,7 @@ from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch
 from apps.accounts.models import Site, Membership
 
+
 def in_commas(word):
     return "," + word + ","
 
@@ -19,7 +20,9 @@ def in_commas(word):
 def notebooks_queryset(request, site_id):
     user = request.user
     if user.is_anonymous:
-        return Notebook.objects.filter(hosted_on__id=site_id, hosted_on__share=Site.PUBLIC)
+        return Notebook.objects.filter(
+            hosted_on__id=site_id, hosted_on__share=Site.PUBLIC
+        )
 
     # it can be optimized
     site = Site.objects.get(pk=site_id)
@@ -28,7 +31,7 @@ def notebooks_queryset(request, site_id):
 
     # admin can see all notebooks on site
     if site.created_by == user:
-        return Notebook.objects.filter(hosted_on=site)    
+        return Notebook.objects.filter(hosted_on=site)
 
     # don't filter on rights because both VIEW and EDIT allows
     # to see and execute notebooks
@@ -36,6 +39,7 @@ def notebooks_queryset(request, site_id):
     if m:
         return Notebook.objects.filter(hosted_on=site)
     return Notebook.objects.filter(hosted_on=site, created_by=user)
+
 
 class ListNotebooks(APIView):
     def get(self, request, site_id, format=None):

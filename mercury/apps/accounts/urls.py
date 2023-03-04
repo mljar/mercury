@@ -3,8 +3,7 @@ from django.urls import path, re_path
 from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.views import (GetSiteView, InviteView, MembershipViewSet,
-                                 SiteViewSet)
+from apps.accounts.views import GetSiteView, InviteView, MembershipViewSet, SiteViewSet
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")

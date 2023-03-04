@@ -8,6 +8,7 @@ from pyppeteer import launch
 
 import logging
 
+
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
     browser = await launch(
@@ -124,7 +125,7 @@ def to_pdf(html_input_file, pdf_output_file):
     # install_chromium()
 
     # dont want to see DEBUG logs for chromium ...
-    prev_log_level =logging.getLogger().getEffectiveLevel()
+    prev_log_level = logging.getLogger().getEffectiveLevel()
     logging.getLogger().setLevel(logging.ERROR)
 
     # convert notebook to PDF

@@ -19,7 +19,6 @@ log = logging.getLogger(__name__)
 
 
 class ClientProxy(WebsocketConsumer):
-
     def connect(self):
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
@@ -34,7 +33,7 @@ class ClientProxy(WebsocketConsumer):
                 owner = nb.hosted_on.created_by == self.user
                 if not member and not owner:
                     self.close()
-            
+
         log.debug(f"Client connect to {self.notebook_id}/{self.session_id}")
 
         self.client_group = client_group(self.notebook_id, self.session_id)

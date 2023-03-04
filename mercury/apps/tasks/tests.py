@@ -1,5 +1,5 @@
 from django.test import TestCase
-from apps.tasks.tasks import sanitize_string 
+from apps.tasks.tasks import sanitize_string
 
 # python manage.py test apps.tasks.tests -v 2
 
