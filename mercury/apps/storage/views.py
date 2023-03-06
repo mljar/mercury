@@ -7,6 +7,7 @@ from django.db.models import Q
 from apps.accounts.models import Membership, Site
 from apps.storage.s3utils import S3
 from apps.storage.models import UploadedFile
+from apps.storage.serializers import UploadedFileSerializer
 
 
 def get_bucket_key(user, site, filename):
@@ -28,7 +29,13 @@ def get_site(user, site_id):
 
 class ListFiles(APIView):
     def get(self, request, site_id, format=None):
-        return JsonResponse([], safe=False)
+        site = get_site(request.user, site_id)
+        if site is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        files = UploadedFile.objects.filter(hosted_on=site)
+        
+        return Response(UploadedFileSerializer(files, many=True).data)
 
 
 class PresignedUrl(APIView):
@@ -43,7 +50,7 @@ class PresignedUrl(APIView):
         url = s3.get_presigned_url(
             get_bucket_key(request.user, site, filename), client_action
         )
-        return Response({"url": "url"}, safe=False)
+        return Response({"url": url})
 
 
 class FileUploaded(APIView):
@@ -51,7 +58,7 @@ class FileUploaded(APIView):
         site_id = request.data.get("site_id")
         filename = request.data.get("filename")
         filesize = request.data.get("filesize")
-        filetype = filename.split(".")[-1]
+        filetype = filename.split(".")[-1].lower()
 
         site = get_site(request.user, site_id)
         if site is None:
@@ -59,6 +66,10 @@ class FileUploaded(APIView):
 
         bucket_key = get_bucket_key(request.user, site, filename)
 
+        # remove previous objects with the same filepath
+        UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
+
+        # create a new object
         UploadedFile.objects.create(
             filename=filename,
             filepath=bucket_key,
@@ -71,7 +82,7 @@ class FileUploaded(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class FileNotUploaded(APIView):
+class DeleteFile(APIView):
     def post(self, request, format=None):
         site_id = request.data.get("site_id")
         filename = request.data.get("filename")
@@ -85,4 +96,6 @@ class FileNotUploaded(APIView):
         s3 = S3()
         s3.delete_file(bucket_key)
 
-        return Response(status=status.HTTP_200_OK)
+        UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

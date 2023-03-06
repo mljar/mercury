@@ -5,13 +5,13 @@ from apps.storage.views import (
     ListFiles,
     PresignedUrl,
     FileUploaded,
-    FileNotUploaded,
+    DeleteFile,
 )
 
 storage_urlpatterns = [
     re_path("api/v1/(?P<site_id>.+)/files", ListFiles.as_view()),
     re_path(
-        "api/v1/presigned-re_path/(?P<action>.+)/(?P<site_id>.+)/(?P<filename>.+)",
+        "api/v1/presigned-url/(?P<action>.+)/(?P<site_id>.+)/(?P<filename>.+)",
         PresignedUrl.as_view(),
     ),
     re_path(
@@ -19,7 +19,7 @@ storage_urlpatterns = [
         FileUploaded.as_view(),
     ),
     re_path(
-        "api/v1/file-not-uploaded",
-        FileNotUploaded.as_view(),
+        "api/v1/delete-file",
+        DeleteFile.as_view(),
     ),
 ]

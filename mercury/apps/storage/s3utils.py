@@ -26,7 +26,7 @@ class S3:
         try:
             method_parameters = {
                 "Bucket": settings.AWS_BUCKET_NAME,
-                "Key": "filename.txt",
+                "Key": bucket_key,
             }
             url = self.s3_client.generate_presigned_url(
                 ClientMethod=client_method,
