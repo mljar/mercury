@@ -153,15 +153,17 @@ class GetSiteView(APIView):
         if not sites:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        share = Site.PUBLIC if request.user.is_anonymous else Site.PRIVATE
-        sites = sites.filter(share=share)
+        if sites[0].share == Site.PUBLIC:
+            return Response(SiteSerializer(sites[0]).data)
 
-        if not request.user.is_anonymous:
-            sites = sites.filter(
-                # any Membership (VIEW or EDIT) or owner
-                Q(hosts__user=self.request.user)
-                | Q(created_by=self.request.user)
-            )
+        if request.user.is_anonymous:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        sites = sites.filter(
+            # any Membership (VIEW or EDIT) or owner
+            Q(hosts__user=self.request.user)
+            | Q(created_by=self.request.user)
+        )
 
         if not sites:
             return Response(status=status.HTTP_403_FORBIDDEN)
