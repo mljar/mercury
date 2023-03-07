@@ -5,6 +5,13 @@ from django.dispatch import receiver
 
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
+from enum import Enum
+
+class SiteState(str, Enum):
+    Created = "Created"
+    Initializing = "Initializing"
+    Ready = "Ready"
+    Error = "Error"
 
 class Site(models.Model):
     title = models.CharField(
@@ -26,6 +33,14 @@ class Site(models.Model):
     share = models.CharField(
         default=PUBLIC, max_length=32, choices=SHARE_CHOICES, blank=False, null=False
     )
+
+    # Created
+    # Initializing
+    # Ready
+    # Error
+    status = models.CharField(default="Created", max_length=32, blank=False, null=False)
+    info = models.TextField(blank=True, null=True)
+
     active = models.BooleanField(default=True, blank=False, null=False)
     created_at = AutoCreatedField()
     updated_at = AutoLastModifiedField()

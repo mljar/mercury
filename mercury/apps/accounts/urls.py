@@ -3,7 +3,13 @@ from django.urls import path, re_path
 from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.views import GetSiteView, InviteView, MembershipViewSet, SiteViewSet
+from apps.accounts.views import (
+    GetSiteView,
+    InviteView,
+    MembershipViewSet,
+    SiteViewSet,
+    InitializeSite,
+)
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
@@ -32,4 +38,5 @@ accounts_urlpatterns += [
     ),
     re_path("api/v1/(?P<site_id>.+)/invite/", InviteView.as_view()),
     re_path("api/v1/get-site/(?P<site_slug>.+)/", GetSiteView.as_view()),
+    re_path("api/v1/init-site/(?P<site_id>.+)/", InitializeSite.as_view()),
 ]

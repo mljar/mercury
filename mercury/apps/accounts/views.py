@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.models import Invitation, Membership, Site
 from apps.accounts.serializers import MembershipSerializer, SiteSerializer
-from apps.accounts.tasks import task_send_invitation
+from apps.accounts.tasks import task_init_site, task_send_invitation
 
 
 def some_random_slug():
@@ -85,6 +85,7 @@ class SiteViewSet(viewsets.ModelViewSet):
 
 class HasEditRights(permissions.BasePermission):
     def has_permission(self, request, view):
+        print("has rights?")
         site_id = view.kwargs.get("site_id")
         if site_id is None:  # just in case
             return False
@@ -96,6 +97,7 @@ class HasEditRights(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
+        print("has object rights?")
         return (
             Membership.objects.filter(
                 host=obj.host, user=request.user, rights=Membership.EDIT
@@ -169,3 +171,16 @@ class GetSiteView(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         return Response(SiteSerializer(sites[0]).data)
+
+
+class InitializeSite(APIView):
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
+
+    def post(self, request, site_id, format=None):
+        try:
+            with transaction.atomic():
+                job_params = {"site_id": site_id}
+                transaction.on_commit(lambda: task_init_site.delay(job_params))
+                return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            raise APIException(str(e))
