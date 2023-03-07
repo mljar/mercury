@@ -68,7 +68,15 @@ export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
     dispatch(setSite({} as Site));
     dispatch(setSiteStatus(SiteStatus.Unknown));
 
-    const siteSlug = "single-site";
+    let siteSlug = "single-site";
+    if(process.env.REACT_APP_SERVER_URL) {
+      //siteSlug = window.location.origin;
+      console.log("site ---")
+      console.log( window.location.host)
+      siteSlug = window.location.host.split('.')[0]
+      console.log(siteSlug)
+    }
+
     const url = `/api/v1/get-site/${siteSlug}/`;
     const { data } = await axios.get(url);
 

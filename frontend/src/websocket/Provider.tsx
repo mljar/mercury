@@ -31,14 +31,19 @@ export { WebSocketContext };
 
 let wsServer = "ws://127.0.0.1:8000";
 let localServer = true;
-if (window.location.origin === "http://localhost:3000") {
-  wsServer = "ws://127.0.0.1:8000";
-  localServer = true;
-} else {
-  wsServer = window.location.origin
-    .replace("http://", "ws://")
-    .replace("https://", "wss://");
+if (process.env.REACT_APP_SERVER_WS) {
+  wsServer = process.env.REACT_APP_SERVER_WS;
   localServer = false;
+} else {
+  if (window.location.origin === "http://localhost:3000") {
+    wsServer = "ws://127.0.0.1:8000";
+    localServer = true;
+  } else {
+    wsServer = window.location.origin
+      .replace("http://", "ws://")
+      .replace("https://", "wss://");
+    localServer = false;
+  }
 }
 
 export default function WebSocketProvider({

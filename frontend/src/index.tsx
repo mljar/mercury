@@ -16,20 +16,26 @@ import "./index.css";
 
 const store = configuredStore();
 
-if (window.location.origin === "http://localhost:3000") {
-  axios.defaults.baseURL = "http://127.0.0.1:8000";
+console.log("settings " + process.env.REACT_APP_SERVER_URL);
+if (process.env.REACT_APP_SERVER_URL) {
+  axios.defaults.baseURL = process.env.REACT_APP_SERVER_URL;
 } else {
-  axios.defaults.baseURL = window.location.origin;
-}
-if (window.location.origin.startsWith("https://hf.space")) {
-  axios.defaults.baseURL = window.location.href;
+  if (window.location.origin === "http://localhost:3000") {
+    axios.defaults.baseURL = "http://127.0.0.1:8000";
+  } else {
+    axios.defaults.baseURL = window.location.origin;
+  }
+  if (window.location.origin.startsWith("https://hf.space")) {
+    axios.defaults.baseURL = window.location.href;
+  }
+
+  // in the case of some special params in the url
+  axios.defaults.baseURL = axios.defaults.baseURL.split("+")[0];
+  axios.defaults.baseURL = axios.defaults.baseURL.split("?")[0];
+  axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
 }
 
-// in the case of some special params in the url
-axios.defaults.baseURL = axios.defaults.baseURL.split("+")[0];
-axios.defaults.baseURL = axios.defaults.baseURL.split("?")[0];
-axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
-
+console.log("set " + axios.defaults.baseURL)
 
 document.addEventListener("DOMContentLoaded", () =>
   render(

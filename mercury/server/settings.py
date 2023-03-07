@@ -128,7 +128,14 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+# CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://single-site.localhost:3000", 
+#                 "http://127.0.0.1:3000"]
+
+# CORS_ALLOWED_ORIGIN_REGEXES = [
+#     r"^http://\w+\.localhost:3000$",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = ["django.middleware.security.SecurityMiddleware"]
 if SERVE_STATIC:
