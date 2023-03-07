@@ -6,35 +6,53 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notebook',
+            name="Notebook",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('file_updated_at', models.DateTimeField(blank=True)),
-                ('title', models.CharField(max_length=512)),
-                ('slug', models.CharField(blank=True, max_length=512)),
-                ('path', models.CharField(max_length=1024)),
-                ('share', models.TextField(blank=True)),
-                ('params', models.TextField(blank=True)),
-                ('state', models.CharField(blank=True, max_length=128)),
-                ('default_view_path', models.CharField(blank=True, max_length=1024)),
-                ('output', models.CharField(blank=True, max_length=128)),
-                ('format', models.CharField(blank=True, max_length=1024)),
-                ('schedule', models.CharField(blank=True, max_length=128)),
-                ('notify', models.TextField(blank=True)),
-                ('errors', models.TextField(blank=True)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('hosted_on', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.site')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("file_updated_at", models.DateTimeField(blank=True)),
+                ("title", models.CharField(max_length=512)),
+                ("slug", models.CharField(blank=True, max_length=512)),
+                ("path", models.CharField(max_length=1024)),
+                ("share", models.TextField(blank=True)),
+                ("params", models.TextField(blank=True)),
+                ("state", models.CharField(blank=True, max_length=128)),
+                ("default_view_path", models.CharField(blank=True, max_length=1024)),
+                ("output", models.CharField(blank=True, max_length=128)),
+                ("format", models.CharField(blank=True, max_length=1024)),
+                ("schedule", models.CharField(blank=True, max_length=128)),
+                ("notify", models.TextField(blank=True)),
+                ("errors", models.TextField(blank=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "hosted_on",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="accounts.site"
+                    ),
+                ),
             ],
         ),
     ]

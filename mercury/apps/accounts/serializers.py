@@ -31,7 +31,7 @@ class SiteSerializer(serializers.ModelSerializer):
             "share",
             "active",
             "status",
-            "info"
+            "info",
         )
 
 

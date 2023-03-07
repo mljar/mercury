@@ -26,6 +26,7 @@ from apps.notebooks.slides_themes import SlidesThemes
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
+from apps.storage.s3utils import S3
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +104,11 @@ def make_unique(slug):
 
 
 def task_init_notebook(
-    notebook_path, render_html=True, is_watch_mode=False, notebook_id=None
+    notebook_path,
+    render_html=True,
+    is_watch_mode=False,
+    notebook_id=None,
+    bucket_key=None,
 ):
     try:
         params = {
@@ -238,6 +243,13 @@ def task_init_notebook(
             else:
                 site = Site.objects.get(slug="single-site")
 
+            if bucket_key is not None:
+                s3 = S3()
+                s3.upload_file(
+                    os.path.join(settings.MEDIA_URL, f"{notebook_output_file}.html"),
+                    bucket_key,
+                )
+
             notebook = Notebook(
                 title=notebook_title,
                 slug=notebook_slug,
@@ -245,9 +257,9 @@ def task_init_notebook(
                 state="WATCH_READY" if is_watch_mode else "READY",
                 share=notebook_share,
                 params=json.dumps(params),
-                default_view_path=os.path.join(
-                    settings.MEDIA_URL, f"{notebook_output_file}.html"
-                ),
+                default_view_path=bucket_key
+                if bucket_key is not None
+                else os.path.join(settings.MEDIA_URL, f"{notebook_output_file}.html"),
                 file_updated_at=make_aware(
                     datetime.fromtimestamp(os.path.getmtime(notebook_path))
                 ),

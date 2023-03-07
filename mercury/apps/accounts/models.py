@@ -7,11 +7,13 @@ from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 
 from enum import Enum
 
+
 class SiteState(str, Enum):
     Created = "Created"
     Initializing = "Initializing"
     Ready = "Ready"
     Error = "Error"
+
 
 class Site(models.Model):
     title = models.CharField(

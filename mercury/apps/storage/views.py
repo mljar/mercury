@@ -10,8 +10,11 @@ from apps.storage.models import UploadedFile
 from apps.storage.serializers import UploadedFileSerializer
 
 
-def get_bucket_key(user, site, filename):
-    return f"user-{user.id}/site-{site.id}/{filename}"
+def get_bucket_key(site, user, filename):
+    return f"site-{site.id}/user-{user.id}/{filename}"
+
+def get_site_bucket_key(site, filename):
+    return f"site-{site.id}/files/{filename}"
 
 
 def get_site(user, site_id):
@@ -34,7 +37,7 @@ class ListFiles(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         files = UploadedFile.objects.filter(hosted_on=site)
-        
+
         return Response(UploadedFileSerializer(files, many=True).data)
 
 
@@ -48,7 +51,7 @@ class PresignedUrl(APIView):
 
         s3 = S3()
         url = s3.get_presigned_url(
-            get_bucket_key(request.user, site, filename), client_action
+            get_bucket_key(site, request.user, filename), client_action
         )
         return Response({"url": url})
 
@@ -64,7 +67,7 @@ class FileUploaded(APIView):
         if site is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        bucket_key = get_bucket_key(request.user, site, filename)
+        bucket_key = get_bucket_key(site, request.user, filename)
 
         # remove previous objects with the same filepath
         UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
@@ -91,7 +94,7 @@ class DeleteFile(APIView):
         if site is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        bucket_key = get_bucket_key(request.user, site, filename)
+        bucket_key = get_bucket_key(site, request.user, filename)
 
         s3 = S3()
         s3.delete_file(bucket_key)
