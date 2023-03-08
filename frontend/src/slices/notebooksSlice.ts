@@ -78,6 +78,7 @@ const initialState = {
   watchModeCounter: 0,
   slidesHash: "",
   widgets: {} as Record<string, WidgetValueType>,
+  nbIframes: {} as Record<string, string>, // slug -> signed URL
 };
 
 const notebooksSlice = createSlice({
@@ -272,6 +273,9 @@ const notebooksSlice = createSlice({
     updateShowCode(state, action: PayloadAction<boolean>) {
       state.selectedNotebook.params["show-code"] = action.payload;
     },
+    setNbIframes(state, action: PayloadAction<Record<string, string>>) {
+      state.nbIframes = action.payload;
+    }
   },
 });
 
@@ -290,6 +294,7 @@ export const {
   initWidgets,
   updateTitle,
   updateShowCode,
+  setNbIframes
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;
@@ -313,6 +318,19 @@ export const getWatchModeCounter = (state: RootState) =>
 export const getSlidesHash = (state: RootState) => state.notebooks.slidesHash;
 
 export const getWidgetsValues = (state: RootState) => state.notebooks.widgets;
+export const getNbIframes = (state: RootState) => state.notebooks.nbIframes;
+
+
+export const fetchNbIframes = (siteId: number) => async (dispatch: Dispatch<AnyAction>) => {
+  try {
+    const url = `/api/v1/${siteId}/nb-iframes/`;
+    const { data } = await axios.get(url);
+    dispatch(setNbIframes(data));
+  } catch (error) {
+    console.error(`Problem during loading notebooks iframes. ${error}`);
+  }
+};
+
 
 export const fetchNotebooks = (siteId: number) => async (dispatch: Dispatch<AnyAction>) => {
   try {

@@ -109,6 +109,8 @@ def task_init_notebook(
     is_watch_mode=False,
     notebook_id=None,
     bucket_key=None,
+    site=None,
+    user=None
 ):
     try:
         params = {
@@ -220,34 +222,38 @@ def task_init_notebook(
         parse_errors = validate_notify(notebook_notify)
 
         if notebook_id is None:
-            site, user = None, None
+            
 
-            if not User.objects.filter(username="developer"):
-                user = User.objects.create_user(
-                    username="developer",
-                    email="developer@example.com",
-                    password="developer",
-                )
-                EmailAddress.objects.create(
-                    user=user, email=user.email, verified=True, primary=True
-                )
-            else:
-                user = User.objects.get(username="developer")
-            if not Site.objects.filter(slug="single-site"):
-                site = Site.objects.create(
-                    title="Mercury",
-                    slug="single-site",
-                    share=Site.PUBLIC,
-                    created_by=user,
-                )
-            else:
-                site = Site.objects.get(slug="single-site")
+            if user is None:
+                if not User.objects.filter(username="developer"):
+                    user = User.objects.create_user(
+                        username="developer",
+                        email="developer@example.com",
+                        password="developer",
+                    )
+                    EmailAddress.objects.create(
+                        user=user, email=user.email, verified=True, primary=True
+                    )
+                else:
+                    user = User.objects.get(username="developer")
+            if site is None:
+                if not Site.objects.filter(slug="single-site"):
+                    site = Site.objects.create(
+                        title="Mercury",
+                        slug="single-site",
+                        share=Site.PUBLIC,
+                        created_by=user,
+                    )
+                else:
+                    site = Site.objects.get(slug="single-site")
 
+            bucket_key_fname = ""
             if bucket_key is not None:
                 s3 = S3()
+                bucket_key_fname = bucket_key.replace("<replace>", f"{notebook_output_file}.html")
                 s3.upload_file(
-                    os.path.join(settings.MEDIA_URL, f"{notebook_output_file}.html"),
-                    bucket_key,
+                    os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
+                    bucket_key_fname,
                 )
 
             notebook = Notebook(
@@ -257,7 +263,7 @@ def task_init_notebook(
                 state="WATCH_READY" if is_watch_mode else "READY",
                 share=notebook_share,
                 params=json.dumps(params),
-                default_view_path=bucket_key
+                default_view_path=bucket_key_fname
                 if bucket_key is not None
                 else os.path.join(settings.MEDIA_URL, f"{notebook_output_file}.html"),
                 file_updated_at=make_aware(

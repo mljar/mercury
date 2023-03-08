@@ -4,6 +4,7 @@ from apps.notebooks.views import (
     ListNotebooks,
     RetrieveNotebook,
     RetrieveNotebookWithSlug,
+    GetNbIframes,
 )
 
 notebooks_urlpatterns = [
@@ -16,4 +17,5 @@ notebooks_urlpatterns = [
         RetrieveNotebookWithSlug.as_view(),
     ),
     url("api/v1/(?P<site_id>.+)/notebooks", ListNotebooks.as_view()),
+    url("api/v1/(?P<site_id>.+)/nb-iframes", GetNbIframes.as_view()),
 ]

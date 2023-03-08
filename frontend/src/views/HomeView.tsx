@@ -6,8 +6,10 @@ import axios from "axios";
 import HomeNavBar from "../components/HomeNavBar";
 import Footer from "../components/Footer";
 import {
+  // fetchNbIframes,
   fetchNotebooks,
   getLoadingState,
+  // getNbIframes,
   getNotebooks,
 } from "../slices/notebooksSlice";
 import { fetchWelcome, getWelcome } from "../slices/versionSlice";
@@ -30,11 +32,13 @@ export default function HomeView() {
   const [showButton, setShowButton] = useState("");
   const siteId = useSelector(getSiteId);
   const isSitePublic = useSelector(isPublic);
+  //const nbIframes = useSelector(getNbIframes);
 
   useEffect(() => {
     if (siteId !== undefined) {
       dispatch(fetchNotebooks(siteId));
       dispatch(fetchWelcome(siteId));
+      // dispatch(fetchNbIframes(siteId));
     }
 
     // fetchNotebooks depends on token
