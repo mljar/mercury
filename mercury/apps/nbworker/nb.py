@@ -264,6 +264,8 @@ class NBWorker(WSClient):
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
 
+        StorageManager.provision_uploaded_files(self.notebook)
+
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""

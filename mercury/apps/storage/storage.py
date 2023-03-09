@@ -7,6 +7,8 @@ from django.conf import settings
 from execnb.nbio import write_nb
 
 from apps.tasks.export_pdf import to_pdf
+from apps.storage.models import UploadedFile
+from apps.storage.s3utils import S3
 
 log = logging.getLogger(__name__)
 
@@ -15,6 +17,18 @@ class StorageManager:
     def __init__(self, session_id, worker_id):
         self.session_id = session_id
         self.worker_id = worker_id
+
+
+    @staticmethod
+    def provision_uploaded_files(notebook):
+        log.debug(f"Provision uploaded files for {notebook.title} (id=notebook.id)")
+        files = UploadedFile.objects.filter(hosted_on=notebook.hosted_on)
+        s3 = S3()
+        for f in files:
+            if not os.path.exists(f.filename):
+                log.debug(f"S3 download {f.filename}")
+                s3.download_file(f.filepath, f.filename)
+
 
     @staticmethod
     def create_dir(dir_path):
