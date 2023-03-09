@@ -16,10 +16,10 @@ from apps.ws.middleware import TokenAuthMiddleware
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
-        "websocket": AllowedHostsOriginValidator(
+        "websocket": #AllowedHostsOriginValidator(
             TokenAuthMiddleware(
                 AuthMiddlewareStack(URLRouter(apps.ws.routing.websocket_urlpatterns))
             )
-        ),
+        #),
     }
 )

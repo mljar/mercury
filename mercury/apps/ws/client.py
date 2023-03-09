@@ -20,6 +20,9 @@ log = logging.getLogger(__name__)
 
 class ClientProxy(WebsocketConsumer):
     def connect(self):
+        
+        log.debug("Trying to connect client")
+
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
 
