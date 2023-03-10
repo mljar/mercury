@@ -34,7 +34,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-from apps.nbworker.db import DBClient
+from apps.nbworker.rest import RESTClient
 from apps.nbworker.nb import NBWorker
 from apps.nbworker.utils import stop_event
 
@@ -52,7 +52,7 @@ def signal_handler(signal, frame):
     global stop_event
     log.debug("\nBye bye!")
     stop_event.set()
-    DBClient.delete_worker_in_db(worker_id)
+    RESTClient.delete_worker_in_db(session_id, worker_id, notebook_id)
     sys.exit(1)
 
 

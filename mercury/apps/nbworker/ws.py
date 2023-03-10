@@ -5,14 +5,14 @@ from queue import Queue
 
 import websocket
 
-from apps.nbworker.db import DBClient
+from apps.nbworker.rest import RESTClient
 from apps.nbworker.utils import Purpose, stop_event
 from apps.workers.models import WorkerState
 
 log = logging.getLogger(__name__)
 
 
-class WSClient(DBClient):
+class WSClient(RESTClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
         super(WSClient, self).__init__(notebook_id, session_id, worker_id)
 

@@ -15,15 +15,15 @@ from apps.ws.utils import machine_uuid
 log = logging.getLogger(__name__)
 
 
-class DBClient:
+class RESTClient:
     def __init__(self, notebook_id, session_id, worker_id):
         self.server_url = os.environ.get("MERCURY_SERVER_URL", "http://127.0.0.1:8000")
         self.notebook_id = notebook_id
         self.session_id = session_id
         self.worker_id = worker_id
-        self.worker = None  # db object
+        self.worker = None  # SimpleNamespace object
         self.state = WorkerState.Unknown
-        self.notebook = None
+        self.notebook = None # SimpleNamespace object
         self.load_notebook()
 
     def load_notebook(self):
@@ -82,34 +82,48 @@ class DBClient:
             log.debug(
                 f"Worker id={self.worker_id} set state {new_state} uuid {machine_uuid()}"
             )
-            self.state = new_state
-            if self.worker_exists() and self.worker is not None:
-                self.worker.state = new_state
-                # set worker machine id
-                # to control number of workers
-                # in the single machine
-                self.worker.machine_id = machine_uuid()
-                self.worker.save()
+            # set worker machine id
+            # to control number of workers
+            # in the single machine
+            response = requests.post(
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/set-worker-state",
+                {"state": new_state, "machine_id": machine_uuid()},
+            )
+            if response.status_code != 200:
+                raise Exception(f"Problem when set worker state {response}")
+            self.worker = SimpleNamespace(**response.json())
         except Exception:
             log.exception("Exception when set worker state")
 
     @staticmethod
-    def delete_worker_in_db(worker_id):
+    def delete_worker_in_db(session_id, worker_id, notebook_id):
         try:
             log.debug(f"Delete worker id={worker_id}")
-            Worker.objects.get(pk=worker_id).delete()
+            server_url = os.environ.get("MERCURY_SERVER_URL", "http://127.0.0.1:8000")
+        
+            response = requests.post(
+                f"{server_url}/api/v1/worker/{session_id}/{worker_id}/{notebook_id}/delete-worker",
+            )
+            if response.status_code != 204:
+                raise Exception(f"Problem when delete worker {response}")
+
         except Exception:
             pass
             # log.exception(f"Exception when delete worker")
 
     def delete_worker(self):
-        DBClient.delete_worker_in_db(self.worker_id)
+        RESTClient.delete_worker_in_db(self.session_id, self.worker_id, self.notebook_id)
 
     def worker_exists(self):
         try:
             log.debug(f"Worker id={self.worker_id} exists")
-            self.worker = Worker.objects.get(pk=self.worker_id)
-        except Worker.DoesNotExist as e:
+            
+            response = requests.get(
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker",
+            )
+            self.worker = SimpleNamespace(**response.json())
+        
+        except Exception as e:
             # log.exception(f"Worker id={self.worker_id} does not exists, quit")
             sys.exit(1)
         return True
@@ -117,7 +131,8 @@ class DBClient:
     def is_worker_stale(self):
         try:
             log.debug(f"Check worker id={self.worker_id} is stale")
-            self.worker = Worker.objects.get(pk=self.worker_id)
+
+            self.worker_exists()
             return self.worker.updated_at < timezone.now() - timedelta(
                 minutes=settings.WORKER_STALE_TIME
             )

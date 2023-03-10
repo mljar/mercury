@@ -44,6 +44,8 @@ class SetWorkerState(APIView):
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
             worker.state = request.data.get("state", WorkerState.Unknown)
+            if request.data.get("machine_id") is not None:
+                worker.machine_id = request.data.get("machine_id")
             worker.save()
             return Response(WorkerSerializer(worker).data)
         except Exception:
