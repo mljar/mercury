@@ -73,5 +73,3 @@ class RESTClientTestCase(LiveServerTestCase):
         client.set_worker_state(new_state=WorkerState.Busy)
         worker = Worker.objects.get(pk=worker.id)
         self.assertTrue(worker.state, WorkerState.Busy)
-
-

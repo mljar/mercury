@@ -292,41 +292,45 @@ class NBWorker(WSClient):
         parse_params(nb2dict(self.nb_original), params)
 
         # update database ...
-        log.debug(f"Executed params {json.dumps(params, indent=4)}")
 
-        update_database = False
-        if params.get("title", "") != "" and self.notebook.title != params.get(
-            "title", ""
-        ):
-            self.notebook.title = params.get("title", "")
-            update_database = True
+        log.debug(f"Executed params {json.dumps(params, indent=4)}")
+        update_database = self.update_notebook(params)
+
+        # update_database = False
+        # if params.get("title", "") != "" and self.notebook.title != params.get(
+        #     "title", ""
+        # ):
+        #     self.notebook.title = params.get("title", "")
+        #     update_database = True
+
+        # nb_params = json.loads(self.notebook.params)
+        # for property in [
+        #     "show-code",
+        #     "show-prompt",
+        #     "continuous_update",
+        #     "static_notebook",
+        #     "description",
+        #     "show_sidebar",
+        #     "full_screen",
+        #     "allow_download",
+        # ]:
+        #     if params.get(property) is not None and nb_params.get(
+        #         property
+        #     ) != params.get(property):
+        #         nb_params[property] = params.get(property)
+        #         update_database = True
+        # # save widgets params
+        # if json.dumps(nb_params.get("params", {})) != json.dumps(
+        #     params.get("params", {})
+        # ):
+        #     nb_params["params"] = params["params"]
+        #     update_database = True
+
+        # if update_database:
+        #     self.notebook.params = json.dumps(nb_params)
+        #     self.notebook.save()
 
         nb_params = json.loads(self.notebook.params)
-        for property in [
-            "show-code",
-            "show-prompt",
-            "continuous_update",
-            "static_notebook",
-            "description",
-            "show_sidebar",
-            "full_screen",
-            "allow_download",
-        ]:
-            if params.get(property) is not None and nb_params.get(
-                property
-            ) != params.get(property):
-                nb_params[property] = params.get(property)
-                update_database = True
-        # save widgets params
-        if json.dumps(nb_params.get("params", {})) != json.dumps(
-            params.get("params", {})
-        ):
-            nb_params["params"] = params["params"]
-            update_database = True
-
-        if update_database:
-            self.notebook.params = json.dumps(nb_params)
-            self.notebook.save()
 
         self.nbrun.set_show_code_and_prompt(
             nb_params.get("show-code", False), nb_params.get("show-prompt", True)

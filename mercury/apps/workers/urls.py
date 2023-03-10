@@ -1,6 +1,13 @@
 from django.conf.urls import url
 
-from apps.workers.views import WorkerGetNb, GetWorker, SetWorkerState, DeleteWorker
+from apps.workers.views import (
+    WorkerGetNb,
+    WorkerUpdateNb,
+    GetWorker,
+    IsWorkerStale,
+    SetWorkerState,
+    DeleteWorker,
+)
 
 workers_urlpatterns = [
     url(
@@ -8,8 +15,16 @@ workers_urlpatterns = [
         WorkerGetNb.as_view(),
     ),
     url(
+        "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/update-nb",
+        WorkerUpdateNb.as_view(),
+    ),
+    url(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/worker",
         GetWorker.as_view(),
+    ),
+    url(
+        "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/is-worker-stale",
+        IsWorkerStale.as_view(),
     ),
     url(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/set-worker-state",
