@@ -53,7 +53,7 @@ class RESTClient(LiveServerTestCase):
             wrong_nb_id = 2
             client = DBClient(wrong_nb_id, session_id, worker.id)
             client.load_notebook()
-        
+
         with self.assertRaises(SystemExit):
             wrong_session = "some-wrong-session"
             client = DBClient(wrong_nb_id, wrong_session, worker.id)

@@ -87,4 +87,3 @@ class GetNbIframes(APIView):
             urls[n.slug] = url
 
         return Response(urls)
-

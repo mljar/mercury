@@ -25,11 +25,13 @@ class DBClient:
         self.state = WorkerState.Unknown
         self.notebook = None
         self.load_notebook()
-        
+
     def load_notebook(self):
         try:
             log.debug(f"Load notebook id={self.notebook_id}")
-            response = requests.get(f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb")
+            response = requests.get(
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb"
+            )
             if response.status_code != 200:
                 raise Exception("Cant load notebook")
             self.notebook = SimpleNamespace(**response.json())

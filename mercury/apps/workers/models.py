@@ -3,6 +3,7 @@ from django.db import models
 from enum import Enum
 from apps.notebooks.models import Notebook
 
+
 class WorkerState(str, Enum):
     Busy = "Busy"
     Running = "Running"

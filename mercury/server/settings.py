@@ -50,7 +50,14 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 SERVE_STATIC = os.environ.get("SERVE_STATIC", "False") == "True"
 
-ALLOWED_HOSTS = ["api.docker", "server", "127.0.0.1", "0.0.0.0", "localhost", "mercury.mljar.com"]
+ALLOWED_HOSTS = [
+    "api.docker",
+    "server",
+    "127.0.0.1",
+    "0.0.0.0",
+    "localhost",
+    "mercury.mljar.com",
+]
 
 if os.environ.get("ALLOWED_HOSTS") is not None:
     try:
@@ -100,9 +107,7 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-REST_AUTH = {
-    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer"
-}
+REST_AUTH = {"USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer"}
 
 
 SITE_ID = 1
@@ -111,15 +116,15 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_VERIFICATION = "none" # "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "none"  # "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = False
-OLD_PASSWORD_FIELD_ENABLED = True # use old password when password change in the app
+OLD_PASSWORD_FIELD_ENABLED = True  # use old password when password change in the app
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 if os.environ.get("EMAIL_BACKEND", "console") != "console":
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = os.environ.get("EMAIL_HOST")  
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
@@ -127,9 +132,7 @@ EMAIL_USE_TLS = True  # use TLS by default
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
 
-
-
-# CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://single-site.localhost:3000", 
+# CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://single-site.localhost:3000",
 #                 "http://127.0.0.1:3000"]
 
 # CORS_ALLOWED_ORIGIN_REGEXES = [
@@ -259,8 +262,6 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-
-
 ASGI_APPLICATION = "server.asgi.application"
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
@@ -326,7 +327,7 @@ if EMAIL_HOST_USER is not None:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # you need to install django-ses
-#EMAIL_BACKEND = 'django_ses.SESBackend'
-#AWS_SES_REGION_NAME = AWS_REGION_NAME
-#AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
-#DEFAULT_FROM_EMAIL = '"Mercury" <contact@runmercury.com>'
+# EMAIL_BACKEND = 'django_ses.SESBackend'
+# AWS_SES_REGION_NAME = AWS_REGION_NAME
+# AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
+# DEFAULT_FROM_EMAIL = '"Mercury" <contact@runmercury.com>'

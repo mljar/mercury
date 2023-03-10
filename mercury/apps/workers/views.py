@@ -11,6 +11,7 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.workers.models import Worker, WorkerState
 
+
 class WorkerGetNb(APIView):
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         try:
@@ -35,18 +36,20 @@ class GetWorker(APIView):
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
 class SetWorkerState(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):
         try:
             worker = Worker.objects.get(
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
-            worker.state =request.data.get("state", WorkerState.Unknown)
+            worker.state = request.data.get("state", WorkerState.Unknown)
             worker.save()
             return Response(WorkerSerializer(worker).data)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class DeleteWorker(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):
@@ -59,4 +62,3 @@ class DeleteWorker(APIView):
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
-
