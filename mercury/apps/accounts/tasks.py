@@ -7,6 +7,7 @@ from apps.notebooks.tasks import task_init_notebook
 from apps.storage.views import get_site_bucket_key
 from apps.notebooks.models import Notebook
 
+
 @shared_task(bind=True)
 def task_init_site(self, job_params):
     site = Site.objects.get(pk=job_params["site_id"])

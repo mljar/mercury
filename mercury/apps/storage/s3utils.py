@@ -31,7 +31,7 @@ class S3:
             url = self.s3_client.generate_presigned_url(
                 ClientMethod=client_method,
                 Params=method_parameters,
-                ExpiresIn=expires_in
+                ExpiresIn=expires_in,
             )
             return url
         except Exception:
@@ -54,8 +54,10 @@ class S3:
         try:
             ExtraArgs = {}
             if file_name.endswith("html"):
-                ExtraArgs={'ContentType': "text/html"}
-            self.s3_client.upload_file(file_name, settings.AWS_BUCKET_NAME, bucket_key, ExtraArgs=ExtraArgs)
+                ExtraArgs = {"ContentType": "text/html"}
+            self.s3_client.upload_file(
+                file_name, settings.AWS_BUCKET_NAME, bucket_key, ExtraArgs=ExtraArgs
+            )
             return True
         except Exception:
             log.exception(f"Exception when uploading file {file_name}")

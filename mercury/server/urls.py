@@ -9,7 +9,7 @@ from apps.notebooks.urls import notebooks_urlpatterns
 from apps.tasks.urls import tasks_urlpatterns
 from apps.accounts.urls import accounts_urlpatterns
 from apps.storage.urls import storage_urlpatterns
-
+from apps.workers.urls import workers_urlpatterns
 from server.views import VersionInfo, WelcomeMessage
 
 urlpatterns = []
@@ -46,5 +46,6 @@ urlpatterns += tasks_urlpatterns
 urlpatterns += notebooks_urlpatterns
 urlpatterns += accounts_urlpatterns
 urlpatterns += storage_urlpatterns
+urlpatterns += workers_urlpatterns
 
 admin.site.site_header = "Mercury Admin Panel"

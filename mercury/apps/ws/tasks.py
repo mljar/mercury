@@ -6,7 +6,7 @@ import sys
 from celery import shared_task
 from django.conf import settings
 
-from apps.ws.models import Worker
+from apps.workers.models import Worker
 from apps.ws.utils import machine_uuid
 
 log = logging.getLogger(__name__)

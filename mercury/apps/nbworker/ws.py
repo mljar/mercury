@@ -6,7 +6,8 @@ from queue import Queue
 import websocket
 
 from apps.nbworker.db import DBClient
-from apps.nbworker.utils import Purpose, WorkerState, stop_event
+from apps.nbworker.utils import Purpose, stop_event
+from apps.workers.models import WorkerState
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,6 @@ class WSClient(DBClient):
         if self.worker_exists():
             self.set_worker_state(WorkerState.Running)
             self.send_state()
-        self.delete_stale_workers()
 
     def on_close(self, ws, close_status_code, close_msg):
         global stop_event

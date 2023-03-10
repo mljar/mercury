@@ -4,11 +4,6 @@ from enum import Enum
 stop_event = threading.Event()
 
 
-class WorkerState(str, Enum):
-    Busy = "Busy"
-    Running = "Running"
-    Unknown = "Unknown"
-
 
 class Purpose(str, Enum):
     WorkerPing = "worker-ping"

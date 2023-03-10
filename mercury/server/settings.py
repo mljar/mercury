@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     "apps.ws",
     "apps.storage",
     "apps.accounts",
+    "apps.workers",
 ]
 
 

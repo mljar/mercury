@@ -1,14 +1,15 @@
+import os
 import json
 import logging
 import sys
+import requests
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.conf import settings
 from django.utils import timezone
 
-from apps.nbworker.utils import WorkerState
-from apps.notebooks.models import Notebook
-from apps.ws.models import Worker
+from apps.workers.models import Worker, WorkerState
 from apps.ws.utils import machine_uuid
 
 log = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ log = logging.getLogger(__name__)
 
 class DBClient:
     def __init__(self, notebook_id, session_id, worker_id):
+        self.server_url = os.environ.get("MERCURY_SERVER_URL", "http://127.0.0.1:8000")
         self.notebook_id = notebook_id
         self.session_id = session_id
         self.worker_id = worker_id
@@ -23,13 +25,16 @@ class DBClient:
         self.state = WorkerState.Unknown
         self.notebook = None
         self.load_notebook()
-
+        
     def load_notebook(self):
         try:
             log.debug(f"Load notebook id={self.notebook_id}")
-            self.notebook = Notebook.objects.get(pk=self.notebook_id)
+            response = requests.get(f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb")
+            if response.status_code != 200:
+                raise Exception("Cant load notebook")
+            self.notebook = SimpleNamespace(**response.json())
         except Exception:
-            log.exception("Expetion when notebook load, quit")
+            log.exception("Exception when notebook load, quit")
             sys.exit(0)
 
     def is_presentation(self):
@@ -97,25 +102,6 @@ class DBClient:
 
     def delete_worker(self):
         DBClient.delete_worker_in_db(self.worker_id)
-
-    def delete_stale_workers(self):
-        try:
-            log.debug(
-                (
-                    "Delete stale workers, "
-                    f"notebook_id={self.notebook_id}, "
-                    f"session_id={self.session_id}, "
-                    f"worker_id<{self.worker_id}"
-                )
-            )
-            workers = Worker.objects.filter(
-                session_id=self.session_id,
-                notebook__id=self.notebook_id,
-                pk__lt=self.worker_id,
-            )
-            workers.delete()
-        except Exception as e:
-            log.exception("Exception when delete stale workers")
 
     def worker_exists(self):
         try:

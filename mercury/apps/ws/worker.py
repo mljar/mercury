@@ -4,7 +4,7 @@ import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from apps.ws.models import Worker
+from apps.workers.models import Worker
 from apps.ws.utils import client_group, worker_group
 
 log = logging.getLogger(__name__)

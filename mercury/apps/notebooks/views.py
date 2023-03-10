@@ -13,6 +13,7 @@ from apps.notebooks.tasks import task_init_notebook, task_watch
 from apps.accounts.models import Site, Membership
 from apps.storage.s3utils import S3
 
+
 def in_commas(word):
     return "," + word + ","
 
@@ -75,7 +76,6 @@ class RetrieveNotebookWithSlug(APIView):
 
 class GetNbIframes(APIView):
     def get(self, request, site_id, format=None):
-        
         site = Site.objects.get(pk=site_id)
 
         notebooks = notebooks_queryset(request, site_id)
@@ -87,3 +87,4 @@ class GetNbIframes(APIView):
             urls[n.slug] = url
 
         return Response(urls)
+

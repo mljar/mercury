@@ -18,7 +18,6 @@ class StorageManager:
         self.session_id = session_id
         self.worker_id = worker_id
 
-
     @staticmethod
     def provision_uploaded_files(notebook):
         log.debug(f"Provision uploaded files for {notebook.title} (id=notebook.id)")
@@ -28,7 +27,6 @@ class StorageManager:
             if not os.path.exists(f.filename):
                 log.debug(f"S3 download {f.filename}")
                 s3.download_file(f.filepath, f.filename)
-
 
     @staticmethod
     def create_dir(dir_path):

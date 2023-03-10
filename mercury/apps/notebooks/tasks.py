@@ -110,7 +110,7 @@ def task_init_notebook(
     notebook_id=None,
     bucket_key=None,
     site=None,
-    user=None
+    user=None,
 ):
     try:
         params = {
@@ -222,8 +222,6 @@ def task_init_notebook(
         parse_errors = validate_notify(notebook_notify)
 
         if notebook_id is None:
-            
-
             if user is None:
                 if not User.objects.filter(username="developer"):
                     user = User.objects.create_user(
@@ -250,7 +248,9 @@ def task_init_notebook(
             bucket_key_fname = ""
             if bucket_key is not None:
                 s3 = S3()
-                bucket_key_fname = bucket_key.replace("<replace>", f"{notebook_output_file}.html")
+                bucket_key_fname = bucket_key.replace(
+                    "<replace>", f"{notebook_output_file}.html"
+                )
                 s3.upload_file(
                     os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html"),
                     bucket_key_fname,

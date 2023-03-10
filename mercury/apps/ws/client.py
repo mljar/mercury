@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from apps.accounts.models import Site, Membership
 from apps.notebooks.models import Notebook
-from apps.ws.models import Worker
+from apps.workers.models import Worker
 from apps.ws.tasks import task_start_websocket_worker
 from apps.ws.utils import client_group, worker_group
 
@@ -20,7 +20,6 @@ log = logging.getLogger(__name__)
 
 class ClientProxy(WebsocketConsumer):
     def connect(self):
-        
         log.debug("Trying to connect client")
 
         self.notebook_id = int(self.scope["url_route"]["kwargs"]["notebook_id"])
