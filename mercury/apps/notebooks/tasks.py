@@ -23,10 +23,10 @@ from apps.accounts.models import Site
 from apps.nb.exporter import Exporter
 from apps.notebooks.models import Notebook
 from apps.notebooks.slides_themes import SlidesThemes
+from apps.storage.s3utils import S3
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
-from apps.storage.s3utils import S3
 
 log = logging.getLogger(__name__)
 

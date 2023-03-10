@@ -1,19 +1,17 @@
 import os
+from datetime import datetime
 
-from django.test import LiveServerTestCase
-
-# python manage.py test apps.nbworker -v 2
-
-from apps.nbworker.rest import RESTClient
-
-from apps.accounts.models import Site
 from allauth.account.admin import EmailAddress
 from django.contrib.auth.models import User
+from django.test import LiveServerTestCase
+from django.utils.timezone import make_aware
+
+from apps.accounts.models import Site
+from apps.nbworker.rest import RESTClient
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker, WorkerState
 
-from datetime import datetime
-from django.utils.timezone import make_aware
+# python manage.py test apps.nbworker -v 2
 
 
 class RESTClientTestCase(LiveServerTestCase):

@@ -5,10 +5,10 @@ from rest_framework.routers import DefaultRouter
 
 from apps.accounts.views import (
     GetSiteView,
+    InitializeSite,
     InviteView,
     MembershipViewSet,
     SiteViewSet,
-    InitializeSite,
 )
 
 router = DefaultRouter()

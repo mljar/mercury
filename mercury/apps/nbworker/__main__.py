@@ -34,8 +34,8 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-from apps.nbworker.rest import RESTClient
 from apps.nbworker.nb import NBWorker
+from apps.nbworker.rest import RESTClient
 from apps.nbworker.utils import stop_event
 
 if len(sys.argv) != 5:

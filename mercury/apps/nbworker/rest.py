@@ -1,9 +1,10 @@
-import os
 import json
 import logging
+import os
 import sys
-import requests
 from types import SimpleNamespace
+
+import requests
 
 from apps.workers.models import Worker, WorkerState
 from apps.ws.utils import machine_uuid

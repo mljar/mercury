@@ -1,11 +1,11 @@
 from django.urls import re_path
 
 from apps.storage.views import (
+    DeleteFile,
     FileUploaded,
     ListFiles,
     PresignedUrl,
-    FileUploaded,
-    DeleteFile,
+    WorkerPresignedUrl,
 )
 
 storage_urlpatterns = [
@@ -21,5 +21,9 @@ storage_urlpatterns = [
     re_path(
         "api/v1/delete-file",
         DeleteFile.as_view(),
+    ),
+    re_path(
+        "api/v1/worker/presigned-url/(?P<action>.+)/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/(?P<output_dir>.+)/(?P<filename>.+)",
+        WorkerPresignedUrl.as_view(),
     ),
 ]

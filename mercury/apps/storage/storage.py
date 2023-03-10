@@ -1,22 +1,30 @@
 import logging
 import os
 import shutil
+import sys
 import uuid
 
+import requests
 from django.conf import settings
 from execnb.nbio import write_nb
 
-from apps.tasks.export_pdf import to_pdf
+from apps.nbworker.utils import stop_event
 from apps.storage.models import UploadedFile
 from apps.storage.s3utils import S3
+from apps.tasks.export_pdf import to_pdf
 
 log = logging.getLogger(__name__)
 
 
 class StorageManager:
-    def __init__(self, session_id, worker_id):
+    def __init__(self, session_id, worker_id, notebook_id):
         self.session_id = session_id
         self.worker_id = worker_id
+        self.notebook_id = notebook_id
+        if settings.STORAGE not in [settings.STORAGE_MEDIA, settings.STORAGE_S3]:
+            log.error(f"{settings.STORAGE} not implemented")
+            stop_event.set()
+            sys.exit(1)
 
     @staticmethod
     def provision_uploaded_files(notebook):
@@ -62,15 +70,15 @@ class StorageManager:
             return output_dir
         raise Exception("Other methods for worker output directory are not implemented")
 
-    def delete_worker_output_dir(self):
-        if settings.STORAGE == settings.STORAGE_MEDIA:
-            output_dir = self.worker_output_dir(self.session_id, self.worker_id)
-            StorageManager.delete_dir(output_dir)
-            log.debug(f"Deleted worker output directory: {output_dir}")
-            return output_dir
-        raise Exception(
-            "Other methods to delete worker output directory are not implemented"
-        )
+    # def delete_worker_output_dir(self):
+    #     if settings.STORAGE == settings.STORAGE_MEDIA:
+    #         output_dir = self.worker_output_dir(self.session_id, self.worker_id)
+    #         StorageManager.delete_dir(output_dir)
+    #         log.debug(f"Deleted worker output directory: {output_dir}")
+    #         return output_dir
+    #     raise Exception(
+    #         "Other methods to delete worker output directory are not implemented"
+    #     )
 
     def list_worker_files_urls(self):
         files_urls = []
@@ -83,24 +91,35 @@ class StorageManager:
                     ]
         return files_urls
 
-    def save_nb(self, nb):
-        fpath = None
-        if settings.STORAGE == settings.STORAGE_MEDIA:
-            fpath = os.path.join(
-                self.worker_output_dir(), f"nb-{self.some_hash()}.ipynb"
-            )
-            write_nb(nb, fpath)
-        return fpath
+    # def save_nb(self, nb):
+    #     fpath = None
+    #     if settings.STORAGE == settings.STORAGE_MEDIA:
+    #         fpath = os.path.join(
+    #             self.worker_output_dir(), f"nb-{self.some_hash()}.ipynb"
+    #         )
+    #         write_nb(nb, fpath)
+    #     return fpath
 
     def save_nb_html(self, nb_html_body):
-        fpath, url = None, None
+        html_path, url = None, None
         if settings.STORAGE == settings.STORAGE_MEDIA:
             fname = f"download-notebook-{self.some_hash()}.html"
-            fpath = os.path.join(self.worker_output_dir(), fname)
-            with open(fpath, "w", encoding="utf-8", errors="ignore") as fout:
+            html_path = os.path.join(self.worker_output_dir(), fname)
+            with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(nb_html_body)
-            url = f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
-        return fpath, url
+            html_url = f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
+        elif settings.STORAGE == settings.STORAGE_S3:
+            # get upload link
+            # re_path(
+            #     "api/v1/presigned-url/(?P<action>.+)/(?P<site_id>.+)/(?P<filename>.+)",
+            #     PresignedUrl.as_view(),
+            # ),
+            response = requests.get()
+            # upload file
+
+            # get download link
+
+        return html_path, html_url
 
     def save_nb_pdf(self, nb_html_body, is_presentation):
         pdf_path, pdf_url = None, None

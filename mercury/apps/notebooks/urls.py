@@ -1,10 +1,10 @@
 from django.conf.urls import url
 
 from apps.notebooks.views import (
+    GetNbIframes,
     ListNotebooks,
     RetrieveNotebook,
     RetrieveNotebookWithSlug,
-    GetNbIframes,
 )
 
 notebooks_urlpatterns = [

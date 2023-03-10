@@ -9,7 +9,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
-from apps.accounts.models import Site, Membership
+from apps.accounts.models import Membership, Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 from apps.ws.tasks import task_start_websocket_worker

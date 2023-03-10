@@ -1,11 +1,11 @@
+from enum import Enum
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
-
-from enum import Enum
 
 
 class SiteState(str, Enum):

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.accounts.models import Site, Membership
+from apps.accounts.models import Membership, Site
 
 
 class SiteModelAdmin(admin.ModelAdmin):

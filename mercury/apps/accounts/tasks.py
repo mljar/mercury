@@ -1,11 +1,11 @@
 from celery import shared_task
 
 from apps.accounts.models import Site, SiteState
+from apps.notebooks.models import Notebook
+from apps.notebooks.tasks import task_init_notebook
 from apps.storage.models import UploadedFile
 from apps.storage.s3utils import S3
-from apps.notebooks.tasks import task_init_notebook
 from apps.storage.views import get_site_bucket_key
-from apps.notebooks.models import Notebook
 
 
 @shared_task(bind=True)

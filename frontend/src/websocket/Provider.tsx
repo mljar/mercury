@@ -94,10 +94,10 @@ export default function WebSocketProvider({
           dispatch(fetchNotebook(siteId, selectedNotebookId));
         }
         dispatch(setNotebookSrc(response.body));
-      } else if (response.purpose === "saved-notebook") {
-        if (selectedNotebookId !== undefined) {
-          dispatch(fetchExecutionHistory(selectedNotebookId, false));
-        }
+      // } else if (response.purpose === "saved-notebook") {
+      //   if (selectedNotebookId !== undefined) {
+      //     dispatch(fetchExecutionHistory(selectedNotebookId, false));
+      //   }
       } else if (response.purpose === "update-widgets") {
         dispatch(updateWidgetsParams(response));
       } else if (response.purpose === "hide-widgets") {

@@ -1,13 +1,19 @@
+import logging
+
+from django.db.models import Q
 from django.http import JsonResponse
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from django.db.models import Q
 
 from apps.accounts.models import Membership, Site
-from apps.storage.s3utils import S3
 from apps.storage.models import UploadedFile
+from apps.storage.s3utils import S3
 from apps.storage.serializers import UploadedFileSerializer
+from apps.workers.models import Worker
+
+
+log = logging.getLogger(__name__)
 
 
 def get_bucket_key(site, user, filename):
@@ -16,6 +22,10 @@ def get_bucket_key(site, user, filename):
 
 def get_site_bucket_key(site, filename):
     return f"site-{site.id}/files/{filename}"
+
+
+def get_worker_bucket_key(session_id, output_dir, filename):
+    return f"session-{session_id}/{output_dir}/{filename}"
 
 
 def get_site(user, site_id):
@@ -48,13 +58,49 @@ class PresignedUrl(APIView):
         if site is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        client_action = "put_object" if action == "put" else "get_object"
+        client_action = (
+            "put_object" if action in ["put", "put_object"] else "get_object"
+        )
 
         s3 = S3()
         url = s3.get_presigned_url(
             get_bucket_key(site, request.user, filename), client_action
         )
         return Response({"url": url})
+
+
+class WorkerPresignedUrl(APIView):
+    def get(
+        self,
+        request,
+        action,
+        session_id,
+        worker_id,
+        notebook_id,
+        output_dir,
+        filename,
+        format=None,
+    ):
+        try:
+            # check if such worker exists
+            Worker.objects.get(
+                pk=worker_id, session_id=session_id, notebook__id=notebook_id
+            )
+            client_action = (
+                "put_object" if action in ["put", "put_object"] else "get_object"
+            )
+
+            s3 = S3()
+            url = s3.get_presigned_url(
+                get_worker_bucket_key(session_id, output_dir, filename), client_action
+            )
+
+            return Response({"url": url})
+
+        except Exception as e:
+            log.exception("Cant create presigned url for worker")
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class FileUploaded(APIView):

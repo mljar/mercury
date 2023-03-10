@@ -1,19 +1,19 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.utils import timezone
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.workers.serializers import WorkerSerializer
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.workers.models import Worker, WorkerState
+from apps.workers.serializers import WorkerSerializer
 
 
 class WorkerGetNb(APIView):

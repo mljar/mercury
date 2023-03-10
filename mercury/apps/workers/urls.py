@@ -1,12 +1,12 @@
 from django.conf.urls import url
 
 from apps.workers.views import (
-    WorkerGetNb,
-    WorkerUpdateNb,
+    DeleteWorker,
     GetWorker,
     IsWorkerStale,
     SetWorkerState,
-    DeleteWorker,
+    WorkerGetNb,
+    WorkerUpdateNb,
 )
 
 workers_urlpatterns = [

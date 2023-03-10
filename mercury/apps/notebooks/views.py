@@ -6,11 +6,10 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import Membership
+from apps.accounts.models import Membership, Site
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.notebooks.tasks import task_init_notebook, task_watch
-from apps.accounts.models import Site, Membership
 from apps.storage.s3utils import S3
 
 

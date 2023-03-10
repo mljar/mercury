@@ -13,10 +13,10 @@ from execnb.nbio import nb2dict, read_nb
 
 from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, stop_event
-from apps.workers.models import WorkerState
 from apps.nbworker.ws import WSClient
 from apps.storage.storage import StorageManager
 from apps.tasks.models import Task
+from apps.workers.models import WorkerState
 from apps.ws.utils import parse_params
 from widgets.manager import WidgetsManager
 
@@ -32,6 +32,8 @@ class NBWorker(WSClient):
         self.prev_body = ""
         self.prev_update_time = None
         self.prev_md5 = None
+        self.sm = StorageManager(self.session_id, self.worker_id, self.notebook_id)
+
         # monitor notebook file updates if running locally
         if "127.0.0.1" in ws_address:
             threading.Thread(target=self.nb_file_watch, daemon=True).start()
@@ -80,8 +82,8 @@ class NBWorker(WSClient):
                 self.init_notebook()
             elif json_data.get("purpose", "") == Purpose.RunNotebook:
                 self.run_notebook(json_data)
-            elif json_data.get("purpose", "") == Purpose.SaveNotebook:
-                self.save_notebook()
+            # elif json_data.get("purpose", "") == Purpose.SaveNotebook:
+            #     self.save_notebook()
             elif json_data.get("purpose", "") == Purpose.DisplayNotebook:
                 self.display_notebook(json_data)
             elif json_data.get("purpose", "") == Purpose.ClearSession:
@@ -150,8 +152,7 @@ class NBWorker(WSClient):
                     f'WidgetsManager.update("{widget_key}", field="filepath", new_value="{value[1]}")\n'
                 )
             elif widget_type == "OutputDir":
-                sm = StorageManager(self.session_id, self.worker_id)
-                output_dir = sm.worker_output_dir()
+                output_dir = self.sm.worker_output_dir()
                 output_dir = output_dir.replace("\\", "\\\\")
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{output_dir}")'
 
@@ -255,8 +256,7 @@ class NBWorker(WSClient):
                 self.ws.send(json.dumps(msg))
 
     def initialize_outputdir(self):
-        sm = StorageManager(self.session_id, self.worker_id)
-        output_dir = sm.worker_output_dir()
+        output_dir = self.sm.worker_output_dir()
         output_dir = output_dir.replace("\\", "\\\\")
         self.nbrun.run_code(
             f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """
@@ -356,30 +356,30 @@ class NBWorker(WSClient):
         self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)
         self.update_worker_state(WorkerState.Running)
 
-    def save_notebook(self):
-        log.debug(f"Save notebook")
-        # save nb in HTML
-        if self.is_presentation():
-            nb_body = self.nbrun.export_html(self.nb, full_header=True)
-        else:
-            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+    # def save_notebook(self):
+    #     log.debug(f"Save notebook")
+    #     # save nb in HTML
+    #     if self.is_presentation():
+    #         nb_body = self.nbrun.export_html(self.nb, full_header=True)
+    #     else:
+    #         nb_body = self.nbrun.export_html(self.nb, full_header=True)
 
-        sm = StorageManager(self.session_id, self.worker_id)
-        nb_path = sm.save_nb_html(nb_body)
+    #     sm = StorageManager(self.session_id, self.worker_id)
+    #     nb_path = sm.save_nb_html(nb_body)
 
-        # create task with path to HTML file
-        task = Task.objects.create(
-            task_id=f"worker-{self.worker_id}",
-            session_id=self.session_id,
-            notebook_id=self.notebook_id,
-            state="DONE",
-            params=json.dumps(self.prev_widgets),
-            result=nb_path,
-        )
-        log.debug(f"Task ({task.id}) created")
+    #     # create task with path to HTML file
+    #     task = Task.objects.create(
+    #         task_id=f"worker-{self.worker_id}",
+    #         session_id=self.session_id,
+    #         notebook_id=self.notebook_id,
+    #         state="DONE",
+    #         params=json.dumps(self.prev_widgets),
+    #         result=nb_path,
+    #     )
+    #     log.debug(f"Task ({task.id}) created")
 
-        # send notice that nb saved
-        self.ws.send(json.dumps({"purpose": Purpose.SavedNotebook}))
+    #     # send notice that nb saved
+    #     self.ws.send(json.dumps({"purpose": Purpose.SavedNotebook}))
 
     def display_notebook(self, json_params):
         log.debug(f"Display notebook ({json_params})")
@@ -392,8 +392,7 @@ class NBWorker(WSClient):
         else:
             nb_body = self.nbrun.export_html(self.nb, full_header=True)
 
-        sm = StorageManager(self.session_id, self.worker_id)
-        _, nb_url = sm.save_nb_html(nb_body)
+        _, nb_url = self.sm.save_nb_html(nb_body)
 
         # send HTML url address
         self.ws.send(
@@ -412,8 +411,7 @@ class NBWorker(WSClient):
         nb_body = self.nbrun.export_html(self.nb, full_header=True)
 
         # export to PDF
-        sm = StorageManager(self.session_id, self.worker_id)
-        _, pdf_url = sm.save_nb_pdf(nb_body, self.is_presentation())
+        _, pdf_url = self.sm.save_nb_pdf(nb_body, self.is_presentation())
 
         # send PDF url
         self.ws.send(
