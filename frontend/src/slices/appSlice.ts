@@ -74,13 +74,13 @@ export const fetchOutputFiles =
     };
 
 export const fetchWorkerOutputFiles =
-  (workerId: number) =>
+  (workerId: number, notebookId: number) =>
     async (dispatch: Dispatch<AnyAction>) => {
       try {
         dispatch(setFilesState("loading"))
         dispatch(setFiles([]));
         const sessionId = getSessionId();
-        const url = `/api/v1/worker_output_files/${sessionId}/${workerId}/`;
+        const url = `/api/v1/worker-output-files/${sessionId}/${workerId}/${notebookId}/`;
         const { data } = await axios.get(url);
         dispatch(setFiles(data));
         dispatch(setFilesState("loaded"))

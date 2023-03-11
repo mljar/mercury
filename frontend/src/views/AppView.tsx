@@ -91,9 +91,10 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
     if (
       appView === "files" &&
       notebook?.params?.version === "2" &&
-      workerId !== undefined
+      workerId !== undefined &&
+      notebook.id !== undefined
     ) {
-      dispatch(fetchWorkerOutputFiles(workerId));
+      dispatch(fetchWorkerOutputFiles(workerId, notebook.id));
     }
   }, [dispatch, appView, notebook, workerId]);
 

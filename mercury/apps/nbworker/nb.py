@@ -114,11 +114,10 @@ class NBWorker(WSClient):
 
         self.update_nb(widgets)
 
-        if self.is_presentation():
-            body = self.nbrun.export_html(self.nb, full_header=True)
-        else:
-            body = self.nbrun.export_html(self.nb, full_header=False)
+        self.sm.sync_output_dir()
 
+        body = self.nbrun.export_html(self.nb, full_header=self.is_presentation())
+        
         # with open(f"test_{counter}.html", "w") as fout:
         #    fout.write(body)
 
@@ -286,6 +285,8 @@ class NBWorker(WSClient):
         self.nb_original = read_nb(self.notebook.path)
 
         self.nbrun.run_notebook(self.nb_original)
+
+        self.sm.sync_output_dir()
 
         # TODO: update params in db if needed"
         params = {}

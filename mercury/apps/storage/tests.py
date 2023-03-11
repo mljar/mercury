@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import encode_multipart
 from django_drf_filepond.models import TemporaryUpload
+from mercury.apps.storage.storage import StorageManager
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -34,6 +35,8 @@ class StorageTestCase(APITestCase):
         EmailAddress.objects.create(
             user=self.user, email=self.user.email, verified=True, primary=True
         )
+
+
 
     def test_file_upload(self):
         fname = "test.txt"

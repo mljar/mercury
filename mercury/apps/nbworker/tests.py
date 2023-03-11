@@ -1,4 +1,5 @@
 import os
+import requests
 from datetime import datetime
 
 from allauth.account.admin import EmailAddress
@@ -10,6 +11,9 @@ from apps.accounts.models import Site
 from apps.nbworker.rest import RESTClient
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker, WorkerState
+
+from apps.storage.storage import StorageManager
+from django.conf import settings
 
 # python manage.py test apps.nbworker -v 2
 
@@ -39,6 +43,43 @@ class RESTClientTestCase(LiveServerTestCase):
             hosted_on=self.site,
             file_updated_at=make_aware(datetime.now()),
         )
+
+
+    def test_sync_output_dir(self):
+        settings.STORAGE = settings.STORAGE_S3
+        os.environ["MERCURY_SERVER_URL"] = self.live_server_url
+        session_id = "some-string"
+        worker = Worker.objects.create(session_id=session_id, notebook=self.nb)
+        sm = StorageManager(session_id, worker.id, self.nb.id)
+
+        output_dir = sm.worker_output_dir()
+        fname = "test.txt"
+        fpath = os.path.join(output_dir, "test.txt")
+        print(output_dir, fpath, fname)
+        with open(fpath, "w") as fout:
+            fout.write("test")
+
+        sm.sync_output_dir()
+
+        url = f"{self.live_server_url}/api/v1/worker-output-files/{session_id}/{worker.id}/{self.nb.id}"
+        response = requests.get(url)
+        print(response)
+        print(response.json())
+
+
+    def test_save_nb_html(self):
+        settings.STORAGE = settings.STORAGE_S3
+        os.environ["MERCURY_SERVER_URL"] = self.live_server_url
+
+        nb_html = "<html>test</html>"    
+        session_id = "some-string"
+        worker = Worker.objects.create(session_id=session_id, notebook=self.nb)
+
+        sm = StorageManager(session_id, worker.id, self.nb.id)
+        html_path, html_url = sm.save_nb_html(nb_html)
+        response = requests.get(html_url)
+        self.assertTrue(response.text, nb_html)
+
 
     def test_get_nb(self):
         session_id = "some-string"

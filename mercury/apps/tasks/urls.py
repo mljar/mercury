@@ -25,7 +25,7 @@ tasks_urlpatterns = [
         ListOutputFilesView.as_view(),
     ),
     url(
-        "api/v1/worker_output_files/(?P<session_id>.+)/(?P<worker_id>.+)",
+        "api/v1/worker-output-files/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)",
         ListWorkerOutputFilesView.as_view(),
     ),
     url(

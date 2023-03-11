@@ -22,6 +22,8 @@ from apps.tasks.models import Task
 from apps.tasks.serializers import TaskSerializer
 from apps.tasks.tasks import task_execute
 from apps.tasks.tasks_export import export_to_pdf
+from apps.storage.models import WorkerFile
+from apps.storage.s3utils import S3
 
 
 class TaskCreateView(CreateAPIView):
@@ -88,11 +90,17 @@ class ListOutputFilesView(APIView):
 
 
 class ListWorkerOutputFilesView(APIView):
-    def get(self, request, session_id, worker_id, format=None):
+    def get(self, request, session_id, worker_id, notebook_id, format=None):
         files_urls = []
+        sm = StorageManager(session_id, worker_id, notebook_id)
         if settings.STORAGE == settings.STORAGE_MEDIA:
-            sm = StorageManager(session_id, worker_id)
             files_urls = sm.list_worker_files_urls()
+        elif settings.STORAGE == settings.STORAGE_S3:
+            output_dir = sm.worker_output_dir()
+            files = WorkerFile.objects.filter(created_by__id=worker_id, output_dir=output_dir)
+            s3 = S3()
+            for f in files:
+                files_urls += [s3.get_presigned_url(f.filepath, "get_object")]
 
         return Response(files_urls)
 

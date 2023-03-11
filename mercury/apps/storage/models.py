@@ -3,7 +3,7 @@ from django.db import models
 
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.models import Site
-
+from apps.workers.models import Worker
 
 class UploadedFile(models.Model):
     filename = models.CharField(max_length=1024, blank=False, null=False)
@@ -16,3 +16,16 @@ class UploadedFile(models.Model):
         User,
         on_delete=models.CASCADE,
     )
+
+
+class WorkerFile(models.Model):
+    filename = models.CharField(max_length=1024, blank=False, null=False)
+    filepath = models.CharField(max_length=1024, blank=False, null=False)
+    output_dir = models.CharField(max_length=1024, blank=False, null=False)
+    local_filepath = models.CharField(max_length=1024, blank=False, null=False)
+    created_at = AutoCreatedField()
+    created_by = models.ForeignKey(
+        Worker,
+        on_delete=models.CASCADE, 
+    )
+

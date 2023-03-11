@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import Membership, Site
-from apps.storage.models import UploadedFile
+from apps.storage.models import UploadedFile, WorkerFile
 from apps.storage.s3utils import S3
 from apps.storage.serializers import UploadedFileSerializer
 from apps.workers.models import Worker
@@ -149,3 +149,34 @@ class DeleteFile(APIView):
         UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WorkerAddFile(APIView):
+    def post(self, request, format=None):
+        worker_id = request.data.get("worker_id")
+        session_id = request.data.get("session_id")
+        notebook_id = request.data.get("notebook_id")
+        
+        filename = request.data.get("filename")
+        filepath = request.data.get("filepath")
+        output_dir = request.data.get("output_dir")
+        local_filepath = request.data.get("local_filepath")
+        
+        workers = Worker.objects.filter(pk=worker_id, session_id=session_id, notebook__id=notebook_id)
+        if not workers:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # remove previous objects with the same filepath
+        WorkerFile.objects.filter(filepath=filepath, output_dir=output_dir).delete()
+
+        # create a new object
+        WorkerFile.objects.create(
+            filename=filename,
+            filepath=filepath,
+            output_dir=output_dir,
+            local_filepath=local_filepath,
+            created_by=workers[0],
+        )
+
+        return Response(status=status.HTTP_200_OK)
+
