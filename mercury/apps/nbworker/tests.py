@@ -11,6 +11,8 @@ from apps.accounts.models import Site
 from apps.nbworker.rest import RESTClient
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker, WorkerState
+from apps.storage.s3utils import S3
+from apps.storage.models import UploadedFile
 
 from apps.storage.storage import StorageManager
 from django.conf import settings
@@ -43,6 +45,40 @@ class RESTClientTestCase(LiveServerTestCase):
             hosted_on=self.site,
             file_updated_at=make_aware(datetime.now()),
         )
+
+    def test_provision_uploaded_files(self):
+        settings.STORAGE = settings.STORAGE_S3
+        os.environ["MERCURY_SERVER_URL"] = self.live_server_url
+        session_id = "some-string"
+
+        worker = Worker.objects.create(session_id=session_id, notebook=self.nb)
+        sm = StorageManager(session_id, worker.id, self.nb.id)
+
+        fname = "test.txt"
+        with open(fname, "w") as fout:
+            fout.write("test")
+
+        s3 = S3()
+        bucket_key = f"test/{fname}"
+        s3.upload_file(fname, bucket_key)
+
+        
+
+        f = UploadedFile.objects.create(
+            filename = fname,
+            filepath = bucket_key,
+            filetype = "txt",
+            filesize = 5,
+            hosted_on = self.site,
+            created_by= self.user
+        )
+
+        os.remove(fname)
+        self.assertFalse(os.path.exists(fname))
+
+        sm.provision_uploaded_files()
+
+        self.assertTrue(os.path.exists(fname))
 
 
     def test_sync_output_dir(self):

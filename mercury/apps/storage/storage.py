@@ -10,7 +10,7 @@ from execnb.nbio import write_nb
 
 from apps.nbworker.utils import stop_event
 from apps.storage.models import UploadedFile
-from apps.storage.s3utils import S3
+
 from apps.tasks.export_pdf import to_pdf
 from apps.storage.views import get_worker_bucket_key
 
@@ -29,14 +29,28 @@ class StorageManager:
             sys.exit(1)
 
     @staticmethod
-    def provision_uploaded_files(notebook):
-        log.debug(f"Provision uploaded files for {notebook.title} (id=notebook.id)")
-        files = UploadedFile.objects.filter(hosted_on=notebook.hosted_on)
-        s3 = S3()
-        for f in files:
-            if not os.path.exists(f.filename):
-                log.debug(f"S3 download {f.filename}")
-                s3.download_file(f.filepath, f.filename)
+    def download_file(url):
+        local_filename = url.split("?")[0].split('/')[-1]
+        with requests.get(url, stream=True) as r:
+            with open(local_filename, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+        return local_filename
+
+    def provision_uploaded_files(self):
+        log.debug(f"Provision uploaded files")
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            pass
+        elif settings.STORAGE == settings.STORAGE_S3:        
+            # get links
+            url = f"{self.server_url}/api/v1/worker/uploaded-files-urls/{self.session_id}/{self.worker_id}/{self.notebook_id}"
+            response = requests.get(url)
+            download_urls = response.json().get("urls")
+            # download files
+            for url in download_urls:
+                f = StorageManager.download_file(url)
+                log.debug(f"Downloaded {f}")
+
 
     @staticmethod
     def create_dir(dir_path):

@@ -180,3 +180,36 @@ class WorkerAddFile(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
+
+class WorkerGetUploadedFilesUrls(APIView):
+    def get(
+        self,
+        request,
+        session_id,
+        worker_id,
+        notebook_id,
+        format=None,
+    ):
+        try:
+            print("worker uploaded files")
+            # check if such worker exists
+            worker = Worker.objects.get(
+                pk=worker_id, session_id=session_id, notebook__id=notebook_id
+            )
+            client_action = "get_object"
+
+            s3 = S3()
+            files = UploadedFile.objects.filter(hosted_on=worker.notebook.hosted_on)
+            urls = []
+            for f in files:
+                urls += [s3.get_presigned_url(
+                    f.filepath, client_action
+                )]
+
+            return Response({"urls": urls})
+
+        except Exception as e:
+            log.exception("Cant get uploaded files urls for worker")
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+

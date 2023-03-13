@@ -6,7 +6,8 @@ from apps.storage.views import (
     ListFiles,
     PresignedUrl,
     WorkerPresignedUrl,
-    WorkerAddFile
+    WorkerAddFile,
+    WorkerGetUploadedFilesUrls
 )
 
 storage_urlpatterns = [
@@ -30,5 +31,9 @@ storage_urlpatterns = [
     re_path(
         "api/v1/worker/add-file",
         WorkerAddFile.as_view(),
+    ),
+    re_path(
+        "api/v1/worker/uploaded-files-urls/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)",
+        WorkerGetUploadedFilesUrls.as_view(),
     ),
 ]
