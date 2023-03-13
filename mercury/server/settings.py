@@ -26,6 +26,8 @@ FRONTEND_STATIC_DIR = str(BASE_DIR / "frontend-dist" / "static")
 STORAGE_MEDIA = "media"
 STORAGE_S3 = "s3"
 STORAGE = STORAGE_MEDIA
+if os.environ.get("AWS_BUCKET_NAME") is not None:
+    STORAGE = STORAGE_S3
 DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
 DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
 

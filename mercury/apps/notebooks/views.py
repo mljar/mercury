@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Q
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -41,9 +42,26 @@ def notebooks_queryset(request, site_id):
     return Notebook.objects.filter(hosted_on=site, created_by=user)
 
 
+def nb_iframe_url(request, iframe_db_address):
+    iframe_url = ""
+    if settings.STORAGE == settings.STORAGE_MEDIA:
+        host = request.build_absolute_uri("/")[:-1]
+        iframe_url = f"{host}{iframe_db_address}"
+    elif settings.STORAGE == settings.STORAGE_S3:
+        s3 = S3()
+        url = s3.get_presigned_url(iframe_db_address, "get_object")
+        iframe_url = url
+    return iframe_url
+
 class ListNotebooks(APIView):
     def get(self, request, site_id, format=None):
+        
         notebooks = notebooks_queryset(request, site_id).order_by("slug")
+        
+        # build iframe urls
+        for n in notebooks:
+            n.default_view_path = nb_iframe_url(request, n.default_view_path)
+            
         serializer = NotebookSerializer(notebooks, many=True)
         return JsonResponse(serializer.data, safe=False)
 
@@ -52,6 +70,8 @@ class RetrieveNotebook(APIView):
     def get(self, request, site_id, notebook_id, format=None):
         pk = int(notebook_id.replace("/", ""))
         notebook = get_object_or_404(notebooks_queryset(request, site_id), pk=pk)
+        notebook.default_view_path = nb_iframe_url(request, notebook.default_view_path)
+        
         serializer = NotebookSerializer(notebook)
         if notebook.state.startswith("WATCH"):
             task_watch.delay(notebook.id)
@@ -68,6 +88,8 @@ class RetrieveNotebookWithSlug(APIView):
         if not notebooks:
             return JsonResponse({}, status=status.HTTP_404_NOT_FOUND)
 
+        notebooks[0].default_view_path = nb_iframe_url(request, notebooks[0].default_view_path)
+        
         # get the first one - it should be only one :)
         serializer = NotebookSerializer(notebooks[0])
         return JsonResponse(serializer.data, safe=False)

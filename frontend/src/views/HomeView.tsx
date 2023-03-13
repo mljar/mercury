@@ -72,7 +72,7 @@ export default function HomeView() {
               className="thumbnailIframe"
               width="200%"
               height={800}
-              src={`${axios.defaults.baseURL}${notebook.default_view_path}`}
+              src={`${notebook.default_view_path}`}
               title="display"
               scrolling="no"
             ></iframe>

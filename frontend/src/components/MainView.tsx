@@ -97,7 +97,7 @@ export default function MainView({
   useEffect(() => {
     if (notebookPath !== undefined) {
       axios
-        .get(`${axios.defaults.baseURL}${notebookPath}${slidesHash}`)
+        .get(`${notebookPath}${slidesHash}`)
         .then((response) => {
           let nbSrc = response.data;
           if (!isPresentation) {
