@@ -97,7 +97,9 @@ class ListWorkerOutputFilesView(APIView):
             files_urls = sm.list_worker_files_urls()
         elif settings.STORAGE == settings.STORAGE_S3:
             output_dir = sm.worker_output_dir()
-            files = WorkerFile.objects.filter(created_by__id=worker_id, output_dir=output_dir)
+            files = WorkerFile.objects.filter(
+                created_by__id=worker_id, output_dir=output_dir
+            )
             s3 = S3()
             for f in files:
                 files_urls += [s3.get_presigned_url(f.filepath, "get_object")]

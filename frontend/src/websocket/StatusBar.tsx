@@ -1,16 +1,26 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getSessionId } from "../utils";
 import {
   WorkerState,
   WebSocketState,
   getWebSocketState,
   getWorkerState,
+  getTryConnectCount,
 } from "../slices/wsSlice";
+import { setSiteStatus, SiteStatus } from "../slices/sitesSlice";
 
 export default function StatusBar() {
+  const dispatch = useDispatch();
   const wsStatus = useSelector(getWebSocketState);
   const workerState = useSelector(getWorkerState);
+  const tryConnectCount = useSelector(getTryConnectCount);
+
+  useEffect(() => {
+    if (tryConnectCount >= 5) {
+      dispatch(setSiteStatus(SiteStatus.LostConnection));
+    }
+  }, [dispatch, tryConnectCount]);
 
   let wifiColor = "orange";
   if (wsStatus === WebSocketState.Connected) {
@@ -23,10 +33,7 @@ export default function StatusBar() {
   }
 
   let workerColor = "orange";
-  if (
-    workerState === WorkerState.Running ||
-    workerState === WorkerState.Busy
-  ) {
+  if (workerState === WorkerState.Running || workerState === WorkerState.Busy) {
     workerColor = "green";
   } else if (
     workerState === WorkerState.Missing ||
@@ -77,7 +84,8 @@ export default function StatusBar() {
               fillRule="evenodd"
               d="M6 2a.5.5 0 0 1 .47.33L10 12.036l1.53-4.208A.5.5 0 0 1 12 7.5h3.5a.5.5 0 0 1 0 1h-3.15l-1.88 5.17a.5.5 0 0 1-.94 0L6 3.964 4.47 8.171A.5.5 0 0 1 4 8.5H.5a.5.5 0 0 1 0-1h3.15l1.88-5.17A.5.5 0 0 1 6 2Z"
             />
-          </svg> Busy
+          </svg>{" "}
+          Busy
         </span>
       )}
     </div>

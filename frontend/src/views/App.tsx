@@ -7,7 +7,7 @@ export default function MyApp() {
   const { slug } = useParams<{ slug: string }>();
   const { embed } = useParams<{ embed: string }>();
   const displayEmbed = !!(embed && embed === "embed");
-  
+
   return (
     <WebSocketProvider>
       <AppView

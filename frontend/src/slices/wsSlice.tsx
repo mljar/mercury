@@ -23,6 +23,7 @@ const initialState = {
   workerState: WorkerState.Unknown,
   workerId: undefined as undefined | number,
   notebookSrc: "",
+  tryConnectCount: 0,
 };
 
 const wsSlice = createSlice({
@@ -41,6 +42,12 @@ const wsSlice = createSlice({
     setNotebookSrc(state, action: PayloadAction<string>) {
       state.notebookSrc = action.payload;
     },
+    increaseTryConnectCount(state) {
+      state.tryConnectCount += 1;
+    },
+    resetTryConnectCount(state) {
+      state.tryConnectCount = 0;
+    },
   },
 });
 
@@ -51,12 +58,15 @@ export const {
   setWorkerState,
   setWorkerId,
   setNotebookSrc,
+  increaseTryConnectCount,
+  resetTryConnectCount,
 } = wsSlice.actions;
 
 export const getWebSocketState = (state: RootState) => state.ws.webSocketState;
 export const getWorkerState = (state: RootState) => state.ws.workerState;
 export const getWorkerId = (state: RootState) => state.ws.workerId;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
+export const getTryConnectCount = (state: RootState) => state.ws.tryConnectCount;
 
 export const runNotebook = (widgets_params: string) => {
   return {

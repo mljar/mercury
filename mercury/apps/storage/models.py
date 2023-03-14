@@ -5,7 +5,10 @@ from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.models import Site
 from apps.workers.models import Worker
 
+
 class UploadedFile(models.Model):
+    """Files that are uploaded in Dashboard"""
+
     filename = models.CharField(max_length=1024, blank=False, null=False)
     filepath = models.CharField(max_length=1024, blank=False, null=False)
     filetype = models.CharField(max_length=128, blank=False, null=False)
@@ -19,6 +22,8 @@ class UploadedFile(models.Model):
 
 
 class WorkerFile(models.Model):
+    """Files created in worker (saved in output dir)"""
+
     filename = models.CharField(max_length=1024, blank=False, null=False)
     filepath = models.CharField(max_length=1024, blank=False, null=False)
     output_dir = models.CharField(max_length=1024, blank=False, null=False)
@@ -26,6 +31,5 @@ class WorkerFile(models.Model):
     created_at = AutoCreatedField()
     created_by = models.ForeignKey(
         Worker,
-        on_delete=models.CASCADE, 
+        on_delete=models.CASCADE,
     )
-

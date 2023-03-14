@@ -36,8 +36,6 @@ class StorageTestCase(APITestCase):
             user=self.user, email=self.user.email, verified=True, primary=True
         )
 
-
-
     def test_file_upload(self):
         fname = "test.txt"
         with open(fname, "w") as fout:

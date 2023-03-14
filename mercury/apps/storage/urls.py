@@ -7,7 +7,7 @@ from apps.storage.views import (
     PresignedUrl,
     WorkerPresignedUrl,
     WorkerAddFile,
-    WorkerGetUploadedFilesUrls
+    WorkerGetUploadedFilesUrls,
 )
 
 storage_urlpatterns = [

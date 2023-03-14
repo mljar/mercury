@@ -32,7 +32,8 @@ export enum SiteStatus {
   NotFound = "Not found",
   AccessForbidden = "Access forbidden",
   NetworkError = "Network Error",
-  PleaseRefresh = "Please refresh"
+  PleaseRefresh = "Please refresh",
+  LostConnection = "Lost connection",
 }
 
 const initialState = {

@@ -17,15 +17,30 @@ class SiteState(str, Enum):
 
 class Site(models.Model):
     title = models.CharField(
-        max_length=200, help_text="Name of Mercury Site", blank=False, null=False
+        max_length=256, help_text="Name of Mercury Site", blank=False, null=False
     )
     slug = models.CharField(
-        max_length=200,
-        help_text="Subdomain address",
+        max_length=256,
+        help_text="Subdomain",
         blank=False,
         null=False,
         unique=True,
     )
+    domain = models.CharField(
+        default="runmercury.com",
+        max_length=256,
+        help_text="Domain address",
+        blank=True,
+        null=True,
+    )
+    custom_domain = models.CharField(
+        max_length=256,
+        help_text="Custom domain address",
+        blank=True,
+        null=True,
+        unique=True,
+    )
+
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
     SHARE_CHOICES = (

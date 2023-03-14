@@ -30,9 +30,9 @@ class StorageManager:
 
     @staticmethod
     def download_file(url):
-        local_filename = url.split("?")[0].split('/')[-1]
+        local_filename = url.split("?")[0].split("/")[-1]
         with requests.get(url, stream=True) as r:
-            with open(local_filename, 'wb') as f:
+            with open(local_filename, "wb") as f:
                 shutil.copyfileobj(r.raw, f)
 
         return local_filename
@@ -41,7 +41,7 @@ class StorageManager:
         log.debug(f"Provision uploaded files")
         if settings.STORAGE == settings.STORAGE_MEDIA:
             pass
-        elif settings.STORAGE == settings.STORAGE_S3:        
+        elif settings.STORAGE == settings.STORAGE_S3:
             # get links
             url = f"{self.server_url}/api/v1/worker/uploaded-files-urls/{self.session_id}/{self.worker_id}/{self.notebook_id}"
             response = requests.get(url)
@@ -50,7 +50,6 @@ class StorageManager:
             for url in download_urls:
                 f = StorageManager.download_file(url)
                 log.debug(f"Downloaded {f}")
-
 
     @staticmethod
     def create_dir(dir_path):
@@ -88,7 +87,7 @@ class StorageManager:
             output_dir = f"output_{self.worker_id}"
             StorageManager.create_dir(output_dir)
             return output_dir
-            
+
     def sync_output_dir(self):
         if settings.STORAGE == settings.STORAGE_MEDIA:
             # nothing to do
@@ -103,17 +102,17 @@ class StorageManager:
                         print(entry, entry.path)
                         local_files += [entry]
             log.debug(f"Sync {local_files}")
-            
+
             action = "put_object"
             for entry in local_files:
                 # upload them to s3
                 url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{entry.name}"
                 response = requests.get(url)
                 upload_url = response.json().get("url")
-                
+
                 with open(entry.path, "rb") as fin:
                     response = requests.put(upload_url, fin.read())
-            
+
                 # create db objects
                 url = f"{self.server_url}/api/v1/worker/add-file"
                 data = {
@@ -121,13 +120,14 @@ class StorageManager:
                     "session_id": self.session_id,
                     "notebook_id": self.notebook_id,
                     "filename": entry.name,
-                    "filepath": get_worker_bucket_key(self.session_id, output_dir, entry.name),
+                    "filepath": get_worker_bucket_key(
+                        self.session_id, output_dir, entry.name
+                    ),
                     "output_dir": output_dir,
                     "local_filepath": entry.path,
                 }
                 response = requests.post(url, data)
                 # that's all
-            
 
     def list_worker_files_urls(self):
         files_urls = []
@@ -140,7 +140,7 @@ class StorageManager:
                     ]
         elif settings.STORAGE == settings.STORAGE_S3:
             pass
-                    
+
         return files_urls
 
     # def save_nb(self, nb):
@@ -155,7 +155,7 @@ class StorageManager:
     def save_nb_html(self, nb_html_body):
         html_path, url = None, None
         fname = f"download-notebook-{self.some_hash()}.html"
-            
+
         if settings.STORAGE == settings.STORAGE_MEDIA:
             html_path = os.path.join(self.worker_output_dir(), fname)
             with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
@@ -181,7 +181,6 @@ class StorageManager:
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
             response = requests.get(url)
             html_url = response.json().get("url")
-
 
         return html_path, html_url
 

@@ -156,13 +156,15 @@ class WorkerAddFile(APIView):
         worker_id = request.data.get("worker_id")
         session_id = request.data.get("session_id")
         notebook_id = request.data.get("notebook_id")
-        
+
         filename = request.data.get("filename")
         filepath = request.data.get("filepath")
         output_dir = request.data.get("output_dir")
         local_filepath = request.data.get("local_filepath")
-        
-        workers = Worker.objects.filter(pk=worker_id, session_id=session_id, notebook__id=notebook_id)
+
+        workers = Worker.objects.filter(
+            pk=worker_id, session_id=session_id, notebook__id=notebook_id
+        )
         if not workers:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -202,9 +204,7 @@ class WorkerGetUploadedFilesUrls(APIView):
             files = UploadedFile.objects.filter(hosted_on=worker.notebook.hosted_on)
             urls = []
             for f in files:
-                urls += [s3.get_presigned_url(
-                    f.filepath, client_action
-                )]
+                urls += [s3.get_presigned_url(f.filepath, client_action)]
 
             return Response({"urls": urls})
 
@@ -212,4 +212,3 @@ class WorkerGetUploadedFilesUrls(APIView):
             log.exception("Cant get uploaded files urls for worker")
 
         return Response(status=status.HTTP_403_FORBIDDEN)
-

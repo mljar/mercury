@@ -62,15 +62,13 @@ class RESTClientTestCase(LiveServerTestCase):
         bucket_key = f"test/{fname}"
         s3.upload_file(fname, bucket_key)
 
-        
-
         f = UploadedFile.objects.create(
-            filename = fname,
-            filepath = bucket_key,
-            filetype = "txt",
-            filesize = 5,
-            hosted_on = self.site,
-            created_by= self.user
+            filename=fname,
+            filepath=bucket_key,
+            filetype="txt",
+            filesize=5,
+            hosted_on=self.site,
+            created_by=self.user,
         )
 
         os.remove(fname)
@@ -79,7 +77,6 @@ class RESTClientTestCase(LiveServerTestCase):
         sm.provision_uploaded_files()
 
         self.assertTrue(os.path.exists(fname))
-
 
     def test_sync_output_dir(self):
         settings.STORAGE = settings.STORAGE_S3
@@ -102,12 +99,11 @@ class RESTClientTestCase(LiveServerTestCase):
         print(response)
         print(response.json())
 
-
     def test_save_nb_html(self):
         settings.STORAGE = settings.STORAGE_S3
         os.environ["MERCURY_SERVER_URL"] = self.live_server_url
 
-        nb_html = "<html>test</html>"    
+        nb_html = "<html>test</html>"
         session_id = "some-string"
         worker = Worker.objects.create(session_id=session_id, notebook=self.nb)
 
@@ -115,7 +111,6 @@ class RESTClientTestCase(LiveServerTestCase):
         html_path, html_url = sm.save_nb_html(nb_html)
         response = requests.get(html_url)
         self.assertTrue(response.text, nb_html)
-
 
     def test_get_nb(self):
         session_id = "some-string"

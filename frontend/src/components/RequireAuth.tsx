@@ -8,6 +8,7 @@ import {
   isPublic,
   SiteStatus,
 } from "../slices/sitesSlice";
+import LostConnection from "../views/LostConnection";
 import SiteAccessForbiddenView from "../views/SiteAccessForbiddenView";
 import SiteLoadingView from "../views/SiteLoadingView";
 import SiteNetworkErrorView from "../views/SiteNetworkErrorView";
@@ -35,6 +36,9 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
     return <SiteNetworkErrorView />;
   } else if (siteStatus === SiteStatus.PleaseRefresh) {
     return <SitePleaseRefreshView />;
+  } else if (siteStatus === SiteStatus.LostConnection) {
+    window.location.reload();
+    return <LostConnection />;
   }
 
   if (!isPublicSite && !token) {

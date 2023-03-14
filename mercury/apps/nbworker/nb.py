@@ -117,7 +117,7 @@ class NBWorker(WSClient):
         self.sm.sync_output_dir()
 
         body = self.nbrun.export_html(self.nb, full_header=self.is_presentation())
-        
+
         # with open(f"test_{counter}.html", "w") as fout:
         #    fout.write(body)
 

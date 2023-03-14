@@ -17,11 +17,13 @@ import {
   setWorkerId,
   WebSocketState,
   WorkerState,
+  resetTryConnectCount,
+  increaseTryConnectCount,
 } from "../slices/wsSlice";
 
 import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";
-import { fetchExecutionHistory, setExportingToPDF } from "../slices/tasksSlice";
+import { setExportingToPDF } from "../slices/tasksSlice";
 import { getSiteId } from "../slices/sitesSlice";
 import { getToken } from "../slices/authSlice";
 
@@ -58,6 +60,7 @@ export default function WebSocketProvider({
   const selectedNotebookId = useSelector(getSelectedNotebookId);
   const token = useSelector(getToken);
   const isStatic = useSelector(isStaticNotebook);
+  //const tryConnectCount = useSelector(getTryConnectCount);
 
   let connection: WebSocket | undefined = undefined;
 
@@ -68,6 +71,7 @@ export default function WebSocketProvider({
   };
 
   function onOpen(event: any): void {
+    dispatch(resetTryConnectCount());
     sendMessage(
       JSON.stringify({
         purpose: "server-address",
@@ -83,6 +87,9 @@ export default function WebSocketProvider({
 
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
+      
+      console.log("Purpose-->"+response.purpose)
+
       if (response.purpose === "worker-state") {
         //console.log("worker-state", response.state);
         dispatch(setWorkerState(response.state));
@@ -151,6 +158,7 @@ export default function WebSocketProvider({
       selectedNotebookId !== undefined &&
       connection === undefined
     ) {
+      dispatch(increaseTryConnectCount());
       let url = `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`;
       if (token !== undefined && token !== null && token !== "") {
         url += `?token=${token}`;
