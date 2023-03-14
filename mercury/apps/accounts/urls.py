@@ -39,4 +39,5 @@ accounts_urlpatterns += [
     re_path("api/v1/(?P<site_id>.+)/invite/", InviteView.as_view()),
     re_path("api/v1/get-site/(?P<site_slug>.+)/", GetSiteView.as_view()),
     re_path("api/v1/init-site/(?P<site_id>.+)/", InitializeSite.as_view()),
+    
 ]

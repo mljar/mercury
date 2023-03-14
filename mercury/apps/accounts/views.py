@@ -184,3 +184,15 @@ class InitializeSite(APIView):
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:
             raise APIException(str(e))
+
+
+class AddSecret(APIView):
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
+
+    def post(self, request, site_id, format=None):
+        name = request.data.get("name")
+        secret = request.data.get("secret")
+
+        
+
+        return Response(status=status.HTTP_201_CREATED)

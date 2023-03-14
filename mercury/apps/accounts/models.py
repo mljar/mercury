@@ -114,3 +114,12 @@ class Invitation(models.Model):
     invited = models.CharField(max_length=256, blank=False, null=False)
     created_at = AutoCreatedField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Secret(models.Model):
+    name = models.CharField(max_length=256, blank=False, null=False)
+    token = models.TextField(blank=False, null=False)
+    created_at = AutoCreatedField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    hosted_on = models.ForeignKey(Site, on_delete=models.CASCADE)
+

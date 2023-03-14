@@ -87,9 +87,6 @@ export default function WebSocketProvider({
 
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
-      
-      console.log("Purpose-->"+response.purpose)
-
       if (response.purpose === "worker-state") {
         //console.log("worker-state", response.state);
         dispatch(setWorkerState(response.state));
