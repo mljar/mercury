@@ -4,11 +4,14 @@ from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
 from apps.accounts.views import (
+    AddSecret,
+    ListSecrets,
     GetSiteView,
     InitializeSite,
     InviteView,
     MembershipViewSet,
     SiteViewSet,
+    WorkerListSecrets,
 )
 
 router = DefaultRouter()
@@ -39,5 +42,12 @@ accounts_urlpatterns += [
     re_path("api/v1/(?P<site_id>.+)/invite/", InviteView.as_view()),
     re_path("api/v1/get-site/(?P<site_slug>.+)/", GetSiteView.as_view()),
     re_path("api/v1/init-site/(?P<site_id>.+)/", InitializeSite.as_view()),
-    
+
+    re_path("api/v1/(?P<site_id>.+)/add-secret", AddSecret.as_view()),
+    re_path("api/v1/(?P<site_id>.+)/list-secrets", ListSecrets.as_view()),
+
+    re_path(
+        "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/list-secrets",
+        WorkerListSecrets.as_view(),
+    ),    
 ]
