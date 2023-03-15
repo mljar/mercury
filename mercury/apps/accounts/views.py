@@ -91,7 +91,6 @@ class SiteViewSet(viewsets.ModelViewSet):
 
 class HasEditRights(permissions.BasePermission):
     def has_permission(self, request, view):
-        print("has rights?")
         site_id = view.kwargs.get("site_id")
         if site_id is None:  # just in case
             return False
@@ -103,7 +102,6 @@ class HasEditRights(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        print("has object rights?")
         return (
             Membership.objects.filter(
                 host=obj.host, user=request.user, rights=Membership.EDIT
@@ -202,7 +200,7 @@ class AddSecret(APIView):
         name = request.data.get("name")
         secret = request.data.get("secret")
 
-        #print(Fernet.generate_key())
+        # print(Fernet.generate_key())
 
         f = Fernet(os.environ.get("FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE=").encode())
 
@@ -233,20 +231,14 @@ class ListSecrets(APIView):
 
 
 class WorkerListSecrets(APIView):
-    
+
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         
-        print(">>>>>>", session_id, worker_id, notebook_id)
-
         w = Worker.objects.get(
             pk=worker_id, session_id=session_id, notebook__id=notebook_id
         )
-        print(w)
-        print('aa')
         nb = Notebook.objects.get(pk=notebook_id)
-        print(nb)
         secrets = Secret.objects.filter(hosted_on=nb.hosted_on)
-        print(secrets)
         data = []
 
         f = Fernet(os.environ.get("FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE=").encode())

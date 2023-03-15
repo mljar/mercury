@@ -89,14 +89,12 @@ class SecretsTestCase(APITestCase):
             machine_id="some-machine",
             notebook=nb
         )
-
+        
         # get worker secrets
-        url = f"api/v1/worker/{session_id}/{worker.id}/{nb.id}/list-secrets"
-        print(url)
+        url = f"/api/v1/worker/{session_id}/{worker.id}/{nb.id}/worker-secrets"
         response = self.client.get(url)
-        print(response)
-        print(response.content)
-        # print(response.json())
+        self.assertEqual(response.json()[0].get("name"), new_data["name"])
+        self.assertEqual(response.json()[0].get("secret"), new_data["secret"])
 
 class AccountsTestCase(APITestCase):
     register_url = "/api/v1/auth/register/"
