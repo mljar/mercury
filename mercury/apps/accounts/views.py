@@ -233,19 +233,20 @@ class ListSecrets(APIView):
 class WorkerListSecrets(APIView):
 
     def get(self, request, session_id, worker_id, notebook_id, format=None):
-        
-        w = Worker.objects.get(
-            pk=worker_id, session_id=session_id, notebook__id=notebook_id
-        )
-        nb = Notebook.objects.get(pk=notebook_id)
-        secrets = Secret.objects.filter(hosted_on=nb.hosted_on)
-        data = []
+        try:
+            w = Worker.objects.get(
+                pk=worker_id, session_id=session_id, notebook__id=notebook_id
+            )
+            nb = Notebook.objects.get(pk=notebook_id)
+            secrets = Secret.objects.filter(hosted_on=nb.hosted_on)
+            data = []
 
-        f = Fernet(os.environ.get("FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE=").encode())
+            f = Fernet(os.environ.get("FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE=").encode())
 
-        for secret in secrets:
-            data += [{"name": secret.name, "secret": f.decrypt(secret.token.encode()).decode()}]
+            for secret in secrets:
+                data += [{"name": secret.name, "secret": f.decrypt(secret.token.encode()).decode()}]
 
-        return Response(data, status=status.HTTP_200_OK)        
-
+            return Response(data, status=status.HTTP_200_OK)        
+        except Exception as e:
+            return Response(status=status.HTTP_404_NOT_FOUND)        
 
