@@ -141,11 +141,14 @@ class InviteView(APIView):
                 address_email = request.data.get("email")
                 token = uuid.uuid4().hex.replace("-", "")[:8]
 
+                site = Site.objects.get(pk=site_id)
+
                 invitation = Invitation.objects.create(
-                    token=token, invited=address_email, created_by=request.user
+                    token=token, invited=address_email, created_by=request.user,
+                    hosted_on=site
                 )
 
-                job_params = {"db_id": invitation.id}
+                job_params = {"invitation_id": invitation.id}
                 transaction.on_commit(lambda: task_send_invitation.delay(job_params))
 
                 return Response(status=status.HTTP_200_OK)

@@ -114,6 +114,17 @@ class Invitation(models.Model):
     invited = models.CharField(max_length=256, blank=False, null=False)
     created_at = AutoCreatedField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    hosted_on = models.ForeignKey(
+        Site, on_delete=models.CASCADE
+    )
+    rights = models.CharField(
+        default=Membership.VIEW,
+        choices=Membership.RIGHTS_CHOICES,
+        max_length=32,
+        help_text="Rights for user",
+        blank=False,
+        null=False,
+    )
 
 
 class Secret(models.Model):

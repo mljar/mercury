@@ -1,6 +1,8 @@
 from celery import shared_task
+from django.core.mail import send_mail
+from allauth.account.admin import EmailAddress
 
-from apps.accounts.models import Site, SiteState
+from apps.accounts.models import Invitation, Site, SiteState
 from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 from apps.storage.models import UploadedFile
@@ -41,4 +43,23 @@ def task_init_site(self, job_params):
 @shared_task(bind=True)
 def task_send_invitation(self, job_params):
     print("TODO: send invitation")
-    print(job_params["db_id"])
+    print(job_params["invitation_id"])
+
+    invitation_id = job_params["invitation_id"]
+    invitation = Invitation.objects.get(pk=invitation_id)
+
+    from_address = EmailAddress.objects.get(
+            user=invitation.created_by, primary=True
+        )
+
+    send_mail(
+        'Mercury Invitation',
+        f'''Hi,
+
+User         
+        
+''',
+        from_address.email,
+        [invitation.invited],
+        fail_silently=False,
+    )
