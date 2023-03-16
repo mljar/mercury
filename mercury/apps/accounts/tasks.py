@@ -40,24 +40,37 @@ def task_init_site(self, job_params):
     site.save()
 
 
+
+def get_app_address(site):
+
+    subdomain = site.slug
+    domain = site.domain
+    custom_domain = site.custom_domain
+
+    if custom_domain is not None and custom_domain != "":
+        return custom_domain
+    
+    return f"https://{subdomain}.{domain}"
+
 @shared_task(bind=True)
 def task_send_invitation(self, job_params):
-    print("TODO: send invitation")
-    print(job_params["invitation_id"])
 
     invitation_id = job_params["invitation_id"]
     invitation = Invitation.objects.get(pk=invitation_id)
 
     from_address = EmailAddress.objects.get(
             user=invitation.created_by, primary=True
-        )
+    )
+    invited_by = invitation.created_by
 
     send_mail(
         'Mercury Invitation',
-        f'''Hi,
+f'''Hi,
 
-User         
-        
+User {invited_by.username} invites you to {invitation.rights.lower()} web app at {get_app_address(invitation.hosted_on)}.
+
+Thank you!
+Mercury Team        
 ''',
         from_address.email,
         [invitation.invited],

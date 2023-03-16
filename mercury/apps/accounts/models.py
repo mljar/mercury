@@ -84,6 +84,25 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+@receiver(post_save, sender=User)
+def check_invitations(sender, instance, **kwargs):
+    
+    print("check invitations")
+    print(instance.username, instance.email)
+
+    invitations = Invitation.objects.filter(invited=instance.email)
+    for invitation in invitations:
+        previous_memberships = Membership.objects.filter(user=instance, host=invitation.hosted_on)
+        if not previous_memberships:
+            Membership.objects.create(
+                user=instance,
+                host=invitation.hosted_on,
+                rights=invitation.rights,
+                created_by=invitation.created_by
+            )
+            invitation.delete()
+
+
 class Membership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     host = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="hosts")
@@ -110,7 +129,6 @@ class Membership(models.Model):
 
 
 class Invitation(models.Model):
-    token = models.CharField(max_length=128, blank=False, null=False)
     invited = models.CharField(max_length=256, blank=False, null=False)
     created_at = AutoCreatedField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)

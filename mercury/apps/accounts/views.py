@@ -139,17 +139,33 @@ class InviteView(APIView):
             # create a database instance
             with transaction.atomic():
                 address_email = request.data.get("email")
-                token = uuid.uuid4().hex.replace("-", "")[:8]
+                rights = request.data.get("rights", "VIEW")
+                if rights not in ["VIEW", "EDIT"]:
+                    rights = "VIEW"
 
                 site = Site.objects.get(pk=site_id)
 
-                invitation = Invitation.objects.create(
-                    token=token, invited=address_email, created_by=request.user,
-                    hosted_on=site
-                )
+                # check for users
+                already_user = User.objects.filter(email=address_email)
+                print(already_user)
 
-                job_params = {"invitation_id": invitation.id}
-                transaction.on_commit(lambda: task_send_invitation.delay(job_params))
+                if already_user:
+                    Membership.objects.create(
+                        user=already_user[0],
+                        host=site,
+                        rights=rights,
+                        created_by=request.user
+                    )
+                else:                    
+                    invitation = Invitation.objects.create(
+                        invited=address_email, 
+                        created_by=request.user,
+                        rights=rights,
+                        hosted_on=site
+                    )
+
+                    job_params = {"invitation_id": invitation.id}
+                    transaction.on_commit(lambda: task_send_invitation.delay(job_params))
 
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:
