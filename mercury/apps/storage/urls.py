@@ -5,6 +5,7 @@ from apps.storage.views import (
     FileUploaded,
     ListFiles,
     PresignedUrl,
+    PresignedUrlPut,
     WorkerAddFile,
     WorkerGetUploadedFilesUrls,
     WorkerPresignedUrl,
@@ -15,6 +16,10 @@ storage_urlpatterns = [
     re_path(
         "api/v1/presigned-url/(?P<action>.+)/(?P<site_id>.+)/(?P<filename>.+)",
         PresignedUrl.as_view(),
+    ),
+    re_path(
+        "api/v1/presigned-url-put/(?P<site_id>.+)/(?P<filename>.+)/(?P<filesize>.+)",
+        PresignedUrlPut.as_view(),
     ),
     re_path(
         "api/v1/file-uploaded",

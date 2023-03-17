@@ -21,14 +21,18 @@ PLAN_BUSINESS = "business"
 
 FORBIDDEN_SLUGS = ["mercury", "dashboard", "report", "mljar", "cloud", "api"]
 
+def get_plan(user):
+    info = json.loads(user.profile.info)
+    user_plan = info.get(PLAN_KEY, PLAN_STARTER)
+    if user_plan not in [PLAN_STARTER, PLAN_PRO, PLAN_BUSINESS]:
+        user_plan = PLAN_STARTER
+    return user_plan
+
 def max_number_of_sites(user):
     if not is_cloud_version():
         return 1000
     try:
-        info = json.loads(user.profile.info)
-        user_plan = info.get(PLAN_KEY, PLAN_STARTER)
-        if user_plan not in [PLAN_STARTER, PLAN_PRO, PLAN_BUSINESS]:
-            user_plan = PLAN_STARTER
+        user_plan = get_plan(user)
         sites_plans = {
             PLAN_STARTER: 1,
             PLAN_PRO: 3,

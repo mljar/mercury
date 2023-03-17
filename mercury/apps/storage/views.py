@@ -12,6 +12,10 @@ from apps.storage.models import UploadedFile, WorkerFile
 from apps.storage.s3utils import S3
 from apps.storage.serializers import UploadedFileSerializer
 from apps.workers.models import Worker
+from apps.accounts.views.utils import is_cloud_version
+
+from apps.accounts.views.sites import get_plan, PLAN_KEY, PLAN_STARTER, PLAN_PRO, PLAN_BUSINESS
+
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +72,54 @@ class PresignedUrl(APIView):
         )
         return Response({"url": url})
 
+
+FILE_LIMITS = {
+    PLAN_STARTER: {
+        "files": 10,
+        "size": 10,
+    },
+    PLAN_PRO: {
+        "files": 25,
+        "size": 50
+    },
+    PLAN_BUSINESS: {
+        "files": 50,
+        "size": 100 # MB
+    }
+}
+
+def upload_allowed_check_limits(user, site_id, filesize):
+    if not is_cloud_version():
+        return True 
+    plan = get_plan(user)
+    files_count_limit = FILE_LIMITS[plan]["files"]
+    files_size_limit = FILE_LIMITS[plan]["size"] # in MB
+    
+    if filesize / 1024 / 1024 > files_size_limit:
+        return False
+
+    total_files = UploadedFile.objects.filter(hosted_on__id=site_id)
+    if total_files.count() > files_count_limit:
+        return False 
+
+    return True
+
+class PresignedUrlPut(APIView):
+    def get(self, request, site_id, filename, filesize, format=None):
+        site = get_site(request.user, site_id)
+        if site is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        upload_allowed = upload_allowed_check_limits(request.user, site_id, filesize)
+        if not upload_allowed:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        client_action = "put_object"
+        s3 = S3()
+        url = s3.get_presigned_url(
+            get_bucket_key(site, request.user, filename), client_action
+        )
+        return Response({"url": url})
 
 class WorkerPresignedUrl(APIView):
     def get(
