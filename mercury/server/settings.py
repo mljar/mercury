@@ -122,18 +122,6 @@ ACCOUNT_EMAIL_VERIFICATION = os.environ.get("ACCOUNT_EMAIL_VERIFICATION", "none"
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = False
 OLD_PASSWORD_FIELD_ENABLED = True  # use old password when password change in the app
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-if os.environ.get("EMAIL_BACKEND", "console") != "console":
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = os.environ.get("EMAIL_HOST")
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = os.environ.get("EMAIL_PORT")
-EMAIL_USE_TLS = True  # use TLS by default
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
-
-
 # CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://single-site.localhost:3000",
 #                 "http://127.0.0.1:3000"]
 
@@ -317,15 +305,16 @@ AWS_BUCKET_NAME = os.environ.get("AWS_BUCKET_NAME")
 
 
 # email setup, used in notification
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")  # default set to gmail smtp
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_TLS = True  # use TLS by default
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-if EMAIL_HOST_USER is not None:
+if os.environ.get("EMAIL_BACKEND", "console") != "console":
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # you need to install django-ses
@@ -333,3 +322,6 @@ if EMAIL_HOST_USER is not None:
 # AWS_SES_REGION_NAME = AWS_REGION_NAME
 # AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
 # DEFAULT_FROM_EMAIL = '"Mercury" <contact@runmercury.com>'
+
+
+
