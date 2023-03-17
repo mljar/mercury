@@ -1,5 +1,6 @@
+
 # Please run tests with below command
-# python manage.py test apps.accounts
+# python manage.py test apps.accounts.tests.test_accounts
 
 from datetime import datetime
 
@@ -14,7 +15,6 @@ from rest_framework.test import APITestCase
 from apps.accounts.models import Membership, Secret, Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
-
 
 class AccountsTestCase(APITestCase):
     register_url = "/api/v1/auth/register/"

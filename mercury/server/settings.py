@@ -118,7 +118,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get("ACCOUNT_EMAIL_VERIFICATION", "none")  # "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get("ACCOUNT_EMAIL_VERIFICATION", "mandatory")  # "none" or "mandatory"
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = False
 OLD_PASSWORD_FIELD_ENABLED = True  # use old password when password change in the app
 

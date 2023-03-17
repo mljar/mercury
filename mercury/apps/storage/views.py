@@ -16,20 +16,9 @@ from apps.accounts.views.utils import is_cloud_version
 
 from apps.accounts.views.sites import get_plan, PLAN_KEY, PLAN_STARTER, PLAN_PRO, PLAN_BUSINESS
 
+from apps.storage.utils import get_bucket_key, get_site_bucket_key, get_worker_bucket_key
 
 log = logging.getLogger(__name__)
-
-
-def get_bucket_key(site, user, filename):
-    return f"site-{site.id}/user-{user.id}/{filename}"
-
-
-def get_site_bucket_key(site, filename):
-    return f"site-{site.id}/files/{filename}"
-
-
-def get_worker_bucket_key(session_id, output_dir, filename):
-    return f"session-{session_id}/{output_dir}/{filename}"
 
 
 def get_site(user, site_id):
