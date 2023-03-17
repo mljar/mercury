@@ -10,9 +10,8 @@ from execnb.nbio import write_nb
 
 from apps.nbworker.utils import stop_event
 from apps.storage.models import UploadedFile
-
-from apps.tasks.export_pdf import to_pdf
 from apps.storage.views import get_worker_bucket_key
+from apps.tasks.export_pdf import to_pdf
 
 log = logging.getLogger(__name__)
 

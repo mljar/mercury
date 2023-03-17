@@ -1,6 +1,8 @@
 import uuid
+
 from django.template.defaultfilters import slugify
 from rest_framework import permissions
+
 from apps.accounts.models import Membership, Site
 
 

@@ -12,7 +12,6 @@ from apps.storage.s3utils import S3
 from apps.storage.serializers import UploadedFileSerializer
 from apps.workers.models import Worker
 
-
 log = logging.getLogger(__name__)
 
 

@@ -1,8 +1,8 @@
+from allauth.account.admin import EmailAddress
 from celery import shared_task
 from django.core.mail import send_mail
-from allauth.account.admin import EmailAddress
 
-from apps.accounts.models import Invitation, Site, SiteState, Membership
+from apps.accounts.models import Invitation, Membership, Site, SiteState
 from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 from apps.storage.models import UploadedFile

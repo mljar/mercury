@@ -1,18 +1,17 @@
 # Please run tests with below command
 # python manage.py test apps.accounts
 
+from datetime import datetime
+
 from allauth.account.admin import EmailAddress
 from django.contrib.auth.models import User
 from django.core import mail
-from datetime import datetime
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from apps.accounts.models import Membership, Site
-from apps.accounts.models import Secret
-
-from django.utils.timezone import make_aware
+from apps.accounts.models import Membership, Secret, Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 

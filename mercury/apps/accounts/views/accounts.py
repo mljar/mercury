@@ -1,31 +1,15 @@
-import os
-import json
-import uuid
-from datetime import datetime, timedelta
-
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q
-from django.template.defaultfilters import slugify
 from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.accounts.models import Invitation, Membership, Site
+from apps.accounts.models import Membership, Site
 from apps.accounts.serializers import MembershipSerializer, SiteSerializer
-from apps.accounts.tasks import (
-    task_init_site,
-    task_send_invitation,
-    task_send_new_member,
-)
-
-from cryptography.fernet import Fernet
-from apps.accounts.models import Secret
-from apps.workers.models import Worker
-from apps.notebooks.models import Notebook
-
-from apps.accounts.views.utils import get_slug, HasEditRights
+from apps.accounts.tasks import task_init_site
+from apps.accounts.views.utils import HasEditRights, get_slug
 
 
 class SiteViewSet(viewsets.ModelViewSet):
@@ -137,73 +121,3 @@ class InitializeSite(APIView):
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:
             raise APIException(str(e))
-
-
-class AddSecret(APIView):
-    permission_classes = [permissions.IsAuthenticated, HasEditRights]
-
-    def post(self, request, site_id, format=None):
-        site = Site.objects.get(pk=site_id)
-
-        name = request.data.get("name")
-        secret = request.data.get("secret")
-
-        # print(Fernet.generate_key())
-
-        f = Fernet(
-            os.environ.get(
-                "FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE="
-            ).encode()
-        )
-
-        Secret.objects.create(
-            name=name,
-            token=f.encrypt(secret.encode()).decode(),
-            created_by=request.user,
-            hosted_on=site,
-        )
-
-        return Response(status=status.HTTP_201_CREATED)
-
-
-class ListSecrets(APIView):
-    permission_classes = [permissions.IsAuthenticated, HasEditRights]
-
-    def get(self, request, site_id, format=None):
-        secrets = Secret.objects.filter(hosted_on__id=site_id)
-
-        data = []
-
-        for secret in secrets:
-            data += [secret.name]
-
-        return Response(data, status=status.HTTP_200_OK)
-
-
-class WorkerListSecrets(APIView):
-    def get(self, request, session_id, worker_id, notebook_id, format=None):
-        try:
-            w = Worker.objects.get(
-                pk=worker_id, session_id=session_id, notebook__id=notebook_id
-            )
-            nb = Notebook.objects.get(pk=notebook_id)
-            secrets = Secret.objects.filter(hosted_on=nb.hosted_on)
-            data = []
-
-            f = Fernet(
-                os.environ.get(
-                    "FERNET_KEY", "ZpojyumLN_yNMwhZH21pXmHA3dgB74Tlcx9lb3wAtmE="
-                ).encode()
-            )
-
-            for secret in secrets:
-                data += [
-                    {
-                        "name": secret.name,
-                        "secret": f.decrypt(secret.token.encode()).decode(),
-                    }
-                ]
-
-            return Response(data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(status=status.HTTP_404_NOT_FOUND)

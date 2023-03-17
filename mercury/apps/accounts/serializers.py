@@ -1,7 +1,7 @@
 from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 
-from apps.accounts.models import Membership, Site, UserProfile, Invitation
+from apps.accounts.models import Invitation, Membership, Site, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -45,7 +45,6 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 
 class InvitationSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = Invitation
         read_only_fields = ("id", "invited", "created_at", "created_by", "rights")

@@ -8,13 +8,13 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.client import encode_multipart
 from django_drf_filepond.models import TemporaryUpload
-from mercury.apps.storage.storage import StorageManager
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from apps.accounts.models import Site
 from apps.storage.s3utils import S3
+from mercury.apps.storage.storage import StorageManager
 
 
 class StorageTestCase(APITestCase):

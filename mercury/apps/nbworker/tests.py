@@ -1,8 +1,9 @@
 import os
-import requests
 from datetime import datetime
 
+import requests
 from allauth.account.admin import EmailAddress
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import LiveServerTestCase
 from django.utils.timezone import make_aware
@@ -10,12 +11,10 @@ from django.utils.timezone import make_aware
 from apps.accounts.models import Site
 from apps.nbworker.rest import RESTClient
 from apps.notebooks.models import Notebook
-from apps.workers.models import Worker, WorkerState
-from apps.storage.s3utils import S3
 from apps.storage.models import UploadedFile
-
+from apps.storage.s3utils import S3
 from apps.storage.storage import StorageManager
-from django.conf import settings
+from apps.workers.models import Worker, WorkerState
 
 # python manage.py test apps.nbworker -v 2
 

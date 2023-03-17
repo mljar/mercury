@@ -1,18 +1,14 @@
 # Please run tests with below command
-# python manage.py test apps.accounts
+# python manage.py test apps.accounts.tests.test_secrets
+
+from datetime import datetime
 
 from allauth.account.admin import EmailAddress
 from django.contrib.auth.models import User
-from django.core import mail
-from datetime import datetime
-from rest_framework import status
-from rest_framework.authtoken.models import Token
+from django.utils.timezone import make_aware
 from rest_framework.test import APITestCase
 
-from apps.accounts.models import Membership, Site
-from apps.accounts.models import Secret
-
-from django.utils.timezone import make_aware
+from apps.accounts.models import Secret, Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 
@@ -22,6 +18,7 @@ class SecretsTestCase(APITestCase):
     login_url = "/api/v1/auth/login/"
     add_secret_url = "/api/v1/{}/add-secret"
     list_secrets_url = "/api/v1/{}/list-secrets"
+    delete_secret_url = "/api/v1/{}/delete-secret/{}"
 
     def setUp(self):
         self.user1_params = {
@@ -92,3 +89,22 @@ class SecretsTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.json()[0].get("name"), new_data["name"])
         self.assertEqual(response.json()[0].get("secret"), new_data["secret"])
+
+    def test_delete_secret(self):
+        # login
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        new_data = {"name": "MY_SECRET", "secret": "super-secret"}
+        response = self.client.post(
+            self.add_secret_url.format(self.site.id), new_data, **headers
+        )
+        secrets = Secret.objects.all()
+        self.assertEqual(len(secrets), 1)
+
+        response = self.client.delete(
+            self.delete_secret_url.format(self.site.id, 1), **headers
+        )
+        self.assertEqual(response.status_code, 204)
+        secrets = Secret.objects.all()
+        self.assertEqual(len(secrets), 0)
