@@ -15,7 +15,6 @@ class NotebookSerializer(serializers.ModelSerializer):
             "title",
             "slug",
             "path",
-            "share",
             "params",
             "state",
             "default_view_path",

@@ -117,7 +117,6 @@ def task_init_notebook(
             "title": "",
             "author": "Please provide author",
             "description": "Please provide description",
-            "share": "public",
             "output": "app",
             "format": {},
             "schedule": "",
@@ -138,7 +137,6 @@ def task_init_notebook(
         notebook_title = params.get("title", "")
         if notebook_title == "":
             notebook_title = nb_default_title(notebook_path)
-        notebook_share = params.get("share", "public")
         notebook_output = params.get("output", "app")
         notebook_format = params.get("format", {})
         notebook_schedule = params.get("schedule", "")
@@ -156,11 +154,6 @@ def task_init_notebook(
                 raise Exception(
                     f"The schedule ({notebook_schedule}) is not valid. {str(e)} Please check schedule at https://crontab.guru"
                 )
-
-        # make sure that there are commas and no spaces between commas
-        notebook_share = (
-            "," + ",".join([i.strip() for i in notebook_share.split(",")]) + ","
-        )
 
         notebook_slug = "some-slug"
         if notebook_id is None:
@@ -261,7 +254,6 @@ def task_init_notebook(
                 slug=notebook_slug,
                 path=os.path.abspath(notebook_path),
                 state="WATCH_READY" if is_watch_mode else "READY",
-                share=notebook_share,
                 params=json.dumps(params),
                 default_view_path=bucket_key_fname
                 if bucket_key is not None
@@ -283,7 +275,6 @@ def task_init_notebook(
             notebook.slug = notebook_slug
             notebook.path = os.path.abspath(notebook_path)
             notebook.state = "WATCH_READY" if is_watch_mode else "READY"
-            notebook.share = notebook_share
             notebook.params = json.dumps(params)
             # remove old default view
             if os.path.exists(notebook.default_view_path):

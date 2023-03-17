@@ -83,8 +83,6 @@ def parse_params(nb, params={}):
                         params["show-code"] = view.get("show_code")
                     if view.get("show_prompt") is not None:
                         params["show-prompt"] = view.get("show_prompt")
-                    if view.get("share") is not None:
-                        params["share"] = view.get("share")
                     if view.get("output") is not None:
                         params["output"] = view.get("output")
                     if view.get("schedule") is not None:
@@ -115,8 +113,6 @@ def parse_params(nb, params={}):
         params["continuous_update"] = True
     if params.get("static_notebook") is None:
         params["static_notebook"] = False
-    if params.get("share") is None:
-        params["share"] = "public"
     if params.get("show_sidebar") is None:
         params["show_sidebar"] = True
     if params.get("full_screen") is None:

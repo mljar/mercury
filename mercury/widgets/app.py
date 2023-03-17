@@ -12,7 +12,6 @@ class App:
         description="",
         show_code=False,
         show_prompt=False,
-        share="public",
         output="app",
         schedule="",
         notify={},
@@ -27,7 +26,6 @@ class App:
         self.description = description
         self.show_code = show_code
         self.show_prompt = show_prompt
-        self.share = share
         self.output = output
         self.schedule = schedule
         self.notify = notify
@@ -53,7 +51,6 @@ class App:
             "description": self.description,
             "show_code": self.show_code,
             "show_prompt": self.show_prompt,
-            "share": self.share,
             "output": self.output,
             "schedule": self.schedule,
             "notify": json.dumps(self.notify),

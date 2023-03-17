@@ -4,7 +4,7 @@ from apps.accounts.models import Membership, Site
 
 
 class SiteModelAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "slug", "share", "created_by")
+    list_display = ("id", "title", "slug", "created_by")
 
     class Meta:
         model = Site

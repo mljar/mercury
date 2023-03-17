@@ -261,11 +261,20 @@ class NBWorker(WSClient):
             f"""import os\nos.environ["MERCURY_OUTPUTDIR"]="{output_dir}" """
         )
 
+    def install_new_packages(self):
+        if "127.0.0.1" not in self.ws_address:
+            fname = "requirements.txt"
+            if os.path.exists(fname):
+                log.debug(f"Install new packages from requirements.txt")
+                cmd = f"pip install -r {fname}"
+                self.nbrun.run_code(cmd)
+
+
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
 
         self.sm.provision_uploaded_files()
-
+        
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""
@@ -278,6 +287,9 @@ class NBWorker(WSClient):
             is_presentation=self.is_presentation(),
             reveal_theme=self.reveal_theme(),
         )
+
+        self.install_new_packages()
+
         # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook
         self.initialize_outputdir()

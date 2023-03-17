@@ -16,6 +16,8 @@ class WSClient(RESTClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
         super(WSClient, self).__init__(notebook_id, session_id, worker_id)
 
+        self.ws_address = ws_address
+
         self.connect(ws_address)
 
         self.queue = Queue()
