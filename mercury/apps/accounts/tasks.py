@@ -2,7 +2,7 @@ from allauth.account.admin import EmailAddress
 from celery import shared_task
 from django.core.mail import send_mail
 
-from apps.accounts.models import Invitation, Membership, Site, SiteState
+from apps.accounts.models import Invitation, Membership, Site, SiteStatus
 from apps.notebooks.models import Notebook
 from apps.notebooks.tasks import task_init_notebook
 from apps.storage.models import UploadedFile
@@ -13,7 +13,7 @@ from apps.storage.utils import get_site_bucket_key
 @shared_task(bind=True)
 def task_init_site(self, job_params):
     site = Site.objects.get(pk=job_params["site_id"])
-    site.status = SiteState.Initializing
+    site.status = SiteStatus.INITIALIZING
     site.save()
 
     files = UploadedFile.objects.filter(hosted_on=site)
@@ -36,7 +36,7 @@ def task_init_site(self, job_params):
                     user=f.created_by,
                 )
 
-    site.status = SiteState.Ready
+    site.status = SiteStatus.READY
     site.save()
 
 

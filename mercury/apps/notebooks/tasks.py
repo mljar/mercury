@@ -19,10 +19,9 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from django.utils.timezone import make_aware
 
-from apps.accounts.models import Site
+from apps.accounts.models import Site, SiteStatus
 from apps.nb.exporter import Exporter
 from apps.notebooks.models import Notebook
-from apps.notebooks.slides_themes import SlidesThemes
 from apps.storage.s3utils import S3
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
@@ -234,6 +233,7 @@ def task_init_notebook(
                         slug="single-site",
                         share=Site.PUBLIC,
                         created_by=user,
+                        status=SiteStatus.READY
                     )
                 else:
                     site = Site.objects.get(slug="single-site")

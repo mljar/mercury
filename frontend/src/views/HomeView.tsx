@@ -20,7 +20,7 @@ import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
 import { getToken, getUsername } from "../slices/authSlice";
-import { getSiteId, isPublic } from "../slices/sitesSlice";
+import { getSiteId, getSiteWelcome, isPublic } from "../slices/sitesSlice";
 
 export default function HomeView() {
   const dispatch = useDispatch();
@@ -32,18 +32,18 @@ export default function HomeView() {
   const [showButton, setShowButton] = useState("");
   const siteId = useSelector(getSiteId);
   const isSitePublic = useSelector(isPublic);
-  //const nbIframes = useSelector(getNbIframes);
-
+  const siteWelcome = useSelector(getSiteWelcome);
+  
   useEffect(() => {
     if (siteId !== undefined) {
       dispatch(fetchNotebooks(siteId));
-      dispatch(fetchWelcome(siteId));
-      // dispatch(fetchNbIframes(siteId));
+      if(siteWelcome === undefined || siteWelcome === "") {
+        dispatch(fetchWelcome(siteId));
+      }
     }
-
     // fetchNotebooks depends on token
     // if token is set then private notebooks are returned
-  }, [dispatch, siteId, token]);
+  }, [dispatch, siteId, token, siteWelcome]);
 
   const firstLetters = (text: string | null, count: number): string => {
     if (text !== null && text !== undefined) {
@@ -132,19 +132,26 @@ export default function HomeView() {
 
   document.body.style.backgroundColor = "white";
 
+  let welcomeMd = siteWelcome;
+  if(welcomeMd === undefined || welcomeMd === "") {
+    welcomeMd = welcome;
+  }
+
+  console.log({welcomeMd})
+
   return (
     <div className="App">
       <HomeNavBar isSitePublic={isSitePublic} username={username} />
       <div className="container" style={{ paddingBottom: "50px" }}>
-        {welcome === "" && (
+        {welcomeMd === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
         )}
-        {welcome !== "" && (
+        {welcomeMd !== "" && (
           <div style={{ paddingTop: "20px", paddingBottom: "10px" }}>
             <ReactMarkdown
               rehypePlugins={[remarkGfm, rehypeHighlight, emoji, rehypeRaw]}
             >
-              {welcome}
+              {welcomeMd}
             </ReactMarkdown>
           </div>
         )}

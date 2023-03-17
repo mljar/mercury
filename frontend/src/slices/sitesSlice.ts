@@ -19,6 +19,7 @@ export interface Site {
   title: string;
   slug: string;
   share: string;
+  welcome: string;
   active: boolean;
   version: string;
   created_at: Date;
@@ -34,6 +35,7 @@ export enum SiteStatus {
   NetworkError = "Network Error",
   PleaseRefresh = "Please refresh",
   LostConnection = "Lost connection",
+  NotReady = "Not Ready"
 }
 
 const initialState = {
@@ -61,6 +63,7 @@ export const { setSite, setSiteStatus } = sitesSlice.actions;
 export const getSite = (state: RootState) => state.sites.site;
 export const getSiteStatus = (state: RootState) => state.sites.siteStatus;
 export const getSiteId = (state: RootState) => state.sites.site.id;
+export const getSiteWelcome = (state: RootState) => state.sites.site.welcome;
 export const isPublic = (state: RootState) => {
   return state.sites.site.share === SITE_PUBLIC;
 };
@@ -82,7 +85,11 @@ export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
     const { data } = await axios.get(url);
 
     dispatch(setSite(data as Site));
-    dispatch(setSiteStatus(SiteStatus.Loaded));
+    if(data?.status !== "Ready") {
+      dispatch(setSiteStatus(SiteStatus.NotReady));  
+    } else {
+      dispatch(setSiteStatus(SiteStatus.Loaded));
+    }
   } catch (error) {
     const err = error as AxiosError;
     console.log(err.message)

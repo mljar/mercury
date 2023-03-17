@@ -9,11 +9,11 @@ from django.dispatch import receiver
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.views.utils import is_cloud_version
 
-class SiteState(str, Enum):
-    Created = "Created"
-    Initializing = "Initializing"
-    Ready = "Ready"
-    Error = "Error"
+class SiteStatus(str, Enum):
+    CREATED = "Created"
+    INITIALIZING = "Initializing"
+    READY = "Ready"
+    ERROR = "Error"
 
 
 class Site(models.Model):
@@ -57,6 +57,7 @@ class Site(models.Model):
     # Ready
     # Error
     status = models.CharField(default="Created", max_length=32, blank=False, null=False)
+    welcome = models.TextField(default="", blank=True, null=True)
     info = models.TextField(blank=True, null=True)
 
     active = models.BooleanField(default=True, blank=False, null=False)

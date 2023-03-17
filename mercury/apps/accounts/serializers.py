@@ -29,6 +29,7 @@ class SiteSerializer(serializers.ModelSerializer):
             "title",
             "slug",
             "share",
+            "welcome",
             "active",
             "status",
             "info",
