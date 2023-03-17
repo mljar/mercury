@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import Membership, Site
+from apps.notebooks.models import Notebook
 from apps.storage.models import UploadedFile, WorkerFile
 from apps.storage.s3utils import S3
 from apps.storage.serializers import UploadedFileSerializer
@@ -146,6 +147,8 @@ class DeleteFile(APIView):
         s3.delete_file(bucket_key)
 
         UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
+        
+        Notebook.objects.filter(path__icontains=filename, hosted_on=site).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 

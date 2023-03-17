@@ -322,6 +322,3 @@ if os.environ.get("EMAIL_BACKEND", "console") != "console":
 # AWS_SES_REGION_NAME = AWS_REGION_NAME
 # AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
 # DEFAULT_FROM_EMAIL = '"Mercury" <contact@runmercury.com>'
-
-
-
