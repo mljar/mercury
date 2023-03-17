@@ -1,8 +1,14 @@
 from django.urls import re_path
 
-from apps.storage.views import (DeleteFile, FileUploaded, ListFiles,
-                                PresignedUrl, WorkerAddFile,
-                                WorkerGetUploadedFilesUrls, WorkerPresignedUrl)
+from apps.storage.views import (
+    DeleteFile,
+    FileUploaded,
+    ListFiles,
+    PresignedUrl,
+    WorkerAddFile,
+    WorkerGetUploadedFilesUrls,
+    WorkerPresignedUrl,
+)
 
 storage_urlpatterns = [
     re_path("api/v1/(?P<site_id>.+)/files", ListFiles.as_view()),

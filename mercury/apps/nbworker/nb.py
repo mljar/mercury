@@ -267,12 +267,11 @@ class NBWorker(WSClient):
                 cmd = f"pip install -r {fname}"
                 self.nbrun.run_code(cmd)
 
-
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
 
         self.sm.provision_uploaded_files()
-        
+
         self.prev_nb = None
         self.prev_widgets = {}
         self.prev_body = ""

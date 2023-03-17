@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import Secret, Site
-from apps.accounts.views.utils import HasEditRights
+from apps.accounts.views.permissions import HasEditRights
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 

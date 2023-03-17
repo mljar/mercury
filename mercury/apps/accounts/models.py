@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 
 from django.contrib.auth.models import User
@@ -6,7 +7,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
-
+from apps.accounts.views.utils import is_cloud_version
 
 class SiteState(str, Enum):
     Created = "Created"
@@ -76,7 +77,12 @@ class UserProfile(models.Model):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
+        info = "{}"
+        if is_cloud_version():
+            info = json.dumps({
+                "plan": "starter"
+            })
+        UserProfile.objects.create(user=instance, info=info)
 
 
 @receiver(post_save, sender=User)

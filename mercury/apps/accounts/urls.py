@@ -3,12 +3,20 @@ from django.urls import path, re_path
 from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.views.accounts import (GetSiteView, InitializeSite,
-                                          MembershipViewSet, SiteViewSet)
-from apps.accounts.views.invitations import (DeleteInvitation, InviteView,
-                                             ListInvitations)
-from apps.accounts.views.secrets import (AddSecret, DeleteSecret, ListSecrets,
-                                         WorkerListSecrets)
+from apps.accounts.views.sites import GetSiteView, InitializeSite, SiteViewSet
+
+from apps.accounts.views.accounts import MembershipViewSet
+from apps.accounts.views.invitations import (
+    DeleteInvitation,
+    InviteView,
+    ListInvitations,
+)
+from apps.accounts.views.secrets import (
+    AddSecret,
+    DeleteSecret,
+    ListSecrets,
+    WorkerListSecrets,
+)
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")

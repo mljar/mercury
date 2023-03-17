@@ -147,7 +147,7 @@ class DeleteFile(APIView):
         s3.delete_file(bucket_key)
 
         UploadedFile.objects.filter(filepath=bucket_key, hosted_on=site).delete()
-        
+
         Notebook.objects.filter(path__icontains=filename, hosted_on=site).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

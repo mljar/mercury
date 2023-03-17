@@ -27,8 +27,6 @@ class WSClient(RESTClient):
 
         self.msg_counter = 0
 
-
-
     def connect(self, ws_address):
         try:
             log.debug(f"WS connect to {ws_address}")

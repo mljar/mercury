@@ -14,9 +14,12 @@ from rest_framework.views import APIView
 
 from apps.accounts.models import Invitation, Membership, Site
 from apps.accounts.serializers import InvitationSerializer
-from apps.accounts.tasks import (task_init_site, task_send_invitation,
-                                 task_send_new_member)
-from apps.accounts.views.utils import HasEditRights
+from apps.accounts.tasks import (
+    task_init_site,
+    task_send_invitation,
+    task_send_new_member,
+)
+from apps.accounts.views.permissions import HasEditRights
 
 
 class InviteView(APIView):
