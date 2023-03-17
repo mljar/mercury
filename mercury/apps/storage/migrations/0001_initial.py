@@ -8,39 +8,80 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('workers', '0001_initial'),
+        ("workers", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('accounts', '0001_initial'),
+        ("accounts", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WorkerFile',
+            name="WorkerFile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=1024)),
-                ('filepath', models.CharField(max_length=1024)),
-                ('output_dir', models.CharField(max_length=1024)),
-                ('local_filepath', models.CharField(max_length=1024)),
-                ('created_at', apps.accounts.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='workers.worker')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("filename", models.CharField(max_length=1024)),
+                ("filepath", models.CharField(max_length=1024)),
+                ("output_dir", models.CharField(max_length=1024)),
+                ("local_filepath", models.CharField(max_length=1024)),
+                (
+                    "created_at",
+                    apps.accounts.fields.AutoCreatedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="workers.worker"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UploadedFile',
+            name="UploadedFile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=1024)),
-                ('filepath', models.CharField(max_length=1024)),
-                ('filetype', models.CharField(max_length=128)),
-                ('filesize', models.IntegerField()),
-                ('created_at', apps.accounts.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('hosted_on', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='accounts.site')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("filename", models.CharField(max_length=1024)),
+                ("filepath", models.CharField(max_length=1024)),
+                ("filetype", models.CharField(max_length=128)),
+                ("filesize", models.IntegerField()),
+                (
+                    "created_at",
+                    apps.accounts.fields.AutoCreatedField(
+                        default=django.utils.timezone.now, editable=False
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "hosted_on",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="accounts.site"
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,16 +4,23 @@ from django.conf.urls import url
 from django.views.generic.base import TemplateView
 from rest_framework.routers import DefaultRouter
 
-from apps.accounts.views import (
+from apps.accounts.views.accounts import (
     AddSecret,
     ListSecrets,
     GetSiteView,
     InitializeSite,
-    InviteView,
     MembershipViewSet,
     SiteViewSet,
     WorkerListSecrets,
 )
+
+
+from apps.accounts.views.invitations import (
+    InviteView,
+    ListInvitations,
+    DeleteInvitation,
+)
+
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
@@ -41,6 +48,11 @@ accounts_urlpatterns += [
         name="password_reset_confirm",
     ),
     re_path("api/v1/(?P<site_id>.+)/invite", InviteView.as_view()),
+    re_path("api/v1/(?P<site_id>.+)/list-invitations", ListInvitations.as_view()),
+    re_path(
+        "api/v1/(?P<site_id>.+)/delete-invitation/(?P<invitation_id>.+)",
+        DeleteInvitation.as_view(),
+    ),
     re_path("api/v1/get-site/(?P<site_slug>.+)/", GetSiteView.as_view()),
     re_path("api/v1/init-site/(?P<site_id>.+)/", InitializeSite.as_view()),
     re_path("api/v1/(?P<site_id>.+)/add-secret", AddSecret.as_view()),
@@ -48,6 +60,5 @@ accounts_urlpatterns += [
     re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/worker-secrets",
         WorkerListSecrets.as_view(),
-    )
+    ),
 ]
-

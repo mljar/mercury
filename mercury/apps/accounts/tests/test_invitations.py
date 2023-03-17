@@ -15,15 +15,16 @@ from apps.accounts.models import Invitation
 from django.utils.timezone import make_aware
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
-from apps.accounts.tasks import task_send_invitation
+from apps.accounts.tasks import task_send_invitation, task_send_new_member
 
 
 class InvitationsTestCase(APITestCase):
     register_url = "/api/v1/auth/register/"
     login_url = "/api/v1/auth/login/"
     invite_url = "/api/v1/{}/invite"
-    
-    
+    list_invitations_url = "/api/v1/{}/list-invitations"
+    delete_invitation_url = "/api/v1/{}/delete-invitation/{}"
+
     def setUp(self):
         self.user1_params = {
             "username": "user1",  # it is optional to pass username
@@ -41,21 +42,20 @@ class InvitationsTestCase(APITestCase):
         self.site = Site.objects.create(
             title="First site", slug="first-site", created_by=self.user
         )
-        
+
     def test_send_invitation(self):
         # login
         response = self.client.post(self.login_url, self.user1_params)
         token = response.json()["key"]
         headers = {"HTTP_AUTHORIZATION": "Token " + token}
-        
+
         new_data = {"email": "some@example.com", "rights": "EDIT"}
-        
+
         response = self.client.post(
             self.invite_url.format(self.site.id), new_data, **headers
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(Invitation.objects.all()), 1)
-
 
         task_send_invitation({"invitation_id": 1})
 
@@ -64,7 +64,7 @@ class InvitationsTestCase(APITestCase):
         self.assertTrue("edit" in mail.outbox[0].body)
         self.assertTrue(new_data["email"] in mail.outbox[0].to)
         self.assertTrue(self.user1_params["email"] in mail.outbox[0].from_email)
-        
+
         new_data = {
             "email": new_data["email"],
             "password1": "verysecret",
@@ -72,10 +72,8 @@ class InvitationsTestCase(APITestCase):
         }
         response = self.client.post(self.register_url, new_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
 
-    
-    def test_invit_already_registered_user(self):
+    def test_invite_already_registered_user(self):
         new_email = "some@example.com"
         new_data = {
             "email": new_email,
@@ -88,10 +86,9 @@ class InvitationsTestCase(APITestCase):
         # login
         response = self.client.post(self.login_url, self.user1_params)
         token = response.json()["key"]
+        # create invitation
         headers = {"HTTP_AUTHORIZATION": "Token " + token}
-        
         new_data = {"email": new_email, "rights": "EDIT"}
-        
         response = self.client.post(
             self.invite_url.format(self.site.id), new_data, **headers
         )
@@ -100,7 +97,52 @@ class InvitationsTestCase(APITestCase):
 
         self.assertEqual(len(Membership.objects.all()), 1)
 
+        task_send_new_member({"membership_id": 1})
 
+        # first email is from registration
+        # second email is invitations
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue("invites" in mail.outbox[1].body)
+        self.assertTrue("edit" in mail.outbox[1].body)
+        self.assertTrue(new_email in mail.outbox[1].to)
+        self.assertTrue(self.user1_params["email"] in mail.outbox[1].from_email)
 
+    def test_list_invitations(self):
+        # login
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        # create invitation
+        new_email = "some@example.com"
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        new_data = {"email": new_email, "rights": "VIEW"}
+        response = self.client.post(
+            self.invite_url.format(self.site.id), new_data, **headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(Invitation.objects.all()), 1)
 
+        response = self.client.get(
+            self.list_invitations_url.format(self.site.id), **headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["invited"], new_email)
 
+    def test_delete_invitation(self):
+        # login
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        # create invitation
+        new_email = "some@example.com"
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        new_data = {"email": new_email, "rights": "VIEW"}
+        response = self.client.post(
+            self.invite_url.format(self.site.id), new_data, **headers
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(Invitation.objects.all()), 1)
+
+        response = self.client.delete(
+            self.delete_invitation_url.format(self.site.id, 1), **headers
+        )
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 204)

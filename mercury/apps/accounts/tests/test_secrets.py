@@ -22,7 +22,7 @@ class SecretsTestCase(APITestCase):
     login_url = "/api/v1/auth/login/"
     add_secret_url = "/api/v1/{}/add-secret"
     list_secrets_url = "/api/v1/{}/list-secrets"
-    
+
     def setUp(self):
         self.user1_params = {
             "username": "user1",  # it is optional to pass username
@@ -40,7 +40,7 @@ class SecretsTestCase(APITestCase):
         self.site = Site.objects.create(
             title="First site", slug="first-site", created_by=self.user
         )
-        
+
     def test_add_secret(self):
         # login
         response = self.client.post(self.login_url, self.user1_params)
@@ -64,7 +64,6 @@ class SecretsTestCase(APITestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], new_data["name"])
 
-
     def test_list_worker_secrets(self):
         # login
         response = self.client.post(self.login_url, self.user1_params)
@@ -74,7 +73,7 @@ class SecretsTestCase(APITestCase):
         response = self.client.post(
             self.add_secret_url.format(self.site.id), new_data, **headers
         )
-        
+
         nb = Notebook.objects.create(
             title="some",
             slug="some",
@@ -85,11 +84,9 @@ class SecretsTestCase(APITestCase):
         )
         session_id = "some-session"
         worker = Worker.objects.create(
-            session_id=session_id,
-            machine_id="some-machine",
-            notebook=nb
+            session_id=session_id, machine_id="some-machine", notebook=nb
         )
-        
+
         # get worker secrets
         url = f"/api/v1/worker/{session_id}/{worker.id}/{nb.id}/worker-secrets"
         response = self.client.get(url)
