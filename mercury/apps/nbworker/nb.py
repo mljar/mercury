@@ -14,7 +14,6 @@ from execnb.nbio import nb2dict, read_nb
 from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, stop_event
 from apps.nbworker.ws import WSClient
-from apps.storage.storage import StorageManager
 from apps.tasks.models import Task
 from apps.workers.models import WorkerState
 from apps.ws.utils import parse_params
@@ -32,7 +31,6 @@ class NBWorker(WSClient):
         self.prev_body = ""
         self.prev_update_time = None
         self.prev_md5 = None
-        self.sm = StorageManager(self.session_id, self.worker_id, self.notebook_id)
 
         # monitor notebook file updates if running locally
         if "127.0.0.1" in ws_address:

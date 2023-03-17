@@ -8,6 +8,7 @@ import websocket
 from apps.nbworker.rest import RESTClient
 from apps.nbworker.utils import Purpose, stop_event
 from apps.workers.models import WorkerState
+from apps.storage.storage import StorageManager
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +17,8 @@ class WSClient(RESTClient):
     def __init__(self, ws_address, notebook_id, session_id, worker_id):
         super(WSClient, self).__init__(notebook_id, session_id, worker_id)
 
+        self.sm = StorageManager(self.session_id, self.worker_id, self.notebook_id)
+
         self.ws_address = ws_address
 
         self.connect(ws_address)
@@ -23,6 +26,8 @@ class WSClient(RESTClient):
         self.queue = Queue()
 
         self.msg_counter = 0
+
+
 
     def connect(self, ws_address):
         try:
@@ -50,6 +55,7 @@ class WSClient(RESTClient):
     def on_close(self, ws, close_status_code, close_msg):
         global stop_event
         stop_event.set()
+        self.sm.delete_worker_output_dir()
         log.info(f"WS close connection, status={close_status_code}, msg={close_msg}")
 
     def on_pong(self, wsapp, msg):

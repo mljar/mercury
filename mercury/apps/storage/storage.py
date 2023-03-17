@@ -62,6 +62,7 @@ class StorageManager:
         else:
             log.debug(f"Directory {dir_path} already exists")
 
+
     @staticmethod
     def delete_dir(dir_path):
         if os.path.exists(dir_path):
@@ -71,6 +72,7 @@ class StorageManager:
             except Exception as e:
                 log.exception(f"Exception when delete {dir_path}")
                 raise Exception(f"Cant delete {dir_path}")
+
 
     def worker_output_dir(self):
         if settings.STORAGE == settings.STORAGE_MEDIA:
@@ -86,6 +88,17 @@ class StorageManager:
             output_dir = f"output_{self.worker_id}"
             StorageManager.create_dir(output_dir)
             return output_dir
+
+
+    def delete_worker_output_dir(self):
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            first_dir = os.path.join(str(settings.MEDIA_ROOT), self.session_id)
+            log.debug(f"Delete Worker output directory: {first_dir}")
+            StorageManager.delete_dir(first_dir)
+        elif settings.STORAGE == settings.STORAGE_S3:
+            output_dir = f"output_{self.worker_id}"
+            StorageManager.delete_dir(output_dir)
+
 
     def sync_output_dir(self):
         if settings.STORAGE == settings.STORAGE_MEDIA:

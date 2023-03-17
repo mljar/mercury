@@ -28,6 +28,7 @@ class SiteSerializer(serializers.ModelSerializer):
             "updated_at",
             "title",
             "slug",
+            "share",
             "active",
             "status",
             "info",
