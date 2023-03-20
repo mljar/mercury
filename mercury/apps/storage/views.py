@@ -84,7 +84,7 @@ def upload_allowed_check_limits(user, site_id, filesize):
     files_count_limit = FILE_LIMITS[plan]["files"]
     files_size_limit = FILE_LIMITS[plan]["size"] # in MB
     
-    if filesize / 1024 / 1024 > files_size_limit:
+    if int(filesize) / 1024 / 1024 > files_size_limit:
         return False
 
     total_files = UploadedFile.objects.filter(hosted_on__id=site_id)

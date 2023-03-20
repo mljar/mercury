@@ -59,7 +59,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             request.user
         ):
             return Response(
-                {"msg": "Sites limit reached"},
+                {"msg": "Sites limit reached. Please change subsription plan"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         proposed_slug = get_slug(request.data.get("slug", ""), request.data.get("title", ""))
