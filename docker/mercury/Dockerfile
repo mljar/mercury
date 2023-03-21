@@ -24,16 +24,6 @@ RUN pip install psycopg2
 RUN pip install daphne
 RUN pip install mercury
 
-
-# install Pro features if GITHUB_TOKEN is set
-RUN if [ -z "${GITHUB_TOKEN}" ] ; then \
-        echo "Skip Pro features installation." && \
-        echo "Please visit https://mljar.com/pricing for Pro features details." ; \
-    else \
-        echo "Install Pro features ..." && \
-        pip install -U git+https://${GITHUB_TOKEN}@github.com/mljar/mercury-pro.git@main#egg=pro ; \
-    fi
-
 ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
 ADD ./mercury/*.py /app/mercury/
