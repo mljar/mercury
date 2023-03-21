@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Setup Mercury Pro"
+echo "Setup Mercury with HTTPS"
 if [[ $# -ne 1 ]]; then
     echo "Please specify your domain" >&2
     exit 2
@@ -12,7 +12,7 @@ echo "[Done] Domain set"
 echo "---------------------------------------------------------"
 mv docker/init-letsencrypt.sh init-letsencrypt.sh
 echo "Build docker-compose:"
-sudo docker-compose -f docker-compose-pro.yml build
+sudo docker-compose -f docker-compose-https.yml build
 echo "[Done] Docker-compose build"
 echo "---------------------------------------------------------"
 echo "Initialize SSL certificates"
@@ -20,6 +20,6 @@ sudo ./init-letsencrypt.sh
 echo "[Done] SSL certificates issued"
 echo "---------------------------------------------------------"
 echo "Start service"
-sudo docker-compose -f docker-compose-pro.yml up --build -d
+sudo docker-compose -f docker-compose-https.yml up --build -d
 echo "[Done] Mercury is running"
 echo "---------------------------------------------------------"
