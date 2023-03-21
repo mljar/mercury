@@ -117,7 +117,21 @@ class SiteViewSet(viewsets.ModelViewSet):
 
 class GetSiteView(APIView):
     def get(self, request, site_slug, format=None):
-        sites = Site.objects.filter(slug=site_slug)
+
+        url = site_slug
+        # this can be a custom domain
+        custom_domain = url
+        # or subdomain with domain
+        subdomain, domain = "", "runmercury.com"
+
+        if len(url.split(".")) > 1:
+            subdomain = url.split(".")[0]
+            domain = "".join(url.split(".")[1:])
+        
+        sites = Site.objects.filter(
+            Q(custom_domain=custom_domain)
+            | Q(slug=subdomain, domain=domain)
+        )
         if not sites:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
