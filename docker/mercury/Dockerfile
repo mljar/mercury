@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-ARG GITHUB_TOKEN
+
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
