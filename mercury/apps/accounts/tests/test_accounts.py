@@ -1,4 +1,3 @@
-
 # Please run tests with below command
 # python manage.py test apps.accounts.tests.test_accounts
 
@@ -15,6 +14,7 @@ from rest_framework.test import APITestCase
 from apps.accounts.models import Membership, Secret, Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
+
 
 class AccountsTestCase(APITestCase):
     register_url = "/api/v1/auth/register/"
@@ -118,7 +118,6 @@ class AccountsTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         # example response
         # {'id': 1, 'created_at': '2023-02-23T14:16:26.210009Z', 'created_by': 1, 'updated_at': '2023-02-23T14:16:26.210310Z', 'rights': 'VIEW', 'user': {'pk': 2, 'username': 'user2', 'email': 'piotr2@example.com', 'first_name': '', 'last_name': ''}}
-
 
     def test_register(self):
         # register data

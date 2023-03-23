@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 from apps.accounts.models import Membership, Site
 
+
 class HasEditRights(permissions.BasePermission):
     def has_permission(self, request, view):
         site_id = view.kwargs.get("site_id")

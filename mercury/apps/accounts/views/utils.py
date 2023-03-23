@@ -3,8 +3,10 @@ import uuid
 
 from django.template.defaultfilters import slugify
 
+
 def is_cloud_version():
     return os.environ.get("MERCURY_CLOUD", "0") == "1"
+
 
 def some_random_slug():
     h = uuid.uuid4().hex.replace("-", "")
