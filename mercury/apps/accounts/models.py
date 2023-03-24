@@ -57,7 +57,7 @@ class Site(models.Model):
     # Initializing
     # Ready
     # Error
-    status = models.CharField(default="Created", max_length=32, blank=False, null=False)
+    status = models.CharField(default="Ready", max_length=32, blank=False, null=False)
     welcome = models.TextField(default="", blank=True, null=True)
     info = models.TextField(blank=True, null=True)
 

@@ -26,7 +26,6 @@ class SiteSerializer(serializers.ModelSerializer):
             "created_by",
             "updated_at",
             "status",
-            "domain",
         )
         fields = (
             "id",
@@ -35,6 +34,8 @@ class SiteSerializer(serializers.ModelSerializer):
             "updated_at",
             "title",
             "slug",
+            "domain",
+            "custom_domain",
             "share",
             "welcome",
             "active",
