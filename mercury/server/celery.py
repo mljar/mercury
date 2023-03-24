@@ -25,6 +25,11 @@ app.conf.timezone = settings.TIME_ZONE
 
 app.autodiscover_tasks()
 
+# workers with active websocket connection are in the separate queue
+app.conf.task_routes = {
+    "apps.ws.tasks.task_start_websocket_worker": {"queue": "ws"}
+}
+
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):

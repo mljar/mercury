@@ -126,7 +126,13 @@ class GetSiteView(APIView):
 
         if len(url.split(".")) > 1:
             subdomain = url.split(".")[0]
-            domain = "".join(url.split(".")[1:])
+            domain = ".".join(url.split(".")[1:])
+        
+        if site_slug in ["127.0.0.1", "localhost"]:
+            subdomain = "single-site"
+            domain = "runmercury.com"
+
+        print(subdomain, domain, custom_domain)
         
         sites = Site.objects.filter(
             Q(custom_domain=custom_domain)

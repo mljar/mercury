@@ -168,6 +168,8 @@ def main():
                 "--concurrency",
                 "1",
                 "-E",
+                "-Q",
+                "celery,ws"
             ]
             if VERBOSE == 0:
                 worker = subprocess.Popen(

@@ -30,7 +30,7 @@ python manage.py collectstatic --noinput
 
 python manage.py createsuperuser --noinput
 
-celery -A server worker --loglevel=info -P gevent --concurrency 4 -E &
+celery -A server worker --loglevel=info -P gevent --concurrency 4 -E -Q celery,ws &
 
 celery -A server beat --loglevel=error --max-interval 60 &
 
