@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from apps.accounts.views.sites import GetSiteView, InitializeSite, SiteViewSet
 
-from apps.accounts.views.accounts import MembershipViewSet
+from apps.accounts.views.accounts import MembershipViewSet, DeleteAccount
 from apps.accounts.views.invitations import (
     DeleteInvitation,
     InviteView,
@@ -17,6 +17,7 @@ from apps.accounts.views.secrets import (
     ListSecrets,
     WorkerListSecrets,
 )
+from apps.accounts.views.subscription import SubscriptionView
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
@@ -63,4 +64,9 @@ accounts_urlpatterns += [
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/worker-secrets",
         WorkerListSecrets.as_view(),
     ),
+    re_path(
+        "api/v1/subscription",
+        SubscriptionView.as_view(),
+    ),
+    re_path("api/v1/auth/delete-account/", DeleteAccount.as_view()),
 ]

@@ -9,6 +9,17 @@ from apps.accounts.serializers import MembershipSerializer
 from apps.accounts.views.permissions import HasEditRights
 
 
+import os
+import json
+import requests
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.serializers import ValidationError
+
+from apps.accounts.serializers import UserSerializer
+
+
 class MembershipViewSet(viewsets.ModelViewSet):
     serializer_class = MembershipSerializer
     permission_classes = [permissions.IsAuthenticated, HasEditRights]
@@ -28,3 +39,24 @@ class MembershipViewSet(viewsets.ModelViewSet):
                 instance.save()
         except Exception as e:
             raise APIException(str(e))
+
+
+class DeleteAccount(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, format=None):
+        user = request.user
+
+        info = json.loads(user.profile.info)
+        plan = info.get("plan", "starter")
+        if plan != "starter":
+            return Response(
+                data={"msg": "Please cancel subscription"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # remove other stuff ...
+
+        user.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
