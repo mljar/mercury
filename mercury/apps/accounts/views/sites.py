@@ -30,6 +30,7 @@ FORBIDDEN_SLUGS = [
     "python",
     "backend",
     "frontend",
+    "www"
 ]
 
 
