@@ -20,7 +20,14 @@ class UserSerializer(UserDetailsSerializer):
 class SiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
-        read_only_fields = ("id", "created_at", "created_by", "updated_at", "status", "domain")
+        read_only_fields = (
+            "id",
+            "created_at",
+            "created_by",
+            "updated_at",
+            "status",
+            "domain",
+        )
         fields = (
             "id",
             "created_at",
@@ -33,7 +40,7 @@ class SiteSerializer(serializers.ModelSerializer):
             "active",
             "status",
             "info",
-            "domain"
+            "domain",
         )
 
 

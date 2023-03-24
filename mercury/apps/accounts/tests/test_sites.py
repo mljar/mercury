@@ -175,6 +175,43 @@ class SitesTestCase(APITestCase):
         self.assertEqual(data["slug"], new_data["slug"])
         self.assertEqual(data["share"], new_data["share"])
 
+    def test_update_site_invalid_slug(self):
+        # create site for first user
+        site = Site.objects.create(
+            title="First site", slug="first-site", created_by=self.user
+        )
+
+        # login as second user to get token
+        response = self.client.post(self.login_url, self.user2_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+
+        new_data = {"title": "New title", "slug": "mljar", "share": Site.PRIVATE}
+        # try to edit without edit rights
+        response = self.client.put(f"{self.sites_url}1/", new_data, **headers)
+        self.assertEqual(response.status_code, 404)
+
+        # give edit access to second user
+        Membership.objects.create(
+            user=self.user2, host=site, rights=Membership.EDIT, created_by=self.user
+        )
+        # second user can edit
+        response = self.client.put(f"{self.sites_url}1/", new_data, **headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue("You cant" in response.json()[0])
+
+        # second user can edit
+        response = self.client.patch(
+            f"{self.sites_url}1/", {"slug": "mljar"}, **headers
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue("You cant" in response.json()[0])
+
+        # second user can edit
+        response = self.client.patch(
+            f"{self.sites_url}1/", {"title": "new title"}, **headers
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_limit_sites(self):
         # login to get token
@@ -188,30 +225,31 @@ class SitesTestCase(APITestCase):
         # create site
         new_data = {"title": "New site", "slug": "Some slug", "share": Site.PRIVATE}
         response = self.client.post(self.sites_url, new_data, **headers)
-        self.assertEqual(response.status_code, 201)    
+        self.assertEqual(response.status_code, 201)
 
         os.environ["MERCURY_CLOUD"] = "1"
         # create site, but limit should be reached
         new_data = {"title": "New site", "slug": "Some slug 2", "share": Site.PRIVATE}
         response = self.client.post(self.sites_url, new_data, **headers)
-        self.assertEqual(response.status_code, 403)    
+        self.assertEqual(response.status_code, 403)
 
         os.environ["MERCURY_CLOUD"] = "0"
         # create site, now it should work
-        new_data = {"title": "New site", "slug": "Some slug 2 asd", "share": Site.PRIVATE}
+        new_data = {
+            "title": "New site",
+            "slug": "Some slug 2 asd",
+            "share": Site.PRIVATE,
+        }
         response = self.client.post(self.sites_url, new_data, **headers)
         print(response.content)
-        self.assertEqual(response.status_code, 201)    
-        
+        self.assertEqual(response.status_code, 201)
 
         # create site with the same slug
         new_data = {"title": "New site", "slug": "Some slug", "share": Site.PRIVATE}
         response = self.client.post(self.sites_url, new_data, **headers)
-        self.assertEqual(response.status_code, 403)    
+        self.assertEqual(response.status_code, 403)
 
         # create site with the forbidden slug
         new_data = {"title": "New site", "slug": "mercury", "share": Site.PRIVATE}
         response = self.client.post(self.sites_url, new_data, **headers)
-        self.assertEqual(response.status_code, 403)    
-
-
+        self.assertEqual(response.status_code, 403)

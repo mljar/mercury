@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.views.utils import is_cloud_version
 
+
 class SiteStatus(str, Enum):
     CREATED = "Created"
     INITIALIZING = "Initializing"
@@ -80,9 +81,7 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         info = "{}"
         if is_cloud_version():
-            info = json.dumps({
-                "plan": "starter"
-            })
+            info = json.dumps({"plan": "starter"})
         UserProfile.objects.create(user=instance, info=info)
 
 

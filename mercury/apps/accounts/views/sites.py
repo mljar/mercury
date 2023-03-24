@@ -7,6 +7,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.serializers import ValidationError
 
 from apps.accounts.models import Membership, Site
 from apps.accounts.serializers import SiteSerializer
@@ -19,7 +20,18 @@ PLAN_STARTER = "starter"
 PLAN_PRO = "pro"
 PLAN_BUSINESS = "business"
 
-FORBIDDEN_SLUGS = ["mercury", "dashboard", "report", "mljar", "cloud", "api"]
+FORBIDDEN_SLUGS = [
+    "mercury",
+    "dashboard",
+    "report",
+    "mljar",
+    "cloud",
+    "api",
+    "python",
+    "backend",
+    "frontend",
+]
+
 
 def get_plan(user):
     info = json.loads(user.profile.info)
@@ -28,20 +40,18 @@ def get_plan(user):
         user_plan = PLAN_STARTER
     return user_plan
 
+
 def max_number_of_sites(user):
     if not is_cloud_version():
         return 1000
     try:
         user_plan = get_plan(user)
-        sites_plans = {
-            PLAN_STARTER: 1,
-            PLAN_PRO: 3,
-            PLAN_BUSINESS: 10
-        }
+        sites_plans = {PLAN_STARTER: 1, PLAN_PRO: 3, PLAN_BUSINESS: 10}
         return sites_plans[user_plan]
     except Exception as e:
         pass
     return 1
+
 
 class SiteViewSet(viewsets.ModelViewSet):
     serializer_class = SiteSerializer
@@ -62,7 +72,9 @@ class SiteViewSet(viewsets.ModelViewSet):
                 {"msg": "Sites limit reached. Please change subsription plan"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        proposed_slug = get_slug(request.data.get("slug", ""), request.data.get("title", ""))
+        proposed_slug = get_slug(
+            request.data.get("slug", ""), request.data.get("title", "")
+        )
         if proposed_slug in FORBIDDEN_SLUGS:
             return Response(
                 {"msg": "Please change site subdomain, current value is forbidden"},
@@ -73,7 +85,7 @@ class SiteViewSet(viewsets.ModelViewSet):
                 {"msg": "Please change site subdomain, current value is not unique"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -98,8 +110,12 @@ class SiteViewSet(viewsets.ModelViewSet):
         updated_instance = serializer.save()
         # lets check slug if we update it
         new_slug = self.request.data.get("slug")
+
         if new_slug is not None:
-            updated_instance.slug = get_slug(new_slug, updated_instance.title)
+            new_slug = get_slug(new_slug, updated_instance.title)
+            if new_slug in FORBIDDEN_SLUGS:
+                raise ValidationError(f"You cant use {new_slug} as a subdomain")
+            updated_instance.slug = new_slug
             updated_instance.save()
 
     def destroy(self, request, *args, **kwargs):
@@ -117,7 +133,6 @@ class SiteViewSet(viewsets.ModelViewSet):
 
 class GetSiteView(APIView):
     def get(self, request, site_slug, format=None):
-
         url = site_slug
         # this can be a custom domain
         custom_domain = url
@@ -135,8 +150,7 @@ class GetSiteView(APIView):
         print(subdomain, domain, custom_domain)
         
         sites = Site.objects.filter(
-            Q(custom_domain=custom_domain)
-            | Q(slug=subdomain, domain=domain)
+            Q(custom_domain=custom_domain) | Q(slug=subdomain, domain=domain)
         )
         if not sites:
             return Response(status=status.HTTP_404_NOT_FOUND)
