@@ -18,6 +18,8 @@ class UserSerializer(UserDetailsSerializer):
 
 
 class SiteSerializer(serializers.ModelSerializer):
+    created_by = UserDetailsSerializer(many=False, read_only=True)
+
     class Meta:
         model = Site
         read_only_fields = (
