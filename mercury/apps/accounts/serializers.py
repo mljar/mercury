@@ -50,12 +50,12 @@ class MembershipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membership
-        read_only_fields = ("created_at", "created_by", "updated_at")
+        read_only_fields = ("id", "created_at", "created_by", "updated_at")
         fields = read_only_fields + ("rights", "user")
 
 
 class InvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitation
-        read_only_fields = ("invited", "created_at", "created_by", "rights")
+        read_only_fields = ("id", "invited", "created_at", "created_by", "rights")
         fields = read_only_fields
