@@ -1,5 +1,7 @@
 from allauth.account.admin import EmailAddress
 from celery import shared_task
+
+from django.conf import settings
 from django.core.mail import send_mail
 
 from apps.accounts.models import Invitation, Membership, Site, SiteStatus
@@ -70,7 +72,7 @@ Please create a new account to access app.
 Thank you!
 Mercury Team        
 """,
-        from_address.email,
+        settings.DEFAULT_FROM_EMAIL,
         [invitation.invited],
         fail_silently=False,
     )
@@ -78,7 +80,6 @@ Mercury Team
 
 @shared_task(bind=True)
 def task_send_new_member(self, job_params):
-    print
     membership_id = job_params["membership_id"]
     membership = Membership.objects.get(pk=membership_id)
 
@@ -94,7 +95,7 @@ User {invited_by.username} invites you to {membership.rights.lower()} web app at
 Thank you!
 Mercury Team        
 """,
-        from_address.email,
+        settings.DEFAULT_FROM_EMAIL,
         [membership.user.email],
         fail_silently=False,
     )
