@@ -194,7 +194,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
                 notebookSchedule={notebook.schedule}
                 taskCreatedAt={task.created_at}
                 loadingState={loadingState}
-                waiting={pleaseWait()} // {waitForTask()}
+                waiting={pleaseWait()}  
                 widgetsParams={notebook?.params?.params}
                 watchMode={isWatchMode()}
                 notebookPath={notebookPath}
@@ -246,7 +246,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
               loadingState={loadingState}
               notebookPath={notebookPath}
               errorMsg={errorMsg}
-              waiting={pleaseWait()} // {waitForTask()}
+              waiting={pleaseWait()}  
               watchMode={isWatchMode()}
               displayEmbed={displayEmbed}
               username={username}
@@ -262,7 +262,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
               <FilesView
                 files={outputFiles}
                 filesState={outputFilesState}
-                waiting={pleaseWait()} // {waitForTask()}
+                waiting={pleaseWait()}  
               />
             )}
           </div>

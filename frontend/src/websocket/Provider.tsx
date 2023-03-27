@@ -24,7 +24,7 @@ import {
 import { useSelector } from "react-redux";
 import { getSessionId, handleDownload } from "../utils";
 import { setExportingToPDF } from "../slices/tasksSlice";
-import { getSiteId } from "../slices/sitesSlice";
+import { getSiteId, setSiteStatus, SiteStatus } from "../slices/sitesSlice";
 import { getToken } from "../slices/authSlice";
 
 const WebSocketContext = createContext(undefined as any);
@@ -48,6 +48,9 @@ if (process.env.REACT_APP_SERVER_WS) {
   }
 }
 
+const MAX_CONNECT_COUNT = 5;
+let connectCounter = 0;
+
 export default function WebSocketProvider({
   children,
 }: {
@@ -63,6 +66,7 @@ export default function WebSocketProvider({
   //const tryConnectCount = useSelector(getTryConnectCount);
 
   let connection: WebSocket | undefined = undefined;
+  let workerState = "Unknown" as WorkerState;
 
   const sendMessage = (payload: string) => {
     if (connection !== undefined && connection.readyState === connection.OPEN) {
@@ -88,9 +92,18 @@ export default function WebSocketProvider({
     const response = JSON.parse(event.data);
     if ("purpose" in response) {
       if (response.purpose === "worker-state") {
-        //console.log("worker-state", response.state);
+        console.log("worker-state", response.state);
+        workerState = response.state;
+
         dispatch(setWorkerState(response.state));
         dispatch(setWorkerId(response.workerId));
+
+        if (
+          workerState === WorkerState.MaxIdleTimeReached ||
+          workerState === WorkerState.MaxRunTimeReached
+        ) {
+          connection?.close();
+        }
       } else if (response.purpose === "executed-notebook") {
         //console.log(response?.reloadNotebook, selectedNotebookId);
         if (response?.reloadNotebook && selectedNotebookId !== undefined) {
@@ -98,10 +111,10 @@ export default function WebSocketProvider({
           dispatch(fetchNotebook(siteId, selectedNotebookId));
         }
         dispatch(setNotebookSrc(response.body));
-      // } else if (response.purpose === "saved-notebook") {
-      //   if (selectedNotebookId !== undefined) {
-      //     dispatch(fetchExecutionHistory(selectedNotebookId, false));
-      //   }
+        // } else if (response.purpose === "saved-notebook") {
+        //   if (selectedNotebookId !== undefined) {
+        //     dispatch(fetchExecutionHistory(selectedNotebookId, false));
+        //   }
       } else if (response.purpose === "update-widgets") {
         dispatch(updateWidgetsParams(response));
       } else if (response.purpose === "hide-widgets") {
@@ -132,10 +145,17 @@ export default function WebSocketProvider({
 
   function onClose(event: any): void {
     dispatch(setWebSocketState(WebSocketState.Disconnected));
-    dispatch(setWorkerState(WorkerState.Unknown));
-    dispatch(setWorkerId(undefined));
     connection = undefined;
-    setTimeout(() => connect(), 5000);
+    if (
+      workerState !== WorkerState.MaxIdleTimeReached &&
+      workerState !== WorkerState.MaxRunTimeReached
+    ) {
+      dispatch(setWorkerState(WorkerState.Unknown));
+      dispatch(setWorkerId(undefined));
+      if (connectCounter < MAX_CONNECT_COUNT) {
+        setTimeout(() => connect(), 5000);
+      }
+    }
   }
 
   function ping(): void {
@@ -150,11 +170,17 @@ export default function WebSocketProvider({
   }
 
   function connect() {
+    console.log("try to connect ..." + workerState + " " + connectCounter);
     if (
       (localServer || !isStatic) &&
       selectedNotebookId !== undefined &&
-      connection === undefined
+      connection === undefined &&
+      workerState !== WorkerState.MaxIdleTimeReached &&
+      workerState !== WorkerState.MaxRunTimeReached
     ) {
+      console.log(
+        "(2) try to connect ..." + workerState + " " + connectCounter
+      );
       dispatch(increaseTryConnectCount());
       let url = `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`;
       if (token !== undefined && token !== null && token !== "") {
@@ -165,6 +191,11 @@ export default function WebSocketProvider({
       connection.onmessage = onMessage;
       connection.onerror = onError;
       connection.onclose = onClose;
+      connectCounter += 1;
+
+      if (connectCounter >= MAX_CONNECT_COUNT) {
+        dispatch(setSiteStatus(SiteStatus.NetworkError));
+      }
     }
   }
   connect();

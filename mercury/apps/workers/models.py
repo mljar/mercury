@@ -9,7 +9,9 @@ class WorkerState(str, Enum):
     Busy = "Busy"
     Running = "Running"
     Unknown = "Unknown"
-
+    MaxRunTimeReached = "MaxRunTimeReached"
+    MaxIdleTimeReached = "MaxIdleTimeReached"
+    
 
 class Worker(models.Model):
     # machine unique id

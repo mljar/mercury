@@ -10,6 +10,7 @@ from datetime import datetime
 
 from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
+from matplotlib.pyplot import close
 
 from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, stop_event
@@ -31,6 +32,15 @@ class NBWorker(WSClient):
         self.prev_body = ""
         self.prev_update_time = None
         self.prev_md5 = None
+        self.start_time = time.time()
+        self.max_idle_time = os.environ.get(
+            "MAX_IDLE_TIME", 12 * 60 * 60
+        )  # default idle after 12 hours
+        self.max_run_time = os.environ.get(
+            "MAX_RUN_TIME", 24 * 60 * 60
+        )  # default max run time is 24 hours
+        self.last_execution_time = time.time()
+        self.start_time = time.time()
 
         # monitor notebook file updates if running locally
         if "127.0.0.1" in ws_address:
@@ -76,6 +86,9 @@ class NBWorker(WSClient):
             log.debug(f"Porcess msg {item}")
             json_data = json.loads(item)
 
+            if json_data.get("purpose", "") != Purpose.WorkerPing:
+                self.last_execution_time = time.time()
+
             if json_data.get("purpose", "") == Purpose.InitNotebook:
                 self.init_notebook()
             elif json_data.get("purpose", "") == Purpose.RunNotebook:
@@ -100,9 +113,25 @@ class NBWorker(WSClient):
             self.queue.task_done()
 
     def worker_pong(self):
-        self.update_worker_state(WorkerState.Running)
+        total_run_time = time.time() - self.start_time
+        elapsed_from_last_execution = time.time() - self.last_execution_time
+        log.debug(f"Total run time {total_run_time}")
+        log.debug(f"Elapsed from last execution {elapsed_from_last_execution}")
+
+        close_worker = True
+        if total_run_time > self.max_run_time:
+            self.update_worker_state(WorkerState.MaxRunTimeReached)
+        elif elapsed_from_last_execution > self.max_idle_time:
+            self.update_worker_state(WorkerState.MaxIdleTimeReached)
+        else:
+            self.update_worker_state(WorkerState.Running)
+            close_worker = False
+
         if self.worker_exists():
             self.send_state()
+
+        if close_worker:
+            self.queue.put(json.dumps({"purpose": Purpose.CloseWorker}))
 
     def run_notebook(self, json_params):
         log.debug(f"Run notebook with {json_params}")

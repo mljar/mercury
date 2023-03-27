@@ -460,6 +460,34 @@ export default function SideBar({
                 </div>
               )} */}
 
+              {workerState === WorkerState.MaxIdleTimeReached && (
+                <div className="alert alert-info mb-3 mt-3" role="alert">
+                  <i className="fa fa-info-circle" aria-hidden="true"></i> Your
+                  worker was idle for too long, that's why we have stopped it.
+                  Do you need a worker?
+                  <br />
+                  <button
+                    className="btn btn-sm btn-primary my-2"
+                    onClick={() => window.location.reload()}
+                  >
+                    Restart worker
+                  </button>
+                </div>
+              )}
+              {workerState === WorkerState.MaxRunTimeReached && (
+                <div className="alert alert-info mb-3 mt-3" role="alert">
+                  <i className="fa fa-info-circle" aria-hidden="true"></i> Your
+                  worker was running for too long, that's why we have stopped
+                  it. Do you need a worker?
+                  <br />
+                  <button
+                    className="btn btn-sm btn-primary my-2"
+                    onClick={() => window.location.reload()}
+                  >
+                    Restart worker
+                  </button>
+                </div>
+              )}
               {waiting &&
                 (workerState === WorkerState.Unknown ||
                   workerState === WorkerState.Queued) && (

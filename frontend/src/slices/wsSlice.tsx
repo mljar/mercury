@@ -16,6 +16,8 @@ export enum WorkerState {
   Missing = "Missing",
   Busy = "Busy",
   Queued = "Queued",
+  MaxRunTimeReached = "MaxRunTimeReached",
+  MaxIdleTimeReached = "MaxIdleTimeReached"
 }
 
 const initialState = {
@@ -66,7 +68,8 @@ export const getWebSocketState = (state: RootState) => state.ws.webSocketState;
 export const getWorkerState = (state: RootState) => state.ws.workerState;
 export const getWorkerId = (state: RootState) => state.ws.workerId;
 export const getNotebookSrc = (state: RootState) => state.ws.notebookSrc;
-export const getTryConnectCount = (state: RootState) => state.ws.tryConnectCount;
+export const getTryConnectCount = (state: RootState) =>
+  state.ws.tryConnectCount;
 
 export const runNotebook = (widgets_params: string) => {
   return {
