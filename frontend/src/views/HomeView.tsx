@@ -162,26 +162,8 @@ export default function HomeView() {
           {loadingState === "loaded" && notebooks.length === 0 && (
             <div>
               <p>
-                There are no notebooks available. Please add notebook to Mercury
-                server.
+                There are no notebooks available. 
               </p>
-
-              <p>
-                Command to watch notebook development in Mercury (with automatic
-                refresh):
-              </p>
-              <div className="alert alert-primary" role="alert">
-                <pre style={{ margin: "0px" }}>
-                  mercury watch {"<path_to_notebook>"}
-                </pre>
-              </div>
-
-              <p>Command to add notebook to your Mercury server:</p>
-              <div className="alert alert-primary" role="alert">
-                <pre style={{ margin: "0px" }}>
-                  mercury add {"<path_to_notebook>"}
-                </pre>
-              </div>
             </div>
           )}
           {loadingState === "error" && (
