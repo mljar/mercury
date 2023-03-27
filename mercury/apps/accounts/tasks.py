@@ -67,7 +67,7 @@ def task_send_invitation(self, job_params):
 
 User {invited_by.username} invites you to {invitation.rights.lower()} web app at {get_app_address(invitation.hosted_on)}.
 
-Please create a new account to access app.
+Please create a new account at https://cloud.runmercury.com to access app.
 
 Thank you!
 Mercury Team        
