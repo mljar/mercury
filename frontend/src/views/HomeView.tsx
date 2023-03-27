@@ -137,8 +137,6 @@ export default function HomeView() {
     welcomeMd = welcome;
   }
 
-  console.log({welcomeMd})
-
   return (
     <div className="App">
       <HomeNavBar isSitePublic={isSitePublic} username={username} />

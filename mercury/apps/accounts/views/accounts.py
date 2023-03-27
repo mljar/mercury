@@ -56,6 +56,7 @@ class DeleteAccount(APIView):
             )
 
         # remove other stuff ...
+        print("TODO: remove all files ...")
 
         user.delete()
 

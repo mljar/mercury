@@ -1,4 +1,5 @@
 import json
+import time
 import logging
 from datetime import timedelta
 
@@ -47,6 +48,9 @@ class ClientProxy(WebsocketConsumer):
 
         self.server_address = None
 
+        self.start_time = time.time()
+        self.site_owner = nb.hosted_on.created_by 
+
         self.accept()
 
     def disconnect(self, close_code):
@@ -61,6 +65,18 @@ class ClientProxy(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.client_group, self.channel_name
         )
+        #log usage
+        usage = time.time() - self.start_time
+        prev_usage = json.loads(self.site_owner.profile.usage)
+
+        if "usage" in prev_usage:
+            prev_usage["usage"] += usage 
+        else:
+            prev_usage["usage"] = usage 
+
+        self.site_owner.profile.usage = json.dumps(prev_usage)
+        self.site_owner.profile.save()
+
 
     def receive(self, text_data):
         log.debug(f"Received from client: {text_data}")

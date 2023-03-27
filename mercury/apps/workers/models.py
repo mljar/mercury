@@ -11,7 +11,7 @@ class WorkerState(str, Enum):
     Unknown = "Unknown"
     MaxRunTimeReached = "MaxRunTimeReached"
     MaxIdleTimeReached = "MaxIdleTimeReached"
-    
+    InstallPackages = "InstallPackages"
 
 class Worker(models.Model):
     # machine unique id

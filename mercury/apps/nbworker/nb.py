@@ -265,7 +265,7 @@ class NBWorker(WSClient):
 
         if init_widgets:
             msg = {"purpose": Purpose.InitWidgets, "widgets": widgets_params}
-            log.debug("------------Init widgets")
+            log.debug("Init widgets")
             log.debug(msg)
             self.ws.send(json.dumps(msg))
         else:
@@ -289,7 +289,8 @@ class NBWorker(WSClient):
         )
 
     def install_new_packages(self):
-        if "127.0.0.1" not in self.ws_address:
+        
+        if "127.0.0.1" not in self.ws_address and "localhost" not in self.ws_address:
             fname = "requirements.txt"
             if os.path.exists(fname):
                 log.debug(f"Install new packages from requirements.txt")

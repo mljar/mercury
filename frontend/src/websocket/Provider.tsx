@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   getSelectedNotebookId,
@@ -50,6 +50,7 @@ if (process.env.REACT_APP_SERVER_WS) {
 
 const MAX_CONNECT_COUNT = 5;
 let connectCounter = 0;
+let globalConnection: WebSocket | undefined = undefined;
 
 export default function WebSocketProvider({
   children,
@@ -67,6 +68,16 @@ export default function WebSocketProvider({
 
   let connection: WebSocket | undefined = undefined;
   let workerState = "Unknown" as WorkerState;
+
+  useEffect(() => {
+    connectCounter = 0;
+    // returned function will be called on component unmount
+    return () => {
+      connectCounter = MAX_CONNECT_COUNT + 1;
+      globalConnection?.close();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const sendMessage = (payload: string) => {
     if (connection !== undefined && connection.readyState === connection.OPEN) {
@@ -170,17 +181,15 @@ export default function WebSocketProvider({
   }
 
   function connect() {
-    console.log("try to connect ..." + workerState + " " + connectCounter);
     if (
       (localServer || !isStatic) &&
       selectedNotebookId !== undefined &&
       connection === undefined &&
       workerState !== WorkerState.MaxIdleTimeReached &&
-      workerState !== WorkerState.MaxRunTimeReached
+      workerState !== WorkerState.MaxRunTimeReached &&
+      connectCounter < MAX_CONNECT_COUNT
     ) {
-      console.log(
-        "(2) try to connect ..." + workerState + " " + connectCounter
-      );
+      console.log("WS connect ..." + workerState + " " + connectCounter);
       dispatch(increaseTryConnectCount());
       let url = `${wsServer}/ws/client/${selectedNotebookId}/${getSessionId()}/`;
       if (token !== undefined && token !== null && token !== "") {
@@ -193,6 +202,7 @@ export default function WebSocketProvider({
       connection.onclose = onClose;
       connectCounter += 1;
 
+      globalConnection = connection;
       if (connectCounter >= MAX_CONNECT_COUNT) {
         dispatch(setSiteStatus(SiteStatus.NetworkError));
       }

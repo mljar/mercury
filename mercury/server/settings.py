@@ -293,16 +293,13 @@ LOGGING = {
 
 NBWORKERS_PER_MACHINE = 20
 
-
 # delta time after which worker is considered as stale and deleted
 WORKER_STALE_TIME = 1  # in minutes
-
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 AWS_REGION_NAME = os.environ.get("AWS_REGION_NAME")
 AWS_BUCKET_NAME = os.environ.get("AWS_BUCKET_NAME")
-
 
 # email setup, used in notification
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
@@ -312,13 +309,12 @@ EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_TLS = True  # use TLS by default
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
 
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-if os.environ.get("EMAIL_BACKEND", "console") != "console":
+if os.environ.get("DJANGO_EMAIL_BACKEND", "console") == "smtp":
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# you need to install django-ses
-# EMAIL_BACKEND = 'django_ses.SESBackend'
-# AWS_SES_REGION_NAME = AWS_REGION_NAME
-# AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
-# DEFAULT_FROM_EMAIL = '"Mercury" <contact@runmercury.com>'
+if os.environ.get("DJANGO_EMAIL_BACKEND", "console") == "ses":
+    # you need to install django-ses
+    EMAIL_BACKEND = "django_ses.SESBackend"
+    AWS_SES_REGION_NAME = AWS_REGION_NAME
+    AWS_SES_REGION_ENDPOINT = f'email.{AWS_REGION_NAME}.amazonaws.com'
+    # DEFAULT_FROM_EMAIL = os.environ("DEFAULT_FROM_EMAIL", '"Mercury" <contact@runmercury.com>')

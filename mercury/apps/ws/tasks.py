@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):
     log.debug(f"NbWorkers per machine: {settings.NBWORKERS_PER_MACHINE}")
+    
     machine_id = machine_uuid()
     workers = Worker.objects.filter(machine_id=machine_id)
 

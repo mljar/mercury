@@ -73,7 +73,8 @@ class Site(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     # custom fields for user
-    info = models.TextField(blank=True)
+    info = models.TextField(default="{}", blank=True)
+    usage = models.TextField(default="{}", blank=True)
 
 
 @receiver(post_save, sender=User)

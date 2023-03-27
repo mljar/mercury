@@ -17,7 +17,8 @@ export enum WorkerState {
   Busy = "Busy",
   Queued = "Queued",
   MaxRunTimeReached = "MaxRunTimeReached",
-  MaxIdleTimeReached = "MaxIdleTimeReached"
+  MaxIdleTimeReached = "MaxIdleTimeReached",
+  //InstallPackages = "InstallPackages",
 }
 
 const initialState = {
