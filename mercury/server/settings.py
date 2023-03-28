@@ -32,8 +32,8 @@ DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
 DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
 
 
-CELERY_BROKER_URL = "sqla+sqlite:///celery.sqlite"
-CELERY_RESULT_BACKEND = "db+sqlite:///celery.sqlite"
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "sqla+sqlite:///celery.sqlite")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
