@@ -26,6 +26,7 @@ RUN pip install mercury
 
 ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
+ADD ./mercury/templates /app/mercury/templates
 ADD ./mercury/*.py /app/mercury/
 ADD ./mercury/widgets /app/mercury/widgets
 ADD ./docker /app/docker
