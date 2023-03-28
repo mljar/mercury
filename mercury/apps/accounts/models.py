@@ -40,7 +40,6 @@ class Site(models.Model):
         help_text="Custom domain address",
         blank=True,
         null=True,
-        unique=True,
     )
 
     PUBLIC = "PUBLIC"
