@@ -179,7 +179,7 @@ class StorageManager:
             upload_url = response.json().get("url")
             # 2.
             # upload file
-            response = requests.put(upload_url, nb_html_body)
+            response = requests.put(upload_url, nb_html_body.encode("utf-8"))
             if response.status_code != 200:
                 raise Exception(f"Notebook not uploaded {response}")
             # 3.
@@ -194,6 +194,7 @@ class StorageManager:
 
     def save_nb_pdf(self, nb_html_body, is_presentation):
         pdf_path, pdf_url = None, None
+        fname = f"download-notebook-{self.some_hash()}.pdf"
         if settings.STORAGE == settings.STORAGE_MEDIA:
             # save HTML
             html_path, html_url = self.save_nb_html(nb_html_body)
@@ -206,6 +207,43 @@ class StorageManager:
             pdf_url = html_url.replace(".html", ".pdf")
             log.debug(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
+
+        elif settings.STORAGE == settings.STORAGE_S3:
+            
+            # 0. first lets create HTML file
+            html_fname = fname.replace(".pdf", ".html")
+            html_path = os.path.join("/home/piotr/sandbox/mercury/mercury", self.worker_output_dir(), html_fname)
+            pdf_path = os.path.join(self.worker_output_dir(), fname)
+
+            log.debug(f"Dump to HTML {html_path}")
+            with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
+                fout.write(nb_html_body)
+            # check if we need postfix
+            slides_postfix = "?print-pdf" if is_presentation else ""
+            # export to PDF
+            log.debug(f"Export HTML {html_path}{slides_postfix} to PDF {pdf_path}")
+            to_pdf(f"{html_path}{slides_postfix}", pdf_path)
+
+            # 1.
+            # get upload link
+            action = "put_object"
+            output_dir = "downdload-pdf"
+            url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
+            response = requests.get(url)
+            upload_url = response.json().get("url")
+            # 2.
+            # upload file
+            with open(pdf_path, "rb") as fout:
+                response = requests.put(upload_url, fout.read())
+                if response.status_code != 200:
+                    raise Exception(f"PDF notebook not uploaded {response}")
+            # 3.
+            # get download link
+            action = "get_object"
+            output_dir = "downdload-pdf"
+            url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
+            response = requests.get(url)
+            pdf_url = response.json().get("url")
 
         return pdf_path, pdf_url
 
