@@ -33,12 +33,12 @@ class NBWorker(WSClient):
         self.prev_update_time = None
         self.prev_md5 = None
         self.start_time = time.time()
-        self.max_idle_time = os.environ.get(
+        self.max_idle_time = int(os.environ.get(
             "MAX_IDLE_TIME", 12 * 60 * 60
-        )  # default idle after 12 hours
-        self.max_run_time = os.environ.get(
+        ))  # default idle after 12 hours
+        self.max_run_time = int(os.environ.get(
             "MAX_RUN_TIME", 24 * 60 * 60
-        )  # default max run time is 24 hours
+        ))  # default max run time is 24 hours
         self.last_execution_time = time.time()
         self.start_time = time.time()
 
