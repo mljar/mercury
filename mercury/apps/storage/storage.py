@@ -212,8 +212,8 @@ class StorageManager:
             
             # 0. first lets create HTML file
             html_fname = fname.replace(".pdf", ".html")
-            html_path = os.path.join("/home/piotr/sandbox/mercury/mercury", self.worker_output_dir(), html_fname)
-            pdf_path = os.path.join(self.worker_output_dir(), fname)
+            html_path = os.path.abspath(os.path.join(self.worker_output_dir(), html_fname))
+            pdf_path = os.path.abspath(os.path.join(self.worker_output_dir(), fname))
 
             log.debug(f"Dump to HTML {html_path}")
             with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
