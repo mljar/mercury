@@ -178,12 +178,14 @@ class RESTClient:
 
     def is_worker_stale(self):
         try:
-            log.debug(f"Check worker id={self.worker_id} is stale")
-
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/is-worker-stale",
             )
-            return response.json().get("is_stale", True)
+            if response.status_code == 200:
+                is_stale = response.json().get("is_stale", True)
+                log.debug(f"Check worker id={self.worker_id} is stale {is_stale}")
+                return is_stale
+            return True
 
         except Exception:
             log.exception(
