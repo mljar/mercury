@@ -196,7 +196,9 @@ export default function FileWidget({
               })
             );
           }}
-          server={s3ServerActions}
+          server={
+            storageType === "media" ? mediaServerActions : s3ServerActions
+          }
           labelIdle='Drag & Drop your file or <span class="filepond--label-action">Browse</span>'
         />
       </div>
