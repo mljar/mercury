@@ -2,10 +2,7 @@ import logging
 from tempfile import TemporaryFile
 
 import boto3
-from botocore.exceptions import ClientError
 from django.conf import settings
-from more_itertools import bucket
-from pyrsistent import b
 
 log = logging.getLogger(__name__)
 
