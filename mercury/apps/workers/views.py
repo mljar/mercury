@@ -14,7 +14,7 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.workers.models import Worker, WorkerState
 from apps.workers.serializers import WorkerSerializer
-
+from apps.storage.s3utils import clean_worker_files
 
 class WorkerGetNb(APIView):
     def get(self, request, session_id, worker_id, notebook_id, format=None):
@@ -92,10 +92,16 @@ class SetWorkerState(APIView):
 class DeleteWorker(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):
         try:
+            
             worker = Worker.objects.get(
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
+
+            # delete worker output files
+            clean_worker_files(worker.notebook.hosted_on.id, worker.session_id)
+
             worker.delete()
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception:
             pass

@@ -2,6 +2,7 @@ import logging
 
 from django.db.models import Q
 from django.http import JsonResponse
+from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,11 +15,26 @@ from apps.storage.serializers import UploadedFileSerializer
 from apps.workers.models import Worker
 from apps.accounts.views.utils import is_cloud_version
 
-from apps.accounts.views.sites import get_plan, PLAN_KEY, PLAN_STARTER, PLAN_PRO, PLAN_BUSINESS
+from apps.accounts.views.sites import (
+    get_plan,
+    PLAN_KEY,
+    PLAN_STARTER,
+    PLAN_PRO,
+    PLAN_BUSINESS,
+)
 
-from apps.storage.utils import get_bucket_key, get_site_bucket_key, get_worker_bucket_key
+from apps.storage.utils import (
+    get_bucket_key,
+    get_site_bucket_key,
+    get_worker_bucket_key,
+)
 
 log = logging.getLogger(__name__)
+
+
+class GetStorageType(APIView):
+    def get(self, request, format=None):
+        return Response({"storage_type": settings.STORAGE})
 
 
 def get_site(user, site_id):
@@ -67,31 +83,27 @@ FILE_LIMITS = {
         "files": 10,
         "size": 10,
     },
-    PLAN_PRO: {
-        "files": 25,
-        "size": 50
-    },
-    PLAN_BUSINESS: {
-        "files": 50,
-        "size": 100 # MB
-    }
+    PLAN_PRO: {"files": 25, "size": 50},
+    PLAN_BUSINESS: {"files": 50, "size": 100},  # MB
 }
+
 
 def upload_allowed_check_limits(user, site_id, filesize):
     if not is_cloud_version():
-        return True 
+        return True
     plan = get_plan(user)
     files_count_limit = FILE_LIMITS[plan]["files"]
-    files_size_limit = FILE_LIMITS[plan]["size"] # in MB
-    
+    files_size_limit = FILE_LIMITS[plan]["size"]  # in MB
+
     if int(filesize) / 1024 / 1024 > files_size_limit:
         return False
 
     total_files = UploadedFile.objects.filter(hosted_on__id=site_id)
     if total_files.count() > files_count_limit:
-        return False 
+        return False
 
     return True
+
 
 class PresignedUrlPut(APIView):
     def get(self, request, site_id, filename, filesize, format=None):
@@ -109,6 +121,7 @@ class PresignedUrlPut(APIView):
             get_bucket_key(site, request.user, filename), client_action
         )
         return Response({"url": url})
+
 
 class WorkerPresignedUrl(APIView):
     def get(
@@ -192,66 +205,3 @@ class DeleteFile(APIView):
         Notebook.objects.filter(path__icontains=filename, hosted_on=site).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class WorkerAddFile(APIView):
-    def post(self, request, format=None):
-        worker_id = request.data.get("worker_id")
-        session_id = request.data.get("session_id")
-        notebook_id = request.data.get("notebook_id")
-
-        filename = request.data.get("filename")
-        filepath = request.data.get("filepath")
-        output_dir = request.data.get("output_dir")
-        local_filepath = request.data.get("local_filepath")
-
-        workers = Worker.objects.filter(
-            pk=worker_id, session_id=session_id, notebook__id=notebook_id
-        )
-        if not workers:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        # remove previous objects with the same filepath
-        WorkerFile.objects.filter(filepath=filepath, output_dir=output_dir).delete()
-
-        # create a new object
-        WorkerFile.objects.create(
-            filename=filename,
-            filepath=filepath,
-            output_dir=output_dir,
-            local_filepath=local_filepath,
-            created_by=workers[0],
-        )
-
-        return Response(status=status.HTTP_200_OK)
-
-
-class WorkerGetUploadedFilesUrls(APIView):
-    def get(
-        self,
-        request,
-        session_id,
-        worker_id,
-        notebook_id,
-        format=None,
-    ):
-        try:
-            print("worker uploaded files")
-            # check if such worker exists
-            worker = Worker.objects.get(
-                pk=worker_id, session_id=session_id, notebook__id=notebook_id
-            )
-            client_action = "get_object"
-
-            s3 = S3()
-            files = UploadedFile.objects.filter(hosted_on=worker.notebook.hosted_on)
-            urls = []
-            for f in files:
-                urls += [s3.get_presigned_url(f.filepath, client_action)]
-
-            return Response({"urls": urls})
-
-        except Exception as e:
-            log.exception("Cant get uploaded files urls for worker")
-
-        return Response(status=status.HTTP_403_FORBIDDEN)

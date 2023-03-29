@@ -4,6 +4,7 @@ from django.db import models
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.models import Site
 from apps.workers.models import Worker
+from apps.notebooks.models import Notebook
 
 
 class UploadedFile(models.Model):
@@ -33,3 +34,16 @@ class WorkerFile(models.Model):
         Worker,
         on_delete=models.CASCADE,
     )
+
+
+class UserUploadedFile(models.Model):
+    """Files that are uploaded in notebook by users"""
+
+    filename = models.CharField(max_length=1024, blank=False, null=False)
+    filepath = models.CharField(max_length=1024, blank=False, null=False)
+
+    hosted_on = models.ForeignKey(Site, on_delete=models.CASCADE)
+    # web browser session id
+    session_id = models.CharField(max_length=128)
+
+    created_at = AutoCreatedField()

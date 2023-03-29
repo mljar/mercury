@@ -16,6 +16,7 @@ const initialState = {
   files: [] as string[],
   filesState: "unknown",
   showSideBar: true,
+  storageType: "media"
 };
 
 const appSlice = createSlice({
@@ -37,6 +38,9 @@ const appSlice = createSlice({
     toggleShowSideBar(state) {
       state.showSideBar = !state.showSideBar;
     },
+    setStorageType(state, action: PayloadAction<string>) {
+      state.storageType = action.payload;
+    }
   },
 });
 
@@ -48,12 +52,16 @@ export const {
   setFiles,
   setShowSideBar,
   toggleShowSideBar,
+  setStorageType,
 } = appSlice.actions;
+
 
 export const getView = (state: RootState) => state.app.view;
 export const getOutputFilesState = (state: RootState) => state.app.filesState;
 export const getOutputFiles = (state: RootState) => state.app.files;
 export const getShowSideBar = (state: RootState) => state.app.showSideBar;
+export const getStorageType = (state: RootState) => state.app.storageType;
+
 
 export const fetchOutputFiles =
   (taskId: number) =>
@@ -89,4 +97,44 @@ export const fetchWorkerOutputFiles =
         console.error(`Problem during loading worker output files. ${error}`);
       }
 
+    };
+
+
+export const fetchStorageType =
+  () =>
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        const url = `/api/v1/storage-type`;
+        const { data } = await axios.get(url);
+        dispatch(setStorageType(data.storage_type));
+
+      } catch (error) {
+        console.error(`Get storage type error. ${error}`);
+      }
+
+    };
+
+export const userFileUploaded =
+  (siteId: number, sessionId: string, filename: string) =>
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        const data = { site_id: siteId, session_id: sessionId, filename }
+        const url = `/api/v1/nb-file-uploaded`;
+        await axios.post(url, data);
+      } catch (error) {
+        console.error(`Problem with file upload. ${error}`);
+      }
+    };
+
+
+export const deleteUserFileUploaded =
+  (siteId: number, sessionId: string, filename: string) =>
+    async (dispatch: Dispatch<AnyAction>) => {
+      try {
+        const data = { site_id: siteId, session_id: sessionId, filename }
+        const url = `/api/v1/nb-delete-file`;
+        await axios.post(url, data);
+      } catch (error) {
+        console.error(`Problem with file upload. ${error}`);
+      }
     };

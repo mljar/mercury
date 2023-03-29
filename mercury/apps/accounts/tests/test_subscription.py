@@ -23,9 +23,9 @@ from apps.workers.models import Worker
 #     verify_email_url = "/api/v1/auth/register/verify-email/"
 #     login_url = "/api/v1/auth/login/"
 #     user_details_url = "/api/v1/auth/user/"
-    
+
 #     subscription_url = "/api/v1/subscription"
-    
+
 #     def setUp(self):
 #         #
 #         # first user
@@ -69,11 +69,11 @@ from apps.workers.models import Worker
 #         new_data = {"action": "check", "checkoutId": "206702119-chre59f1e77e6ca-132bd39c55"}
 #         response = self.client.post(self.subscription_url, new_data, **headers)
 #         print(response)
-        
+
 #         user = User.objects.get(pk=1)
 #         print(user.profile.info)
 
-    
+
 #     def test_is_active(self):
 #         # login as second user to get token
 #         response = self.client.post(self.login_url, self.user1_params)
@@ -82,7 +82,7 @@ from apps.workers.models import Worker
 
 #         new_data = {"action": "check", "checkoutId": "206702119-chre59f1e77e6ca-132bd39c55"}
 #         response = self.client.post(self.subscription_url, new_data, **headers)
-        
+
 #         user = User.objects.get(pk=1)
 #         print(user.profile.info)
 
@@ -90,8 +90,6 @@ from apps.workers.models import Worker
 #         response = self.client.post(self.subscription_url, new_data, **headers)
 #         print(response)
 #         print(response.json())
-        
+
 #         user = User.objects.get(pk=1)
 #         print(user.profile.info)
-
-        

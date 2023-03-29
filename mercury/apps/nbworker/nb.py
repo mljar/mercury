@@ -33,12 +33,12 @@ class NBWorker(WSClient):
         self.prev_update_time = None
         self.prev_md5 = None
         self.start_time = time.time()
-        self.max_idle_time = int(os.environ.get(
-            "MAX_IDLE_TIME", 12 * 60 * 60
-        ))  # default idle after 12 hours
-        self.max_run_time = int(os.environ.get(
-            "MAX_RUN_TIME", 24 * 60 * 60
-        ))  # default max run time is 24 hours
+        self.max_idle_time = int(
+            os.environ.get("MAX_IDLE_TIME", 12 * 60 * 60)
+        )  # default idle after 12 hours
+        self.max_run_time = int(
+            os.environ.get("MAX_RUN_TIME", 24 * 60 * 60)
+        )  # default max run time is 24 hours
         self.last_execution_time = time.time()
         self.start_time = time.time()
 
@@ -167,10 +167,12 @@ class NBWorker(WSClient):
             )
 
             if widget_type == "File" and len(value) == 2:
+                
                 log.debug(f"Get file {value[0]} from id={value[1]}")
-                tu = TemporaryUpload.objects.get(upload_id=value[1])
-                value[1] = tu.get_file_path()
-                value[1] = value[1].replace("\\", "\\\\")
+                # tu = TemporaryUpload.objects.get(upload_id=value[1])
+                # value[1] = tu.get_file_path()
+                # value[1] = value[1].replace("\\", "\\\\")
+                value = self.sm.get_user_uploaded_file(value)
                 log.debug(f"File path is {value[1]}")
 
                 code = (
@@ -289,7 +291,6 @@ class NBWorker(WSClient):
         )
 
     def install_new_packages(self):
-        
         if "127.0.0.1" not in self.ws_address and "localhost" not in self.ws_address:
             fname = "requirements.txt"
             if os.path.exists(fname):

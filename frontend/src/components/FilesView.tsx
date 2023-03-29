@@ -29,11 +29,19 @@ export default function FilesView({
       });
   };
 
+  console.log(files)
+
   let filesLinks = [];
 
   for (let f of files) {
-    let fname = f.split("/").pop();
+    let fname = f.split("/").pop()
+    fname = fname?.split("?")[0];
+
     if (f && fname) {
+      let downloadLink = `${axios.defaults.baseURL}${f}`
+      if(f.includes("s3.amazonaws.com")) {
+        downloadLink = f;
+      }
       filesLinks.push(
         <div key={f}>
           <i
@@ -47,7 +55,9 @@ export default function FilesView({
             type="button"
             className="btn btn-primary"
             onClick={() =>
-              handleDownload(`${axios.defaults.baseURL}${f}`, fname!)
+
+              handleDownload(downloadLink, fname!)
+
             }
           >
             <i className="fa fa-download" aria-hidden="true"></i> Download

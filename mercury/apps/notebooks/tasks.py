@@ -233,7 +233,7 @@ def task_init_notebook(
                         slug="single-site",
                         share=Site.PUBLIC,
                         created_by=user,
-                        status=SiteStatus.READY
+                        status=SiteStatus.READY,
                     )
                 else:
                     site = Site.objects.get(slug="single-site")

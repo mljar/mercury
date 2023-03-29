@@ -15,6 +15,7 @@ from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 from apps.ws.tasks import task_start_websocket_worker
 from apps.ws.utils import client_group, worker_group
+from apps.storage.s3utils import clean_worker_files
 
 log = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ class ClientProxy(WebsocketConsumer):
         self.server_address = None
 
         self.start_time = time.time()
-        self.site_owner = nb.hosted_on.created_by 
+        self.site_owner = nb.hosted_on.created_by
 
         self.accept()
 
@@ -65,18 +66,17 @@ class ClientProxy(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             self.client_group, self.channel_name
         )
-        #log usage
+        # log usage
         usage = time.time() - self.start_time
         prev_usage = json.loads(self.site_owner.profile.usage)
 
         if "usage" in prev_usage:
-            prev_usage["usage"] += usage 
+            prev_usage["usage"] += usage
         else:
-            prev_usage["usage"] = usage 
+            prev_usage["usage"] = usage
 
         self.site_owner.profile.usage = json.dumps(prev_usage)
         self.site_owner.profile.save()
-
 
     def receive(self, text_data):
         log.debug(f"Received from client: {text_data}")
@@ -164,4 +164,8 @@ class ClientProxy(WebsocketConsumer):
             updated_at__lte=timezone.now()
             - timedelta(minutes=settings.WORKER_STALE_TIME)
         )
+        # clean s3 data for worker
+        for worker in workers:
+            clean_worker_files(worker.notebook.hosted_on.id, worker.session_id)
+        
         workers.delete()

@@ -4,6 +4,8 @@ from tempfile import TemporaryFile
 import boto3
 from botocore.exceptions import ClientError
 from django.conf import settings
+from more_itertools import bucket
+from pyrsistent import b
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +71,7 @@ class S3:
                 Bucket=settings.AWS_BUCKET_NAME, Key=bucket_key
             )
             return True
-        except Exception:
+        except Exception as e:
             log.exception(f"Exception when delete file {bucket_key}")
         return False
 
@@ -83,3 +85,30 @@ class S3:
         except Exception:
             log.exception(f"Exception when list files from {prefix}")
         return files
+
+    def file_exists(self, bucket_key):
+        try:
+            prefix = "/".join(bucket_key.split("/")[:-1])
+            files = self.list_files(prefix)
+            print(files, bucket_key, bucket_key in files)
+            return bucket_key in files
+        except Exception:
+            log.exception(f"Exception when check if file exists {bucket_key}")
+        return False
+
+
+def clean_worker_files(site_id, session_id):
+    if settings.STORAGE == settings.STORAGE_S3:
+        s3 = S3()
+        # remove output dir files
+        bucket_key = f"session-{session_id}"
+        keys = s3.list_files(bucket_key)
+        for key in keys:
+            s3.delete_file(key)
+        # remove user upload files
+        bucket_key = f"site-{site_id}/session-{session_id}/user-input"
+        keys = s3.list_files(bucket_key)
+        for key in keys:
+            s3.delete_file(key)
+        
+        

@@ -7,6 +7,7 @@ import uuid
 import requests
 from django.conf import settings
 from execnb.nbio import write_nb
+from django_drf_filepond.models import TemporaryUpload
 
 from apps.nbworker.utils import stop_event
 from apps.storage.models import UploadedFile
@@ -209,10 +210,11 @@ class StorageManager:
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
         elif settings.STORAGE == settings.STORAGE_S3:
-            
             # 0. first lets create HTML file
             html_fname = fname.replace(".pdf", ".html")
-            html_path = os.path.abspath(os.path.join(self.worker_output_dir(), html_fname))
+            html_path = os.path.abspath(
+                os.path.join(self.worker_output_dir(), html_fname)
+            )
             pdf_path = os.path.abspath(os.path.join(self.worker_output_dir(), fname))
 
             log.debug(f"Dump to HTML {html_path}")
@@ -250,3 +252,27 @@ class StorageManager:
     def some_hash(self):
         h = uuid.uuid4().hex.replace("-", "")
         return h[:8]
+
+
+    def get_user_uploaded_file(self, value):
+        if settings.STORAGE == settings.STORAGE_MEDIA:
+            log.debug(f"Get file {value[0]} from id={value[1]}")
+            tu = TemporaryUpload.objects.get(upload_id=value[1])
+            value[1] = tu.get_file_path()
+            value[1] = value[1].replace("\\", "\\\\")
+            log.debug(f"File path is {value[1]}")
+        elif settings.STORAGE == settings.STORAGE_S3:
+            # get link
+            
+            url = f"{self.server_url}/api/v1/worker/user-uploaded-file/{self.session_id}/{self.worker_id}/{self.notebook_id}/{value[0]}"
+            print(url)
+            response = requests.get(url)
+            download_url = response.json().get("url")
+            # download file
+            f = StorageManager.download_file(download_url)
+            log.debug(f"Downloaded {f}")
+            value[1] = f
+        return value
+
+    
+

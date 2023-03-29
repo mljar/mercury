@@ -13,6 +13,7 @@ class WorkerState(str, Enum):
     MaxIdleTimeReached = "MaxIdleTimeReached"
     InstallPackages = "InstallPackages"
 
+
 class Worker(models.Model):
     # machine unique id
     machine_id = models.CharField(max_length=128, blank=True)
