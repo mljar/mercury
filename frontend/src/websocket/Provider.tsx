@@ -176,7 +176,7 @@ export default function WebSocketProvider({
       })
     );
     if (connection !== undefined && connection.readyState === connection.OPEN) {
-      setTimeout(() => ping(), 5000);
+      setTimeout(() => ping(), 10000);
     }
   }
 

@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 import sys
 from queue import Queue
 
@@ -68,7 +69,13 @@ class WSClient(RESTClient):
 
     def on_message(self, ws, msg):
         log.debug(f"WS on_message {msg}")
-        self.queue.put(msg)
+
+        json_data = json.loads(msg)    
+        if json_data.get("purpose", "") == Purpose.WorkerPing:
+            self.worker_pong()
+        else:
+            self.queue.put(msg)
+
         self.msg_counter += 1
 
     def send_state(self):

@@ -46,7 +46,7 @@ class NBWorker(WSClient):
         if "127.0.0.1" in ws_address:
             threading.Thread(target=self.nb_file_watch, daemon=True).start()
         threading.Thread(target=self.process_msgs, daemon=True).start()
-        self.ws.run_forever(ping_interval=5, ping_timeout=3)
+        self.ws.run_forever(ping_interval=10, ping_timeout=5)
 
     @staticmethod
     def md5(fname):
@@ -86,21 +86,16 @@ class NBWorker(WSClient):
             log.debug(f"Porcess msg {item}")
             json_data = json.loads(item)
 
-            if json_data.get("purpose", "") != Purpose.WorkerPing:
-                self.last_execution_time = time.time()
+            self.last_execution_time = time.time()
 
             if json_data.get("purpose", "") == Purpose.InitNotebook:
                 self.init_notebook()
             elif json_data.get("purpose", "") == Purpose.RunNotebook:
                 self.run_notebook(json_data)
-            # elif json_data.get("purpose", "") == Purpose.SaveNotebook:
-            #     self.save_notebook()
             elif json_data.get("purpose", "") == Purpose.DisplayNotebook:
                 self.display_notebook(json_data)
             elif json_data.get("purpose", "") == Purpose.ClearSession:
                 self.init_notebook()
-            elif json_data.get("purpose", "") == Purpose.WorkerPing:
-                self.worker_pong()
             elif json_data.get("purpose", "") == Purpose.CloseWorker:
                 stop_event.set()
                 self.delete_worker()
@@ -124,7 +119,7 @@ class NBWorker(WSClient):
         elif elapsed_from_last_execution > self.max_idle_time:
             self.update_worker_state(WorkerState.MaxIdleTimeReached)
         else:
-            self.update_worker_state(WorkerState.Running)
+            self.update_worker_state(self.worker_state())
             close_worker = False
 
         if self.worker_exists():
