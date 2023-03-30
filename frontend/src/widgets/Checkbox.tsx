@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 
-import { setWidgetValue } from "../slices/notebooksSlice";
+import { setUrlValuesUsed, setWidgetValue } from "../slices/notebooksSlice";
 
 type CheckboxProps = {
   widgetKey: string;
@@ -10,6 +11,7 @@ type CheckboxProps = {
   value: boolean | null;
   disabled: boolean;
   runNb: () => void;
+  url_key: string;
 };
 
 export default function CheckboxWidget({
@@ -18,13 +20,27 @@ export default function CheckboxWidget({
   value,
   disabled,
   runNb,
+  url_key,
 }: CheckboxProps) {
   const dispatch = useDispatch();
   const [updated, userInteraction] = useState(false);
 
+  const [searchParams] = useSearchParams();
+  if (url_key !== undefined && url_key !== "") {
+    const urlValue = searchParams.get(url_key)?.toLowerCase();
+
+    if (
+      !updated &&
+      urlValue !== undefined &&
+      (urlValue === "true" || urlValue === "false")
+    ) {
+      value = urlValue === "true";
+      dispatch(setUrlValuesUsed(true));
+    }
+  }
+
   useEffect(() => {
     if (updated) {
-      //console.log("run from checkbox");
       runNb();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

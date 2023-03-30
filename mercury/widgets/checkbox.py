@@ -7,8 +7,9 @@ from .manager import WidgetsManager
 
 
 class Checkbox:
-    def __init__(self, value=True, label=""):
+    def __init__(self, value=True, label="", url_key=""):
         self.code_uid = WidgetsManager.get_code_uid("Checkbox")
+        self.url_key = url_key
         if WidgetsManager.widget_exists(self.code_uid):
             self.checkbox = WidgetsManager.get_widget(self.code_uid)
             self.checkbox.description = label
@@ -48,6 +49,7 @@ class Checkbox:
                 "label": self.checkbox.description,
                 "model_id": self.checkbox.model_id,
                 "code_uid": self.code_uid,
+                "url_key": self.url_key
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

@@ -1,7 +1,14 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../slices/notebooksSlice";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearWidgetsUrlValues,
+  getWidgetsInitialized,
+  setUrlValuesUsed,
+  setWidgetUrlValue,
+  setWidgetValue,
+} from "../slices/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
+import { useSearchParams } from "react-router-dom";
 
 type RangeProps = {
   widgetKey: string;
@@ -13,6 +20,7 @@ type RangeProps = {
   vertical: boolean | null;
   disabled: boolean;
   runNb: () => void;
+  url_key: string;
 };
 
 export default function RangeWidget({
@@ -25,9 +33,8 @@ export default function RangeWidget({
   vertical,
   disabled,
   runNb,
+  url_key,
 }: RangeProps) {
-  const dispatch = useDispatch();
-  //const [updated, userInteraction] = useState(false);
   let minValue = 0;
   let maxValue = 100;
   let stepValue = 1;
@@ -41,10 +48,63 @@ export default function RangeWidget({
     stepValue = step;
   }
 
+  const dispatch = useDispatch();
+  const [updated, userInteraction] = useState(false);
+  const [isUrlValue, setIsUrlValue] = useState(false);
+  //const widgetsInitialized = useSelector(getWidgetsInitialized);
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (url_key !== undefined && url_key !== "") {
+      const urlValue = searchParams
+        .get(url_key)
+        ?.split(",")
+        .map((i) => parseFloat(i));
+      if (
+        //widgetsInitialized &&
+        !updated &&
+        urlValue !== undefined &&
+        urlValue.length === 2 &&
+        urlValue[0] !== undefined &&
+        !isNaN(urlValue[0]) &&
+        urlValue[1] !== undefined &&
+        !isNaN(urlValue[1]) &&
+        urlValue[0] <= urlValue[1] &&
+        urlValue[0] >= minValue &&
+        urlValue[1] <= maxValue
+      ) {
+        
+        //value = urlValue as [number, number];
+
+        dispatch(
+          setWidgetUrlValue({
+            key: widgetKey,
+            value: urlValue as [number, number],
+          })
+        );
+        dispatch(setUrlValuesUsed(true));
+      }
+    }
+  }, [dispatch, maxValue, minValue, searchParams, updated, url_key, widgetKey]);
+
   const values =
     value != null && value !== undefined && value.length === 2
       ? value
       : [minValue, maxValue];
+
+  // useEffect(() => {
+  //   if (isUrlValue && !updated) {
+  //     dispatch(
+  //       setWidgetValue({
+  //         key: widgetKey,
+  //         value: values,
+  //       })
+  //     );
+  //     //setIsUrlValue(false);
+  //   }
+
+  // }, [isUrlValue, dispatch, widgetKey, updated, values]);
 
   return (
     <div className="form-group mb-3">
@@ -70,7 +130,8 @@ export default function RangeWidget({
           min={minValue}
           max={maxValue}
           onChange={(values) => {
-            //userInteraction(true);
+            userInteraction(true);
+            dispatch(clearWidgetsUrlValues());
             dispatch(
               setWidgetValue({
                 key: widgetKey,

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { setWidgetValue } from "../slices/notebooksSlice";
 
 type TextProps = {
@@ -10,6 +11,7 @@ type TextProps = {
   disabled: boolean;
   runNb: () => void;
   continuousUpdate: boolean;
+  url_key: string;
 };
 
 export default function TextWidget({
@@ -20,14 +22,24 @@ export default function TextWidget({
   disabled,
   runNb,
   continuousUpdate,
+  url_key,
 }: TextProps) {
   const dispatch = useDispatch();
   const [apply, showApply] = useState(false);
+  const [updated, userInteraction] = useState(false);
   let rowsValue: number = rows ? rows : 1;
 
   const sanitizeString = (input_string: string) => {
     return input_string.replace(/["'(){}[\]`^]/gim, "");
   };
+
+  const [searchParams] = useSearchParams();
+  if (url_key !== undefined && url_key !== "") {
+    const urlValue = searchParams.get(url_key);
+    if (!updated && urlValue !== undefined && urlValue !== null) {
+      value = urlValue;
+    }
+  }
 
   return (
     <div className="form-group mb-3">
@@ -44,6 +56,7 @@ export default function TextWidget({
           id={`text-${label}`}
           value={value ? value : ""}
           onChange={(e) => {
+            userInteraction(true);
             showApply(true);
             dispatch(
               setWidgetValue({
@@ -69,6 +82,7 @@ export default function TextWidget({
           rows={rowsValue}
           value={value ? value : ""}
           onChange={(e) => {
+            userInteraction(true);
             showApply(true);
             dispatch(
               setWidgetValue({
@@ -82,17 +96,41 @@ export default function TextWidget({
       )}
 
       {apply && continuousUpdate && rowsValue === 1 && (
+        // <div
+        //   style={{
+        //     fontSize: "0.7em",
+        //     float: "right",
+        //     position: "relative",
+        //     top: "0px",
+        //     left: "-5px",
+        //     color: "#2684ff",
+        //   }}
+        // >
+        //   Press enter to apply
+        // </div>
+
         <div
           style={{
-            fontSize: "0.7em",
             float: "right",
             position: "relative",
-            top: "0px",
-            left: "-5px",
-            color: "#2684ff",
+            top: "2px",
+            left: "0px",
           }}
         >
-          Press enter to apply
+          <button
+            className="btn btn-sm btn-outline-primary"
+            onClick={(e) => {
+              runNb();
+              showApply(false);
+              e.preventDefault();
+            }}
+            style={{
+              fontSize: "0.7em",
+              border: "none",
+            }}
+          >
+            Press enter or click to apply
+          </button>
         </div>
       )}
       {apply && continuousUpdate && rowsValue > 1 && (
@@ -113,6 +151,7 @@ export default function TextWidget({
             }}
             style={{
               fontSize: "0.7em",
+              border: "none",
             }}
           >
             Apply

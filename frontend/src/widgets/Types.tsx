@@ -4,12 +4,14 @@ export interface ISelectWidget {
   input: string;
   choices: string[];
   multi: boolean | undefined;
+  url_key: string;
 }
 
 export interface ICheckboxWidget {
   label: string | null;
   value: boolean | null;
   input: string;
+  url_key: string;
 }
 
 export interface INumericWidget {
@@ -19,6 +21,7 @@ export interface INumericWidget {
   min: number;
   max: number;
   step: number;
+  url_key: string;
 }
 
 export interface ISliderWidget {
@@ -29,6 +32,8 @@ export interface ISliderWidget {
   min: number | null;
   max: number | null;
   step: number | null;
+  url_key: string;
+  urlValue: number | null;
 }
 
 export interface IRangeWidget {
@@ -39,6 +44,7 @@ export interface IRangeWidget {
   min: number | null;
   max: number | null;
   step: number | null;
+  url_key: string;
 }
 
 export interface IFileWidget {
@@ -53,6 +59,7 @@ export interface ITextWidget {
   value: string | undefined;
   input: string;
   rows: number | null;
+  url_key: string;
 }
 
 export interface IOutputFilesWidget {

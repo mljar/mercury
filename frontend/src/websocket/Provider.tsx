@@ -9,6 +9,7 @@ import {
   fetchNotebook,
   updateTitle,
   updateShowCode,
+  setWidgetsInitialized,
 } from "../slices/notebooksSlice";
 import {
   setNotebookSrc,
@@ -64,7 +65,7 @@ export default function WebSocketProvider({
   const selectedNotebookId = useSelector(getSelectedNotebookId);
   const token = useSelector(getToken);
   const isStatic = useSelector(isStaticNotebook);
-  //const tryConnectCount = useSelector(getTryConnectCount);
+  
 
   let connection: WebSocket | undefined = undefined;
   let workerState = "Unknown" as WorkerState;
@@ -131,8 +132,9 @@ export default function WebSocketProvider({
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
       } else if (response.purpose === "init-widgets") {
-        //console.log("init-widgets");
+        console.log("****************************************init-widgets");
         dispatch(initWidgets(response));
+        dispatch(setWidgetsInitialized(true));
       } else if (response.purpose === "update-title") {
         dispatch(updateTitle(response.title));
       } else if (response.purpose === "update-show-code") {

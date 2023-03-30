@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { setWidgetValue } from "../slices/notebooksSlice";
 
 type NumericProps = {
@@ -12,6 +13,7 @@ type NumericProps = {
   disabled: boolean;
   runNb: () => void;
   continuousUpdate: boolean;
+  url_key: string;
 };
 
 export default function NumericWidget({
@@ -24,33 +26,46 @@ export default function NumericWidget({
   disabled,
   runNb,
   continuousUpdate,
+  url_key,
 }: NumericProps) {
   const dispatch = useDispatch();
   const [apply, showApply] = useState(false);
+  const [updated, userInteraction] = useState(false);
 
-  let minValue = undefined;
-  let maxValue = undefined;
+  let minValue = 0;
+  let maxValue = 10;
   let stepValue = 1;
-  if (min) {
+  if (min !== null) {
     minValue = min;
   }
-  if (max) {
+  if (max !== null) {
     maxValue = max;
   }
-  if (step) {
+  if (step !== null) {
     stepValue = step;
   }
+  let displayValue = value !== null && value !== undefined ? value : 0;
 
-  let displayValue: string | number = "";
-  if (value) {
-    displayValue = value;
+  const [searchParams] = useSearchParams();
+  if (url_key !== undefined && url_key !== "") {
+    const urlValue = searchParams.get(url_key);
+    if (
+      !updated &&
+      urlValue !== undefined &&
+      urlValue !== null &&
+      !isNaN(parseFloat(urlValue)) &&
+      parseFloat(urlValue) >= minValue &&
+      parseFloat(urlValue) <= maxValue
+    ) {
+      displayValue = parseFloat(urlValue);
+    }
   }
 
   const validateValue = () => {
-    if (min && value && value < min) {
+    if (min !== null && value !== null && value < min) {
       dispatch(setWidgetValue({ key: widgetKey, value: min }));
     }
-    if (max && value && value > max) {
+    if (max !== null && value !== null && value > max) {
       dispatch(setWidgetValue({ key: widgetKey, value: max }));
     }
   };
@@ -66,8 +81,9 @@ export default function NumericWidget({
       <input
         className="form-control"
         type="number"
-        value={displayValue as number | string}
+        value={displayValue} // {displayValue as number | string}
         onChange={(e) => {
+          userInteraction(true);
           showApply(true);
           dispatch(setWidgetValue({ key: widgetKey, value: e.target.value }));
         }}

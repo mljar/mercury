@@ -29,9 +29,16 @@ import {
 } from "../widgets/Types";
 //import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
 import {
+  clearWidgetsUrlValues,
+  getUrlValuesUsed,
+  getWidgetsInitialized,
+  getWidgetsUrlValues,
   getWidgetsValues,
   setSlidesHash,
+  setUrlValuesUsed,
+  setWidgetsInitialized,
   setWidgetValue,
+  WidgetValueType,
 } from "../slices/notebooksSlice";
 import FileWidget from "../widgets/File";
 import TextWidget from "../widgets/Text";
@@ -90,8 +97,13 @@ export default function SideBar({
   allowDownload,
 }: SideBarProps) {
   const dispatch = useDispatch();
-  const widgetsValues = useSelector(getWidgetsValues);
+  const widgetsValues: Record<string, WidgetValueType> = useSelector(
+    getWidgetsValues
+  ) as Record<string, WidgetValueType>;
+  const widgetsUrlValues = useSelector(getWidgetsUrlValues);
   const workerState = useSelector(getWorkerState);
+  const widgetsInitialized = useSelector(getWidgetsInitialized);
+  const urlValuesUsed = useSelector(getUrlValuesUsed);
 
   const ws = useContext(WebSocketContext);
 
@@ -105,20 +117,47 @@ export default function SideBar({
     const slidesHash = scrapeSlidesHash();
     dispatch(setSlidesHash(slidesHash));
 
-    ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(widgetsValues))));
+    console.log(widgetsValues);
+    console.log(widgetsUrlValues);
+
+    if (widgetsUrlValues) {
+      let params = {} as Record<string, WidgetValueType>;
+      for (let [key, widgetParams] of Object.entries(widgetsParams)) {
+        if (key in widgetsUrlValues) {
+          params[key] = widgetsUrlValues[key];
+          dispatch(setWidgetValue({ key, value: params[key] }));
+        } else if (key in widgetsValues) {
+          params[key] = widgetsValues[key];
+        }
+      }
+      console.log(params);
+
+      ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(params))));
+
+      dispatch(clearWidgetsUrlValues());
+    } else {
+      ws.sendMessage(
+        JSON.stringify(runNotebook(JSON.stringify(widgetsValues)))
+      );
+    }
   };
 
-  // const saveNb = () => {
-  //   if (!staticNotebook) {
-  //     ws.sendMessage(JSON.stringify(saveNotebook()));
-  //   }
-  // };
+  // console.log({ widgetsInitialized, urlValuesUsed });
+  // if (widgetsInitialized && urlValuesUsed) {
+  //   execNb();
+  //   dispatch(setUrlValuesUsed(false));
+  //   dispatch(setWidgetsInitialized(false));
+  // }
 
-  // const displayNb = (taskId: number) => {
-  //   if (!staticNotebook) {
-  //     ws.sendMessage(JSON.stringify(displayNotebook(taskId)));
-  //   }
-  // };
+  useEffect(() => {
+    console.log({ widgetsInitialized, urlValuesUsed });
+    if (widgetsInitialized && urlValuesUsed) {
+      execNb();
+      dispatch(setUrlValuesUsed(false));
+      dispatch(setWidgetsInitialized(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [widgetsInitialized, urlValuesUsed]);
 
   const runDownloadHTML = () => {
     if (!staticNotebook) {
@@ -191,6 +230,7 @@ export default function SideBar({
             multi={widgetParams?.multi}
             key={key}
             runNb={runNb}
+            url_key={widgetParams?.url_key}
           />
         );
       } else if (isCheckboxWidget(widgetParams)) {
@@ -202,6 +242,7 @@ export default function SideBar({
             value={widgetsValues[key] as boolean}
             key={key}
             runNb={runNb}
+            url_key={widgetParams?.url_key}
           />
         );
       } else if (isNumericWidget(widgetParams)) {
@@ -217,6 +258,7 @@ export default function SideBar({
             key={key}
             runNb={runNb}
             continuousUpdate={continuousUpdate}
+            url_key={widgetParams?.url_key}
           />
         );
       } else if (isSliderWidget(widgetParams)) {
@@ -232,6 +274,7 @@ export default function SideBar({
             vertical={widgetParams?.vertical}
             key={key}
             runNb={runNb}
+            url_key={widgetParams?.url_key}
           />
         );
       } else if (isRangeWidget(widgetParams)) {
@@ -247,6 +290,7 @@ export default function SideBar({
             vertical={widgetParams?.vertical}
             key={key}
             runNb={runNb}
+            url_key={widgetParams.url_key}
           />
         );
       } else if (isFileWidget(widgetParams)) {
@@ -273,6 +317,7 @@ export default function SideBar({
             key={key}
             runNb={runNb}
             continuousUpdate={continuousUpdate}
+            url_key={widgetParams?.url_key}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {

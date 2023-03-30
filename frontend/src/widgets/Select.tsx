@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import Select, { MultiValue } from "react-select";
-import { RUN_DELAY_FAST, setWidgetValue } from "../slices/notebooksSlice";
+import { setWidgetValue } from "../slices/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 type MultiOption = MultiValue<{ value: string; label: string } | undefined>;
@@ -21,6 +22,7 @@ type SelectProps = {
   multi: boolean | undefined;
   disabled: boolean;
   runNb: () => void;
+  url_key: string;
 };
 
 export default function SelectWidget({
@@ -31,6 +33,7 @@ export default function SelectWidget({
   multi,
   disabled,
   runNb,
+  url_key,
 }: SelectProps) {
   const dispatch = useDispatch();
   const [updated, userInteraction] = useState(false);
@@ -41,6 +44,23 @@ export default function SelectWidget({
       zIndex: 100,
     }),
   };
+
+  const [searchParams] = useSearchParams();
+  if (url_key !== undefined && url_key !== "") {
+    const urlValue = searchParams.get(url_key);
+    if (!updated && urlValue !== undefined && urlValue !== null) {
+      if (multi) {
+        const arr = urlValue.split(",");
+        if (arr) {
+          value = arr.filter((a) => choices.includes(a));
+        }
+      } else {
+        if (choices.includes(urlValue)) {
+          value = urlValue;
+        }
+      }
+    }
+  }
 
   let selectedValue: SingleOption = { value: "", label: "" };
   let selectedValues: SingleOption[] = [{ value: "", label: "" }];
@@ -64,11 +84,12 @@ export default function SelectWidget({
 
   useEffect(() => {
     if (!updated) return;
-    const timeOutId = setTimeout(() => {
-      // console.log("run from select");
-      runNb();
-    }, RUN_DELAY_FAST);
-    return () => clearTimeout(timeOutId);
+    runNb();
+    // const timeOutId = setTimeout(() => {
+    //   // console.log("run from select");
+    //   runNb();
+    // }, RUN_DELAY_FAST);
+    // return () => clearTimeout(timeOutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 

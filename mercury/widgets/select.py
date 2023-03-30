@@ -7,12 +7,12 @@ from .manager import WidgetsManager
 
 
 class Select:
-    def __init__(self, value=None, choices=[], label=""):
+    def __init__(self, value=None, choices=[], label="", url_key=""):
         if value is None and len(choices) > 1:
             value = choices[0]
 
         self.code_uid = WidgetsManager.get_code_uid("Select")
-
+        self.url_key = url_key
         if WidgetsManager.widget_exists(self.code_uid):
             self.dropdown = WidgetsManager.get_widget(self.code_uid)
             if list(self.dropdown.options) != choices:
@@ -55,6 +55,7 @@ class Select:
                 "label": self.dropdown.description,
                 "model_id": self.dropdown.model_id,
                 "code_uid": self.code_uid,
+                "url_key": self.url_key,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

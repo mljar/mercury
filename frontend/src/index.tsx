@@ -16,7 +16,6 @@ import "./index.css";
 
 const store = configuredStore();
 
-console.log("settings " + process.env.REACT_APP_SERVER_URL);
 if (process.env.REACT_APP_SERVER_URL) {
   axios.defaults.baseURL = process.env.REACT_APP_SERVER_URL;
 } else {
@@ -35,7 +34,7 @@ if (process.env.REACT_APP_SERVER_URL) {
   axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
 }
 
-console.log("set " + axios.defaults.baseURL)
+
 
 document.addEventListener("DOMContentLoaded", () =>
   render(

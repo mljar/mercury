@@ -59,7 +59,7 @@ export interface INotebook {
   errors: string;
 }
 
-type WidgetValueType =
+export type WidgetValueType =
   | string
   | boolean
   | number
@@ -78,7 +78,10 @@ const initialState = {
   watchModeCounter: 0,
   slidesHash: "",
   widgets: {} as Record<string, WidgetValueType>,
+  widgetsUrlValues: {} as Record<string, WidgetValueType>,
   nbIframes: {} as Record<string, string>, // slug -> signed URL
+  widgetsInitialized: false,
+  urlValuesUsed: false,
 };
 
 const notebooksSlice = createSlice({
@@ -93,8 +96,18 @@ const notebooksSlice = createSlice({
       state.widgets[key] = value;
       //console.log({ key, value });
     },
+    setWidgetUrlValue(
+      state,
+      action: PayloadAction<{ key: string; value: WidgetValueType }>
+    ) {
+      const { key, value } = action.payload;
+      state.widgetsUrlValues[key] = value;
+    },
     clearWidgets(state) {
       state.widgets = {};
+    },
+    clearWidgetsUrlValues(state) {
+      state.widgetsUrlValues = {};
     },
     setNotebooks(state, action: PayloadAction<INotebook[]>) {
       state.notebooks = action.payload;
@@ -261,10 +274,8 @@ const notebooksSlice = createSlice({
       state.selectedNotebook.params.params = {}
       state.widgets = {}
       for (let widget of widgets) {
-        // console.log(widget);
         state.selectedNotebook.params.params[widget.widgetKey] = widget;
         state.widgets[widget.widgetKey] = widget.value;
-
       }
     },
     updateTitle(state, action: PayloadAction<string>) {
@@ -275,6 +286,12 @@ const notebooksSlice = createSlice({
     },
     setNbIframes(state, action: PayloadAction<Record<string, string>>) {
       state.nbIframes = action.payload;
+    },
+    setWidgetsInitialized(state, action: PayloadAction<boolean>) {
+      state.widgetsInitialized = action.payload;
+    },
+    setUrlValuesUsed(state, action: PayloadAction<boolean>) {
+      state.urlValuesUsed = action.payload;
     }
   },
 });
@@ -290,11 +307,15 @@ export const {
   updateWidgetsParams,
   hideWidgets,
   setWidgetValue,
+  setWidgetUrlValue,
   clearWidgets,
+  clearWidgetsUrlValues,
   initWidgets,
   updateTitle,
   updateShowCode,
-  setNbIframes
+  setNbIframes,
+  setWidgetsInitialized,
+  setUrlValuesUsed
 } = notebooksSlice.actions;
 
 export const getNotebooks = (state: RootState) => state.notebooks.notebooks;
@@ -317,9 +338,13 @@ export const getWatchModeCounter = (state: RootState) =>
   state.notebooks.watchModeCounter;
 export const getSlidesHash = (state: RootState) => state.notebooks.slidesHash;
 
-export const getWidgetsValues = (state: RootState) => state.notebooks.widgets;
-export const getNbIframes = (state: RootState) => state.notebooks.nbIframes;
+export const getWidgetsValues = (state: RootState): Record<string, WidgetValueType> => state.notebooks.widgets;
+export const getWidgetsUrlValues = (state: RootState): Record<string, WidgetValueType> => state.notebooks.widgetsUrlValues;
 
+
+export const getNbIframes = (state: RootState) => state.notebooks.nbIframes;
+export const getWidgetsInitialized = (state: RootState) => state.notebooks.widgetsInitialized;
+export const getUrlValuesUsed = (state: RootState) => state.notebooks.urlValuesUsed;
 
 export const fetchNbIframes = (siteId: number) => async (dispatch: Dispatch<AnyAction>) => {
   try {

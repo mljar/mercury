@@ -7,11 +7,11 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Text:
-    def __init__(self, value="", label="", rows=1):
+    def __init__(self, value="", label="", rows=1, url_key=""):
         self.rows = rows
 
         self.code_uid = WidgetsManager.get_code_uid("Text")
-
+        self.url_key = url_key
         if WidgetsManager.widget_exists(self.code_uid):
             self.text = WidgetsManager.get_widget(self.code_uid)
             self.text.description = label
@@ -48,6 +48,7 @@ class Text:
                 "label": self.text.description,
                 "model_id": self.text.model_id,
                 "code_uid": self.code_uid,
+                "url_key": self.url_key,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:

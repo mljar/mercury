@@ -7,7 +7,7 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Range:
-    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1):
+    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1, url_key=""):
         for i in [0, 1]:
             if value[i] < min:
                 raise WidgetException(f"value[{i}] should be equal or larger than min")
@@ -18,7 +18,7 @@ class Range:
             raise WidgetException("Range accepts list with length 2 as value")
 
         self.code_uid = WidgetsManager.get_code_uid("Range")
-
+        self.url_key = url_key
         if WidgetsManager.widget_exists(self.code_uid):
             self.range = WidgetsManager.get_widget(self.code_uid)
             if self.range.min != min:
@@ -69,6 +69,7 @@ class Range:
                 "label": self.range.description,
                 "model_id": self.range.model_id,
                 "code_uid": self.code_uid,
+                "url_key": self.url_key,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
