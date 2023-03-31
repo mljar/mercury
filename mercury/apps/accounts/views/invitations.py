@@ -30,6 +30,11 @@ class InviteView(APIView):
             # create a database instance
             with transaction.atomic():
                 address_email = request.data.get("email")
+
+                if address_email == request.user.email:
+                    # dont need to invite user herself
+                    return Response(status=status.HTTP_200_OK)
+
                 rights = request.data.get("rights", "VIEW")
                 if rights not in ["VIEW", "EDIT"]:
                     rights = "VIEW"
@@ -40,29 +45,43 @@ class InviteView(APIView):
                 already_user = User.objects.filter(email=address_email)
 
                 if already_user:
-                    membership = Membership.objects.create(
-                        user=already_user[0],
-                        host=site,
-                        rights=rights,
-                        created_by=request.user,
-                    )
-                    job_params = {"membership_id": membership.id}
-                    transaction.on_commit(
-                        lambda: task_send_new_member.delay(job_params)
-                    )
+                    # check if membership exists
+                    if Membership.objects.filter(
+                        user=already_user[0], host=site, rights=rights
+                    ):
+                        return Response(status=status.HTTP_200_OK)
+                    else:
+                        # need to create a new one
+                        membership = Membership.objects.create(
+                            user=already_user[0],
+                            host=site,
+                            rights=rights,
+                            created_by=request.user,
+                        )
+                        job_params = {"membership_id": membership.id}
+                        transaction.on_commit(
+                            lambda: task_send_new_member.delay(job_params)
+                        )
 
                 else:
-                    invitation = Invitation.objects.create(
-                        invited=address_email,
-                        created_by=request.user,
-                        rights=rights,
-                        hosted_on=site,
-                    )
+                    # check if invitation already exists
+                    if Invitation.objects.filter(
+                        invited=address_email, rights=rights, hosted_on=site
+                    ):
+                        return Response(status=status.HTTP_200_OK)
+                    else:
+                        # lets create a new invitation
+                        invitation = Invitation.objects.create(
+                            invited=address_email,
+                            created_by=request.user,
+                            rights=rights,
+                            hosted_on=site,
+                        )
 
-                    job_params = {"invitation_id": invitation.id}
-                    transaction.on_commit(
-                        lambda: task_send_invitation.delay(job_params)
-                    )
+                        job_params = {"invitation_id": invitation.id}
+                        transaction.on_commit(
+                            lambda: task_send_invitation.delay(job_params)
+                        )
 
                 return Response(status=status.HTTP_200_OK)
         except Exception as e:

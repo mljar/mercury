@@ -162,7 +162,6 @@ class NBWorker(WSClient):
             )
 
             if widget_type == "File" and len(value) == 2:
-                
                 log.debug(f"Get file {value[0]} from id={value[1]}")
                 # tu = TemporaryUpload.objects.get(upload_id=value[1])
                 # value[1] = tu.get_file_path()

@@ -62,7 +62,6 @@ class InvitationsTestCase(APITestCase):
         self.assertTrue("invites" in mail.outbox[0].body)
         self.assertTrue("edit" in mail.outbox[0].body)
         self.assertTrue(new_data["email"] in mail.outbox[0].to)
-        self.assertTrue(self.user1_params["email"] in mail.outbox[0].from_email)
 
         new_data = {
             "email": new_data["email"],
@@ -104,7 +103,6 @@ class InvitationsTestCase(APITestCase):
         self.assertTrue("invites" in mail.outbox[1].body)
         self.assertTrue("edit" in mail.outbox[1].body)
         self.assertTrue(new_email in mail.outbox[1].to)
-        self.assertTrue(self.user1_params["email"] in mail.outbox[1].from_email)
 
     def test_list_invitations(self):
         # login

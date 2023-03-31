@@ -25,7 +25,6 @@ from apps.accounts.views.sites import (
 
 from apps.storage.utils import (
     get_bucket_key,
-    get_site_bucket_key,
     get_worker_bucket_key,
 )
 
@@ -42,9 +41,17 @@ def get_site(user, site_id):
         return None
 
     sites = Site.objects.filter(
-        Q(hosts__user=user, hosts__rights=Membership.EDIT) | Q(created_by=user)
+        Q(pk=site_id)
+        & (
+            Q(
+                pk__in=Membership.objects.filter(
+                    user=user, rights=Membership.EDIT
+                ).values("host__id")
+            )
+            | Q(created_by=user)
+        )
     )
-    sites = sites.filter(pk=site_id)
+
     if not sites:
         return None
     return sites[0]

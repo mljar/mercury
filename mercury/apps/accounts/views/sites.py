@@ -31,7 +31,7 @@ FORBIDDEN_SLUGS = [
     "backend",
     "frontend",
     "www",
-    "app"
+    "app",
 ]
 
 
@@ -61,9 +61,13 @@ class SiteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Site.objects.filter(
-            Q(hosts__user=self.request.user, hosts__rights=Membership.EDIT)
+            Q(
+                pk__in=Membership.objects.filter(
+                    user=self.request.user, rights=Membership.EDIT
+                ).values("host__id")
+            )
             | Q(created_by=self.request.user)
-        ).distinct("id")
+        )
 
     def create(self, request, *args, **kwargs):
         # check number of allowed sites
@@ -165,9 +169,13 @@ class GetSiteView(APIView):
 
         sites = sites.filter(
             # any Membership (VIEW or EDIT) or owner
-            Q(hosts__user=self.request.user)
+            Q(
+                pk__in=Membership.objects.filter(user=self.request.user).values(
+                    "host__id"
+                )
+            )
             | Q(created_by=self.request.user)
-        ).distinct("id")
+        )
 
         if not sites:
             return Response(status=status.HTTP_403_FORBIDDEN)

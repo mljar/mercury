@@ -253,7 +253,6 @@ class StorageManager:
         h = uuid.uuid4().hex.replace("-", "")
         return h[:8]
 
-
     def get_user_uploaded_file(self, value):
         if settings.STORAGE == settings.STORAGE_MEDIA:
             log.debug(f"Get file {value[0]} from id={value[1]}")
@@ -263,7 +262,7 @@ class StorageManager:
             log.debug(f"File path is {value[1]}")
         elif settings.STORAGE == settings.STORAGE_S3:
             # get link
-            
+
             url = f"{self.server_url}/api/v1/worker/user-uploaded-file/{self.session_id}/{self.worker_id}/{self.notebook_id}/{value[0]}"
             print(url)
             response = requests.get(url)
@@ -273,6 +272,3 @@ class StorageManager:
             log.debug(f"Downloaded {f}")
             value[1] = f
         return value
-
-    
-

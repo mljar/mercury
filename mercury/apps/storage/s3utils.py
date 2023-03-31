@@ -107,5 +107,3 @@ def clean_worker_files(site_id, session_id):
         keys = s3.list_files(bucket_key)
         for key in keys:
             s3.delete_file(key)
-        
-        

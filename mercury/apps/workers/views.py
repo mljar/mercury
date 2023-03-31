@@ -16,6 +16,7 @@ from apps.workers.models import Worker, WorkerState
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
 
+
 class WorkerGetNb(APIView):
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         try:
@@ -92,7 +93,6 @@ class SetWorkerState(APIView):
 class DeleteWorker(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):
         try:
-            
             worker = Worker.objects.get(
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )

@@ -39,7 +39,10 @@ def user_upload_allowed(user, site_id):
         if sites[0].share == Site.PRIVATE and user.is_anonymous:
             return False
 
-        sites = sites.filter(Q(hosts__user=user) | Q(created_by=user))
+        sites = sites.filter(
+            Q(pk__in=Membership.objects.filter(user=user).values("host__id"))
+            | Q(created_by=user)
+        )
         if not sites:
             return False
         return True
@@ -144,12 +147,14 @@ class WorkerGetNbFileUrl(APIView):
             worker = Worker.objects.get(
                 pk=int(worker_id), session_id=session_id, notebook__id=int(notebook_id)
             )
-            
-            upload = UserUploadedFile.objects.filter(filename=filename, session_id=session_id).latest("id")
-            
+
+            upload = UserUploadedFile.objects.filter(
+                filename=filename, session_id=session_id
+            ).latest("id")
+
             client_action = "get_object"
             s3 = S3()
-            
+
             return Response(
                 {"url": s3.get_presigned_url(upload.filepath, client_action)}
             )

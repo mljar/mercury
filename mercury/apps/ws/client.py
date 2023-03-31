@@ -167,5 +167,5 @@ class ClientProxy(WebsocketConsumer):
         # clean s3 data for worker
         for worker in workers:
             clean_worker_files(worker.notebook.hosted_on.id, worker.session_id)
-        
+
         workers.delete()

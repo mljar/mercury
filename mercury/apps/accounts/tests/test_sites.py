@@ -253,3 +253,28 @@ class SitesTestCase(APITestCase):
         new_data = {"title": "New site", "slug": "mercury", "share": Site.PRIVATE}
         response = self.client.post(self.sites_url, new_data, **headers)
         self.assertEqual(response.status_code, 403)
+
+    def test_list_sites_with_members(self):
+        # create site for first user
+        site = Site.objects.create(
+            title="First site", slug="first-site", created_by=self.user
+        )
+        # add memberships
+        Membership.objects.create(
+            user=self.user, host=site, rights=Membership.EDIT, created_by=self.user
+        )
+        Membership.objects.create(
+            user=self.user, host=site, rights=Membership.EDIT, created_by=self.user
+        )
+        Membership.objects.create(
+            user=self.user, host=site, rights=Membership.EDIT, created_by=self.user
+        )
+
+        # login as second user to get token
+        response = self.client.post(self.login_url, self.user1_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+
+        # there should be only 1 site - shouldnt depend on members count
+        response = self.client.get(f"{self.sites_url}", **headers)
+        self.assertTrue(len(response.json()), 1)

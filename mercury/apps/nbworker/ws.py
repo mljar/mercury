@@ -70,7 +70,7 @@ class WSClient(RESTClient):
     def on_message(self, ws, msg):
         log.debug(f"WS on_message {msg}")
 
-        json_data = json.loads(msg)    
+        json_data = json.loads(msg)
         if json_data.get("purpose", "") == Purpose.WorkerPing:
             self.worker_pong()
         else:
