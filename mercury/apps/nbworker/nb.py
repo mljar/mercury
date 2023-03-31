@@ -176,7 +176,7 @@ class NBWorker(WSClient):
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{output_dir}")'
 
             elif isinstance(value, str):
-                code = f'WidgetsManager.update("{widget_key}", field="value", new_value="{value}")'
+                code = f'WidgetsManager.update("{widget_key}", field="value", new_value="""{value}""")'
             else:
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value={value})'
 
