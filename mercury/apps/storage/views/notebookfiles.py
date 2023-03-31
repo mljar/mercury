@@ -81,7 +81,8 @@ class NbPresignedUrlPut(APIView):
         client_action = "put_object"
         s3 = S3()
         url = s3.get_presigned_url(
-            get_user_upload_bucket_key(site_id, session_id, filename), client_action
+            get_user_upload_bucket_key(site_id, session_id, filename.replace(" ", "-")),
+            client_action,
         )
         return Response({"url": url})
 
@@ -90,7 +91,7 @@ class NbFileUploaded(APIView):
     def post(self, request, format=None):
         site_id = int(request.data.get("site_id"))
         session_id = request.data.get("session_id")
-        filename = request.data.get("filename")
+        filename = request.data.get("filename", "").replace(" ", "-")
 
         bucket_key = get_user_upload_bucket_key(site_id, session_id, filename)
 
@@ -119,7 +120,7 @@ class NbDeleteFile(APIView):
     def post(self, request, format=None):
         site_id = int(request.data.get("site_id"))
         session_id = request.data.get("session_id")
-        filename = request.data.get("filename")
+        filename = request.data.get("filename", "").replace(" ", "-")
         bucket_key = get_user_upload_bucket_key(site_id, session_id, filename)
 
         s3 = S3()
@@ -149,7 +150,7 @@ class WorkerGetNbFileUrl(APIView):
             )
 
             upload = UserUploadedFile.objects.filter(
-                filename=filename, session_id=session_id
+                filename=filename.replace(" ", "-"), session_id=session_id
             ).latest("id")
 
             client_action = "get_object"

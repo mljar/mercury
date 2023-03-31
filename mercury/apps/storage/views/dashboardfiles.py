@@ -80,7 +80,8 @@ class PresignedUrl(APIView):
 
         s3 = S3()
         url = s3.get_presigned_url(
-            get_bucket_key(site, request.user, filename), client_action
+            get_bucket_key(site, request.user, filename.replace(" ", "-")),
+            client_action,
         )
         return Response({"url": url})
 
@@ -125,7 +126,8 @@ class PresignedUrlPut(APIView):
         client_action = "put_object"
         s3 = S3()
         url = s3.get_presigned_url(
-            get_bucket_key(site, request.user, filename), client_action
+            get_bucket_key(site, request.user, filename.replace(" ", "-")),
+            client_action,
         )
         return Response({"url": url})
 
@@ -153,7 +155,10 @@ class WorkerPresignedUrl(APIView):
 
             s3 = S3()
             url = s3.get_presigned_url(
-                get_worker_bucket_key(session_id, output_dir, filename), client_action
+                get_worker_bucket_key(
+                    session_id, output_dir, filename.replace(" ", "-")
+                ),
+                client_action,
             )
 
             return Response({"url": url})
@@ -167,7 +172,7 @@ class WorkerPresignedUrl(APIView):
 class FileUploaded(APIView):
     def post(self, request, format=None):
         site_id = request.data.get("site_id")
-        filename = request.data.get("filename")
+        filename = request.data.get("filename", "").replace(" ", "-")
         filesize = request.data.get("filesize")
         filetype = filename.split(".")[-1].lower()
 
@@ -196,7 +201,7 @@ class FileUploaded(APIView):
 class DeleteFile(APIView):
     def post(self, request, format=None):
         site_id = request.data.get("site_id")
-        filename = request.data.get("filename")
+        filename = request.data.get("filename", "").replace(" ", "-")
 
         site = get_site(request.user, site_id)
         if site is None:

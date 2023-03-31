@@ -54,7 +54,10 @@ class WorkerPresignedUrl(APIView):
 
             s3 = S3()
             url = s3.get_presigned_url(
-                get_worker_bucket_key(session_id, output_dir, filename), client_action
+                get_worker_bucket_key(
+                    session_id, output_dir, filename.replace(" ", "-")
+                ),
+                client_action,
             )
 
             return Response({"url": url})
@@ -71,7 +74,7 @@ class WorkerAddFile(APIView):
         session_id = request.data.get("session_id")
         notebook_id = request.data.get("notebook_id")
 
-        filename = request.data.get("filename")
+        filename = request.data.get("filename", "").replace(" ", "-")
         filepath = request.data.get("filepath")
         output_dir = request.data.get("output_dir")
         local_filepath = request.data.get("local_filepath")
