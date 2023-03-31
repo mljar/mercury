@@ -8,14 +8,11 @@ import threading
 import time
 from datetime import datetime
 
-from django_drf_filepond.models import TemporaryUpload
 from execnb.nbio import nb2dict, read_nb
-from matplotlib.pyplot import close
 
 from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, stop_event
 from apps.nbworker.ws import WSClient
-from apps.tasks.models import Task
 from apps.workers.models import WorkerState
 from apps.ws.utils import parse_params
 from widgets.manager import WidgetsManager
