@@ -30,6 +30,6 @@ setup(
     entry_points={
         "console_scripts": ["mercury=mercury.mercury:main"],
     },
-    package_data={"mercury": list_files("frontend-dist") + list_files("frontend-single-site-dist") + ["requirements.txt"]},
+    package_data={"mercury": list_files("frontend-dist") + ["requirements.txt"]},
     include_package_data=True,
 )
