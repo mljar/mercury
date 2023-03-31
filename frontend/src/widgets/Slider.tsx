@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setWidgetValue } from "../slices/notebooksSlice";
+import {
+  setUrlValuesUsed,
+  setWidgetUrlValue,
+  setWidgetValue,
+} from "../slices/notebooksSlice";
 import { Range, getTrackBackground } from "react-range";
 import { useSearchParams } from "react-router-dom";
 
@@ -45,19 +49,27 @@ export default function SliderWidget({
     stepValue = step;
   }
   const [searchParams] = useSearchParams();
-  if (url_key !== undefined && url_key !== "") {
-    const urlValue = searchParams.get(url_key);
-    if (
-      !updated &&
-      urlValue !== undefined &&
-      urlValue !== null &&
-      !isNaN(parseFloat(urlValue)) &&
-      parseFloat(urlValue) >= minValue &&
-      parseFloat(urlValue) <= maxValue
-    ) {
-      value = parseFloat(urlValue);
+  useEffect(() => {
+    if (url_key !== undefined && url_key !== "") {
+      const urlValue = searchParams.get(url_key);
+      if (
+        !updated &&
+        urlValue !== undefined &&
+        urlValue !== null &&
+        !isNaN(parseFloat(urlValue)) &&
+        parseFloat(urlValue) >= minValue &&
+        parseFloat(urlValue) <= maxValue
+      ) {
+        dispatch(
+          setWidgetUrlValue({
+            key: widgetKey,
+            value: parseFloat(urlValue),
+          })
+        );
+        dispatch(setUrlValuesUsed(true));
+      }
     }
-  }
+  }, [dispatch, maxValue, minValue, searchParams, updated, url_key, widgetKey]);
 
   const vals: number[] = [value !== null ? value : maxValue];
 

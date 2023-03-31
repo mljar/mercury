@@ -117,9 +117,6 @@ export default function SideBar({
     const slidesHash = scrapeSlidesHash();
     dispatch(setSlidesHash(slidesHash));
 
-    console.log(widgetsValues);
-    console.log(widgetsUrlValues);
-
     if (widgetsUrlValues) {
       let params = {} as Record<string, WidgetValueType>;
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
@@ -130,10 +127,7 @@ export default function SideBar({
           params[key] = widgetsValues[key];
         }
       }
-      console.log(params);
-
       ws.sendMessage(JSON.stringify(runNotebook(JSON.stringify(params))));
-
       dispatch(clearWidgetsUrlValues());
     } else {
       ws.sendMessage(
@@ -142,15 +136,7 @@ export default function SideBar({
     }
   };
 
-  // console.log({ widgetsInitialized, urlValuesUsed });
-  // if (widgetsInitialized && urlValuesUsed) {
-  //   execNb();
-  //   dispatch(setUrlValuesUsed(false));
-  //   dispatch(setWidgetsInitialized(false));
-  // }
-
   useEffect(() => {
-    console.log({ widgetsInitialized, urlValuesUsed });
     if (widgetsInitialized && urlValuesUsed) {
       execNb();
       dispatch(setUrlValuesUsed(false));

@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import Select, { MultiValue } from "react-select";
-import { setWidgetValue } from "../slices/notebooksSlice";
+import {
+  setUrlValuesUsed,
+  setWidgetUrlValue,
+  setWidgetValue,
+} from "../slices/notebooksSlice";
 
 type SingleOption = { value: string; label: string };
 type MultiOption = MultiValue<{ value: string; label: string } | undefined>;
@@ -46,21 +50,35 @@ export default function SelectWidget({
   };
 
   const [searchParams] = useSearchParams();
-  if (url_key !== undefined && url_key !== "") {
-    const urlValue = searchParams.get(url_key);
-    if (!updated && urlValue !== undefined && urlValue !== null) {
-      if (multi) {
-        const arr = urlValue.split(",");
-        if (arr) {
-          value = arr.filter((a) => choices.includes(a));
-        }
-      } else {
-        if (choices.includes(urlValue)) {
-          value = urlValue;
+  useEffect(() => {
+    if (url_key !== undefined && url_key !== "") {
+      const urlValue = searchParams.get(url_key);
+      if (!updated && urlValue !== undefined && urlValue !== null) {
+        if (multi) {
+          const arr = urlValue.split(",");
+          if (arr) {
+            dispatch(
+              setWidgetUrlValue({
+                key: widgetKey,
+                value: arr.filter((a) => choices.includes(a)),
+              })
+            );
+            dispatch(setUrlValuesUsed(true));
+          }
+        } else {
+          if (choices.includes(urlValue)) {
+            dispatch(
+              setWidgetUrlValue({
+                key: widgetKey,
+                value: urlValue,
+              })
+            );
+            dispatch(setUrlValuesUsed(true));
+          }
         }
       }
     }
-  }
+  }, [choices, dispatch, multi, searchParams, updated, url_key, widgetKey]);
 
   let selectedValue: SingleOption = { value: "", label: "" };
   let selectedValues: SingleOption[] = [{ value: "", label: "" }];

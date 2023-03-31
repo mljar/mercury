@@ -3,7 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
-import { setUrlValuesUsed, setWidgetValue } from "../slices/notebooksSlice";
+import {
+  setUrlValuesUsed,
+  setWidgetUrlValue,
+  setWidgetValue,
+} from "../slices/notebooksSlice";
 
 type CheckboxProps = {
   widgetKey: string;
@@ -26,18 +30,26 @@ export default function CheckboxWidget({
   const [updated, userInteraction] = useState(false);
 
   const [searchParams] = useSearchParams();
-  if (url_key !== undefined && url_key !== "") {
-    const urlValue = searchParams.get(url_key)?.toLowerCase();
 
-    if (
-      !updated &&
-      urlValue !== undefined &&
-      (urlValue === "true" || urlValue === "false")
-    ) {
-      value = urlValue === "true";
-      dispatch(setUrlValuesUsed(true));
+  useEffect(() => {
+    if (url_key !== undefined && url_key !== "") {
+      const urlValue = searchParams.get(url_key)?.toLowerCase();
+
+      if (
+        !updated &&
+        urlValue !== undefined &&
+        (urlValue === "true" || urlValue === "false")
+      ) {
+        dispatch(
+          setWidgetUrlValue({
+            key: widgetKey,
+            value: urlValue === "true",
+          })
+        );
+        dispatch(setUrlValuesUsed(true));
+      }
     }
-  }
+  }, [dispatch, searchParams, updated, url_key, widgetKey]);
 
   useEffect(() => {
     if (updated) {

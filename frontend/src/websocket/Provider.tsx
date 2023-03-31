@@ -132,7 +132,6 @@ export default function WebSocketProvider({
       } else if (response.purpose === "hide-widgets") {
         dispatch(hideWidgets(response));
       } else if (response.purpose === "init-widgets") {
-        console.log("****************************************init-widgets");
         dispatch(initWidgets(response));
         dispatch(setWidgetsInitialized(true));
       } else if (response.purpose === "update-title") {

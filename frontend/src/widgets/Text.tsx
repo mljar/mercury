@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { setWidgetValue } from "../slices/notebooksSlice";
+import { setUrlValuesUsed, setWidgetUrlValue, setWidgetValue } from "../slices/notebooksSlice";
 
 type TextProps = {
   widgetKey: string;
@@ -34,12 +34,20 @@ export default function TextWidget({
   };
 
   const [searchParams] = useSearchParams();
-  if (url_key !== undefined && url_key !== "") {
-    const urlValue = searchParams.get(url_key);
-    if (!updated && urlValue !== undefined && urlValue !== null) {
-      value = urlValue;
+  useEffect(() => {
+    if (url_key !== undefined && url_key !== "") {
+      const urlValue = searchParams.get(url_key);
+      if (!updated && urlValue !== undefined && urlValue !== null) {
+        dispatch(
+          setWidgetUrlValue({
+            key: widgetKey,
+            value: urlValue,
+          })
+        );
+        dispatch(setUrlValuesUsed(true));
+      }
     }
-  }
+  }, [dispatch, searchParams, updated, url_key, widgetKey]);
 
   return (
     <div className="form-group mb-3">

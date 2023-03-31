@@ -50,9 +50,6 @@ export default function RangeWidget({
 
   const dispatch = useDispatch();
   const [updated, userInteraction] = useState(false);
-  const [isUrlValue, setIsUrlValue] = useState(false);
-  //const widgetsInitialized = useSelector(getWidgetsInitialized);
-
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -62,7 +59,6 @@ export default function RangeWidget({
         ?.split(",")
         .map((i) => parseFloat(i));
       if (
-        //widgetsInitialized &&
         !updated &&
         urlValue !== undefined &&
         urlValue.length === 2 &&
@@ -74,9 +70,6 @@ export default function RangeWidget({
         urlValue[0] >= minValue &&
         urlValue[1] <= maxValue
       ) {
-        
-        //value = urlValue as [number, number];
-
         dispatch(
           setWidgetUrlValue({
             key: widgetKey,
@@ -92,19 +85,6 @@ export default function RangeWidget({
     value != null && value !== undefined && value.length === 2
       ? value
       : [minValue, maxValue];
-
-  // useEffect(() => {
-  //   if (isUrlValue && !updated) {
-  //     dispatch(
-  //       setWidgetValue({
-  //         key: widgetKey,
-  //         value: values,
-  //       })
-  //     );
-  //     //setIsUrlValue(false);
-  //   }
-
-  // }, [isUrlValue, dispatch, widgetKey, updated, values]);
 
   return (
     <div className="form-group mb-3">
