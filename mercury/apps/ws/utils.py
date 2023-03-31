@@ -41,7 +41,16 @@ def parse_params(nb, params={}):
 
     no_outputs = True
 
+    mercury_package_imported = False
+
     for cell in nb["cells"]:
+        
+        if not mercury_package_imported:
+            # try to guess if mercury is imported
+            if "import mercury" in cell.get("source", ""):
+                mercury_package_imported = True
+                    
+
         for output in cell.get("outputs", []):
             if "data" in output and "application/mercury+json" in output["data"]:
                 no_outputs = False
@@ -105,6 +114,8 @@ def parse_params(nb, params={}):
 
         cell_counter += 1
 
+    print(mercury_package_imported, params.get("static_notebook"))
+
     if params.get("show-code") is None:
         params["show-code"] = False
     if params.get("show-prompt") is None:
@@ -112,7 +123,7 @@ def parse_params(nb, params={}):
     if params.get("continuous_update") is None:
         params["continuous_update"] = True
     if params.get("static_notebook") is None:
-        params["static_notebook"] = False
+        params["static_notebook"] = not mercury_package_imported
     if params.get("show_sidebar") is None:
         params["show_sidebar"] = True
     if params.get("full_screen") is None:
