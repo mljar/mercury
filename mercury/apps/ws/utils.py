@@ -114,8 +114,6 @@ def parse_params(nb, params={}):
 
         cell_counter += 1
 
-    print(mercury_package_imported, params.get("static_notebook"))
-
     if params.get("show-code") is None:
         params["show-code"] = False
     if params.get("show-prompt") is None:
