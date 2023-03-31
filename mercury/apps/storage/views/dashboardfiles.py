@@ -41,10 +41,10 @@ def get_site(user, site_id):
     if user.is_anonymous:
         return None
 
-    sites = Site.objects.filter(pk=site_id)
-    sites = sites.filter(
+    sites = Site.objects.filter(
         Q(hosts__user=user, hosts__rights=Membership.EDIT) | Q(created_by=user)
     )
+    sites = sites.filter(pk=site_id)
     if not sites:
         return None
     return sites[0]
