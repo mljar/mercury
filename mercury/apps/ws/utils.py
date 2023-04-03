@@ -44,7 +44,6 @@ def parse_params(nb, params={}):
     mercury_package_imported = False
 
     for cell in nb["cells"]:
-        
         if not mercury_package_imported:
             # try to guess if mercury is imported
             code = cell.get("source", "")
