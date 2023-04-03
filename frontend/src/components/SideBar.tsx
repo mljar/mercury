@@ -47,7 +47,7 @@ import { handleDownload } from "../utils";
 import MarkdownWidget from "../widgets/Markdown";
 
 import { WebSocketContext } from "../websocket/Provider";
-import WebSocketStateBar from "../websocket/StatusBar";
+import WebSocketStateBar from "./StatusBar";
 import {
   downloadHTML,
   downloadPDF,
@@ -218,7 +218,6 @@ export default function SideBar({
             key={key}
             runNb={runNb}
             url_key={widgetParams?.url_key}
-
           />
         );
       } else if (isCheckboxWidget(widgetParams)) {
@@ -382,7 +381,9 @@ export default function SideBar({
           <div style={{ padding: "0px" }}>
             <form>
               {widgets}
+              
               {addSpaceInsteadTitle && <div style={{ padding: "15px" }}></div>}
+
               <div className="form-group mb-3 pb-1 pt-2">
                 {!continuousUpdate && (
                   <RunButton
@@ -391,114 +392,7 @@ export default function SideBar({
                     workerState={workerState}
                   />
                 )}
-                {allowDownload && (
-                  <div
-                    className="dropdown"
-                    style={{
-                      width: "47%",
-                      float: continuousUpdate ? "left" : "right",
-                    }}
-                  >
-                    <button
-                      className="btn btn-primary dropdown-toggle"
-                      style={{ margin: "0px", width: "100%" }}
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      disabled={waiting}
-                    >
-                      Download
-                    </button>
-
-                    <ul className="dropdown-menu dropdown-menu-end">
-                      <li>
-                        <a
-                          style={{ cursor: "pointer" }}
-                          className="dropdown-item"
-                          onClick={() => {
-                            if (staticNotebook) {
-                              handleDownload(
-                                `${axios.defaults.baseURL}${notebookPath}`,
-                                `${notebookTitle}.html`
-                              );
-                            } else {
-                              runDownloadHTML();
-
-                              //handleDownload(
-                              //  `${axios.defaults.baseURL}${notebookPath}`,
-                              //</li>  `${notebookTitle}.html`
-                              //);
-                            }
-                          }}
-                        >
-                          <i
-                            className="fa fa-file-code-o"
-                            aria-hidden="true"
-                          ></i>{" "}
-                          Download as HTML
-                        </a>
-                      </li>
-                      <li>
-                        <hr className="dropdown-divider" />
-                      </li>
-                      <li>
-                        <button
-                          type="button"
-                          className="dropdown-item"
-                          onClick={() => {
-                            if (staticNotebook) {
-                              dispatch(exportToPDF(notebookId, notebookPath));
-                            } else {
-                              dispatch(setExportingToPDF(true));
-                              runDownloadPDF();
-                            }
-                          }}
-                        >
-                          <i
-                            className="fa fa-file-pdf-o"
-                            aria-hidden="true"
-                          ></i>{" "}
-                          Download as PDF
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                )}
               </div>
-
-              {/* {notebookSchedule !== "" && (
-                <div className="alert alert-success mb-3" role="alert">
-                  <p>
-                    <i className="fa fa-clock-o" aria-hidden="true"></i>{" "}
-                    Scheduled notebook at '{notebookSchedule}'.
-                  </p>
-
-                  {taskCreatedAt && (
-                    <p>
-                      {" "}
-                      <i className="fa fa-calendar" aria-hidden="true"></i> Last
-                      execution at {taskCreatedAt}.
-                    </p>
-                  )}
-                  <div>
-                    <i className="fa fa-refresh" aria-hidden="true"></i> Website
-                    refresh every minute.
-                  </div>
-                </div>
-              )} */}
-
-              {continuousUpdate && (
-                <div>
-                  {/* add some space */}
-                  <br />
-                </div>
-              )}
-
-              {/* {waiting && workerState === WorkerState.Busy && (
-                <div className="alert alert-success mb-3 mt-3" role="alert">
-                  <i className="fa fa-cogs" aria-hidden="true"></i> Notebook is
-                  executed. Please wait.
-                </div>
-              )} */}
 
               {workerState === WorkerState.MaxIdleTimeReached && (
                 <div className="alert alert-info mb-3 mt-3" role="alert">
@@ -576,39 +470,6 @@ export default function SideBar({
             </form>
           </div>
 
-          {/* <hr style={{ marginTop: "20px", marginBottom: "20px" }} />
-          <div>
-            {!watchMode && <SelectExecutionHistory disabled={waiting} displayNb={displayNb} />}
-            {!staticNotebook && (
-              <div>
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => {
-                    saveNb();
-                  }}
-                  style={{ border: "none" }}
-                  disabled={waiting}
-                  title="Click to save current run"
-                >
-                  <i className="fa fa-floppy-o" aria-hidden="true"></i> Save run
-                </button>
-                <button
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => {
-                    dispatch(clearTasks(notebookId));
-                    dispatch(fetchNotebook(notebookId));
-                  }}
-                  style={{ border: "none" }}
-                  disabled={waiting}
-                  title="Click to clear all previous runs of the notebook"
-                >
-                  <i className="fa fa-times-circle" aria-hidden="true"></i>{" "}
-                  Delete runs
-                </button>
-              </div>
-            )}
-          </div>
-           */}
           {showFiles && (
             <div>
               <hr />
@@ -640,14 +501,25 @@ export default function SideBar({
               </button>
             </div>
           )}
-          {notebookId !== undefined && !staticNotebook && (
-            <div>
-              <hr />
-              <div style={{ paddingLeft: "10px" }}>
-                <WebSocketStateBar />{" "}
-              </div>
+
+          <div>
+            <hr />
+            <div style={{ paddingLeft: "10px" }}>
+              <WebSocketStateBar
+                notebookId={notebookId}
+                notebookPath={notebookPath}
+                notebookTitle={notebookTitle}
+                staticNotebook={staticNotebook}
+                allowDownload={allowDownload}
+                waiting={waiting}
+                continuousUpdate={continuousUpdate}
+                runDownloadHTML={runDownloadHTML}
+                runDownloadPDF={runDownloadPDF}
+                widgetsValues={widgetsValues}
+                widgetsParams={widgetsParams}
+              />{" "}
             </div>
-          )}
+          </div>
         </div>
       </BlockUi>
     </nav>

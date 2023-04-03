@@ -17,7 +17,7 @@ export default function RunButton({
     <button
       type="button"
       className="btn btn-success"
-      style={{ marginRight: "10px", width: "47%" }}
+      style={{ marginRight: "10px", width: "100%" }}
       onClick={() => {
         runNb();
       }}
