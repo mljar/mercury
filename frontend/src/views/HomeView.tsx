@@ -32,11 +32,11 @@ export default function HomeView() {
   const siteId = useSelector(getSiteId);
   const isSitePublic = useSelector(isPublic);
   const siteWelcome = useSelector(getSiteWelcome);
-  
+
   useEffect(() => {
     if (siteId !== undefined) {
       dispatch(fetchNotebooks(siteId));
-      if(siteWelcome === undefined || siteWelcome === "") {
+      if (siteWelcome === undefined || siteWelcome === "") {
         dispatch(fetchWelcome(siteId));
       }
     }
@@ -75,6 +75,13 @@ export default function HomeView() {
               title="display"
               scrolling="no"
             ></iframe>
+
+            {/* <img
+              alt="some alt" 
+              
+              width="100%"
+              src={`${notebook.default_view_path.replace(".html", ".png")}`}
+            ></img> */}
           </div>
           <a
             href={`/app/${notebook.slug}`}
@@ -132,7 +139,7 @@ export default function HomeView() {
   document.body.style.backgroundColor = "white";
 
   let welcomeMd = siteWelcome;
-  if(welcomeMd === undefined || welcomeMd === "") {
+  if (welcomeMd === undefined || welcomeMd === "") {
     welcomeMd = welcome;
   }
 
@@ -160,9 +167,7 @@ export default function HomeView() {
 
           {loadingState === "loaded" && notebooks.length === 0 && (
             <div>
-              <p>
-                There are no notebooks available. 
-              </p>
+              <p>There are no notebooks available.</p>
             </div>
           )}
           {loadingState === "error" && (

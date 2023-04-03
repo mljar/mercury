@@ -27,6 +27,8 @@ from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
 from apps.ws.utils import parse_params
 
+# from apps.tasks.export_png import to_png
+
 log = logging.getLogger(__name__)
 
 
@@ -269,6 +271,13 @@ def task_init_notebook(
                 created_by=user,
                 hosted_on=site,
             )
+
+            # html_file = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.html")
+            # png_file = os.path.join(settings.MEDIA_ROOT, f"{notebook_output_file}.png")
+            # print(html_file)
+            # print(png_file)
+            # to_png(html_file, png_file)
+
         else:
             notebook = Notebook.objects.get(pk=notebook_id)
             notebook.title = notebook_title
