@@ -1,6 +1,8 @@
 import json
 import os
 import tempfile
+import atexit
+import shutil
 
 import ipywidgets
 from IPython.display import display
@@ -12,6 +14,8 @@ class File:
     def __init__(self, label="File upload", max_file_size="100MB"):
         self.max_file_size = max_file_size
         self.code_uid = WidgetsManager.get_code_uid("File")
+        self.temp_dir = None
+        atexit.register(self.cleanup)
 
         if WidgetsManager.widget_exists(self.code_uid):
             self.file = WidgetsManager.get_widget(self.code_uid)
@@ -31,7 +35,7 @@ class File:
         if self.file.filepath is not None:
             # read that file
             with open(
-                self.file.filepath, "rb", encoding="utf-8", errors="ignore"
+                self.file.filepath, "rb"
             ) as fin:
                 return fin.read()
 
@@ -57,8 +61,8 @@ class File:
         ):
             # store file in temp dir
             # and return the path
-            temp_dir = tempfile.TemporaryDirectory()
-            self.file.filepath = os.path.join(temp_dir.name, self.filename)
+            self.temp_dir = tempfile.mkdtemp()
+            self.file.filepath = os.path.join(self.temp_dir, self.filename)
 
             with open(self.file.filepath, "wb") as fout:
                 fout.write(self.value)
@@ -66,6 +70,11 @@ class File:
             return self.file.filepath
 
         return None
+    
+    def cleanup(self):
+        if self.temp_dir is not None and os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
+
 
     @value.setter
     def value(self, v):
