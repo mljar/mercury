@@ -9,6 +9,7 @@ type TextProps = {
   value: string | undefined;
   rows: number | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   continuousUpdate: boolean;
   url_key: string;
@@ -20,6 +21,7 @@ export default function TextWidget({
   value,
   rows,
   disabled,
+  hidden,
   runNb,
   continuousUpdate,
   url_key,
@@ -50,7 +52,7 @@ export default function TextWidget({
   }, [dispatch, searchParams, updated, url_key, widgetKey]);
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`textarea-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}

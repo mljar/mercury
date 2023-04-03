@@ -14,6 +14,7 @@ type CheckboxProps = {
   label: string | null;
   value: boolean | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   url_key: string;
 };
@@ -23,6 +24,7 @@ export default function CheckboxWidget({
   label,
   value,
   disabled,
+  hidden,
   runNb,
   url_key,
 }: CheckboxProps) {
@@ -59,7 +61,7 @@ export default function CheckboxWidget({
   }, [value]);
 
   return (
-    <div className="form-group form-check form-switch mb-3">
+    <div className="form-group form-check form-switch mb-3"  style={{ display: hidden ? "none" : "" }}>
       <input
         className="form-check-input"
         type="checkbox"

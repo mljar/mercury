@@ -25,6 +25,7 @@ type SelectProps = {
   choices: string[];
   multi: boolean | undefined;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   url_key: string;
 };
@@ -36,6 +37,7 @@ export default function SelectWidget({
   choices,
   multi,
   disabled,
+  hidden,
   runNb,
   url_key,
 }: SelectProps) {
@@ -112,7 +114,7 @@ export default function SelectWidget({
   }, [value]);
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`select-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}

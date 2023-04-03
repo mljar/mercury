@@ -20,6 +20,7 @@ import {
   isNumericWidget,
   isMarkdownWidget,
   isButtonWidget,
+  isFileWidget,
 } from "../widgets/Types";
 import { getWindowDimensions } from "../components/WindowDimensions";
 
@@ -149,6 +150,16 @@ const notebooksSlice = createSlice({
           let widget = { ...state.selectedNotebook.params.params[widgetKey] };
 
           if (isRangeWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.min !== action.payload.min) {
               widget.min = action.payload.min;
               state.widgets[key] = action.payload.value;
@@ -169,6 +180,16 @@ const notebooksSlice = createSlice({
               updated = true;
             }
           } else if (isTextWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.rows !== action.payload.rows) {
               widget.rows = action.payload.rows;
               updated = true;
@@ -178,6 +199,16 @@ const notebooksSlice = createSlice({
               updated = true;
             }
           } else if (isSliderWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.min !== action.payload.min) {
               widget.min = action.payload.min;
               state.widgets[key] = action.payload.value;
@@ -198,6 +229,16 @@ const notebooksSlice = createSlice({
               updated = true;
             }
           } else if (isSelectWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (
               widget.choices.toString() !== action.payload.choices.toString()
             ) {
@@ -210,11 +251,31 @@ const notebooksSlice = createSlice({
               updated = true;
             }
           } else if (isCheckboxWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.label !== action.payload.label) {
               widget.label = action.payload.label;
               updated = true;
             }
           } else if (isNumericWidget(widget)) {
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.min !== action.payload.min) {
               widget.min = action.payload.min;
               state.widgets[key] = action.payload.value;
@@ -241,13 +302,38 @@ const notebooksSlice = createSlice({
             }
           } else if (isButtonWidget(widget)) {
             state.widgets[key] = action.payload.value;
-
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
             if (widget.label !== action.payload.label) {
               widget.label = action.payload.label;
               updated = true;
             }
             if (widget.style !== action.payload.style) {
               widget.style = action.payload.style;
+              updated = true;
+            }
+          } else if (isFileWidget(widget)) {
+            state.widgets[key] = action.payload.value;
+            if (widget.disabled !== action.payload.disabled) {
+              widget.disabled = action.payload.disabled;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.hidden !== action.payload.hidden) {
+              widget.hidden = action.payload.hidden;
+              state.widgets[key] = action.payload.value;
+              updated = true;
+            }
+            if (widget.label !== action.payload.label) {
+              widget.label = action.payload.label;
               updated = true;
             }
           }

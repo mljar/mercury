@@ -15,6 +15,7 @@ type NumericProps = {
   max: number | null;
   step: number | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   continuousUpdate: boolean;
   url_key: string;
@@ -28,6 +29,7 @@ export default function NumericWidget({
   max,
   step,
   disabled,
+  hidden,
   runNb,
   continuousUpdate,
   url_key,
@@ -83,7 +85,7 @@ export default function NumericWidget({
   };
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`checkbox-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}
@@ -113,6 +115,7 @@ export default function NumericWidget({
         min={minValue}
         max={maxValue}
         step={stepValue}
+        disabled={disabled}
       />
       {apply && continuousUpdate && (
         <div

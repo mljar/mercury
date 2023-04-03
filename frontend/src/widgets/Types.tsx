@@ -5,6 +5,8 @@ export interface ISelectWidget {
   choices: string[];
   multi: boolean | undefined;
   url_key: string;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface ICheckboxWidget {
@@ -12,6 +14,8 @@ export interface ICheckboxWidget {
   value: boolean | null;
   input: string;
   url_key: string;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface INumericWidget {
@@ -22,6 +26,8 @@ export interface INumericWidget {
   max: number;
   step: number;
   url_key: string;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface ISliderWidget {
@@ -34,6 +40,8 @@ export interface ISliderWidget {
   step: number | null;
   url_key: string;
   urlValue: number | null;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface IRangeWidget {
@@ -45,6 +53,8 @@ export interface IRangeWidget {
   max: number | null;
   step: number | null;
   url_key: string;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface IFileWidget {
@@ -52,6 +62,8 @@ export interface IFileWidget {
   value: string | null;
   input: string;
   maxFileSize: string | null;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface ITextWidget {
@@ -60,6 +72,8 @@ export interface ITextWidget {
   input: string;
   rows: number | null;
   url_key: string;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 export interface IOutputFilesWidget {
@@ -79,6 +93,8 @@ export interface IButtonWidget {
   style: string;
   input: string;
   value: string | boolean | null;
+  disabled: boolean;
+  hidden: boolean;
 }
 
 

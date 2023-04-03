@@ -27,7 +27,7 @@ import {
   isOutputFilesWidget,
   isButtonWidget,
 } from "../widgets/Types";
-//import { getWidgetsValues, setWidgetValue } from "./Widgets/widgetsSlice";
+
 import {
   clearWidgetsUrlValues,
   getUrlValuesUsed,
@@ -209,7 +209,8 @@ export default function SideBar({
         widgets.push(
           <SelectWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as string}
             choices={widgetParams?.choices}
@@ -217,13 +218,15 @@ export default function SideBar({
             key={key}
             runNb={runNb}
             url_key={widgetParams?.url_key}
+
           />
         );
       } else if (isCheckboxWidget(widgetParams)) {
         widgets.push(
           <CheckboxWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as boolean}
             key={key}
@@ -235,7 +238,8 @@ export default function SideBar({
         widgets.push(
           <NumericWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as number}
             min={widgetParams?.min}
@@ -251,7 +255,8 @@ export default function SideBar({
         widgets.push(
           <SliderWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as number}
             min={widgetParams?.min}
@@ -267,7 +272,8 @@ export default function SideBar({
         widgets.push(
           <RangeWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as [number, number]}
             min={widgetParams?.min}
@@ -283,7 +289,8 @@ export default function SideBar({
         widgets.push(
           <FileWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             maxFileSize={widgetParams?.maxFileSize}
             key={key}
@@ -296,7 +303,8 @@ export default function SideBar({
         widgets.push(
           <TextWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as string}
             rows={widgetParams?.rows}
@@ -318,7 +326,8 @@ export default function SideBar({
         widgets.push(
           <ButtonWidget
             widgetKey={key}
-            disabled={waiting}
+            disabled={waiting || widgetParams?.disabled}
+            hidden={widgetParams?.hidden}
             label={widgetParams?.label}
             value={widgetsValues[key] as boolean}
             style={widgetParams?.style}

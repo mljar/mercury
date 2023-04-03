@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {
-  setWidgetValue,
-} from "../slices/notebooksSlice";
+import { setWidgetValue } from "../slices/notebooksSlice";
 
 type ButtonProps = {
   widgetKey: string;
@@ -10,6 +8,7 @@ type ButtonProps = {
   style: string;
   value: string | boolean | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
 };
 
@@ -19,6 +18,7 @@ export default function ButtonWidget({
   style,
   value,
   disabled,
+  hidden,
   runNb,
 }: ButtonProps) {
   const dispatch = useDispatch();
@@ -42,7 +42,7 @@ export default function ButtonWidget({
   }, [value]);
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <button
         type="button"
         className={`btn ${selectedClass}`}

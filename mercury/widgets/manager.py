@@ -107,6 +107,8 @@ class WidgetsManager:
                 "max": output.get("max", 10),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "Select":
             return {
@@ -116,6 +118,8 @@ class WidgetsManager:
                 "multi": False,
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "MultiSelect":
             return {
@@ -125,6 +129,8 @@ class WidgetsManager:
                 "multi": True,
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "Range":
             return {
@@ -134,6 +140,8 @@ class WidgetsManager:
                 "max": output.get("max", 10),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "Text":
             return {
@@ -142,12 +150,16 @@ class WidgetsManager:
                 "rows": output.get("rows", 1),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "File":
             return {
                 "input": "file",
                 "maxFileSize": output.get("max_file_size", 1),
                 "label": output.get("label", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "OutputDir":
             return {
@@ -160,6 +172,8 @@ class WidgetsManager:
                 "value": output.get("value", True),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "Numeric":
             return {
@@ -170,6 +184,8 @@ class WidgetsManager:
                 "step": output.get("step", 1),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
         elif widget_type == "Note":
             return {
@@ -182,6 +198,8 @@ class WidgetsManager:
                 "value": output.get("value", False),
                 "label": output.get("label", ""),
                 "style": output.get("style", "primary"),
+                "disabled": output.get("disabled", False),
+                "hidden": output.get("hidden", False),
             }
 
         return {}

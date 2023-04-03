@@ -17,6 +17,7 @@ type SliderProps = {
   step: number | null;
   vertical: boolean | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   url_key: string;
 };
@@ -30,6 +31,7 @@ export default function SliderWidget({
   step,
   vertical,
   disabled,
+  hidden,
   runNb,
   url_key,
 }: SliderProps) {
@@ -74,7 +76,7 @@ export default function SliderWidget({
   const vals: number[] = [value !== null ? value : maxValue];
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`slider-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}

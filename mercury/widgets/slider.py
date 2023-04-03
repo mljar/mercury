@@ -7,7 +7,7 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Slider:
-    def __init__(self, value=0, min=0, max=10, label="", step=1, url_key=""):
+    def __init__(self, value=0, min=0, max=10, label="", step=1, url_key="", disabled=False, hidden=False):
         if value < min:
             raise WidgetException("value should be equal or larger than min")
         if value > max:
@@ -15,6 +15,7 @@ class Slider:
 
         self.code_uid = WidgetsManager.get_code_uid("Slider")
         self.url_key = url_key
+        self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):
             self.slider = WidgetsManager.get_widget(self.code_uid)
             if self.slider.min != min:
@@ -27,6 +28,7 @@ class Slider:
                 self.slider.step = step
                 self.slider.value = value
             self.slider.description = label
+            self.slider.disabled = disabled
         else:
             self.slider = ipywidgets.IntSlider(
                 value=value,
@@ -35,6 +37,7 @@ class Slider:
                 description=label,
                 step=step,
                 style={"description_width": "initial"},
+                disabled=disabled
             )
             WidgetsManager.add_widget(self.slider.model_id, self.code_uid, self.slider)
         display(self)
@@ -70,9 +73,16 @@ class Slider:
                 "model_id": self.slider.model_id,
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
+                "disabled": self.slider.disabled,
+                "hidden": self.hidden
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
+
+            if self.hidden:
+                key = 'application/vnd.jupyter.widget-view+json'
+                if key in data:
+                    del data[key]
 
             return data

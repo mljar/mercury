@@ -30,6 +30,7 @@ type FileProps = {
   label: string | null;
   maxFileSize: string | null;
   disabled: boolean;
+  hidden: boolean;
   value: string[];
   runNb: () => void;
 };
@@ -39,6 +40,7 @@ export default function FileWidget({
   label,
   maxFileSize,
   disabled,
+  hidden,
   value,
   runNb,
 }: FileProps) {
@@ -176,7 +178,7 @@ export default function FileWidget({
   };
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`file-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}

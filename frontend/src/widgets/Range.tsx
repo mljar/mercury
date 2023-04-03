@@ -19,6 +19,7 @@ type RangeProps = {
   step: number | null;
   vertical: boolean | null;
   disabled: boolean;
+  hidden: boolean;
   runNb: () => void;
   url_key: string;
 };
@@ -32,6 +33,7 @@ export default function RangeWidget({
   step,
   vertical,
   disabled,
+  hidden,
   runNb,
   url_key,
 }: RangeProps) {
@@ -87,7 +89,7 @@ export default function RangeWidget({
       : [minValue, maxValue];
 
   return (
-    <div className="form-group mb-3">
+    <div className="form-group mb-3" style={{ display: hidden ? "none" : "" }}>
       <label
         htmlFor={`range-slider-${label}`}
         style={{ color: disabled ? "#555" : "#212529" }}

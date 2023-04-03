@@ -7,7 +7,7 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Range:
-    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1, url_key=""):
+    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1, url_key="", disabled=False, hidden=False):
         for i in [0, 1]:
             if value[i] < min:
                 raise WidgetException(f"value[{i}] should be equal or larger than min")
@@ -19,6 +19,7 @@ class Range:
 
         self.code_uid = WidgetsManager.get_code_uid("Range")
         self.url_key = url_key
+        self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):
             self.range = WidgetsManager.get_widget(self.code_uid)
             if self.range.min != min:
@@ -31,6 +32,7 @@ class Range:
                 self.range.step = step
                 self.range.value = value
             self.range.description = label
+            self.range.disabled = disabled
         else:
             self.range = ipywidgets.IntRangeSlider(
                 value=value,
@@ -39,6 +41,7 @@ class Range:
                 description=label,
                 step=step,
                 style={"description_width": "initial"},
+                disabled=disabled
             )
             WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)
@@ -70,9 +73,16 @@ class Range:
                 "model_id": self.range.model_id,
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
+                "disabled": self.range.disabled,
+                "hidden": self.hidden
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
+
+            if self.hidden:
+                key = 'application/vnd.jupyter.widget-view+json'
+                if key in data:
+                    del data[key]
 
             return data

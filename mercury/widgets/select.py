@@ -7,24 +7,27 @@ from .manager import WidgetsManager
 
 
 class Select:
-    def __init__(self, value=None, choices=[], label="", url_key=""):
+    def __init__(self, value=None, choices=[], label="", url_key="", disabled=False, hidden=False):
         if value is None and len(choices) > 1:
             value = choices[0]
 
         self.code_uid = WidgetsManager.get_code_uid("Select")
         self.url_key = url_key
+        self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):
             self.dropdown = WidgetsManager.get_widget(self.code_uid)
             if list(self.dropdown.options) != choices:
                 self.dropdown.options = choices
                 self.dropdown.value = value
             self.dropdown.description = label
+            self.dropdown.disabled = disabled
         else:
             self.dropdown = ipywidgets.Dropdown(
                 value=value,
                 options=choices,
                 description=label,
                 style={"description_width": "initial"},
+                disabled=disabled
             )
             WidgetsManager.add_widget(
                 self.dropdown.model_id, self.code_uid, self.dropdown
@@ -56,9 +59,16 @@ class Select:
                 "model_id": self.dropdown.model_id,
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
+                "disabled": self.dropdown.disabled,
+                "hidden": self.hidden
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
+
+            if self.hidden:
+                key = 'application/vnd.jupyter.widget-view+json'
+                if key in data:
+                    del data[key]
 
             return data
