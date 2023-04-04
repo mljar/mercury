@@ -18,6 +18,7 @@ export enum WorkerState {
   Queued = "Queued",
   MaxRunTimeReached = "MaxRunTimeReached",
   MaxIdleTimeReached = "MaxIdleTimeReached",
+  UsageLimitReached = "UsageLimitReached",
   //InstallPackages = "InstallPackages",
 }
 

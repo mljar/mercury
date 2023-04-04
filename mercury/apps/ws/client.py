@@ -111,6 +111,19 @@ class ClientProxy(WebsocketConsumer):
     def need_worker(self):
         if self.server_address is None:
             return
+
+
+        # usage = json.loads(self.site_owner.profile.usage).get("usage", 0)
+        # log.debug(f"Current usage {usage} seconds")
+
+        # async_to_sync(self.channel_layer.group_send)(
+        #     self.client_group,
+        #     {
+        #         "type": "broadcast_message",
+        #         "payload": {"purpose": "worker-state", "state": "UsageLimitReached"},
+        #     },
+        # )
+
         with transaction.atomic():
             log.debug("Create worker in db")
             worker = Worker(

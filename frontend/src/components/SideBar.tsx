@@ -381,7 +381,7 @@ export default function SideBar({
           <div style={{ padding: "0px" }}>
             <form>
               {widgets}
-              
+
               {addSpaceInsteadTitle && <div style={{ padding: "15px" }}></div>}
 
               <div className="form-group mb-3 pb-1 pt-2">
@@ -393,6 +393,13 @@ export default function SideBar({
                   />
                 )}
               </div>
+
+              {workerState === WorkerState.UsageLimitReached && (
+                <div className="alert alert-info mb-3 mt-3" role="alert">
+                  <i className="fa fa-info-circle" aria-hidden="true"></i> Usage
+                  limit was reached. Please upgrade the plan.
+                </div>
+              )}
 
               {workerState === WorkerState.MaxIdleTimeReached && (
                 <div className="alert alert-info mb-3 mt-3" role="alert">

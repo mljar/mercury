@@ -70,6 +70,13 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
     if (notebook?.params?.static_notebook) {
       return false;
     }
+    if (
+      workerState === WorkerState.UsageLimitReached ||
+      workerState === WorkerState.MaxIdleTimeReached ||
+      workerState === WorkerState.MaxRunTimeReached
+    ) {
+      return false;
+    }
     return workerState !== WorkerState.Running;
   };
 
