@@ -17,6 +17,7 @@ WORKER_SITE = "worker"
 my_ip = None
 
 def machine_uuid():
+    global my_ip
     if my_ip is not None:
         return my_ip
     if os.environ.get("USE_WORKER_IP") is not None:
