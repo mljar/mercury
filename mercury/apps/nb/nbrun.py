@@ -1,6 +1,6 @@
-import json
 import os
 import sys
+import copy
 
 import nbformat
 from execnb.nbio import nb2dict, nb2str, read_nb, write_nb
@@ -10,7 +10,6 @@ CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
 sys.path.insert(0, BACKEND_DIR)
 
-import copy
 
 from execnb.nbio import _dict2obj, dict2nb
 
@@ -65,11 +64,15 @@ class NbRun:
             if counter is not None:
                 cell.execution_count = counter
 
-            for output in cell.outputs:
-                if output.get(
-                    "output_type", ""
-                ) == "error" and "StopExecution" in output.get("ename", ""):
-                    return False
+            try:
+                for output in cell.outputs:   
+                    if output.get(
+                        "output_type", ""
+                    ) == "error" and "StopExecution" in output.get("ename", ""):
+                        return False                    
+            except Exception as e:
+                pass
+
         return True
 
     def run_notebook(self, nb, start=0):
