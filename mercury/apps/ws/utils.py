@@ -1,7 +1,8 @@
+import os
 import json
 import logging
 import platform
-
+import requests
 import nbformat
 
 from widgets.manager import WidgetsManager
@@ -14,8 +15,10 @@ WORKER_SITE = "worker"
 
 
 def machine_uuid():
+    if os.environ.get("USE_WORKER_IP") is not None:
+        response = requests.get("https://api.ipify.org?format=json")
+        return response.json().get("ip", platform.node())
     return platform.node()
-
 
 def client_group(notebook_id, session_id):
     return f"{CLIENT_SITE}-{notebook_id}-{session_id}"
