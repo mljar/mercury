@@ -14,10 +14,15 @@ CLIENT_SITE = "client"
 WORKER_SITE = "worker"
 
 
+my_ip = None
+
 def machine_uuid():
+    if my_ip is not None:
+        return my_ip
     if os.environ.get("USE_WORKER_IP") is not None:
         response = requests.get("https://api.ipify.org?format=json")
-        return response.json().get("ip", platform.node())
+        my_ip = response.json().get("ip", platform.node())
+        return my_ip
     return platform.node()
 
 def client_group(notebook_id, session_id):
