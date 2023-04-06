@@ -97,8 +97,8 @@ class Exporter:
             for cell in n.cells:
                 if cell.get("outputs") is None:
                     continue
-                for output in cell.outputs:   
-                    # check for iframe 
+                for output in cell.outputs:
+                    # check for iframe
                     any_html = output.get("data", {}).get("text/html", None)
                     if any_html is not None:
                         if isinstance(any_html, list):
@@ -106,20 +106,30 @@ class Exporter:
                         if "<iframe" in any_html:
                             place = any_html.find("src=")
                             if place != -1:
-                                stop = any_html.find('"', place+5)
+                                stop = any_html.find('"', place + 5)
                             if place != -1 and stop != -1:
-                                fname = any_html[place+5:stop]
-                            
+                                fname = any_html[place + 5 : stop]
+
                                 if not fname.startswith("http"):
                                     content = None
                                     if os.path.exists(fname):
-                                        with open(fname, "r", encoding="utf-8", errors="ignore") as fin:
+                                        with open(
+                                            fname,
+                                            "r",
+                                            encoding="utf-8",
+                                            errors="ignore",
+                                        ) as fin:
                                             content = html.escape(fin.read())
                                     if content is not None:
-                                        any_html = any_html.replace(any_html[place:stop+1], f'srcdoc="{content}"')
-                                        #new_output = [i+"\n" for i in any_html.split("\n")]
-                                        output["data"]["text/html"] = any_html # new_output
-                                        
+                                        any_html = any_html.replace(
+                                            any_html[place : stop + 1],
+                                            f'srcdoc="{content}"',
+                                        )
+                                        # new_output = [i+"\n" for i in any_html.split("\n")]
+                                        output["data"][
+                                            "text/html"
+                                        ] = any_html  # new_output
+
         except Exception as e:
             pass
 

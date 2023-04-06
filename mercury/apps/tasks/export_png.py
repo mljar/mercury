@@ -134,10 +134,7 @@ def to_png(html_input_file, png_output_file):
     pool = concurrent.futures.ThreadPoolExecutor()
     pool.submit(
         asyncio.run,
-        html_to_png(
-            html_input_file,
-            png_output_file
-        ),
+        html_to_png(html_input_file, png_output_file),
     ).result()
 
     # set previous log level

@@ -20,7 +20,6 @@ def task_start_websocket_worker(self, job_params):
     workers_ip_list = os.environ.get("WORKERS_IP_LIST", "")
 
     if workers_ip_list == "":
-
         machine_id = machine_uuid()
         workers = Worker.objects.filter(machine_id=machine_id)
 
@@ -42,14 +41,12 @@ def task_start_websocket_worker(self, job_params):
             log.debug("Start " + " ".join(command))
             worker = subprocess.Popen(command)
     else:
-
         workers_ips = workers_ip_list.split(",")
         print(workers_ips)
 
         all_busy = True
 
         for worker_ip in workers_ips:
-
             try:
                 workers = Worker.objects.filter(machine_id=worker_ip)
 
@@ -59,7 +56,9 @@ def task_start_websocket_worker(self, job_params):
                     notebook_id = job_params["notebook_id"]
                     session_id = job_params["session_id"]
                     worker_id = job_params["worker_id"]
-                    response = requests.get(f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}")
+                    response = requests.get(
+                        f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}"
+                    )
                     if response.status_code == 200:
                         if response.json().get("msg", "") == "ok":
                             all_busy = False

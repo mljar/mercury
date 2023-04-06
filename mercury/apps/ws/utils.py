@@ -16,6 +16,7 @@ WORKER_SITE = "worker"
 
 my_ip = None
 
+
 def machine_uuid():
     global my_ip
     if my_ip is not None:
@@ -25,6 +26,7 @@ def machine_uuid():
         my_ip = response.json().get("ip", platform.node())
         return my_ip
     return platform.node()
+
 
 def client_group(notebook_id, session_id):
     return f"{CLIENT_SITE}-{notebook_id}-{session_id}"

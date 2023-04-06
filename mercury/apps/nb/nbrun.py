@@ -65,11 +65,11 @@ class NbRun:
                 cell.execution_count = counter
 
             try:
-                for output in cell.outputs:   
+                for output in cell.outputs:
                     if output.get(
                         "output_type", ""
                     ) == "error" and "StopExecution" in output.get("ename", ""):
-                        return False                    
+                        return False
             except Exception as e:
                 pass
 

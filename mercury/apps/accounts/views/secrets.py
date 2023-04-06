@@ -10,6 +10,7 @@ from apps.accounts.models import Secret, Site
 from apps.accounts.views.permissions import HasEditRights
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
+from apps.accounts.serializers import SecretSerializer
 
 
 class AddSecret(APIView):
@@ -45,12 +46,9 @@ class ListSecrets(APIView):
     def get(self, request, site_id, format=None):
         secrets = Secret.objects.filter(hosted_on__id=site_id)
 
-        data = []
-
-        for secret in secrets:
-            data += [secret.name]
-
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(
+            SecretSerializer(secrets, many=True).data, status=status.HTTP_200_OK
+        )
 
 
 class WorkerListSecrets(APIView):

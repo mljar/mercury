@@ -112,7 +112,6 @@ class ClientProxy(WebsocketConsumer):
         if self.server_address is None:
             return
 
-
         # usage = json.loads(self.site_owner.profile.usage).get("usage", 0)
         # log.debug(f"Current usage {usage} seconds")
 
