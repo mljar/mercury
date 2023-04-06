@@ -289,6 +289,17 @@ class NBWorker(WSClient):
                 cmd = f"pip install -r {fname}"
                 self.nbrun.run_code(cmd)
 
+    def provision_secrets(self):
+        secrets = self.list_secrets()
+        if secrets:
+            cmd = "import os\n"
+            for s in secrets:
+                name = s.get("name", "")
+                secret = s.get("secret", "")
+                cmd += f'os.environ["{name}"] = "{secret}"'
+            log.debug("Set secrets")
+            self.nbrun.run_code(cmd)
+
     def init_notebook(self):
         log.debug(f"Init notebook, show_code={self.show_code()}")
 
@@ -308,6 +319,7 @@ class NBWorker(WSClient):
         )
 
         self.install_new_packages()
+        self.provision_secrets()
 
         # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook

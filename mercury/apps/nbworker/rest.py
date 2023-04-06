@@ -192,3 +192,14 @@ class RESTClient:
                 f"Exception when check if worker id={self.worker_id} is stale"
             )
         return True
+
+    def list_secrets(self):
+        try:
+            response = requests.get(
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker-secrets",
+            )
+            if response.status_code == 200:
+                return response.json()
+        except Exception:
+            log.exception(f"Exception when list worker id={self.worker_id} secrets")
+        return []
