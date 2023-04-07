@@ -14,6 +14,7 @@ class Select:
         self.code_uid = WidgetsManager.get_code_uid("Select")
         self.url_key = url_key
         self.hidden = hidden
+        choices = list(choices)
         if WidgetsManager.widget_exists(self.code_uid):
             self.dropdown = WidgetsManager.get_widget(self.code_uid)
             if list(self.dropdown.options) != choices:
