@@ -17,7 +17,10 @@ class Checkbox:
             self.checkbox.disabled = disabled
         else:
             self.checkbox = ipywidgets.Checkbox(
-                value=value, description=label, style={"description_width": "initial"}, disabled=disabled
+                value=value,
+                description=label,
+                style={"description_width": "initial"},
+                disabled=disabled,
             )
             WidgetsManager.add_widget(
                 self.checkbox.model_id, self.code_uid, self.checkbox
@@ -53,14 +56,14 @@ class Checkbox:
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
                 "disabled": self.checkbox.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

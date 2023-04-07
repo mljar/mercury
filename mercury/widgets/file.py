@@ -11,7 +11,9 @@ from .manager import WidgetsManager
 
 
 class File:
-    def __init__(self, label="File upload", max_file_size="100MB", disabled=False, hidden=False):
+    def __init__(
+        self, label="File upload", max_file_size="100MB", disabled=False, hidden=False
+    ):
         self.max_file_size = max_file_size
         self.code_uid = WidgetsManager.get_code_uid("File")
         self.temp_dir = None
@@ -36,9 +38,7 @@ class File:
 
         if self.file.filepath is not None:
             # read that file
-            with open(
-                self.file.filepath, "rb"
-            ) as fin:
+            with open(self.file.filepath, "rb") as fin:
                 return fin.read()
 
         return None
@@ -72,11 +72,10 @@ class File:
             return self.file.filepath
 
         return None
-    
+
     def cleanup(self):
         if self.temp_dir is not None and os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir, ignore_errors=True)
-
 
     @value.setter
     def value(self, v):
@@ -104,14 +103,14 @@ class File:
                 "model_id": self.file.model_id,
                 "code_uid": self.code_uid,
                 "disabled": self.file.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

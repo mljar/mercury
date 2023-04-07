@@ -7,7 +7,9 @@ from .manager import WidgetsManager
 
 
 class Select:
-    def __init__(self, value=None, choices=[], label="", url_key="", disabled=False, hidden=False):
+    def __init__(
+        self, value=None, choices=[], label="", url_key="", disabled=False, hidden=False
+    ):
         if value is None and len(choices) > 1:
             value = choices[0]
 
@@ -28,7 +30,7 @@ class Select:
                 options=choices,
                 description=label,
                 style={"description_width": "initial"},
-                disabled=disabled
+                disabled=disabled,
             )
             WidgetsManager.add_widget(
                 self.dropdown.model_id, self.code_uid, self.dropdown
@@ -61,14 +63,14 @@ class Select:
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
                 "disabled": self.dropdown.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

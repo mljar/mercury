@@ -7,7 +7,17 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Range:
-    def __init__(self, value=[0, 1], min=0, max=10, label="", step=1, url_key="", disabled=False, hidden=False):
+    def __init__(
+        self,
+        value=[0, 1],
+        min=0,
+        max=10,
+        label="",
+        step=1,
+        url_key="",
+        disabled=False,
+        hidden=False,
+    ):
         for i in [0, 1]:
             if value[i] < min:
                 raise WidgetException(f"value[{i}] should be equal or larger than min")
@@ -41,7 +51,7 @@ class Range:
                 description=label,
                 step=step,
                 style={"description_width": "initial"},
-                disabled=disabled
+                disabled=disabled,
             )
             WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)
@@ -74,14 +84,14 @@ class Range:
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
                 "disabled": self.range.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

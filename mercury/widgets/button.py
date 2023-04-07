@@ -20,7 +20,9 @@ class Button:
             self.button.button_style = style
             self.button.disabled = disabled
         else:
-            self.button = ipywidgets.Button(description=label, button_style=style, disabled=disabled)
+            self.button = ipywidgets.Button(
+                description=label, button_style=style, disabled=disabled
+            )
             self.button.value = False
 
             def on_button_clicked(b):
@@ -60,14 +62,14 @@ class Button:
                 "model_id": self.button.model_id,
                 "code_uid": self.code_uid,
                 "disabled": self.button.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

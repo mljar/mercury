@@ -7,7 +7,9 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Text:
-    def __init__(self, value="", label="", rows=1, url_key="", disabled=False, hidden=False):
+    def __init__(
+        self, value="", label="", rows=1, url_key="", disabled=False, hidden=False
+    ):
         self.rows = rows
 
         self.code_uid = WidgetsManager.get_code_uid("Text")
@@ -18,7 +20,9 @@ class Text:
             self.text.description = label
             self.text.disabled = disabled
         else:
-            self.text = ipywidgets.Textarea(value=value, description=label, disabled=disabled)
+            self.text = ipywidgets.Textarea(
+                value=value, description=label, disabled=disabled
+            )
             WidgetsManager.add_widget(self.text.model_id, self.code_uid, self.text)
         display(self)
 
@@ -52,14 +56,14 @@ class Text:
                 "code_uid": self.code_uid,
                 "url_key": self.url_key,
                 "disabled": self.text.disabled,
-                "hidden": self.hidden
+                "hidden": self.hidden,
             }
             data["application/mercury+json"] = json.dumps(view, indent=4)
             if "text/plain" in data:
                 del data["text/plain"]
 
             if self.hidden:
-                key = 'application/vnd.jupyter.widget-view+json'
+                key = "application/vnd.jupyter.widget-view+json"
                 if key in data:
                     del data[key]
 

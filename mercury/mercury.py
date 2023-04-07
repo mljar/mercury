@@ -40,6 +40,8 @@ from widgets.md import Markdown
 from widgets.md import Markdown as Md
 from widgets.json import JSON
 from widgets.stop import StopExecution, Stop
+from widgets.confetti import Confetti
+from widgets.chat import Chat
 
 
 def main():
