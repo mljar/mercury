@@ -147,7 +147,7 @@ class NBWorker(WSClient):
     def update_nb(self, widgets):
         log.debug(f"Update nb {widgets}")
 
-        index_execute_from = 1
+        index_execute_from = None
         # fill notebook with widgets values
         self.prev_widgets = copy.deepcopy(widgets)
         for widget_key in widgets.keys():
@@ -191,12 +191,12 @@ class NBWorker(WSClient):
                 cell_index = WidgetsManager.parse_cell_index(widget_key)
                 log.debug(f"Widget updated, update nb from {cell_index}")
 
-                if index_execute_from == 1:
+                if index_execute_from is None:
                     index_execute_from = cell_index
                 else:
                     index_execute_from = min(index_execute_from, cell_index)
 
-        if index_execute_from != 1:
+        if index_execute_from is not None:
             if self.prev_nb is not None:
                 self.nb = copy.deepcopy(self.prev_nb)
             else:
