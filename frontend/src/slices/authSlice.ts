@@ -147,7 +147,7 @@ export const changePassword =
         });
         toast.success("Password changed successfully");
       } catch (error) {
-        const err = error as AxiosError;
+        // const err = error as AxiosError;
         // if (err !== undefined && err.response !== undefined && err.response.data !== undefined) {
         //   const msg = Object.values(err.response.data);
         //   toast.error("Password not changed." + msg);

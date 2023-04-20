@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   clearWidgetsUrlValues,
-  getWidgetsInitialized,
   setUrlValuesUsed,
   setWidgetUrlValue,
   setWidgetValue,

@@ -13,7 +13,6 @@ import axios from "axios";
 import { exportToPDF, setExportingToPDF } from "../slices/tasksSlice";
 import {
   isCheckboxWidget,
-  isFileWidget,
   isNumericWidget,
   isRangeWidget,
   isSelectWidget,

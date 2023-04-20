@@ -2,11 +2,8 @@
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import {
-  exportToPDF,
   scrapeSlidesHash,
-  setExportingToPDF,
 } from "../slices/tasksSlice";
 import CheckboxWidget from "../widgets/Checkbox";
 import NumericWidget from "../widgets/Numeric";
@@ -43,7 +40,6 @@ import {
 import FileWidget from "../widgets/File";
 import TextWidget from "../widgets/Text";
 import { setShowSideBar, setView } from "../slices/appSlice";
-import { handleDownload } from "../utils";
 import MarkdownWidget from "../widgets/Markdown";
 
 import { WebSocketContext } from "../websocket/Provider";
@@ -119,6 +115,7 @@ export default function SideBar({
 
     if (widgetsUrlValues) {
       let params = {} as Record<string, WidgetValueType>;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (let [key, widgetParams] of Object.entries(widgetsParams)) {
         if (key in widgetsUrlValues) {
           params[key] = widgetsUrlValues[key];
