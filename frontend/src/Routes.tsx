@@ -39,8 +39,9 @@ function AppLayout() {
 export default function AppRoutes() {
   const dispatch = useDispatch();
 
+
   useEffect(() => {
-    getSessionId();
+    getSessionId(true);
     // dispatch(fetchVersion());
     if (localStorage.getItem("token")) {
       dispatch(setToken(localStorage.getItem("token")));

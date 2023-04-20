@@ -2,9 +2,12 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import fileDownload from "js-file-download";
 
-export const getSessionId = () => {
+export const getSessionId = (forceReload = false) => {
     var sessionId = sessionStorage.getItem("sessionId");
     if (sessionId == null) {
+        sessionId = uuidv4();
+        sessionStorage.setItem("sessionId", sessionId);
+    } else if (forceReload) {
         sessionId = uuidv4();
         sessionStorage.setItem("sessionId", sessionId);
     }

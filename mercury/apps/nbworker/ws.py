@@ -47,9 +47,9 @@ class WSClient(RESTClient):
     def on_open(self, ws):
         log.info("Open ws connection")
         self.queue.put(json.dumps({"purpose": Purpose.InitNotebook}))
-        if self.worker_exists():
-            self.set_worker_state(WorkerState.Running)
-            self.send_state()
+        # just check if exists
+        self.worker_exists()
+        
 
     def on_close(self, ws, close_status_code, close_msg):
         global stop_event
