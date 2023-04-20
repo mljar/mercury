@@ -226,7 +226,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
                     position: "absolute",
                     top: displayEmbed ? "5px" : "50px",
                     left: "5px",
-                    zIndex: "100",
+                    zIndex: "2000",
                   }}
                   onClick={() => dispatch(setShowSideBar(true))}
                   data-toggle="tooltip"

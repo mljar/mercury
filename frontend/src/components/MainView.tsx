@@ -96,20 +96,18 @@ export default function MainView({
 
   useEffect(() => {
     if (notebookPath !== undefined) {
-      axios
-        .get(`${notebookPath}${slidesHash}`)
-        .then((response) => {
-          let nbSrc = response.data;
-          if (!isPresentation) {
-            nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
-            nbSrc = nbSrc.replace("<html>", "");
-            nbSrc = nbSrc.replace("</html>", "");
-            nbSrc = nbSrc.replace("<body", "<div");
-            nbSrc = nbSrc.replace("</body>", "</div>");
-            nbSrc = nbSrc.replace("<!DOCTYPE html>", "");
-          }
-          dispatch(setNotebookSrc(nbSrc));
-        });
+      axios.get(`${notebookPath}${slidesHash}`).then((response) => {
+        let nbSrc = response.data;
+        if (!isPresentation) {
+          nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
+          nbSrc = nbSrc.replace("<html>", "");
+          nbSrc = nbSrc.replace("</html>", "");
+          nbSrc = nbSrc.replace("<body", "<div");
+          nbSrc = nbSrc.replace("</body>", "</div>");
+          nbSrc = nbSrc.replace("<!DOCTYPE html>", "");
+        }
+        dispatch(setNotebookSrc(nbSrc));
+      });
     }
   }, [dispatch, notebookPath, slidesHash, isPresentation]);
 
@@ -125,9 +123,17 @@ export default function MainView({
     divStyle = { maxWidth: "1140px", margin: "auto" };
   }
 
+  // hide blocking for small screens when sidebar is only showed
+  // because it causes some strange shadow 
+  // see https://github.com/mljar/mercury/issues/250
+  let hideBlockUi = false;
+  if(columnsWidth < 12 && window.innerWidth < 992) {
+    hideBlockUi = true;
+  }
+
   return (
     <main className={`ms-sm-auto col-${columnsWidth}`} style={mainStyle}>
-      <BlockUi tag="div" blocking={waiting}>
+      <BlockUi tag="div" blocking={!hideBlockUi && waiting}>
         <div style={divStyle}>
           {loadingState === "loading" && !watchMode && (
             <p>Loading notebook. Please wait ...</p>
