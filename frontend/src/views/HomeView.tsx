@@ -52,6 +52,11 @@ export default function HomeView() {
   };
 
   const notebookItems = notebooks.map((notebook, index) => {
+    let nbPath = notebook.default_view_path;
+    if (window.location.origin.startsWith("https")) {
+      nbPath = nbPath.replace("http://", "https://");
+    }
+
     return (
       <div
         className="col-md-4"
@@ -71,7 +76,7 @@ export default function HomeView() {
               className="thumbnailIframe"
               width="200%"
               height={800}
-              src={`${notebook.default_view_path}`}
+              src={nbPath}
               title="display"
               scrolling="no"
             ></iframe>
