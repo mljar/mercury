@@ -24,7 +24,7 @@ if (process.env.REACT_APP_SERVER_URL) {
   } else {
     axios.defaults.baseURL = window.location.origin;
   }
-  if (window.location.origin.startsWith("https://hf.space")) {
+  if (window.location.origin.endsWith("hf.space")) {
     axios.defaults.baseURL = window.location.href;
   }
 

@@ -73,16 +73,19 @@ export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
     dispatch(setSiteStatus(SiteStatus.Unknown));
 
     let siteSlug = "single-site";
-    if(process.env.REACT_APP_SERVER_URL) {
+    if (process.env.REACT_APP_SERVER_URL) {
       siteSlug = window.location.host.split(':')[0]
+    }
+    if (window.location.origin.endsWith("hf.space")) {
+      siteSlug = "localhost";
     }
 
     const url = `/api/v1/get-site/${siteSlug}/`;
     const { data } = await axios.get(url);
 
     dispatch(setSite(data as Site));
-    if(data?.status !== "Ready") {
-      dispatch(setSiteStatus(SiteStatus.NotReady));  
+    if (data?.status !== "Ready") {
+      dispatch(setSiteStatus(SiteStatus.NotReady));
     } else {
       dispatch(setSiteStatus(SiteStatus.Loaded));
     }
