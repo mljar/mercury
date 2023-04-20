@@ -23,17 +23,17 @@ if (process.env.REACT_APP_SERVER_URL) {
     axios.defaults.baseURL = "http://127.0.0.1:8000";
   } else {
     axios.defaults.baseURL = window.location.origin;
-  }
-  if (window.location.origin.endsWith("hf.space")) {
-    axios.defaults.baseURL = window.location.href;
-  }
-
-  // in the case of some special params in the url
-  axios.defaults.baseURL = axios.defaults.baseURL.split("+")[0];
-  axios.defaults.baseURL = axios.defaults.baseURL.split("?")[0];
-  axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
+  }  
 }
 
+if (window.location.origin.endsWith("hf.space")) {
+  axios.defaults.baseURL = window.location.href;
+}
+
+// in the case of some special params in the url
+axios.defaults.baseURL = axios.defaults.baseURL.split("+")[0];
+axios.defaults.baseURL = axios.defaults.baseURL.split("?")[0];
+axios.defaults.baseURL = axios.defaults.baseURL.split("#")[0];
 
 
 document.addEventListener("DOMContentLoaded", () =>
