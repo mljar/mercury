@@ -48,6 +48,9 @@ worker_id = int(sys.argv[3])
 server_url = sys.argv[4]
 
 
+if os.environ.get("MERCURY_SERVER_URL") is None:
+    os.environ["MERCURY_SERVER_URL"] = server_url.replace("ws://", "http://").replace("wss://", "https://")
+    
 def signal_handler(signal, frame):
     global stop_event
     log.debug("\nBye bye!")
