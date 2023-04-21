@@ -49,6 +49,13 @@ if (process.env.REACT_APP_SERVER_WS) {
   }
 }
 
+if (window.location.origin.endsWith("hf.space")) {
+  wsServer = window.location.origin
+    .replace("http://", "ws://")
+    .replace("https://", "wss://");
+  localServer = false;
+}
+
 const MAX_CONNECT_COUNT = 5;
 let connectCounter = 0;
 let globalConnection: WebSocket | undefined = undefined;
@@ -65,7 +72,6 @@ export default function WebSocketProvider({
   const selectedNotebookId = useSelector(getSelectedNotebookId);
   const token = useSelector(getToken);
   const isStatic = useSelector(isStaticNotebook);
-  
 
   let connection: WebSocket | undefined = undefined;
   let workerState = "Unknown" as WorkerState;

@@ -96,7 +96,13 @@ export default function MainView({
 
   useEffect(() => {
     if (notebookPath !== undefined) {
-      axios.get(`${notebookPath}${slidesHash}`).then((response) => {
+      
+      let nbPath = notebookPath;
+      if (window.location.origin.startsWith("https")) {
+        nbPath = nbPath.replace("http://", "https://");
+      }
+
+      axios.get(`${nbPath}${slidesHash}`).then((response) => {
         let nbSrc = response.data;
         if (!isPresentation) {
           nbSrc = nbSrc.replace(/<head>[\s\S]*?<\/head>/, "");
@@ -124,10 +130,10 @@ export default function MainView({
   }
 
   // hide blocking for small screens when sidebar is only showed
-  // because it causes some strange shadow 
+  // because it causes some strange shadow
   // see https://github.com/mljar/mercury/issues/250
   let hideBlockUi = false;
-  if(columnsWidth < 12 && window.innerWidth < 992) {
+  if (columnsWidth < 12 && window.innerWidth < 992) {
     hideBlockUi = true;
   }
 
