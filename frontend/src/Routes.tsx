@@ -17,6 +17,7 @@ import HomeView from "./views/HomeView";
 import LoginView from "./views/LoginView";
 import { fetchSite } from "./slices/sitesSlice";
 import RequireAuth from "./components/RequireAuth";
+import WebSocketProvider from "./websocket/Provider";
 type Props = {
   children: ReactNode;
 };
@@ -39,7 +40,6 @@ function AppLayout() {
 export default function AppRoutes() {
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     getSessionId(true);
     // dispatch(fetchVersion());
@@ -60,7 +60,14 @@ export default function AppRoutes() {
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route path="/" element={<HomeView />} />
-            <Route path="/app/:slug/:embed?" element={<MainApp />} />
+            <Route
+              path="/app/:slug/:embed?"
+              element={
+                <WebSocketProvider>
+                  <MainApp />
+                </WebSocketProvider>
+              }
+            />
             <Route path="/account" element={<AccountView />} />
           </Route>
           <Route path="/login" element={<LoginView />} />
