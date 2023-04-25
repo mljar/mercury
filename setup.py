@@ -13,7 +13,7 @@ def list_files(directory):
 
 setup(
     name="mercury",
-    version="2.2.6",
+    version="2.2.7",
     maintainer="MLJAR Sp. z o.o.",
     maintainer_email="contact@mljar.com",
     description="Turn Jupyter Notebook to Web App and share with non-technical users",
