@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import render
@@ -31,11 +31,11 @@ if settings.DEBUG or settings.SERVE_STATIC:
 
 urlpatterns += [
     path("admin/", admin.site.urls),
-    url(
+    re_path(
         "api/v1/version",
         VersionInfo.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/(?P<site_id>.+)/welcome",
         WelcomeMessage.as_view(),
     ),

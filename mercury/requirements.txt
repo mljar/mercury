@@ -1,5 +1,5 @@
-django==3.2.5
-djangorestframework==3.12.4
+django==4.2
+djangorestframework==3.14.0
 django-filter==21.1
 markdown==3.3.6
 celery>=5.1.2
@@ -25,3 +25,4 @@ dj-rest-auth[with_social]==3.0.0
 boto3==1.26.83
 cryptography
 pyopenssl>=23.1.1
+

@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from apps.workers.views import (
     DeleteWorker,
@@ -10,27 +10,27 @@ from apps.workers.views import (
 )
 
 workers_urlpatterns = [
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/nb",
         WorkerGetNb.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/update-nb",
         WorkerUpdateNb.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/worker",
         GetWorker.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/is-worker-stale",
         IsWorkerStale.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/set-worker-state",
         SetWorkerState.as_view(),
     ),
-    url(
+    re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/delete-worker",
         DeleteWorker.as_view(),
     ),
