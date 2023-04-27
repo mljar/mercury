@@ -143,7 +143,7 @@ class GetSiteView(APIView):
         # this can be a custom domain
         custom_domain = url
         # or subdomain with domain
-        subdomain, domain = "", "runmercury.com"
+        subdomain, domain = "single-site", "runmercury.com"
 
         if len(url.split(".")) > 1:
             subdomain = url.split(".")[0]
@@ -153,7 +153,11 @@ class GetSiteView(APIView):
             subdomain = "single-site"
             domain = "runmercury.com"
 
-        print(subdomain, domain, custom_domain)
+        if request.build_absolute_uri().startswith("http://127.0.0.1"):
+            subdomain = "single-site"
+            domain = "runmercury.com"
+
+        print(f"{url}|{request.build_absolute_uri()}|{subdomain}|{domain}|{custom_domain}")
 
         sites = Site.objects.filter(
             Q(custom_domain=custom_domain) | Q(slug=subdomain, domain=domain)

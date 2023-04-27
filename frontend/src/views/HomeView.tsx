@@ -53,9 +53,31 @@ export default function HomeView() {
 
   const notebookItems = notebooks.map((notebook, index) => {
     let nbPath = notebook.default_view_path;
+
     if (window.location.origin.startsWith("https")) {
       nbPath = nbPath.replace("http://", "https://");
     }
+
+    if (window.location.origin === "http://localhost:3000") {
+      if (nbPath.startsWith("/media")) {
+        nbPath = "https://127.0.0.1:8000" + nbPath;
+      }
+    }
+
+    // if (window.location.origin !== "http://localhost:3000") {
+    //   if (nbPath.startsWith("https://127.0.0.1:8000")) {
+    //     nbPath = nbPath.replace(
+    //       "https://127.0.0.1:8000",
+    //       window.location.origin
+    //     );
+    //   }
+    //   if (nbPath.startsWith("http://127.0.0.1:8000")) {
+    //     nbPath = nbPath.replace(
+    //       "http://127.0.0.1:8000",
+    //       window.location.origin
+    //     );
+    //   }
+    // }
 
     return (
       <div

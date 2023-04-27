@@ -215,9 +215,15 @@ def main():
                 for i in sys.argv:
                     if "0.0.0.0" in i:
                         running_local = False
+                        
                 if running_local:
                     # open web browser if we are running a server
                     url = "http://127.0.0.1:8000"
+
+                    for arg in arguments:
+                        if arg.count(".") == 3 and arg.count(":"):
+                            url = arg
+
                     webbrowser.open(url)
             except Exception as e:
                 pass

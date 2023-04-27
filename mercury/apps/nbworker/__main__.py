@@ -33,6 +33,7 @@ logging.basicConfig(
     level=LOG_LEVEL,
 )
 log = logging.getLogger(__name__)
+logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 
 from apps.nbworker.nb import NBWorker
 from apps.nbworker.rest import RESTClient

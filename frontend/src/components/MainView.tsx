@@ -98,8 +98,14 @@ export default function MainView({
     if (notebookPath !== undefined) {
       
       let nbPath = notebookPath;
+      
       if (window.location.origin.startsWith("https")) {
         nbPath = nbPath.replace("http://", "https://");
+      }
+      if (window.location.origin === "http://localhost:3000") {
+        if (nbPath.startsWith("/media")) {
+          nbPath = "https://127.0.0.1:8000" + nbPath;
+        }
       }
 
       axios.get(`${nbPath}${slidesHash}`).then((response) => {

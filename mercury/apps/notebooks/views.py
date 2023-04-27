@@ -45,8 +45,9 @@ def notebooks_queryset(request, site_id):
 def nb_iframe_url(request, iframe_db_address):
     iframe_url = ""
     if settings.STORAGE == settings.STORAGE_MEDIA:
-        host = request.build_absolute_uri("/")[:-1]
-        iframe_url = f"{host}{iframe_db_address}"
+        # host = request.build_absolute_uri("/")[:-1]
+        # iframe_url = f"{host}{iframe_db_address}"
+        iframe_url = iframe_db_address
     elif settings.STORAGE == settings.STORAGE_S3:
         s3 = S3()
         url = s3.get_presigned_url(iframe_db_address, "get_object")
