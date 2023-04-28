@@ -88,26 +88,25 @@ export default function MainView({
       if (injectCode !== "") {
         notebookSrc = notebookSrc.replace(
           "setScrollingSlide);",
-          `setScrollingSlide); try{ ${injectCode} } catch(error) {}`
+          `setScrollingSlide); Reveal.on( 'ready', event => { try{ Reveal.configure({transition: "none"}); ${injectCode} Reveal.configure({transition: "slide"}); } catch(error) {} } );`
         );
       }
     }
   }
 
   useEffect(() => {
-    if (notebookPath !== undefined) {
-      
+    if (notebookPath !== undefined && notebookSrc === "") {
       let nbPath = notebookPath;
-      
+
+      if (window.location.origin === "http://localhost:3000") {
+        if (nbPath.startsWith("/media")) {
+          nbPath = "http://127.0.0.1:8000" + nbPath;
+        }
+      }
       if (window.location.origin.startsWith("https")) {
         nbPath = nbPath.replace("http://", "https://");
       }
-      if (window.location.origin === "http://localhost:3000") {
-        if (nbPath.startsWith("/media")) {
-          nbPath = "https://127.0.0.1:8000" + nbPath;
-        }
-      }
-
+      
       axios.get(`${nbPath}${slidesHash}`).then((response) => {
         let nbSrc = response.data;
         if (!isPresentation) {
@@ -121,7 +120,7 @@ export default function MainView({
         dispatch(setNotebookSrc(nbSrc));
       });
     }
-  }, [dispatch, notebookPath, slidesHash, isPresentation]);
+  }, [dispatch, notebookPath, slidesHash, isPresentation, notebookSrc]);
 
   let mainStyle = {
     paddingTop: "0px",
