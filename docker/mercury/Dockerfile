@@ -13,16 +13,20 @@ RUN apt-get update && \
             libxcb-render0 libharfbuzz0b libdatrie1 libgraphite2-3 libgbm1 \
             libpq-dev
 
+# Install Miniconda using official installer script
+RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    bash /tmp/miniconda.sh -b -p /opt/conda && \
+    rm /tmp/miniconda.sh
+
+ENV PATH="/opt/conda/bin:${PATH}"
 
 WORKDIR /app
 ADD ./mercury/requirements.txt /app/mercury/
 
-RUN pip install --upgrade pip
-RUN pip install gunicorn
-RUN pip install -r mercury/requirements.txt
-RUN pip install psycopg2 
-RUN pip install daphne
-RUN pip install mercury
+RUN conda install --yes mamba -c conda-forge
+RUN mamba install --yes --file mercury/requirements.txt -c conda-forge
+RUN mamba install --yes gunicorn psycopg2 daphne -c conda-forge
+RUN mamba install --yes mercury -c conda-forge
 
 ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/server /app/mercury/server
