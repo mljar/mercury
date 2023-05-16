@@ -20,6 +20,14 @@ export default function FilesView({
   const dispatch = useDispatch();
 
   const handleDownload = (url: string, filename: string) => {
+    let token = axios.defaults.headers.common["Authorization"];
+
+    if (url.includes("s3.amazonaws.com")) {
+      // we cant do requests to s3 with auth token
+      // we need to remove auth token before request
+      delete axios.defaults.headers.common["Authorization"];
+    }
+
     axios
       .get(url, {
         responseType: "blob",
@@ -27,19 +35,24 @@ export default function FilesView({
       .then((res) => {
         fileDownload(res.data, filename);
       });
+
+    if (url.includes("s3.amazonaws.com")) {
+      // after request we set token back
+      axios.defaults.headers.common["Authorization"] = token;
+    }
   };
 
-  console.log(files)
+  console.log(files);
 
   let filesLinks = [];
 
   for (let f of files) {
-    let fname = f.split("/").pop()
+    let fname = f.split("/").pop();
     fname = fname?.split("?")[0];
 
     if (f && fname) {
-      let downloadLink = `${axios.defaults.baseURL}${f}`
-      if(f.includes("s3.amazonaws.com")) {
+      let downloadLink = `${axios.defaults.baseURL}${f}`;
+      if (f.includes("s3.amazonaws.com")) {
         downloadLink = f;
       }
       filesLinks.push(
@@ -54,11 +67,7 @@ export default function FilesView({
             style={{ float: "right" }}
             type="button"
             className="btn btn-primary"
-            onClick={() =>
-
-              handleDownload(downloadLink, fname!)
-
-            }
+            onClick={() => handleDownload(downloadLink, fname!)}
           >
             <i className="fa fa-download" aria-hidden="true"></i> Download
           </button>
@@ -72,7 +81,8 @@ export default function FilesView({
     <main className="col-md-9 ms-sm-auto col-lg-9" style={{ padding: "20px" }}>
       <div className="col-8">
         <h3 style={{ paddingBottom: "10px" }}>
-          <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output Files
+          <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output
+          Files
         </h3>
         <BlockUi tag="div" blocking={waiting}>
           <div>
