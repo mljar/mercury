@@ -43,6 +43,17 @@ from widgets.stop import StopExecution, Stop
 from widgets.confetti import Confetti
 from widgets.chat import Chat
 
+def print_version():
+    try:
+        mercury_version = ""
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "__init__.py")) as fin:
+            for l in fin.readlines():
+                if l.startswith("__version__"):
+                    mercury_version = l.split("\"")[1]
+        if mercury_version:
+            print(f"Version: {mercury_version}")
+    except Exception:
+        pass
 
 def main():
     """Run administrative tasks."""
@@ -88,6 +99,7 @@ def main():
                                         |___/ 
         """
         print(logo)
+        print_version()
 
         if "clear" in sys.argv:
             for n in ["db.sqlite", "db.sqlite3"]:
