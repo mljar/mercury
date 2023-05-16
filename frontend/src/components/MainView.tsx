@@ -106,7 +106,13 @@ export default function MainView({
       if (window.location.origin.startsWith("https")) {
         nbPath = nbPath.replace("http://", "https://");
       }
-      
+
+      let token = axios.defaults.headers.common["Authorization"];
+      if (nbPath.includes("s3.amazonaws.com")) {
+        // we cant do requests to s3 with auth token
+        // we need to remove auth token before request
+        delete axios.defaults.headers.common["Authorization"];
+      }
       axios.get(`${nbPath}${slidesHash}`).then((response) => {
         let nbSrc = response.data;
         if (!isPresentation) {
@@ -119,6 +125,10 @@ export default function MainView({
         }
         dispatch(setNotebookSrc(nbSrc));
       });
+      if (nbPath.includes("s3.amazonaws.com")) {
+        // after request we set token back
+        axios.defaults.headers.common["Authorization"] = token;
+      }
     }
   }, [dispatch, notebookPath, slidesHash, isPresentation, notebookSrc]);
 
