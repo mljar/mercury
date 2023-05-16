@@ -204,6 +204,7 @@ export default function MainView({
           )}
         </div>
       </BlockUi>
+      
     </main>
   );
 }

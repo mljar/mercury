@@ -519,8 +519,6 @@ export default function SideBar({
                 continuousUpdate={continuousUpdate}
                 runDownloadHTML={runDownloadHTML}
                 runDownloadPDF={runDownloadPDF}
-                widgetsValues={widgetsValues}
-                widgetsParams={widgetsParams}
               />{" "}
             </div>
           </div>

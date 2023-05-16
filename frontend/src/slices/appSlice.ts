@@ -16,7 +16,8 @@ const initialState = {
   files: [] as string[],
   filesState: "unknown",
   showSideBar: true,
-  storageType: "media"
+  storageType: "media",
+  showShareDialog: false,
 };
 
 const appSlice = createSlice({
@@ -40,6 +41,9 @@ const appSlice = createSlice({
     },
     setStorageType(state, action: PayloadAction<string>) {
       state.storageType = action.payload;
+    },
+    setShowShareDialog(state, action: PayloadAction<boolean>) {
+      state.showShareDialog = action.payload;
     }
   },
 });
@@ -53,6 +57,7 @@ export const {
   setShowSideBar,
   toggleShowSideBar,
   setStorageType,
+  setShowShareDialog,
 } = appSlice.actions;
 
 
@@ -61,6 +66,7 @@ export const getOutputFilesState = (state: RootState) => state.app.filesState;
 export const getOutputFiles = (state: RootState) => state.app.files;
 export const getShowSideBar = (state: RootState) => state.app.showSideBar;
 export const getStorageType = (state: RootState) => state.app.storageType;
+export const getShowShareDialog = (state: RootState) => state.app.showShareDialog;
 
 
 export const fetchOutputFiles =

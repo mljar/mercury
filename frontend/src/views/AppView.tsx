@@ -39,6 +39,7 @@ import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
 import { getWorkerId, getWorkerState, WorkerState } from "../slices/wsSlice";
 import { getSiteId, isPublic } from "../slices/sitesSlice";
+import ShareDialog from "../components/ShareDialog";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -272,6 +273,8 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
                 waiting={pleaseWait()}
               />
             )}
+
+            <ShareDialog widgetsParams={notebook?.params?.params} />
           </div>
         </div>
       </BlockUi>
