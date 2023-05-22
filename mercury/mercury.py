@@ -107,6 +107,10 @@ def main():
                 if os.path.exists(db_path):
                     os.remove(db_path)
                     print("SQLite database deleted")
+            media_dir = os.path.join(BACKEND_DIR, "media")
+            if os.path.exists(media_dir):
+                shutil.rmtree(media_dir, ignore_errors=True)
+                print("Media directory removed")
             print("All clear")
             sys.exit(1)
 
