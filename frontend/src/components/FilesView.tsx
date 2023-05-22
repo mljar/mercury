@@ -2,9 +2,9 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import fileDownload from "js-file-download";
 import BlockUi from "react-block-ui";
 import { setView } from "../slices/appSlice";
+import FileItem from "./FileItem";
 
 type FilesViewProps = {
   files: string[];
@@ -19,31 +19,6 @@ export default function FilesView({
 }: FilesViewProps) {
   const dispatch = useDispatch();
 
-  const handleDownload = (url: string, filename: string) => {
-    let token = axios.defaults.headers.common["Authorization"];
-
-    if (url.includes("s3.amazonaws.com")) {
-      // we cant do requests to s3 with auth token
-      // we need to remove auth token before request
-      delete axios.defaults.headers.common["Authorization"];
-    }
-
-    axios
-      .get(url, {
-        responseType: "blob",
-      })
-      .then((res) => {
-        fileDownload(res.data, filename);
-      });
-
-    if (url.includes("s3.amazonaws.com")) {
-      // after request we set token back
-      axios.defaults.headers.common["Authorization"] = token;
-    }
-  };
-
-  console.log(files);
-
   let filesLinks = [];
 
   for (let f of files) {
@@ -56,30 +31,19 @@ export default function FilesView({
         downloadLink = f;
       }
       filesLinks.push(
-        <div key={f}>
-          <i
-            className="fa fa-file-text-o"
-            aria-hidden="true"
-            style={{ paddingRight: "5px" }}
-          ></i>{" "}
-          <b>{fname}</b>
-          <button
-            style={{ float: "right" }}
-            type="button"
-            className="btn btn-primary"
-            onClick={() => handleDownload(downloadLink, fname!)}
-          >
-            <i className="fa fa-download" aria-hidden="true"></i> Download
-          </button>
-          <hr />
-        </div>
+        <FileItem
+          fname={fname}
+          downloadLink={downloadLink}
+          firstItem={f === files[0]}
+          lastItem={f === files[files.length - 1]}
+        />
       );
     }
   }
 
   return (
     <main className="col-md-9 ms-sm-auto col-lg-9" style={{ padding: "20px" }}>
-      <div className="col-8">
+      <div className="col-12" style={{ maxWidth: "900px" }}>
         <h3 style={{ paddingBottom: "10px" }}>
           <i className="fa fa-folder-open-o" aria-hidden="true"></i> Output
           Files
@@ -87,6 +51,9 @@ export default function FilesView({
         <BlockUi tag="div" blocking={waiting}>
           <div>
             {filesState === "loaded" && filesLinks}
+            {filesState === "loaded" && filesLinks.length === 0 && (
+              <div>No files available for download</div>
+            )}
             {filesState === "unknown" && (
               <p>Please run the notebook to produce output files ...</p>
             )}
@@ -103,7 +70,7 @@ export default function FilesView({
 
       <button
         className="btn btn-secondary btn-sm"
-        // style={{ background: "transparent", border: "none", fontSize: "0.9em" }}
+        style={{ marginTop: "20px" }}
         onClick={() => {
           dispatch(setView("app"));
         }}

@@ -66,8 +66,6 @@ export default function FileWidget({
     dispatch(fetchStorageType());
   }, [dispatch]);
 
-  console.log(storageType);
-
   const mediaServerActions = {
     url: `${axios.defaults.baseURL}/api/v1/fp`,
     process: "/process/",

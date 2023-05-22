@@ -178,14 +178,25 @@ div[role="slider"]:focus,
 }
 
 .btn-primary:hover {
-  border-color: #217BF1 !important;
-  background-color: #217BF1 !important;
+  border-color: #217bf1 !important;
+  background-color: #217bf1 !important;
+}
+
+.btn-outline-primary {
+  border-color: #2684ff !important;
+  color: #2684ff !important;
+}
+
+.btn-outline-primary:hover {
+  border-color: #2684ff !important;
+  color: white !important;
+  background-color: #2684ff !important;
 }
 
 .title-card {
-  background-color: rgba(38,132,255,0.04);
+  background-color: rgba(38, 132, 255, 0.04);
 }
 
 .title-card:hover {
-  background-color: rgba(38,132,255,0.08);
+  background-color: rgba(38, 132, 255, 0.08);
 }
