@@ -8,6 +8,7 @@
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
 [![PyPI version](https://badge.fury.io/py/mercury.svg)](https://badge.fury.io/py/mercury)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/mercury.svg)](https://pypi.python.org/pypi/mercury/)
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/mljar-mercury/badges/license.svg)](https://anaconda.org/conda-forge/mljar-mercury)
 
 # Build Web Apps in Jupyter Notebook
