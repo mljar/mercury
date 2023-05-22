@@ -17,7 +17,7 @@ export default function NotebookNotFoundView() {
       >
         <h3>Notebook not found</h3>
         <p>
-          We can't find your notebook. Please double check the URL address.
+          We can't find your notebook. Please double check the URL address and permissions.
         </p>
       </div>
       <Footer />
