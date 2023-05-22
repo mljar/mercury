@@ -15,6 +15,7 @@ import SiteNetworkErrorView from "../views/SiteNetworkErrorView";
 import SiteNotFoundView from "../views/SiteNotFoundView";
 import SitePleaseRefreshView from "../views/SitePleaseRefreshView";
 import SiteNotReadyView from "../views/SiteNotReadyView";
+import NotebookNotFoundView from "../views/NotebookNotFoundView";
 
 export default function RequireAuth({ children }: { children: JSX.Element }) {
   const token = useSelector(getToken);
@@ -42,6 +43,8 @@ export default function RequireAuth({ children }: { children: JSX.Element }) {
   } else if (siteStatus === SiteStatus.LostConnection) {
     window.location.reload();
     return <LostConnection />;
+  } else if (siteStatus === SiteStatus.NotebookNotFound) {
+    return <NotebookNotFoundView />;
   }
 
   if (!isPublicSite && !token) {

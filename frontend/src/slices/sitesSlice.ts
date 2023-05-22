@@ -35,7 +35,8 @@ export enum SiteStatus {
   NetworkError = "Network Error",
   PleaseRefresh = "Please refresh",
   LostConnection = "Lost connection",
-  NotReady = "Not Ready"
+  NotReady = "Not Ready",
+  NotebookNotFound = "Notebook not found",
 }
 
 const initialState = {

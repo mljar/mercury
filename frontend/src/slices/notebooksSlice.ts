@@ -5,7 +5,7 @@ import {
   AnyAction,
   Dispatch,
 } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import { RootState } from "../store";
 import { clearExecutionHistory } from "./tasksSlice";
@@ -23,6 +23,7 @@ import {
   isFileWidget,
 } from "../widgets/Types";
 import { getWindowDimensions } from "../components/WindowDimensions";
+import { setSiteStatus, SiteStatus } from "./sitesSlice";
 
 export const RUN_DELAY = 600; // ms
 export const RUN_DELAY_FAST = 100; // ms
@@ -537,11 +538,20 @@ export const fetchNotebookWithSlug =
           dispatch(setShowSideBar(parsedParams?.show_sidebar));
         }
       } catch (error) {
+        const err = error as AxiosError;
+
         if (!silent) {
           dispatch(setLoadingStateSelected("error"));
+
+          if (err.response!.status === 404) {
+            // switch to notebook not found view
+            dispatch(setSiteStatus(SiteStatus.NotebookNotFound))
+          }
         }
         console.error(
           `Problem during loading selected notebook (${slug}). ${error}`
         );
+
+
       }
     };
