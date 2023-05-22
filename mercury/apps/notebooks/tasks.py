@@ -236,6 +236,8 @@ def task_init_notebook(
                         share=Site.PUBLIC,
                         created_by=user,
                         status=SiteStatus.READY,
+                        domain=os.environ.get("MERCURY_DOMAIN", "runmercury.com"),
+                        custom_domain=os.environ.get("MERCURY_CUSTOM_DOMAIN")
                     )
                 else:
                     site = Site.objects.get(slug="single-site")
