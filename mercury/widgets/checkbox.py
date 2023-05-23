@@ -8,7 +8,7 @@ from .manager import WidgetsManager
 
 class Checkbox:
     def __init__(self, value=True, label="", url_key="", disabled=False, hidden=False):
-        self.code_uid = WidgetsManager.get_code_uid("Checkbox")
+        self.code_uid = WidgetsManager.get_code_uid("Checkbox", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):

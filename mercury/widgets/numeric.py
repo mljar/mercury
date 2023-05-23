@@ -23,7 +23,7 @@ class Numeric:
         if value > max:
             raise WidgetException("value should be equal or smaller than max")
 
-        self.code_uid = WidgetsManager.get_code_uid("Numeric")
+        self.code_uid = WidgetsManager.get_code_uid("Numeric", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):

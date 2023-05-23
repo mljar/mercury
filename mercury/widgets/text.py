@@ -12,7 +12,7 @@ class Text:
     ):
         self.rows = rows
 
-        self.code_uid = WidgetsManager.get_code_uid("Text")
+        self.code_uid = WidgetsManager.get_code_uid("Text", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):

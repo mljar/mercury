@@ -27,7 +27,7 @@ class Range:
         if len(value) != 2:
             raise WidgetException("Range accepts list with length 2 as value")
 
-        self.code_uid = WidgetsManager.get_code_uid("Range")
+        self.code_uid = WidgetsManager.get_code_uid("Range", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
         if WidgetsManager.widget_exists(self.code_uid):

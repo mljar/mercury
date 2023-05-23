@@ -13,7 +13,7 @@ class MultiSelect:
         if value is None and len(choices) > 1:
             value = [choices[0]]
 
-        self.code_uid = WidgetsManager.get_code_uid("MultiSelect")
+        self.code_uid = WidgetsManager.get_code_uid("MultiSelect", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
         choices = list(choices)
