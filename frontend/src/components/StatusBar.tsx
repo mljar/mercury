@@ -8,7 +8,7 @@ import {
   getWorkerState,
   getTryConnectCount,
 } from "../slices/wsSlice";
-import { setSiteStatus, SiteStatus } from "../slices/sitesSlice";
+import { getSiteId, setSiteStatus, SiteStatus } from "../slices/sitesSlice";
 import axios from "axios";
 import { exportToPDF, setExportingToPDF } from "../slices/tasksSlice";
 import { setShowShareDialog } from "../slices/appSlice";
@@ -40,6 +40,7 @@ export default function StatusBar({
   const wsStatus = useSelector(getWebSocketState);
   const workerState = useSelector(getWorkerState);
   const tryConnectCount = useSelector(getTryConnectCount);
+  const siteId = useSelector(getSiteId);
 
   useEffect(() => {
     if (tryConnectCount >= 5) {
@@ -184,7 +185,7 @@ export default function StatusBar({
                   className="dropdown-item"
                   onClick={() => {
                     if (staticNotebook) {
-                      dispatch(exportToPDF(notebookId, notebookPath));
+                      dispatch(exportToPDF(siteId, notebookId, notebookPath));
                     } else {
                       dispatch(setExportingToPDF(true));
                       runDownloadPDF();

@@ -21,13 +21,10 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=open("mercury/requirements.txt").readlines(),
     url="https://github.com/mljar/mercury",
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
     packages=find_packages(),
     python_requires='>=3.8',
     classifiers=[
+        "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",

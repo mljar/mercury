@@ -104,7 +104,7 @@ export const getExportToPDFCounter = (state: RootState) => state.tasks.exportToP
 export const getExecutionHistory = (state: RootState) => state.tasks.executionHistory;
 
 export const fetchCurrentTask =
-    (notebookId: Number) =>
+    (notebookId: number) =>
         async (dispatch: Dispatch<AnyAction>) => {
 
             const sessionId = getSessionId();
@@ -134,7 +134,7 @@ export const scrapeSlidesHash = () => {
 
 
 export const executeNotebook =
-    (notebookId: Number) =>
+    (notebookId: number) =>
         async (dispatch: Dispatch<AnyAction>, getState: () => any) => {
             const { widgets } = getState().widgets;
             const sessionId = getSessionId();
@@ -159,7 +159,7 @@ export const executeNotebook =
 
 
 export const clearTasks =
-    (notebookId: Number) =>
+    (notebookId: number) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
                 const sessionId = getSessionId();
@@ -177,7 +177,7 @@ export const clearTasks =
 
 
 export const exportToPDF =
-    (notebookId: Number, notebookPath: String) =>
+    (siteId: number, notebookId: number, notebookPath: string) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
                 dispatch(setExportingToPDF(true));
@@ -188,6 +188,7 @@ export const exportToPDF =
                 const url = `/api/v1/export_pdf/`;
                 // convert from JS camel case to Python undescore variables
                 const params = {
+                    site_id: siteId,
                     session_id: sessionId,
                     notebook_id: notebookId,
                     notebook_path: notebookPath,
@@ -201,7 +202,7 @@ export const exportToPDF =
         };
 
 export const getPDF =
-    (jobId: String) =>
+    (jobId: string) =>
         async (dispatch: Dispatch<AnyAction>) => {
             try {
                 const url = `/api/v1/get_pdf/${jobId}/`;
@@ -228,7 +229,7 @@ export const getPDF =
 
 
 export const fetchExecutionHistory =
-    (notebookId: Number, clearPreviousHistory = true) =>
+    (notebookId: number, clearPreviousHistory = true) =>
         async (dispatch: Dispatch<AnyAction>) => {
 
             dispatch(setHistoricTask({} as ITask));

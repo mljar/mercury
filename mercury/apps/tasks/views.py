@@ -198,11 +198,14 @@ class ExportPDF(APIView):
     def post(self, request):
         try:
             # check if user can access the notebook
-            notebook = notebooks_queryset(request).get(pk=request.data["notebook_id"])
+            notebook = notebooks_queryset(request, request.data.get("site_id")).get(
+                pk=request.data["notebook_id"]
+            )
         except Notebook.DoesNotExist:
             raise Http404()
         try:
             celery_job = export_to_pdf.delay(request.data)
+            print(celery_job.id)
             return Response({"job_id": celery_job.id}, status=status.HTTP_201_CREATED)
         except Exception as e:
             raise APIException(str(e))
