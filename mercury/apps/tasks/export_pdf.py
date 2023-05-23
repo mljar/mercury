@@ -5,9 +5,12 @@ import os
 import tempfile
 from subprocess import PIPE, Popen
 
-from pyppeteer import launch
-
-
+pdf_export_available = True
+try:
+    from pyppeteer import launch
+except Exception:
+    pdf_export_available = False
+    
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
     browser = await launch(
@@ -120,6 +123,8 @@ def install_chromium():
 
 
 def to_pdf(html_input_file, pdf_output_file):
+    if not pdf_export_available:
+        return
     # make sure chromium is installed
     # install_chromium()
 
