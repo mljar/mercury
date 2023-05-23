@@ -42,6 +42,7 @@ from widgets.json import JSON
 from widgets.stop import StopExecution, Stop
 from widgets.confetti import Confetti
 from widgets.chat import Chat
+from widgets.numberbox import NumberBox
 
 def print_version():
     try:
