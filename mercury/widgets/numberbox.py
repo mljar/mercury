@@ -52,10 +52,13 @@ class NumberBox:
             bloxs = ""
             for i, b in enumerate(self.data):
                 if isinstance(b, NumberBox):
-                    b.position = i
+                    # we dont set position for last item
+                    # because we dont need to add margin for it
+                    if i != len(self.data)-1:
+                        b.position = i
                     bloxs += b._repr_html_()
 
-            return f"""{self.styles()}<div class="numberbox-container" style="display: flex; background: #fff">{bloxs}</div>"""
+            return f"""{self.styles()}<div class="numberbox-container" style="display: flex; background: #fff;">{bloxs}</div>"""
 
         percent_change_html = ""
         if self.percent_change is not None:
@@ -77,9 +80,9 @@ class NumberBox:
         else:
             data_str = f"{self.data:,}"
 
-        margin = "0px" if self.position is None else "10px"
+        margin = "0px" if self.position is None else "15px"
         return f"""
-<div style="text-align: center; width: 100%; border: 1px solid {self.border_color}; margin: {margin}; padding-top: 40px; padding-bottom: 30px; background: {self.background_color}; border-radius:5px">
+<div style="text-align: center; width: 100%; border: 1px solid {self.border_color}; margin-right: {margin}; margin-top: 15px; padding-top: 40px; padding-bottom: 30px; background: {self.background_color}; border-radius:5px">
   <span style="font-size: 4em; color: {self.data_color}; font-family: monospace; ">{data_str}</span>
   {percent_change_html}
   {title_html}

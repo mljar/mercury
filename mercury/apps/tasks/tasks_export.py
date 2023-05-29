@@ -7,7 +7,7 @@ from apps.notebooks.models import Notebook
 from apps.tasks.export_pdf import to_pdf
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, ignore_result=False)
 def export_to_pdf(self, job_params):
     notebook_id = job_params.get("notebook_id")
     notebook_path = job_params.get("notebook_path")
