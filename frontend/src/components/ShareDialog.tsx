@@ -152,7 +152,7 @@ export default function ShareDialog({
                   type="text"
                   className="form-control"
                   disabled={true}
-                  value={window.location.href}
+                  value={window.location.origin + window.location.pathname}
                 ></input>
               </div>
 
@@ -163,7 +163,7 @@ export default function ShareDialog({
                     rows={5}
                     className="form-control"
                     disabled={true}
-                    value={window.location.href + urlParams}
+                    value={window.location.origin + window.location.pathname + urlParams}
                   />
                 </div>
               )}
