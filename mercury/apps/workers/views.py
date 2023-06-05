@@ -18,6 +18,7 @@ from apps.storage.s3utils import clean_worker_files
 
 
 class WorkerGetNb(APIView):
+    authentication_classes = []
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         try:
             Worker.objects.get(
