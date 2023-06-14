@@ -154,6 +154,6 @@ The command should be run in the same directory as notebooks. You can change cod
 
 Mercury is released with AGPL v3 license.
 
-Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at [our website](https://mljar.com/pricing).
+Looking for dedicated support, a commercial-friendly license, and more features? The Mercury Pro is for you. Please see the details at [our website](https://runmercury.com/pricing/).
 
 
