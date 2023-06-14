@@ -3,7 +3,7 @@
 <p align="center">
   <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/mercury-og.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Main.png" width="100%" />  
 </p>
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
@@ -24,6 +24,11 @@ You can build with Mercury:
 - Create [Reports](https://runmercury.com/tutorials/report-python-jupyter-notebook/) with PDF exports, automatic scheduling, and email notifications (coming soon),
 - Serve Python notebooks as [REST API](https://runmercury.com/tutorials/rest-api-python-jupyter-notebook/) endpoints (coming soon).
 
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/What_to_build.png" width="100%" />  
+</p>
+
 Mercury features:
 - add widgets with Python code - no frontend experience needed!
 - hide or show notebook's code,
@@ -33,6 +38,15 @@ Mercury features:
 - easy file upload and download from the notebook,
 - add authentication to notebooks (coming soon),
 - schedule automatic notebook execution (coming soon).
+
+## Integrations
+ 
+Mercury works with virtually every Python package!
+Among the most important are machine learning libraries such as Scikit-Learn, Pandas, and Seaborn or visualization libraries: Plotly, matplotlib, Vega-Altair, and Ipyvizzu.
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Integrations.png" width="100%" />  
+</p>
 
 ## Example
 
@@ -107,6 +121,19 @@ mercury run demo
 
 Please check [127.0.0.1:8000](http://127.0.0.1:8000) to see demo notebooks.
 
+## Deployment
+
+You have several options to deploy the notebook. You can use the self-hosted option where you use [docker-compose](https://runmercury.com/docs/docker-compose/) on a VPS machine or use ngrok. There's also a possibility to use [Hugging Face Spaces](https://runmercury.com/docs/hugging-face/).
+
+Another option is a Self-hosted commercial where you get access to the deployment dashboard where you manage notebooks and user access. In addition, you have access to user analytics; you can freely customize the style of your application. You benefit from private forks and email support.
+
+The third option is to use [Mercury Cloud](https://runmercury.com/docs/cloud/). It's the easiest way to share notebooks online. You will be able to create a website with a few clicks.
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Deployment.png" width="100%" />  
+</p>
+
+
 
 ## Mercury with your notebooks
 
@@ -117,6 +144,7 @@ mercury run
 ```
 
 The command should be run in the same directory as notebooks. You can change code in Jupyter Notebook, and Mercury will **instantly** update web app.
+
 
 
 ## Mercury License
