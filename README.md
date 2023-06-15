@@ -31,13 +31,24 @@ You can build with Mercury:
 
 Mercury features:
 - add widgets with Python code - no frontend experience needed!
-- hide or show notebook's code,
+- hide or show the notebook's code,
 - export executed notebook to PDF or HTML,
-- share muplitple notebooks - no limits!
+- share multiple notebooks - no limits!
 - embed notebook on any website,
 - easy file upload and download from the notebook,
 - add authentication to notebooks (coming soon),
 - schedule automatic notebook execution (coming soon).
+
+## Widgets
+
+Mercury provides multiple widgets. There are 3 types of widgets:
+- [Input widgets](https://runmercury.com/docs/input-widgets/) are components that will appear in the sidebar when running the notebook in Mercury. They can be used to provide user input or trigger action in the notebook.
+- [Output widgets](https://runmercury.com/docs/output-widgets/) help present notebook results to the user and control execution flow.
+- [Custom Widgets](https://runmercury.com/docs/custom-widgets/) - you can use many custom widgets, for example, PyDeck, and Pivot Tables.
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets2.png" width="100%" />  
+</p>
 
 ## Integrations
  
