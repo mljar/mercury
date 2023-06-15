@@ -47,7 +47,7 @@ Mercury provides multiple widgets. There are 3 types of widgets:
 - [Custom Widgets](https://runmercury.com/docs/custom-widgets/) - you can use many custom widgets, for example, PyDeck, and Pivot Tables.
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets2.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets3.png" width="100%" />  
 </p>
 
 ## Integrations
