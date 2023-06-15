@@ -3,7 +3,7 @@
 <p align="center">
   <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Main.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/main.png" width="100%" />  
 </p>
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
