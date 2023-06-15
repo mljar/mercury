@@ -135,6 +135,7 @@ Please check [127.0.0.1:8000](http://127.0.0.1:8000) to see demo notebooks.
 ## Deployment
 
 You have several options to deploy the notebook. You can use the self-hosted option where you use [docker-compose](https://runmercury.com/docs/docker-compose/) on a VPS machine or use ngrok. There's also a possibility to use [Hugging Face Spaces](https://runmercury.com/docs/hugging-face/).
+
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/jupyter-notebook-hugging-face.gif" width="100%" />  
