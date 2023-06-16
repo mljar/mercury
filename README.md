@@ -3,7 +3,12 @@
 <p align="center">
   <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/main.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/main.png#gh-light-mode-only" width="100%" />  
+</p>
+<p align="center">
+  <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/main_black.png#gh-dark-mode-only" width="100%" />  
 </p>
 
 [![Tests](https://github.com/mljar/mercury/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mljar/mercury/actions/workflows/run-tests.yml)
@@ -26,7 +31,11 @@ You can build with Mercury:
 
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/What_to_build.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/What_to_build.png#gh-light-mode-only" width="100%" />  
+</p>
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/What_to_build_black.png#gh-dark-mode-only" width="100%" />  
 </p>
 
 Mercury features:
@@ -47,16 +56,23 @@ Mercury provides multiple widgets. There are 3 types of widgets:
 - [Custom Widgets](https://runmercury.com/docs/custom-widgets/) - you can use many custom widgets, for example, PyDeck, and Pivot Tables.
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets3.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets3.png#gh-light-mode-only" width="100%" />  
 </p>
-
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets_black.png#gh-dark-mode-only" width="100%" />  
+</p>
 ## Integrations
  
 Mercury works with virtually every Python package!
 Among the most important are machine learning libraries such as Scikit-Learn, Pandas, and Seaborn or visualization libraries: Plotly, matplotlib, Vega-Altair, and Ipyvizzu.
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Integrations.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Integrations.png#gh-light-mode-only" width="100%" />  
+</p>
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Integrations_black.png#gh-dark-mode-only" width="100%" />  
 </p>
 
 ## Example
@@ -140,14 +156,18 @@ You have several options to deploy the notebook. You can use the self-hosted opt
     alt="Mercury convert Jupyter Notebook to Web App"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/jupyter-notebook-hugging-face.gif" width="100%" />  
 </p>
+
 Another option is a Self-hosted commercial where you get access to the deployment dashboard where you manage notebooks and user access. In addition, you have access to user analytics; you can freely customize the style of your application. You benefit from private forks and email support.
 
 The third option is to use [Mercury Cloud](https://runmercury.com/docs/cloud/). It's the easiest way to share notebooks online. You will be able to create a website with a few clicks.
  <img 
     alt="Mercury convert Jupyter Notebook to Web App"
-    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Deployment.png" width="100%" />  
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Deployment.png#gh-light-mode-only" width="100%" />  
 </p>
-
+ <img 
+    alt="Mercury convert Jupyter Notebook to Web App"
+    src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/Deployment_black.png#gh-dark-mode-only" width="100%" />  
+</p>
 
 
 ## Mercury with your notebooks
