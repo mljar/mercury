@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 
 from django.conf import settings
@@ -12,13 +13,16 @@ from rest_framework.views import APIView
 
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
-from apps.workers.models import Worker, WorkerState
+from apps.workers.models import Worker, WorkerState, Machine, MachineState
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
+
+MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
 
 class WorkerGetNb(APIView):
     authentication_classes = []
+
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         try:
             Worker.objects.get(
@@ -103,6 +107,45 @@ class DeleteWorker(APIView):
 
             worker.delete()
 
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception:
+            pass
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class MachineInfo(APIView):
+    def post(self, request, format=None):
+        try:
+            if MACHINE_SPELL is None:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            if MACHINE_SPELL != request.data.get("machine_spell", ""):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+
+            ipv4 = request.data.get("ipv4", "")
+            if ipv4 == "":
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            state = request.data.get("state", "")
+            if state not in [s.value for s in MachineState]:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            action = request.data.get("action", "add")
+            if action not in ["add", "update", "delete"]:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            if action == "add":
+                Machine.objects.create(ipv4=ipv4, state=state)
+            elif action == "update":
+                ms = Machine.objects.filter(ipv4=ipv4)
+                if not ms:
+                    Machine.objects.create(ipv4=ipv4, state=state)
+                else:
+                    for m in ms:
+                        m.state = state
+                        m.save()
+            elif action == "delete":
+                ms = Machine.objects.filter(ipv4=ipv4)
+                ms.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception:
             pass

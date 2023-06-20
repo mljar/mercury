@@ -7,6 +7,7 @@ from apps.workers.views import (
     SetWorkerState,
     WorkerGetNb,
     WorkerUpdateNb,
+    MachineInfo,
 )
 
 workers_urlpatterns = [
@@ -33,5 +34,9 @@ workers_urlpatterns = [
     re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/delete-worker",
         DeleteWorker.as_view(),
+    ),
+    re_path(
+        "api/v1/machine-info",
+        MachineInfo.as_view(),
     ),
 ]
