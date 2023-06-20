@@ -129,23 +129,14 @@ class MachineInfo(APIView):
             if state not in [s.value for s in MachineState]:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
-            action = request.data.get("action", "add")
-            if action not in ["add", "update", "delete"]:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            if action == "add":
+            ms = Machine.objects.filter(ipv4=ipv4)
+            if not ms:
                 Machine.objects.create(ipv4=ipv4, state=state)
-            elif action == "update":
-                ms = Machine.objects.filter(ipv4=ipv4)
-                if not ms:
-                    Machine.objects.create(ipv4=ipv4, state=state)
-                else:
-                    for m in ms:
-                        m.state = state
-                        m.save()
-            elif action == "delete":
-                ms = Machine.objects.filter(ipv4=ipv4)
-                ms.delete()
+            else:
+                for m in ms:
+                    m.state = state
+                    m.save()
+                    
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception:
             pass
