@@ -7,19 +7,23 @@ import requests
 from celery import shared_task
 from django.conf import settings
 
-from apps.workers.models import Worker
+from apps.workers.models import Worker, Machine, MachineState
 from apps.ws.utils import machine_uuid
 
+from apps.workers.utils import get_running_machines, shuffle_machines
+
+
 log = logging.getLogger(__name__)
+
 
 
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):
     log.debug(f"NbWorkers per machine: {settings.NBWORKERS_PER_MACHINE}")
 
-    workers_ip_list = os.environ.get("WORKERS_IP_LIST", "")
+    machines = get_running_machines()
 
-    if workers_ip_list == "":
+    if not machines:
         machine_id = machine_uuid()
         workers = Worker.objects.filter(machine_id=machine_id)
 
@@ -41,7 +45,10 @@ def task_start_websocket_worker(self, job_params):
             log.debug("Start " + " ".join(command))
             worker = subprocess.Popen(command)
     else:
-        workers_ips = workers_ip_list.split(",")
+
+        machines = shuffle_machines(machines)
+
+        workers_ips = [m.ipv4 for m in machines]
         print(workers_ips)
 
         all_busy = True
