@@ -13,19 +13,32 @@ log = logging.getLogger(__name__)
 CLIENT_SITE = "client"
 WORKER_SITE = "worker"
 
-
+# global variable
 my_ip = None
-
 
 def machine_uuid():
     global my_ip
+    print("machine_uuid", my_ip)
     if my_ip is not None:
         return my_ip
     if os.environ.get("USE_WORKER_IP") is not None:
-        response = requests.get("https://api.ipify.org?format=json")
-        my_ip = response.json().get("ip", platform.node())
-        return my_ip
-    return platform.node()
+        try:
+            # fast way to get IP
+            response = requests.get("http://checkip.amazonaws.com")
+            my_ip = response.content.decode("UTF-8").replace("\n", "")
+            print("IP", my_ip)
+            return my_ip
+
+        except Exception as e:
+            pass
+
+        # alternative service
+        # response = requests.get("https://api.ipify.org?format=json")
+        # my_ip = response.json().get("ip", platform.node())
+        # return my_ip
+
+    my_ip = platform.node()        
+    return my_ip
 
 
 def client_group(notebook_id, session_id):
