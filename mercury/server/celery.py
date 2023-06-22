@@ -34,11 +34,6 @@ app.conf.task_routes = {
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     try:
-        import django
-
-        django.setup()
-
-        from apps.workers.utils import scale_down
         sender.add_periodic_task(
                 crontab(
                     minute="*",
@@ -47,7 +42,7 @@ def setup_periodic_tasks(sender, **kwargs):
                     month_of_year="*",
                     day_of_week="*",
                 ),
-                scale_down.s(),
+                scale_down_task.s(),
             )
 
         # from apps.notebooks.models import Notebook
@@ -81,6 +76,13 @@ def setup_periodic_tasks(sender, **kwargs):
         print("Problem with periodic tasks setup")
         print(str(e))
 
+
+@app.task
+def scale_down_task():
+    import django
+    django.setup()
+    from apps.workers.utils import scale_down
+    scale_down()
 
 @app.task
 def execute_notebook(notebook_id):

@@ -20,9 +20,7 @@ log = logging.getLogger(__name__)
 def task_start_websocket_worker(self, job_params):
     log.debug(f"NbWorkers per machine: {settings.NBWORKERS_PER_MACHINE}")
 
-    machines = get_running_machines()
-
-    if not machines:
+    if os.environ.get("MACHINE_SPELL", "") == "":
         machine_id = machine_uuid()
         workers = Worker.objects.filter(machine_id=machine_id)
 
@@ -44,6 +42,7 @@ def task_start_websocket_worker(self, job_params):
             log.debug("Start " + " ".join(command))
             worker = subprocess.Popen(command)
     else:
+        machines = get_running_machines()
         machines = shuffle_machines(machines)
 
         workers_ips = [m.ipv4 for m in machines]
