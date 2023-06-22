@@ -1,30 +1,31 @@
-import random
-from datetime import timedelta
-from django.utils import timezone
-
-from apps.workers.models import Machine, MachineState
+import logging
+log = logging.getLogger(__name__)
 
 
 def get_running_machines():
-    machines = Machine.objects.filter(
-        state=MachineState.Running,
-        updated_at__gte=timezone.now() - timedelta(seconds=30),
-    )
-    return machines
+    return []
 
 def shuffle_machines(machines):
-    machines = list(machines)
-    random.shuffle(machines)
-    return machines
+    return []
 
-def start_new_machine():
+def list_instances():
     pass
 
-def start_sleeping_machine():
+def start_new_instance():
     pass
 
-def terminate_machine():
+def start_sleeping_instance(instance_id):
     pass
 
-def hibernate_machine():
+def terminate_instance(instance_id):
     pass
+
+def hibernate_instance(instance_id):
+    pass
+
+def need_instance():
+    pass
+
+def scale_down():
+    log.debug("Scale instances down")
+    

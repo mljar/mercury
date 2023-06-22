@@ -28,6 +28,9 @@ class ClientProxy(WebsocketConsumer):
         self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
 
         self.user = self.scope["user"]
+
+        print("client connect user" * 22)
+        print(self.user)
         nb = Notebook.objects.get(pk=self.notebook_id)
         if nb.hosted_on.share == Site.PRIVATE:
             if self.user.is_anonymous:
@@ -130,6 +133,8 @@ class ClientProxy(WebsocketConsumer):
                 notebook_id=self.notebook_id,
                 state="Queued",
             )
+            if not self.user.is_anonymous:
+                worker.run_by = self.user
             worker.save()
             job_params = {
                 "notebook_id": self.notebook_id,

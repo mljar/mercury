@@ -102,6 +102,12 @@ def main():
         print(logo)
         print_version()
 
+        if "dry" in sys.argv:
+            import django
+            django.setup()
+            import apps.workers.utils
+            sys.exit(1)
+
         if "clear" in sys.argv:
             for n in ["db.sqlite", "db.sqlite3"]:
                 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), n)

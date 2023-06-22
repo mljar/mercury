@@ -4,8 +4,9 @@ import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from apps.workers.models import Worker
+from apps.workers.models import Worker, WorkerSession, WorkerSessionState
 from apps.ws.utils import client_group, worker_group
+
 
 log = logging.getLogger(__name__)
 
@@ -34,9 +35,23 @@ class WorkerProxy(WebsocketConsumer):
             self.worker_group, self.channel_name
         )
 
+        worker = workers[len(workers) - 1]
+        self.worker_session = WorkerSession.objects.create(
+            ipv4="unknown",
+            state=WorkerSessionState.Running,
+            owned_by=worker.notebook.created_by,
+            run_by=worker.run_by,
+            site=worker.notebook.hosted_on,
+            notebook=worker.notebook,
+            worker=worker,
+        )
+
         self.accept()
 
     def disconnect(self, close_code):
+        self.worker_session.sate = WorkerSessionState.Stopped
+        self.worker_session.worker = None
+        self.worker_session.save()
         async_to_sync(self.channel_layer.group_discard)(
             self.worker_group, self.channel_name
         )

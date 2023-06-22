@@ -37,33 +37,46 @@ def setup_periodic_tasks(sender, **kwargs):
         import django
 
         django.setup()
-        from apps.notebooks.models import Notebook
 
-        # get all notebooks with not empty schedule
-        notebooks = Notebook.objects.exclude(schedule__isnull=True).exclude(
-            schedule__exact=""
-        )
-
-        for n in notebooks:
-            schedule_str = n.schedule
-            schedule_arr = schedule_str.split(" ")
-            minute, hour, day_of_month, month, day_of_week = (
-                schedule_arr[0],
-                schedule_arr[1],
-                schedule_arr[2],
-                schedule_arr[3],
-                schedule_arr[4],
-            )
-            sender.add_periodic_task(
+        from apps.workers.utils import scale_down
+        sender.add_periodic_task(
                 crontab(
-                    minute=minute,
-                    hour=hour,
-                    day_of_month=day_of_month,
-                    month_of_year=month,
-                    day_of_week=day_of_week,
+                    minute="*",
+                    hour="*",
+                    day_of_month="*",
+                    month_of_year="*",
+                    day_of_week="*",
                 ),
-                execute_notebook.s(n.id),
+                scale_down.s(),
             )
+
+        # from apps.notebooks.models import Notebook
+
+        # # get all notebooks with not empty schedule
+        # notebooks = Notebook.objects.exclude(schedule__isnull=True).exclude(
+        #     schedule__exact=""
+        # )
+
+        # for n in notebooks:
+        #     schedule_str = n.schedule
+        #     schedule_arr = schedule_str.split(" ")
+        #     minute, hour, day_of_month, month, day_of_week = (
+        #         schedule_arr[0],
+        #         schedule_arr[1],
+        #         schedule_arr[2],
+        #         schedule_arr[3],
+        #         schedule_arr[4],
+        #     )
+        #     sender.add_periodic_task(
+        #         crontab(
+        #             minute=minute,
+        #             hour=hour,
+        #             day_of_month=day_of_month,
+        #             month_of_year=month,
+        #             day_of_week=day_of_week,
+        #         ),
+        #         execute_notebook.s(n.id),
+        #     )
     except Exception as e:
         print("Problem with periodic tasks setup")
         print(str(e))

@@ -10,11 +10,10 @@ from django.conf import settings
 from apps.workers.models import Worker, Machine, MachineState
 from apps.ws.utils import machine_uuid
 
-from apps.workers.utils import get_running_machines, shuffle_machines
+from apps.workers.utils import get_running_machines, shuffle_machines, need_instance
 
 
 log = logging.getLogger(__name__)
-
 
 
 @shared_task(bind=True)
@@ -45,11 +44,9 @@ def task_start_websocket_worker(self, job_params):
             log.debug("Start " + " ".join(command))
             worker = subprocess.Popen(command)
     else:
-
         machines = shuffle_machines(machines)
 
         workers_ips = [m.ipv4 for m in machines]
-        print(workers_ips)
 
         all_busy = True
 
@@ -75,4 +72,5 @@ def task_start_websocket_worker(self, job_params):
 
         if all_busy:
             log.debug("Defer task start ws worker")
+            need_instance()
             task_start_websocket_worker.s(job_params).apply_async(countdown=15)

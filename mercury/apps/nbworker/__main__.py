@@ -33,7 +33,7 @@ logging.basicConfig(
     level=LOG_LEVEL,
 )
 log = logging.getLogger(__name__)
-logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 from apps.nbworker.nb import NBWorker
 from apps.nbworker.rest import RESTClient
@@ -50,8 +50,11 @@ server_url = sys.argv[4]
 
 
 if os.environ.get("MERCURY_SERVER_URL") is None:
-    os.environ["MERCURY_SERVER_URL"] = server_url.replace("ws://", "http://").replace("wss://", "https://")
-    
+    os.environ["MERCURY_SERVER_URL"] = server_url.replace("ws://", "http://").replace(
+        "wss://", "https://"
+    )
+
+
 def signal_handler(signal, frame):
     global stop_event
     log.debug("\nBye bye!")

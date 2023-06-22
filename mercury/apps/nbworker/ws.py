@@ -49,7 +49,6 @@ class WSClient(RESTClient):
         self.queue.put(json.dumps({"purpose": Purpose.InitNotebook}))
         # just check if exists
         self.worker_exists()
-        
 
     def on_close(self, ws, close_status_code, close_msg):
         global stop_event

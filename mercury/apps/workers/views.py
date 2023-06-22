@@ -13,7 +13,14 @@ from rest_framework.views import APIView
 
 from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
-from apps.workers.models import Worker, WorkerState, Machine, MachineState
+from apps.workers.models import (
+    Worker,
+    WorkerSessionState,
+    WorkerState,
+    Machine,
+    MachineState,
+    WorkerSession,
+)
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
 
@@ -89,6 +96,15 @@ class SetWorkerState(APIView):
             if request.data.get("machine_id") is not None:
                 worker.machine_id = request.data.get("machine_id")
             worker.save()
+
+            sessions = WorkerSession.objects.filter(worker=worker)
+            if sessions:
+                session = sessions[len(sessions)-1]
+                session.worker = worker
+                session.ipv4 = worker.machine_id
+                session.state = WorkerSessionState.Running
+                session.save()
+
             return Response(WorkerSerializer(worker).data)
         except Exception:
             pass
@@ -101,6 +117,12 @@ class DeleteWorker(APIView):
             worker = Worker.objects.get(
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
+            sessions = WorkerSession.objects.filter(worker=worker)
+            if sessions:
+                session = sessions[len(sessions)-1]
+                session.worker = None
+                session.state = WorkerSessionState.Stopped
+                session.save()
 
             # delete worker output files
             clean_worker_files(worker.notebook.hosted_on.id, worker.session_id)
@@ -136,7 +158,7 @@ class MachineInfo(APIView):
                 for m in ms:
                     m.state = state
                     m.save()
-                    
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception:
             pass

@@ -18,7 +18,6 @@ my_ip = None
 
 def machine_uuid():
     global my_ip
-    print("machine_uuid", my_ip)
     if my_ip is not None:
         return my_ip
     if os.environ.get("USE_WORKER_IP") is not None:
@@ -26,7 +25,6 @@ def machine_uuid():
             # fast way to get IP
             response = requests.get("http://checkip.amazonaws.com")
             my_ip = response.content.decode("UTF-8").replace("\n", "")
-            print("IP", my_ip)
             return my_ip
 
         except Exception as e:
@@ -37,7 +35,7 @@ def machine_uuid():
         # my_ip = response.json().get("ip", platform.node())
         # return my_ip
 
-    my_ip = platform.node()        
+    my_ip = platform.node()
     return my_ip
 
 

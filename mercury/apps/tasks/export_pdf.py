@@ -10,7 +10,8 @@ try:
     from pyppeteer import launch
 except Exception:
     pdf_export_available = False
-    
+
+
 async def html_to_pdf(html_file, pdf_file, pyppeteer_args=None):
     """Convert a HTML file to a PDF"""
     browser = await launch(
