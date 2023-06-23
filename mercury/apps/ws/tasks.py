@@ -71,5 +71,5 @@ def task_start_websocket_worker(self, job_params):
 
         if all_busy:
             log.debug("Defer task start ws worker")
-            need_instance()
+            need_instance(job_params["worker_id"])
             task_start_websocket_worker.s(job_params).apply_async(countdown=15)

@@ -11,7 +11,7 @@ def shuffle_machines(machines):
 def list_instances():
     pass
 
-def start_new_instance():
+def start_new_instance(worker_id):
     pass
 
 def start_sleeping_instance(instance_id):
@@ -23,7 +23,7 @@ def terminate_instance(instance_id):
 def hibernate_instance(instance_id):
     pass
 
-def need_instance():
+def need_instance(worker_id):
     pass
 
 def scale_down():
