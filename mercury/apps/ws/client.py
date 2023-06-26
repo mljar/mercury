@@ -29,8 +29,6 @@ class ClientProxy(WebsocketConsumer):
 
         self.user = self.scope["user"]
 
-        print("client connect user" * 22)
-        print(self.user)
         nb = Notebook.objects.get(pk=self.notebook_id)
         if nb.hosted_on.share == Site.PRIVATE:
             if self.user.is_anonymous:
