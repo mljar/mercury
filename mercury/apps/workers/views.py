@@ -15,12 +15,10 @@ from apps.notebooks.models import Notebook
 from apps.notebooks.serializers import NotebookSerializer
 from apps.workers.models import (
     Worker,
-    WorkerSessionState,
-    WorkerState,
     Machine,
-    MachineState,
     WorkerSession,
 )
+from apps.workers.constants import WorkerState, MachineState, WorkerSessionState
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
 

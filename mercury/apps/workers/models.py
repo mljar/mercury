@@ -8,15 +8,6 @@ from apps.accounts.models import Site
 from apps.notebooks.models import Notebook
 
 
-class WorkerState(str, Enum):
-    Busy = "Busy"
-    Running = "Running"
-    Unknown = "Unknown"
-    MaxRunTimeReached = "MaxRunTimeReached"
-    MaxIdleTimeReached = "MaxIdleTimeReached"
-    InstallPackages = "InstallPackages"
-
-
 class Worker(models.Model):
     """It is a task that is done by the worker"""
 
@@ -41,15 +32,6 @@ class Worker(models.Model):
     run_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
 
-class MachineState(str, Enum):
-    Pending = "Pending"
-    Running = "Running"
-    Stopping = "Stopping"
-    Stopped = "Stopped"
-    ShuttingDown = "ShuttingDown"
-    Terminated = "Terminated"
-
-
 class Machine(models.Model):
     # machine ip v4 address
     ipv4 = models.CharField(max_length=128, blank=True)
@@ -60,11 +42,6 @@ class Machine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
-
-
-class WorkerSessionState(str, Enum):
-    Running = "Running"
-    Stopped = "Stopped"
 
 
 class WorkerSession(models.Model):

@@ -14,7 +14,8 @@ from apps.notebooks.models import Notebook
 from apps.storage.models import UploadedFile
 from apps.storage.s3utils import S3
 from apps.storage.storage import StorageManager
-from apps.workers.models import Worker, WorkerState
+from apps.workers.models import Worker
+from apps.workers.constants import WorkerState
 
 # python manage.py test apps.nbworker -v 2
 

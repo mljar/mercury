@@ -4,7 +4,8 @@ import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
-from apps.workers.models import Worker, WorkerSession, WorkerSessionState
+from apps.workers.models import Worker, WorkerSession
+from apps.workers.constants import WorkerSessionState
 from apps.ws.utils import client_group, worker_group
 
 

@@ -4,7 +4,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from apps.accounts.models import Site
 from apps.notebooks.models import Notebook
-from apps.workers.models import Machine, WorkerSession, WorkerSessionState
+from apps.workers.models import Machine, WorkerSession
+from apps.workers.constants import WorkerSessionState
 from apps.workers.utils import get_running_machines, shuffle_machines
 
 

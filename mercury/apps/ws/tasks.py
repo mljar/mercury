@@ -7,7 +7,7 @@ import requests
 from celery import shared_task
 from django.conf import settings
 
-from apps.workers.models import Worker, Machine, MachineState
+from apps.workers.models import Worker
 from apps.ws.utils import machine_uuid
 
 from apps.workers.utils import get_running_machines, shuffle_machines, need_instance
