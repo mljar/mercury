@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import requests
 
-from apps.workers.models import Worker, WorkerState
+from apps.workers.constants import WorkerState
 from apps.ws.utils import machine_uuid
 
 log = logging.getLogger(__name__)

@@ -1,27 +1,12 @@
-import json
 import os
-import queue
 import signal
 import sys
-import threading
 import time
-import traceback
-from datetime import datetime, timedelta
-
-import websocket
-from django.utils.timezone import make_aware
+import logging
 
 CURRENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
 sys.path.insert(0, BACKEND_DIR)
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
-import django
-
-django.setup()
-
-
-import logging
 
 LOG_LEVEL = (
     logging.ERROR if os.environ.get("MERCURY_VERBOSE", "0") == "0" else logging.DEBUG

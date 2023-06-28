@@ -13,7 +13,7 @@ from execnb.nbio import nb2dict, read_nb
 from apps.nb.nbrun import NbRun
 from apps.nbworker.utils import Purpose, stop_event
 from apps.nbworker.ws import WSClient
-from apps.workers.models import WorkerState
+from apps.workers.constants import WorkerState
 from apps.ws.utils import parse_params
 from widgets.manager import WidgetsManager
 

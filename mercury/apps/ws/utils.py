@@ -16,6 +16,7 @@ WORKER_SITE = "worker"
 # global variable
 my_ip = None
 
+
 def machine_uuid():
     global my_ip
     if my_ip is not None:

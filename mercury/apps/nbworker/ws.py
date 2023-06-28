@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 import sys
 from queue import Queue
 
@@ -8,7 +7,6 @@ import websocket
 
 from apps.nbworker.rest import RESTClient
 from apps.nbworker.utils import Purpose, stop_event
-from apps.workers.models import WorkerState
 from apps.storage.storage import StorageManager
 
 log = logging.getLogger(__name__)

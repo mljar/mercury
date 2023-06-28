@@ -99,7 +99,7 @@ class SetWorkerState(APIView):
 
             sessions = WorkerSession.objects.filter(worker=worker)
             if sessions:
-                session = sessions[len(sessions)-1]
+                session = sessions[len(sessions) - 1]
                 session.worker = worker
                 session.ipv4 = worker.machine_id
                 session.state = WorkerSessionState.Running
@@ -119,7 +119,7 @@ class DeleteWorker(APIView):
             )
             sessions = WorkerSession.objects.filter(worker=worker)
             if sessions:
-                session = sessions[len(sessions)-1]
+                session = sessions[len(sessions) - 1]
                 session.worker = None
                 session.state = WorkerSessionState.Stopped
                 session.save()

@@ -6,11 +6,8 @@ import uuid
 
 import requests
 from django.conf import settings
-from execnb.nbio import write_nb
-from django_drf_filepond.models import TemporaryUpload
 
 from apps.nbworker.utils import stop_event
-from apps.storage.models import UploadedFile
 from apps.storage.utils import get_worker_bucket_key
 from apps.tasks.export_pdf import to_pdf
 
@@ -254,8 +251,14 @@ class StorageManager:
         return h[:8]
 
     def get_user_uploaded_file(self, value):
+        log.debug("get user uploaded file " * 33)
         if settings.STORAGE == settings.STORAGE_MEDIA:
             log.debug(f"Get file {value[0]} from id={value[1]}")
+            import django
+
+            django.setup()
+            from django_drf_filepond.models import TemporaryUpload
+
             tu = TemporaryUpload.objects.get(upload_id=value[1])
             value[1] = tu.get_file_path()
             value[1] = value[1].replace("\\", "\\\\")
