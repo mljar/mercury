@@ -75,7 +75,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             request.user
         ):
             return Response(
-                {"msg": "Sites limit reached. Please change subsription plan"},
+                {"msg": "Sorry, you reached Sites limit. Please upgrade subsription plan"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         proposed_slug = get_slug(
@@ -91,6 +91,15 @@ class SiteViewSet(viewsets.ModelViewSet):
                 {"msg": "Please change site subdomain, current value is not unique"},
                 status=status.HTTP_403_FORBIDDEN,
             )
+
+        if is_cloud_version():
+            proposed_share = request.data.get("share", "")
+            user_plan = get_plan(self.request.user)
+            if user_plan == PLAN_STARTER and proposed_share == "PRIVATE":
+                return Response(
+                    {"msg": "Sorry, you can't create PRIVATE Site. Please uprgade subsription plan"},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -121,6 +130,13 @@ class SiteViewSet(viewsets.ModelViewSet):
             new_slug = get_slug(new_slug, updated_instance.title)
             if new_slug in FORBIDDEN_SLUGS:
                 raise ValidationError(f"You cant use {new_slug} as a subdomain")
+
+            if is_cloud_version():
+                proposed_share = self.request.data.get("share", "")
+                user_plan = get_plan(self.request.user)
+                if user_plan == PLAN_STARTER and proposed_share == "PRIVATE":
+                    raise ValidationError(f"Sorry, you can't create PRIVATE Site. Please uprgade subsription plan")
+                    
             updated_instance.slug = new_slug
             updated_instance.save()
 
