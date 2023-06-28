@@ -75,7 +75,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             request.user
         ):
             return Response(
-                {"msg": "Sorry, you reached Sites limit. Please upgrade subsription plan"},
+                {"msg": "Sorry, you reached Sites limit. Please upgrade subscription plan"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         proposed_slug = get_slug(
@@ -97,7 +97,7 @@ class SiteViewSet(viewsets.ModelViewSet):
             user_plan = get_plan(self.request.user)
             if user_plan == PLAN_STARTER and proposed_share == "PRIVATE":
                 return Response(
-                    {"msg": "Sorry, you can't create PRIVATE Site. Please uprgade subsription plan"},
+                    {"msg": "Sorry, you can't create PRIVATE Site. Please uprgade subscription plan"},
                     status=status.HTTP_403_FORBIDDEN,
                 )
 
@@ -135,7 +135,7 @@ class SiteViewSet(viewsets.ModelViewSet):
                 proposed_share = self.request.data.get("share", "")
                 user_plan = get_plan(self.request.user)
                 if user_plan == PLAN_STARTER and proposed_share == "PRIVATE":
-                    raise ValidationError(f"Sorry, you can't create PRIVATE Site. Please uprgade subsription plan")
+                    raise ValidationError(f"Sorry, you can't create PRIVATE Site. Please uprgade subscription plan")
                     
             updated_instance.slug = new_slug
             updated_instance.save()
