@@ -32,7 +32,7 @@ FORBIDDEN_SLUGS = [
     "frontend",
     "www",
     "app",
-    "blog"
+    "blog",
 ]
 
 
