@@ -8,8 +8,8 @@ from rest_framework.serializers import ValidationError
 
 from apps.accounts.serializers import UserSerializer
 
-MERCURY_CLOUD_PRO_ID = 820856
-MERCURY_CLOUD_BUSINESS_ID = 820858
+MERCURY_CLOUD_PRO_ID = 839780
+MERCURY_CLOUD_BUSINESS_ID = 839783
 
 PADDLE_VENDOR_ID = os.environ.get("PADDLE_VENDOR_ID")
 PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY")
