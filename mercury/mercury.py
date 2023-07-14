@@ -43,6 +43,7 @@ from widgets.stop import StopExecution, Stop
 from widgets.confetti import Confetti
 from widgets.chat import Chat
 from widgets.numberbox import NumberBox
+from widgets.in_mercury import in_mercury
 
 def print_version():
     try:
