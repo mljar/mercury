@@ -40,7 +40,18 @@ class Slider:
             self.slider.description = label
             self.slider.disabled = disabled
         else:
-            self.slider = ipywidgets.IntSlider(
+            SliderConstructor = ipywidgets.IntSlider
+            number_format = "d"
+            if isinstance(step, float):
+                SliderConstructor = ipywidgets.FloatSlider
+                number_format = ".2f"
+                if "." in str(step):
+                    try:
+                        number_format = f".{len(str(step).split('.')[1])}f"
+                    except Exception as e:
+                        pass
+
+            self.slider = SliderConstructor(
                 value=value,
                 min=min,
                 max=max,
@@ -48,7 +59,10 @@ class Slider:
                 step=step,
                 style={"description_width": "initial"},
                 disabled=disabled,
+                readout_format=number_format
             )
+        
+
             WidgetsManager.add_widget(self.slider.model_id, self.code_uid, self.slider)
         display(self)
 
