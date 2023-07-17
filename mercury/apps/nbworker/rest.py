@@ -56,6 +56,7 @@ class RESTClient:
             "show_sidebar",
             "full_screen",
             "allow_download",
+            "stop_on_error",
         ]:
             if new_params.get(property) is not None and nb_params.get(
                 property
@@ -118,6 +119,17 @@ class RESTClient:
     def reveal_theme(self):
         # TODO: get reveal theme
         return "white"
+
+    def stop_on_error(self):
+        try:
+            stop_on_error = str(
+                json.loads(self.notebook.params).get("stop_on_error", "false")
+            ).lower()
+            log.debug(f"Check if stop_on_error ({stop_on_error})")
+            return stop_on_error == "true"
+        except Exception:
+            log.exception("Exception when check if stop_on_error")
+        return False
 
     def worker_state(self):
         return self.state

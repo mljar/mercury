@@ -316,6 +316,7 @@ class NBWorker(WSClient):
             show_prompt=self.show_prompt(),
             is_presentation=self.is_presentation(),
             reveal_theme=self.reveal_theme(),
+            stop_on_error=self.stop_on_error(),
         )
 
         self.install_new_packages()
@@ -380,6 +381,9 @@ class NBWorker(WSClient):
             nb_params.get("show-code", False), nb_params.get("show-prompt", True)
         )
         self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
+        self.nbrun.set_stop_on_error(
+            nb_params.get("stop_on_error", "false").lower() == "true"
+        )
 
         log.debug(params)
         log.debug(f"Exporter show_code {self.nbrun.exporter.show_code}")

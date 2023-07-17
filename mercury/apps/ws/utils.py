@@ -127,7 +127,12 @@ def parse_params(nb, params={}):
                     if view.get("static_notebook") is not None:
                         params["static_notebook"] = view.get("static_notebook")
 
-                    for property in ["show_sidebar", "full_screen", "allow_download"]:
+                    for property in [
+                        "show_sidebar",
+                        "full_screen",
+                        "allow_download",
+                        "stop_on_error",
+                    ]:
                         if view.get(property) is not None:
                             params[property] = view.get(property)
 
@@ -152,6 +157,8 @@ def parse_params(nb, params={}):
         params["full_screen"] = True
     if params.get("allow_download") is None:
         params["allow_download"] = True
+    if params.get("stop_on_error") is None:
+        params["stop_on_error"] = False
 
     if no_outputs:
         params["version"] = "2"

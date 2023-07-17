@@ -9,6 +9,7 @@ class WorkerState(str, Enum):
     MaxIdleTimeReached = "MaxIdleTimeReached"
     InstallPackages = "InstallPackages"
 
+
 class MachineState(str, Enum):
     Pending = "Pending"
     Running = "Running"
@@ -16,6 +17,7 @@ class MachineState(str, Enum):
     Stopped = "Stopped"
     ShuttingDown = "ShuttingDown"
     Terminated = "Terminated"
+
 
 class WorkerSessionState(str, Enum):
     Running = "Running"

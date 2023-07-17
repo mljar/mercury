@@ -24,6 +24,7 @@ class NbRun:
         show_prompt=False,
         is_presentation=False,
         reveal_theme="white",
+        stop_on_error=False,
     ):
         self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
         self.shell = CaptureShell()
@@ -33,6 +34,10 @@ class NbRun:
             pass
         self.shell.run("from mercury import WidgetsManager")
         self.shell.run("import os\nos.environ['RUN_MERCURY']='1'")
+        self.stop_on_error = stop_on_error
+
+    def set_stop_on_error(self, new_stop_on_error):
+        self.stop_on_error = new_stop_on_error
 
     def set_show_code(self, new_show_code):
         self.exporter.set_show_code(new_show_code)
@@ -70,6 +75,9 @@ class NbRun:
                         "output_type", ""
                     ) == "error" and "StopExecution" in output.get("ename", ""):
                         return False
+                    if self.stop_on_error and output.get("output_type", "") == "error":
+                        return False
+
             except Exception as e:
                 pass
 

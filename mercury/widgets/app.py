@@ -20,6 +20,7 @@ class App:
         show_sidebar=True,
         full_screen=True,
         allow_download=True,
+        stop_on_error=False,
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
@@ -34,6 +35,7 @@ class App:
         self.show_sidebar = show_sidebar
         self.full_screen = full_screen
         self.allow_download = allow_download
+        self.stop_on_error = stop_on_error
         display(self)
 
     def __repr__(self):
@@ -59,6 +61,7 @@ class App:
             "show_sidebar": self.show_sidebar,
             "full_screen": self.full_screen,
             "allow_download": self.allow_download,
+            "stop_on_error": self.stop_on_error,
             "model_id": "mercury-app",
             "code_uid": self.code_uid,
         }
