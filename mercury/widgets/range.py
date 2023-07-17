@@ -4,7 +4,7 @@ import ipywidgets
 from IPython.display import display
 
 from .manager import WidgetException, WidgetsManager
-
+from .slider import get_number_format
 
 class Range:
     def __init__(
@@ -44,7 +44,13 @@ class Range:
             self.range.description = label
             self.range.disabled = disabled
         else:
-            self.range = ipywidgets.IntRangeSlider(
+            RangeConstructor = ipywidgets.IntRangeSlider
+            number_format = "d"
+            if isinstance(step, float):
+                RangeConstructor = ipywidgets.FloatRangeSlider
+                number_format = get_number_format(step)
+
+            self.range = RangeConstructor(
                 value=value,
                 min=min,
                 max=max,
@@ -52,6 +58,7 @@ class Range:
                 step=step,
                 style={"description_width": "initial"},
                 disabled=disabled,
+                readout_format=number_format
             )
             WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)

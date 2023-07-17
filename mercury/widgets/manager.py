@@ -139,6 +139,7 @@ class WidgetsManager:
                 "value": output.get("value", [0, 1]),
                 "min": output.get("min", 0),
                 "max": output.get("max", 10),
+                "step": output.get("step", 1),
                 "label": output.get("label", ""),
                 "url_key": output.get("url_key", ""),
                 "disabled": output.get("disabled", False),
