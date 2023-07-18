@@ -46,6 +46,17 @@ storage_urlpatterns = [
         DeleteFile.as_view(),
     ),
     #
+    # style files
+    #
+    re_path(
+        "api/v1/style-put/(?P<site_id>.+)/(?P<filename>.+)/(?P<filesize>.+)",
+        PresignedUrlPut.as_view(),
+    ),
+    re_path(
+        "api/v1/style-get/(?P<site_id>.+)/(?P<filename>.+)",
+        PresignedUrlPut.as_view(),
+    ),
+    #
     # worker files
     #
     re_path(

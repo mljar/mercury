@@ -25,6 +25,7 @@ export interface Site {
   created_at: Date;
   updated_at: Date;
   created_by: number;
+  info: string;
 }
 
 export enum SiteStatus {
