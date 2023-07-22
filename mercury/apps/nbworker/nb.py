@@ -382,7 +382,7 @@ class NBWorker(WSClient):
         )
         self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
         self.nbrun.set_stop_on_error(
-            nb_params.get("stop_on_error", "false").lower() == "true"
+            nb_params.get("stop_on_error", False)
         )
 
         log.debug(params)
