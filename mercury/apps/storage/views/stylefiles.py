@@ -28,9 +28,10 @@ from apps.storage.utils import (
     get_worker_bucket_key,
 )
 
-from apps.storage.dashboardfiles import get_site
+from apps.storage.views.dashboardfiles import get_site
 
 log = logging.getLogger(__name__)
+
 
 
 def pro_upload_allowed(user, site_id, filesize):
@@ -76,7 +77,6 @@ class StyleUrlGet(APIView):
     ):
         try:
             sites = Site.objects.filter(pk=site_id)
-
             if not sites:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -19,6 +19,11 @@ from apps.storage.views.notebookfiles import (
     NbDeleteFile,
     WorkerGetNbFileUrl,
 )
+from apps.storage.views.stylefiles import (
+    StyleUrlPut,
+    StyleUrlGet
+)
+
 
 storage_urlpatterns = [
     re_path(
@@ -50,11 +55,11 @@ storage_urlpatterns = [
     #
     re_path(
         "api/v1/style-put/(?P<site_id>.+)/(?P<filename>.+)/(?P<filesize>.+)",
-        PresignedUrlPut.as_view(),
+        StyleUrlPut.as_view(),
     ),
     re_path(
-        "api/v1/style-get/(?P<site_id>.+)/(?P<filename>.+)",
-        PresignedUrlPut.as_view(),
+        "api/v1/get-style/(?P<site_id>.+)/(?P<filename>.+)",
+        StyleUrlGet.as_view(),
     ),
     #
     # worker files
