@@ -6,7 +6,12 @@ import HomeNavBar from "../components/HomeNavBar";
 export default function SiteLoadingView() {
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={true} username={""} />
+      <HomeNavBar
+        isSitePublic={true}
+        username={""}
+        logoSrc={""}
+        navbarColor={""}
+      />
       <div
         style={{
           width: "100%",
@@ -17,7 +22,7 @@ export default function SiteLoadingView() {
       >
         <p style={{ color: "gray" }}>Please wait. Loading site ...</p>
       </div>
-      <Footer />
+      <Footer footerText={""} />
     </div>
   );
 }

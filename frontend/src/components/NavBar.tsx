@@ -1,27 +1,57 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { Link } from "react-router-dom";
+import DefaultLogo from "./DefaultLogo";
 import LoginButton from "./LoginButton";
 import UserButton from "./UserButton";
 
 type NavBarProps = {
   isSitePublic: boolean;
   username: string;
+  logoSrc: string;
+  navbarColor: string;
 };
 
-export default function NavBar({ isSitePublic, username }: NavBarProps) {
+export default function NavBar({
+  isSitePublic,
+  username,
+  logoSrc,
+  navbarColor,
+}: NavBarProps) {
+  console.log("======================just navbar");
+  console.log(logoSrc);
+  console.log(logoSrc === "");
+
+  let headerBgClass = "";
+  let headerStyle = {};
+  if (navbarColor === "") {
+    headerBgClass = "bg-dark";
+  } else {
+    headerStyle = {
+      backgroundColor: navbarColor,
+    };
+  }
+
   return (
-    <header className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+    <header
+      className={`navbar navbar-dark sticky-top ${headerBgClass} flex-md-nowrap p-0`}
+      style={headerStyle}
+    >
       <Link className="navbar-brand col-md-3 col-lg-3 me-0 px-3" to="/">
-        <img
-          alt="Mercury"
-          src={
-            process.env.PUBLIC_URL +
-            process.env.REACT_APP_LOCAL_URL +
-            "/mercury_logo.svg"
-          }
-          style={{ height: "28px", paddingLeft: "10px" }} // height was 24px
-        />
+        {logoSrc !== "" && logoSrc !== "loading" && (
+          <img
+            alt="Mercury"
+            src={logoSrc}
+            style={{ height: "28px", paddingLeft: "10px" }}
+          />
+        )}
+        {/* {logoSrc === "" && (
+          <img
+            alt="Mercury"
+            src={DefaultLogo}
+            style={{ height: "28px", paddingLeft: "10px" }}
+          />
+        )} */}
       </Link>
 
       {!isSitePublic && username === "" && <LoginButton />}

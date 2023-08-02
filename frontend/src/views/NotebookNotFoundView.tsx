@@ -6,7 +6,12 @@ import HomeNavBar from "../components/HomeNavBar";
 export default function NotebookNotFoundView() {
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={true} username={""} />
+      <HomeNavBar
+        isSitePublic={true}
+        username={""}
+        logoSrc={""}
+        navbarColor={""}
+      />
       <div
         style={{
           width: "100%",
@@ -17,10 +22,11 @@ export default function NotebookNotFoundView() {
       >
         <h3>Notebook not found</h3>
         <p>
-          We can't find your notebook. Please double check the URL address and permissions.
+          We can't find your notebook. Please double check the URL address and
+          permissions.
         </p>
       </div>
-      <Footer />
+      <Footer footerText={""} />
     </div>
   );
 }

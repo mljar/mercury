@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 import NavBar from "../components/NavBar";
@@ -38,8 +38,15 @@ import RestAPIView from "../components/RestAPIView";
 import BlockUi from "react-block-ui";
 import WaitPDFExport from "../components/WaitPDFExport";
 import { getWorkerId, getWorkerState, WorkerState } from "../slices/wsSlice";
-import { getSiteId, isPublic } from "../slices/sitesSlice";
+import {
+  getLogoFilename,
+  getNavbarColor,
+  getSiteId,
+  isPublic,
+} from "../slices/sitesSlice";
 import ShareDialog from "../components/ShareDialog";
+import axios from "axios";
+import DefaultLogoSrc from "../components/DefaultLogo";
 
 type AppProps = {
   isSingleApp: boolean;
@@ -66,6 +73,9 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
   const workerState = useSelector(getWorkerState);
   const siteId = useSelector(getSiteId);
   const isSitePublic = useSelector(isPublic);
+  const navbarColor = useSelector(getNavbarColor);
+  const [logoSrc, setLogoSrc] = useState("loading");
+  const logoFilename = useSelector(getLogoFilename);
 
   const pleaseWait = () => {
     if (notebook?.params?.static_notebook) {
@@ -179,10 +189,28 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
     return true;
   };
 
+  useEffect(() => {
+    if (logoFilename === "") {
+      setLogoSrc(DefaultLogoSrc);
+    } else {
+      axios
+        .get(`/api/v1/get-style/${siteId}/${logoFilename}`)
+        .then((response) => {
+          const { url } = response.data;
+          setLogoSrc(url);
+        });
+    }
+  }, [dispatch, logoFilename, siteId]);
+
   return (
     <div className="App">
       {!displayEmbed && (
-        <NavBar isSitePublic={isSitePublic} username={username} />
+        <NavBar
+          isSitePublic={isSitePublic}
+          username={username}
+          logoSrc={logoSrc}
+          navbarColor={navbarColor}
+        />
       )}
       <BlockUi
         blocking={exportingToPDF}

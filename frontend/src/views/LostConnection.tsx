@@ -1,12 +1,17 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react"; 
+import React from "react";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
 
 export default function LostConnection() {
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={true} username={""} />
+      <HomeNavBar
+        isSitePublic={true}
+        username={""}
+        logoSrc={""}
+        navbarColor={""}
+      />
       <div
         style={{
           width: "100%",
@@ -17,10 +22,11 @@ export default function LostConnection() {
       >
         <h3>Lost connection</h3>
         <p>
-          App lost connection to the server. Please try again in a moment or contact administrator.
+          App lost connection to the server. Please try again in a moment or
+          contact administrator.
         </p>
       </div>
-      <Footer />
+      <Footer footerText={""} />
     </div>
   );
 }

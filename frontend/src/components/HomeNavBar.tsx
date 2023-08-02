@@ -6,27 +6,48 @@ import UserButton from "./UserButton";
 type NavBarProps = {
   isSitePublic: boolean;
   username: string;
+  logoSrc: string;
+  navbarColor: string;
 };
 
-export default function NavBar({ isSitePublic, username }: NavBarProps) {
+export default function NavBar({
+  isSitePublic,
+  username,
+  logoSrc,
+  navbarColor,
+}: NavBarProps) {
+  console.log("****************home navbar");
+  console.log({logoSrc, navbarColor});
+  console.log(logoSrc === "");
+
+  let headerBgClass = "";
+  let headerStyle = {};
+  if (navbarColor === "") {
+    headerBgClass = "bg-dark";
+  } else {
+    headerStyle = {
+      backgroundColor: navbarColor,
+    };
+  }
+
   return (
     <header
-      className="navbar navbar-dark sticky-top bg-dark p-0"
+      className={`navbar navbar-dark sticky-top p-0 ${headerBgClass}`}
+      style={headerStyle}
     >
       <div className="row" style={{ width: "100%", paddingRight: "0px" }}>
         <div className="col-4"></div>
         <div className="col-4 text-center">
-          <a href="/">
-            <img
-              alt="Mercury"
-              src={
-                process.env.PUBLIC_URL +
-                process.env.REACT_APP_LOCAL_URL +
-                "/mercury_logo.svg"
-              }
-              style={{ height: "40px" }}
-            />
-          </a>
+          {logoSrc !== "" && logoSrc !== "loading" && (
+            <a href="/">
+              <img alt="Mercury" src={logoSrc} style={{ height: "40px" }} />
+            </a>
+          )}
+          {logoSrc === "loading" && (
+            <a href="/">
+              <div style={{ height: "40px" }} />
+            </a>
+          )}
         </div>
         <div
           className="col-4"

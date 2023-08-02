@@ -69,6 +69,30 @@ export const getSiteWelcome = (state: RootState) => state.sites.site.welcome;
 export const isPublic = (state: RootState) => {
   return state.sites.site.share === SITE_PUBLIC;
 };
+
+export const getLogoFilename = (state: RootState) => {
+  if (state.sites.site.info === undefined || state.sites.site.info === "") {
+    return "";
+  }
+  const info = JSON.parse(state.sites.site.info);
+  return info?.logoFilename
+};
+export const getNavbarColor = (state: RootState) => {
+  if (state.sites.site.info === undefined || state.sites.site.info === "") {
+    return "";
+  }
+  const info = JSON.parse(state.sites.site.info);
+  return info?.navbarColor;
+};
+export const getFooterText = (state: RootState) => {
+  if (state.sites.site.info === undefined || state.sites.site.info === "") {
+    return "";
+  }
+  const info = JSON.parse(state.sites.site.info);
+  return info?.footerText;
+};
+
+
 export const fetchSite = () => async (dispatch: Dispatch<AnyAction>) => {
   try {
     dispatch(setSite({} as Site));

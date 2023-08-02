@@ -6,7 +6,12 @@ import HomeNavBar from "../components/HomeNavBar";
 export default function SiteNotFoundView() {
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={true} username={""} />
+      <HomeNavBar
+        isSitePublic={true}
+        username={""}
+        logoSrc={""}
+        navbarColor={""}
+      />
       <div
         style={{
           width: "100%",
@@ -21,7 +26,7 @@ export default function SiteNotFoundView() {
           address is correct.
         </p>
       </div>
-      <Footer />
+      <Footer footerText={""} />
     </div>
   );
 }

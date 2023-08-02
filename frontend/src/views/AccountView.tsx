@@ -9,16 +9,31 @@ import {
 } from "../slices/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
-import { isPublic } from "../slices/sitesSlice";
+import {
+  getFooterText,
+  getLogoFilename,
+  getNavbarColor,
+  getSiteId,
+  isPublic,
+} from "../slices/sitesSlice";
+import axios from "axios";
+
+import DefaultLogoSrc from "../components/DefaultLogo";
 
 export default function AccountView() {
   const dispatch = useDispatch();
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
+  const [logoSrc, setLogoSrc] = useState("loading");
+
   const username = useSelector(getUsername);
   const user = useSelector(getUserInfo);
   const isSitePublic = useSelector(isPublic);
+  const logoFilename = useSelector(getLogoFilename);
+  const siteId = useSelector(getSiteId);
+  const navbarColor = useSelector(getNavbarColor);
+  const footerText = useSelector(getFooterText);
 
   document.body.style.backgroundColor = "white";
 
@@ -26,9 +41,29 @@ export default function AccountView() {
     dispatch(fetchUserInfo());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (siteId !== undefined) {
+      if (logoFilename === "") {
+        setLogoSrc(DefaultLogoSrc);
+      } else {
+        axios
+          .get(`/api/v1/get-style/${siteId}/${logoFilename}`)
+          .then((response) => {
+            const { url } = response.data;
+            setLogoSrc(url);
+          });
+      }
+    }
+  }, [dispatch, logoFilename, siteId]);
+
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={isSitePublic} username={username} />
+      <HomeNavBar
+        isSitePublic={isSitePublic}
+        username={username}
+        logoSrc={logoSrc}
+        navbarColor={navbarColor}
+      />
 
       <div className="container">
         <div className="mx-auto" style={{ width: "700px" }}>
@@ -123,7 +158,7 @@ export default function AccountView() {
         </div>
       </div>
 
-      <Footer />
+      <Footer footerText={footerText} />
     </div>
   );
 }

@@ -1,12 +1,21 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchToken } from "../slices/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { isPublic } from "../slices/sitesSlice";
+import {
+  getFooterText,
+  getLogoFilename,
+  getNavbarColor,
+  getSiteId,
+  isPublic,
+} from "../slices/sitesSlice";
+import axios from "axios";
+
+import DefaultLogoSrc from "../components/DefaultLogo";
 
 type LocationState = {
   from: {
@@ -20,6 +29,11 @@ export default function LoginView() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isSitePublic = useSelector(isPublic);
+  const [logoSrc, setLogoSrc] = useState("loading");
+  const logoFilename = useSelector(getLogoFilename);
+  const siteId = useSelector(getSiteId);
+  const navbarColor = useSelector(getNavbarColor);
+  const footerText = useSelector(getFooterText);
 
   document.body.style.backgroundColor = "#f5f5f5";
 
@@ -31,9 +45,31 @@ export default function LoginView() {
     redirectPath = from.pathname;
   }
 
+  useEffect(() => {
+    if (siteId !== undefined) {
+      if (logoFilename === "") {
+        setLogoSrc(DefaultLogoSrc);
+      } else {
+        axios
+          .get(`/api/v1/get-style/${siteId}/${logoFilename}`)
+          .then((response) => {
+            const { url } = response.data;
+            setLogoSrc(url);
+          });
+      }
+    }
+  }, [dispatch, logoFilename, siteId]);
+
+  console.log({ logoFilename });
+
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={isSitePublic} username={""} />
+      <HomeNavBar
+        isSitePublic={isSitePublic}
+        username={""}
+        logoSrc={logoSrc}
+        navbarColor={navbarColor}
+      />
 
       <div className="div-signin text-center">
         <form
@@ -86,7 +122,7 @@ export default function LoginView() {
         </div>
       </div>
 
-      <Footer />
+      <Footer footerText={footerText} />
     </div>
   );
 }

@@ -6,7 +6,12 @@ import HomeNavBar from "../components/HomeNavBar";
 export default function SiteNotReadyView() {
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={true} username={""} />
+      <HomeNavBar
+        isSitePublic={true}
+        username={""}
+        logoSrc={""}
+        navbarColor={""}
+      />
       <div
         style={{
           width: "100%",
@@ -27,7 +32,7 @@ export default function SiteNotReadyView() {
           Refresh
         </button>
       </div>
-      <Footer />
+      <Footer footerText={""} />
     </div>
   );
 }

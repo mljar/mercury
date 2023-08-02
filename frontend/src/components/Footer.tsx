@@ -1,6 +1,10 @@
 import React from "react";
 
-export default function Footer() {
+type FooterProps = {
+  footerText: string;
+};
+
+export default function Footer({ footerText }: FooterProps) {
   return (
     <footer
       className="footer"
@@ -14,32 +18,42 @@ export default function Footer() {
         borderTop: "1px solid #e5e5e5",
       }}
     >
-      <div className="container">
-        <span className="text-muted" style={{ color: "gray" }}>
-          Mercury ©{" "}
-          <a
-            style={{ textDecoration: "none", color: "gray" }}
-            href="https://mljar.com"
-            target="_blank"
-            rel="noreferrer"
-          >
-            MLJAR
-          </a>
-        </span>
-        <span className="text-muted" style={{ float: "right" }}>
-          
-          <a
-            style={{ textDecoration: "none", color: "gray" }}
-            href="https://github.com/mljar/mercury"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Mercury
-          </a>
-          {" "}
-          <i className="fa fa-github" aria-hidden="true"></i>
-        </span>
-      </div>
+      {footerText === "" && (
+        <div className="container">
+          <span className="text-muted" style={{ color: "gray" }}>
+            Mercury ©{" "}
+            <a
+              style={{ textDecoration: "none", color: "gray" }}
+              href="https://mljar.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              MLJAR
+            </a>
+          </span>
+          <span className="text-muted" style={{ float: "right" }}>
+            <a
+              style={{ textDecoration: "none", color: "gray" }}
+              href="https://github.com/mljar/mercury"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Mercury
+            </a>{" "}
+            <i className="fa fa-github" aria-hidden="true"></i>
+          </span>
+        </div>
+      )}
+      {footerText !== "" && (
+        <div
+          className="container"
+          style={{ color: "gray", textAlign: "center" }}
+        >
+          <span className="text-muted" style={{ color: "gray" }}>
+            {footerText}
+          </span>
+        </div>
+      )}
     </footer>
   );
 }

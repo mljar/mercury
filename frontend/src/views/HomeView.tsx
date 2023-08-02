@@ -19,7 +19,17 @@ import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
 import { getToken, getUsername } from "../slices/authSlice";
-import { getSiteId, getSiteWelcome, isPublic } from "../slices/sitesSlice";
+import {
+  getFooterText,
+  getLogoFilename,
+  getNavbarColor,
+  getSiteId,
+  getSiteWelcome,
+  isPublic,
+} from "../slices/sitesSlice";
+import axios from "axios";
+
+import DefaultLogoSrc from "../components/DefaultLogo";
 
 export default function HomeView() {
   const dispatch = useDispatch();
@@ -32,6 +42,25 @@ export default function HomeView() {
   const siteId = useSelector(getSiteId);
   const isSitePublic = useSelector(isPublic);
   const siteWelcome = useSelector(getSiteWelcome);
+  const [logoSrc, setLogoSrc] = useState("loading");
+  const logoFilename = useSelector(getLogoFilename);
+  const navbarColor = useSelector(getNavbarColor);
+  const footerText = useSelector(getFooterText);
+
+  useEffect(() => {
+    if (siteId !== undefined) {
+      if (logoFilename === "") {
+        setLogoSrc(DefaultLogoSrc);
+      } else {
+        axios
+          .get(`/api/v1/get-style/${siteId}/${logoFilename}`)
+          .then((response) => {
+            const { url } = response.data;
+            setLogoSrc(url);
+          });
+      }
+    }
+  }, [dispatch, logoFilename, siteId]);
 
   useEffect(() => {
     if (siteId !== undefined) {
@@ -170,9 +199,16 @@ export default function HomeView() {
     welcomeMd = welcome;
   }
 
+  console.log({ logoSrc });
+
   return (
     <div className="App">
-      <HomeNavBar isSitePublic={isSitePublic} username={username} />
+      <HomeNavBar
+        isSitePublic={isSitePublic}
+        username={username}
+        logoSrc={logoSrc}
+        navbarColor={navbarColor}
+      />
       <div className="container" style={{ paddingBottom: "50px" }}>
         {welcomeMd === "" && (
           <h1 style={{ padding: "30px", textAlign: "center" }}>Welcome!</h1>
@@ -206,7 +242,7 @@ export default function HomeView() {
           {notebookItems}
         </div>
       </div>
-      <Footer />
+      <Footer footerText={footerText} />
     </div>
   );
 }
