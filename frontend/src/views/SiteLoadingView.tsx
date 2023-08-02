@@ -1,17 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
-import Footer from "../components/Footer";
-import HomeNavBar from "../components/HomeNavBar";
 
 export default function SiteLoadingView() {
   return (
     <div className="App">
-      <HomeNavBar
-        isSitePublic={true}
-        username={""}
-        logoSrc={""}
-        navbarColor={""}
-      />
       <div
         style={{
           width: "100%",
@@ -22,7 +14,6 @@ export default function SiteLoadingView() {
       >
         <p style={{ color: "gray" }}>Please wait. Loading site ...</p>
       </div>
-      <Footer footerText={""} />
     </div>
   );
 }

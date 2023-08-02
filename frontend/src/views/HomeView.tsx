@@ -199,8 +199,6 @@ export default function HomeView() {
     welcomeMd = welcome;
   }
 
-  console.log({ logoSrc });
-
   return (
     <div className="App">
       <HomeNavBar

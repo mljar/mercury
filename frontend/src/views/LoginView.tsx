@@ -60,8 +60,6 @@ export default function LoginView() {
     }
   }, [dispatch, logoFilename, siteId]);
 
-  console.log({ logoFilename });
-
   return (
     <div className="App">
       <HomeNavBar

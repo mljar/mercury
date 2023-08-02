@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { Link } from "react-router-dom";
-import DefaultLogo from "./DefaultLogo";
 import LoginButton from "./LoginButton";
 import UserButton from "./UserButton";
 
@@ -18,10 +17,7 @@ export default function NavBar({
   logoSrc,
   navbarColor,
 }: NavBarProps) {
-  console.log("======================just navbar");
-  console.log(logoSrc);
-  console.log(logoSrc === "");
-
+  
   let headerBgClass = "";
   let headerStyle = {};
   if (navbarColor === "") {
@@ -45,13 +41,6 @@ export default function NavBar({
             style={{ height: "28px", paddingLeft: "10px" }}
           />
         )}
-        {/* {logoSrc === "" && (
-          <img
-            alt="Mercury"
-            src={DefaultLogo}
-            style={{ height: "28px", paddingLeft: "10px" }}
-          />
-        )} */}
       </Link>
 
       {!isSitePublic && username === "" && <LoginButton />}

@@ -306,7 +306,8 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
           </div>
         </div>
       </BlockUi>
-      {displayEmbed && <MadeWithDiv />}
+      {/* dont show created with logo for embedded notebooks when we are using custom logo */}
+      {displayEmbed && logoSrc === DefaultLogoSrc && <MadeWithDiv />}
     </div>
   );
 }

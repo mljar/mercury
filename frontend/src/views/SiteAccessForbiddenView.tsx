@@ -1,18 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { Link } from "react-router-dom";
-import Footer from "../components/Footer";
-import HomeNavBar from "../components/HomeNavBar";
 
 export default function SiteAccessForbiddenView() {
   return (
     <div className="App">
-      <HomeNavBar
-        isSitePublic={true}
-        username={""}
-        logoSrc={""}
-        navbarColor={""}
-      />
       <div
         style={{
           width: "100%",
@@ -26,7 +18,6 @@ export default function SiteAccessForbiddenView() {
           Please <Link to="/login">login</Link> to access site.
         </p>
       </div>
-      <Footer footerText={""} />
     </div>
   );
 }

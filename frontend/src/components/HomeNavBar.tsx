@@ -16,10 +16,6 @@ export default function NavBar({
   logoSrc,
   navbarColor,
 }: NavBarProps) {
-  console.log("****************home navbar");
-  console.log({logoSrc, navbarColor});
-  console.log(logoSrc === "");
-
   let headerBgClass = "";
   let headerStyle = {};
   if (navbarColor === "") {
