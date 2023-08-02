@@ -8,12 +8,17 @@ from apps.workers.views import (
     WorkerGetNb,
     WorkerUpdateNb,
     MachineInfo,
+    WorkerGetOwnerAndUser,
 )
 
 workers_urlpatterns = [
     re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/nb",
         WorkerGetNb.as_view(),
+    ),
+    re_path(
+        "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/owner-and-user",
+        WorkerGetOwnerAndUser.as_view(),
     ),
     re_path(
         "api/v1/worker/(?P<session_id>.+)/(?P<worker_id>.+)/(?P<notebook_id>.+)/update-nb",

@@ -1,5 +1,5 @@
-from tkinter.tix import NoteBook
 from django.test import TestCase
+import requests
 
 from django.contrib.auth.models import User
 from apps.accounts.models import Site
@@ -116,3 +116,41 @@ class WorkerSessionTestCase(TestCase):
 
         self.assertEqual(prev_created_at, ws.created_at)
         self.assertNotEqual(prev_updated_at, ws.updated_at)
+
+# python manage.py test apps.workers.tests.WorkerGetUserInfoTestCase -v 2 
+class WorkerGetUserInfoTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="developer",
+            email="developer@example.com",
+            password="developer",
+        )
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, verified=True, primary=True
+        )
+        self.site = Site.objects.create(
+            title="Mercury",
+            slug="single-site",
+            share=Site.PUBLIC,
+            created_by=self.user,
+        )
+
+        self.nb = Notebook.objects.create(
+            title="some",
+            slug="some",
+            path="some",
+            created_by=self.user,
+            hosted_on=self.site,
+            file_updated_at=make_aware(datetime.now()),
+        )
+        
+
+    def test_get_user_info(self):
+        wrk = Worker.objects.create(
+            machine_id="some-id",
+            session_id="session-some-id",
+            notebook=self.nb
+        )
+        url = f"/api/v1/worker/{wrk.session_id}/{wrk.id}/{self.nb.id}/owner-and-user"
+        response = self.client.get(url)
+        self.assertTrue("plan" in response.data)

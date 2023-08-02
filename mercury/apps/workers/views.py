@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import timedelta
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from apps.workers.models import (
 from apps.workers.constants import WorkerState, MachineState, WorkerSessionState
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
+from apps.accounts.serializers import UserSerializer
 
 MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
@@ -39,6 +41,24 @@ class WorkerGetNb(APIView):
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+class WorkerGetOwnerAndUser(APIView):
+    authentication_classes = []
+
+    def get(self, request, session_id, worker_id, notebook_id, format=None):
+        try:
+            Worker.objects.get(
+                pk=worker_id, session_id=session_id, notebook__id=notebook_id
+            )
+            nb = Notebook.objects.get(pk=notebook_id)
+            
+            user_data = json.loads(nb.created_by.profile.info)
+
+            plan = user_data.get("plan", "starter")
+
+            return Response({"plan": plan})
+        except Exception:
+            pass
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 class WorkerUpdateNb(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):
