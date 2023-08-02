@@ -36,7 +36,7 @@ export default function NavBar({
       <Link className="navbar-brand col-md-3 col-lg-3 me-0 px-3" to="/">
         {logoSrc !== "" && logoSrc !== "loading" && (
           <img
-            alt="Mercury"
+            alt=""
             src={logoSrc}
             style={{ height: "28px", paddingLeft: "10px" }}
           />

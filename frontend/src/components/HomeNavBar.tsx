@@ -36,7 +36,7 @@ export default function NavBar({
         <div className="col-4 text-center">
           {logoSrc !== "" && logoSrc !== "loading" && (
             <a href="/">
-              <img alt="Mercury" src={logoSrc} style={{ height: "40px" }} />
+              <img alt="" src={logoSrc} style={{ height: "40px" }} />
             </a>
           )}
           {logoSrc === "loading" && (
