@@ -46,16 +46,30 @@ class WorkerGetOwnerAndUser(APIView):
 
     def get(self, request, session_id, worker_id, notebook_id, format=None):
         try:
-            Worker.objects.get(
+            wrk = Worker.objects.get(
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
             nb = Notebook.objects.get(pk=notebook_id)
             
-            user_data = json.loads(nb.created_by.profile.info)
+            owner = nb.created_by
+            user = wrk.run_by 
+            owner_info = json.loads(owner.profile.info)
+            plan = owner_info.get("plan", "starter")
 
-            plan = user_data.get("plan", "starter")
-
-            return Response({"plan": plan})
+            data = {
+                "owner": {
+                    "username": owner.username,
+                    "email": owner.email,
+                    "plan": owner_info.get("plan", "starter")
+                },
+                "user": {}
+            }
+            if user is not None:
+                data["user"] = {
+                    "username": user.username,
+                    "email": user.email
+                }
+            return Response(data)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)

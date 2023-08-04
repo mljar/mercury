@@ -21,7 +21,10 @@ class RESTClient:
         self.worker = None  # SimpleNamespace object
         self.state = WorkerState.Unknown
         self.notebook = None  # SimpleNamespace object
+        self.owner = None # SimpleNamespace object
+        self.user = None # SimpleNamespace object
         self.load_notebook()
+        self.load_owner_and_user()
 
     def load_notebook(self):
         try:
@@ -35,6 +38,21 @@ class RESTClient:
         except Exception:
             log.exception("Exception when notebook load, quit")
             sys.exit(0)
+
+    def load_owner_and_user(self):
+        try:
+            log.debug("Load owner and user")
+            response = requests.get(
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/owner-and-user"
+            )
+            if response.status_code != 200:
+                raise Exception("Cant load onwer and user information")
+            owner = response.json().get("owner", {})
+            user = response.json().get("user", {})
+            if owner: self.owner = SimpleNamespace(**owner)
+            if user: self.user = SimpleNamespace(**user)
+        except Exception:
+            log.exception("Exception when loading owner and user")
 
     def update_notebook(self, new_params):
         log.debug(f"Executed params {json.dumps(new_params, indent=4)}")

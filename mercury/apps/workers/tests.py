@@ -143,9 +143,17 @@ class WorkerGetUserInfoTestCase(TestCase):
             hosted_on=self.site,
             file_updated_at=make_aware(datetime.now()),
         )
-        
 
-    def test_get_user_info(self):
+        self.user2 = User.objects.create_user(
+            username="developer2",
+            email="developer2@example.com",
+            password="developer2",
+        )
+        EmailAddress.objects.create(
+            user=self.user2, email=self.user2.email, verified=True, primary=True
+        )        
+
+    def test_get_owner(self):
         wrk = Worker.objects.create(
             machine_id="some-id",
             session_id="session-some-id",
@@ -153,4 +161,25 @@ class WorkerGetUserInfoTestCase(TestCase):
         )
         url = f"/api/v1/worker/{wrk.session_id}/{wrk.id}/{self.nb.id}/owner-and-user"
         response = self.client.get(url)
-        self.assertTrue("plan" in response.data)
+
+        self.assertTrue("owner" in response.data)
+        self.assertTrue("username" in response.data["owner"])
+        self.assertTrue("email" in response.data["owner"])
+        self.assertTrue("plan" in response.data["owner"])
+        # there should be user information but it should be empty dict
+        self.assertTrue("user" in response.data)
+        self.assertTrue(not response.data["user"]) # empty dict = user not logged
+
+    def test_get_user(self):
+        wrk = Worker.objects.create(
+            machine_id="some-id",
+            session_id="session-some-id",
+            notebook=self.nb,
+            run_by=self.user2
+        )
+        url = f"/api/v1/worker/{wrk.session_id}/{wrk.id}/{self.nb.id}/owner-and-user"
+        response = self.client.get(url)
+
+        self.assertTrue("user" in response.data)
+        self.assertTrue("username" in response.data["user"])
+        self.assertTrue("email" in response.data["user"])

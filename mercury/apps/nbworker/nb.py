@@ -15,6 +15,7 @@ from apps.nbworker.utils import Purpose, stop_event
 from apps.nbworker.ws import WSClient
 from apps.workers.constants import WorkerState
 from apps.ws.utils import parse_params
+from apps.accounts.views.utils import get_idle_time, get_max_run_time
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -30,12 +31,8 @@ class NBWorker(WSClient):
         self.prev_update_time = None
         self.prev_md5 = None
         self.start_time = time.time()
-        self.max_idle_time = int(
-            os.environ.get("MAX_IDLE_TIME", 12 * 60 * 60)
-        )  # default idle after 12 hours
-        self.max_run_time = int(
-            os.environ.get("MAX_RUN_TIME", 24 * 60 * 60)
-        )  # default max run time is 24 hours
+        self.max_idle_time = get_idle_time(self.owner)
+        self.max_run_time = get_max_run_time(self.owner)
         self.last_execution_time = time.time()
         self.start_time = time.time()
 

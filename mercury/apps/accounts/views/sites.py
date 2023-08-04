@@ -12,13 +12,16 @@ from rest_framework.serializers import ValidationError
 from apps.accounts.models import Membership, Site
 from apps.accounts.serializers import SiteSerializer
 from apps.accounts.tasks import task_init_site
-from apps.accounts.views.utils import get_slug, is_cloud_version
-from apps.accounts.views.permissions import HasEditRights
+from apps.accounts.views.utils import (
+    get_slug, 
+    is_cloud_version,
+    PLAN_KEY,
+    PLAN_STARTER,
+    PLAN_PRO,
+    PLAN_BUSINESS
+)
 
-PLAN_KEY = "plan"
-PLAN_STARTER = "starter"
-PLAN_PRO = "pro"
-PLAN_BUSINESS = "business"
+from apps.accounts.views.permissions import HasEditRights
 
 FORBIDDEN_SLUGS = [
     "mercury",
