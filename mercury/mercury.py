@@ -44,6 +44,7 @@ from widgets.confetti import Confetti
 from widgets.chat import Chat
 from widgets.numberbox import NumberBox
 from widgets.in_mercury import in_mercury
+from widgets.user import user
 
 def print_version():
     try:

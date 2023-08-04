@@ -54,6 +54,12 @@ class RESTClient:
         except Exception:
             log.exception("Exception when loading owner and user")
 
+    def get_user_info(self):
+        print(self.user)
+        if self.user is None:
+            return None
+        return json.dumps(self.user.__dict__)
+
     def update_notebook(self, new_params):
         log.debug(f"Executed params {json.dumps(new_params, indent=4)}")
 

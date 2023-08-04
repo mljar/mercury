@@ -25,6 +25,7 @@ class NbRun:
         is_presentation=False,
         reveal_theme="white",
         stop_on_error=False,
+        user_info=None
     ):
         self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
         self.shell = CaptureShell()
@@ -32,8 +33,10 @@ class NbRun:
             self.shell.enable_matplotlib("inline")
         except Exception as e:
             pass
-        self.shell.run("from mercury import WidgetsManager")
-        self.shell.run("import os\nos.environ['RUN_MERCURY']='1'")
+        init_code = "from mercury import WidgetsManager\nimport os\nos.environ['RUN_MERCURY']='1'\n"
+        if user_info is not None:
+            init_code += f"os.environ['MERCURY_USER_INFO']='{user_info}'"
+        self.shell.run(init_code)
         self.stop_on_error = stop_on_error
 
     def set_stop_on_error(self, new_stop_on_error):

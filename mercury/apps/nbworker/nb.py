@@ -314,6 +314,7 @@ class NBWorker(WSClient):
             is_presentation=self.is_presentation(),
             reveal_theme=self.reveal_theme(),
             stop_on_error=self.stop_on_error(),
+            user_info=self.get_user_info(),
         )
 
         self.install_new_packages()
