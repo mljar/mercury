@@ -51,20 +51,27 @@ def pro_upload_allowed(user, site_id, filesize):
 
 class StyleUrlPut(APIView):
     def get(self, request, site_id, filename, filesize, format=None):
-        site = get_site(request.user, site_id)
-        if site is None:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            if not is_cloud_version():
+                return Response({})
+            site = get_site(request.user, site_id)
+            if site is None:
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
-        upload_allowed = pro_upload_allowed(request.user, site_id, filesize)
-        if not upload_allowed:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            upload_allowed = pro_upload_allowed(request.user, site_id, filesize)
+            if not upload_allowed:
+                return Response(status=status.HTTP_403_FORBIDDEN)
 
-        s3 = S3()
-        url = s3.get_presigned_url(
-            get_bucket_key(site, request.user, filename.replace(" ", "-")),
-            "put_object",
-        )
-        return Response({"url": url})
+            s3 = S3()
+            url = s3.get_presigned_url(
+                get_bucket_key(site, request.user, filename.replace(" ", "-")),
+                "put_object",
+            )
+            return Response({"url": url})
+        except Exception as e:
+            log.exception("Cant create presigned PUT url for style files")
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 class StyleUrlGet(APIView):
@@ -76,6 +83,9 @@ class StyleUrlGet(APIView):
         format=None,
     ):
         try:
+            if not is_cloud_version():
+                return Response({})
+        
             sites = Site.objects.filter(pk=site_id)
             if not sites:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -108,6 +118,6 @@ class StyleUrlGet(APIView):
             return Response({"url": url})
 
         except Exception as e:
-            log.exception("Cant create presigned url for style files")
+            log.exception("Cant GET presigned url for style files")
 
         return Response(status=status.HTTP_403_FORBIDDEN)

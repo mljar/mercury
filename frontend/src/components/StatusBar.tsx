@@ -122,7 +122,7 @@ export default function StatusBar({
           <div
             className="dropdown mx-2 btn-group"
             style={{
-              display: "inline",
+              //display: "inline",
               // width: "47%",
               // float: continuousUpdate ? "left" : "right",
             }}

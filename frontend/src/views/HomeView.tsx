@@ -48,6 +48,7 @@ export default function HomeView() {
   const footerText = useSelector(getFooterText);
 
   useEffect(() => {
+    console.log({logoFilename})
     if (siteId !== undefined) {
       if (logoFilename === "") {
         setLogoSrc(DefaultLogoSrc);

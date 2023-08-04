@@ -75,6 +75,9 @@ export const getLogoFilename = (state: RootState) => {
     return "";
   }
   const info = JSON.parse(state.sites.site.info);
+  if(info?.logoFilename === undefined) {
+    return "";
+  }
   return info?.logoFilename
 };
 export const getNavbarColor = (state: RootState) => {
@@ -82,6 +85,9 @@ export const getNavbarColor = (state: RootState) => {
     return "";
   }
   const info = JSON.parse(state.sites.site.info);
+  if(info?.navbarColor === undefined) {
+    return "";
+  }
   return info?.navbarColor;
 };
 export const getFooterText = (state: RootState) => {
@@ -89,6 +95,9 @@ export const getFooterText = (state: RootState) => {
     return "";
   }
   const info = JSON.parse(state.sites.site.info);
+  if(info?.footerText === undefined) {
+    return "";
+  }
   return info?.footerText;
 };
 
