@@ -58,13 +58,13 @@ class StyleUrlPut(APIView):
             if site is None:
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
-            upload_allowed = pro_upload_allowed(request.user, site_id, filesize)
+            upload_allowed = pro_upload_allowed(site.created_by, site_id, filesize)
             if not upload_allowed:
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
             s3 = S3()
             url = s3.get_presigned_url(
-                get_bucket_key(site, request.user, filename.replace(" ", "-")),
+                get_bucket_key(site, site.created_by, filename.replace(" ", "-")),
                 "put_object",
             )
             return Response({"url": url})
@@ -111,7 +111,7 @@ class StyleUrlGet(APIView):
 
             s3 = S3()
             url = s3.get_presigned_url(
-                get_bucket_key(site, request.user, filename.replace(" ", "-")),
+                get_bucket_key(site, site.created_by, filename.replace(" ", "-")),
                 "get_object",
             )
 
