@@ -5,11 +5,12 @@ import sys
 import uuid
 
 import requests
-from django.conf import settings
 
 from apps.nbworker.utils import stop_event
 from apps.storage.utils import get_worker_bucket_key
 from apps.tasks.export_pdf import to_pdf
+from apps.storage.utils import STORAGE, STORAGE_MEDIA, STORAGE_S3, MEDIA_ROOT, MEDIA_URL
+
 
 log = logging.getLogger(__name__)
 
@@ -20,8 +21,8 @@ class StorageManager:
         self.worker_id = worker_id
         self.notebook_id = notebook_id
         self.server_url = os.environ.get("MERCURY_SERVER_URL", "http://127.0.0.1:8000")
-        if settings.STORAGE not in [settings.STORAGE_MEDIA, settings.STORAGE_S3]:
-            log.error(f"{settings.STORAGE} not implemented")
+        if STORAGE not in [STORAGE_MEDIA, STORAGE_S3]:
+            log.error(f"{STORAGE} not implemented")
             stop_event.set()
             sys.exit(1)
 
@@ -36,9 +37,9 @@ class StorageManager:
 
     def provision_uploaded_files(self):
         log.debug(f"Provision uploaded files")
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             pass
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             # get links
             url = f"{self.server_url}/api/v1/worker/uploaded-files-urls/{self.session_id}/{self.worker_id}/{self.notebook_id}"
             response = requests.get(url)
@@ -71,34 +72,34 @@ class StorageManager:
                 raise Exception(f"Cant delete {dir_path}")
 
     def worker_output_dir(self):
-        if settings.STORAGE == settings.STORAGE_MEDIA:
-            first_dir = os.path.join(str(settings.MEDIA_ROOT), self.session_id)
+        if STORAGE == STORAGE_MEDIA:
+            first_dir = os.path.join(str(MEDIA_ROOT), self.session_id)
             StorageManager.create_dir(first_dir)
             output_dir = os.path.join(
-                str(settings.MEDIA_ROOT), self.session_id, f"output_{self.worker_id}"
+                str(MEDIA_ROOT), self.session_id, f"output_{self.worker_id}"
             )
             StorageManager.create_dir(output_dir)
             log.debug(f"Worker output directory: {output_dir}")
             return output_dir
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
             StorageManager.create_dir(output_dir)
             return output_dir
 
     def delete_worker_output_dir(self):
-        if settings.STORAGE == settings.STORAGE_MEDIA:
-            first_dir = os.path.join(str(settings.MEDIA_ROOT), self.session_id)
+        if STORAGE == STORAGE_MEDIA:
+            first_dir = os.path.join(str(MEDIA_ROOT), self.session_id)
             log.debug(f"Delete Worker output directory: {first_dir}")
             StorageManager.delete_dir(first_dir)
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
             StorageManager.delete_dir(output_dir)
 
     def sync_output_dir(self):
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             # nothing to do
             pass
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             # list all files in directory
             local_files = []
             output_dir = self.worker_output_dir()
@@ -137,14 +138,14 @@ class StorageManager:
 
     def list_worker_files_urls(self):
         files_urls = []
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             output_dir = self.worker_output_dir()
             for f in os.listdir(output_dir):
                 if os.path.isfile(os.path.join(output_dir, f)):
                     files_urls += [
-                        f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{f}"
+                        f"{MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{f}"
                     ]
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             pass
 
         return files_urls
@@ -162,12 +163,12 @@ class StorageManager:
         html_path, url = None, None
         fname = f"download-notebook-{self.some_hash()}.html"
 
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             html_path = os.path.join(self.worker_output_dir(), fname)
             with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(nb_html_body)
-            html_url = f"{settings.MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
-        elif settings.STORAGE == settings.STORAGE_S3:
+            html_url = f"{MEDIA_URL}/{self.session_id}/output_{self.worker_id}/{fname}"
+        elif STORAGE == STORAGE_S3:
             # 1.
             # get upload link
             action = "put_object"
@@ -193,7 +194,7 @@ class StorageManager:
     def save_nb_pdf(self, nb_html_body, is_presentation):
         pdf_path, pdf_url = None, None
         fname = f"download-notebook-{self.some_hash()}.pdf"
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             # save HTML
             html_path, html_url = self.save_nb_html(nb_html_body)
 
@@ -206,7 +207,7 @@ class StorageManager:
             log.debug(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             # 0. first lets create HTML file
             html_fname = fname.replace(".pdf", ".html")
             html_path = os.path.abspath(
@@ -252,7 +253,7 @@ class StorageManager:
 
     def get_user_uploaded_file(self, value):
         log.debug("get user uploaded file " * 33)
-        if settings.STORAGE == settings.STORAGE_MEDIA:
+        if STORAGE == STORAGE_MEDIA:
             log.debug(f"Get file {value[0]} from id={value[1]}")
             import django
 
@@ -263,7 +264,7 @@ class StorageManager:
             value[1] = tu.get_file_path()
             value[1] = value[1].replace("\\", "\\\\")
             log.debug(f"File path is {value[1]}")
-        elif settings.STORAGE == settings.STORAGE_S3:
+        elif STORAGE == STORAGE_S3:
             # get link
 
             url = f"{self.server_url}/api/v1/worker/user-uploaded-file/{self.session_id}/{self.worker_id}/{self.notebook_id}/{value[0]}"
