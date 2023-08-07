@@ -23,7 +23,11 @@ def is_cloud_version():
 def get_idle_time(owner):
     if not is_cloud_version():
         return 24 * 60 * 60
-    plan = owner.get(PLAN_KEY, PLAN_STARTER)
+    plan = PLAN_STARTER
+    try:
+        plan = owner.plan 
+    except Exception as e:
+        pass
     return IDLE_TIME.get(plan, 5 * 60)
 
 
