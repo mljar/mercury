@@ -25,7 +25,7 @@ class NbRun:
         is_presentation=False,
         reveal_theme="white",
         stop_on_error=False,
-        user_info=None
+        user_info=None,
     ):
         self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
         self.shell = CaptureShell()

@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv(".env")
 load_dotenv("../.env")
 
@@ -15,6 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MEDIA_ROOT = str(BASE_DIR / "media")
 MEDIA_URL = "/media/"
+
 
 def get_bucket_key(site, user, filename):
     return f"site-{site.id}/user-{user.id}/{filename}"

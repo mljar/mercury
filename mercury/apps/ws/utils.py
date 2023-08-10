@@ -51,7 +51,9 @@ def worker_group(notebook_id, session_id):
 def is_presentation(nb):
     for cell in nb["cells"]:
         if "slideshow" in cell.get("metadata", {}):
-            return True
+            if "slide_type" in cell.get("metadata").get("slideshow", {}):
+                if cell.get("metadata").get("slideshow").get("slide_type") == "slide":
+                    return True
     return False
 
 

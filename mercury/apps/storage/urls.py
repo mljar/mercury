@@ -19,10 +19,7 @@ from apps.storage.views.notebookfiles import (
     NbDeleteFile,
     WorkerGetNbFileUrl,
 )
-from apps.storage.views.stylefiles import (
-    StyleUrlPut,
-    StyleUrlGet
-)
+from apps.storage.views.stylefiles import StyleUrlPut, StyleUrlGet
 
 
 storage_urlpatterns = [

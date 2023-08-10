@@ -25,7 +25,7 @@ from apps.notebooks.models import Notebook
 from apps.storage.s3utils import S3
 from apps.tasks.models import Task
 from apps.tasks.notify import validate_notify
-from apps.ws.utils import parse_params
+from apps.ws.utils import parse_params, is_presentation
 
 # from apps.tasks.export_png import to_png
 
@@ -83,13 +83,6 @@ def nb_default_title(nb_path):
         log.exception("Problem when get default title from notebook")
 
     return "Please provide title"
-
-
-def is_presentation(nb):
-    for cell in nb.cells:
-        if "slideshow" in cell.get("metadata", {}):
-            return True
-    return False
 
 
 def make_unique(slug):

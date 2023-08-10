@@ -33,12 +33,11 @@ from apps.storage.views.dashboardfiles import get_site
 log = logging.getLogger(__name__)
 
 
-
 def pro_upload_allowed(user, site_id, filesize):
     if not is_cloud_version():
         return True
 
-    if int(filesize) / 1024 / 1024 > 5: # 5 MB file limit
+    if int(filesize) / 1024 / 1024 > 5:  # 5 MB file limit
         return False
 
     plan = get_plan(user)
@@ -85,7 +84,7 @@ class StyleUrlGet(APIView):
         try:
             if not is_cloud_version():
                 return Response({})
-        
+
             sites = Site.objects.filter(pk=site_id)
             if not sites:
                 return Response(status=status.HTTP_404_NOT_FOUND)

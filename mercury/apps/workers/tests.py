@@ -117,7 +117,8 @@ class WorkerSessionTestCase(TestCase):
         self.assertEqual(prev_created_at, ws.created_at)
         self.assertNotEqual(prev_updated_at, ws.updated_at)
 
-# python manage.py test apps.workers.tests.WorkerGetUserInfoTestCase -v 2 
+
+# python manage.py test apps.workers.tests.WorkerGetUserInfoTestCase -v 2
 class WorkerGetUserInfoTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -151,13 +152,11 @@ class WorkerGetUserInfoTestCase(TestCase):
         )
         EmailAddress.objects.create(
             user=self.user2, email=self.user2.email, verified=True, primary=True
-        )        
+        )
 
     def test_get_owner(self):
         wrk = Worker.objects.create(
-            machine_id="some-id",
-            session_id="session-some-id",
-            notebook=self.nb
+            machine_id="some-id", session_id="session-some-id", notebook=self.nb
         )
         url = f"/api/v1/worker/{wrk.session_id}/{wrk.id}/{self.nb.id}/owner-and-user"
         response = self.client.get(url)
@@ -168,14 +167,14 @@ class WorkerGetUserInfoTestCase(TestCase):
         self.assertTrue("plan" in response.data["owner"])
         # there should be user information but it should be empty dict
         self.assertTrue("user" in response.data)
-        self.assertTrue(not response.data["user"]) # empty dict = user not logged
+        self.assertTrue(not response.data["user"])  # empty dict = user not logged
 
     def test_get_user(self):
         wrk = Worker.objects.create(
             machine_id="some-id",
             session_id="session-some-id",
             notebook=self.nb,
-            run_by=self.user2
+            run_by=self.user2,
         )
         url = f"/api/v1/worker/{wrk.session_id}/{wrk.id}/{self.nb.id}/owner-and-user"
         response = self.client.get(url)

@@ -41,6 +41,7 @@ class WorkerGetNb(APIView):
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
 class WorkerGetOwnerAndUser(APIView):
     authentication_classes = []
 
@@ -50,9 +51,9 @@ class WorkerGetOwnerAndUser(APIView):
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
             nb = Notebook.objects.get(pk=notebook_id)
-            
+
             owner = nb.created_by
-            user = wrk.run_by 
+            user = wrk.run_by
             owner_info = json.loads(owner.profile.info)
             plan = owner_info.get("plan", "starter")
 
@@ -60,19 +61,17 @@ class WorkerGetOwnerAndUser(APIView):
                 "owner": {
                     "username": owner.username,
                     "email": owner.email,
-                    "plan": owner_info.get("plan", "starter")
+                    "plan": owner_info.get("plan", "starter"),
                 },
-                "user": {}
+                "user": {},
             }
             if user is not None:
-                data["user"] = {
-                    "username": user.username,
-                    "email": user.email
-                }
+                data["user"] = {"username": user.username, "email": user.email}
             return Response(data)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class WorkerUpdateNb(APIView):
     def post(self, request, session_id, worker_id, notebook_id, format=None):

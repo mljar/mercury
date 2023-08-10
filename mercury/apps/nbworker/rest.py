@@ -21,8 +21,8 @@ class RESTClient:
         self.worker = None  # SimpleNamespace object
         self.state = WorkerState.Unknown
         self.notebook = None  # SimpleNamespace object
-        self.owner = None # SimpleNamespace object
-        self.user = None # SimpleNamespace object
+        self.owner = None  # SimpleNamespace object
+        self.user = None  # SimpleNamespace object
         self.load_notebook()
         self.load_owner_and_user()
 
@@ -49,8 +49,10 @@ class RESTClient:
                 raise Exception("Cant load onwer and user information")
             owner = response.json().get("owner", {})
             user = response.json().get("user", {})
-            if owner: self.owner = SimpleNamespace(**owner)
-            if user: self.user = SimpleNamespace(**user)
+            if owner:
+                self.owner = SimpleNamespace(**owner)
+            if user:
+                self.user = SimpleNamespace(**user)
         except Exception:
             log.exception("Exception when loading owner and user")
 
