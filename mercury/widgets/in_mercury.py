@@ -15,6 +15,7 @@
 
 import os
 
+
 def in_mercury():
     """Returns True if running notebook as web app in Mercury Server"""
     return os.environ.get("RUN_MERCURY", "") == "1"

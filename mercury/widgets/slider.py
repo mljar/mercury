@@ -5,6 +5,7 @@ from IPython.display import display
 
 from .manager import WidgetException, WidgetsManager
 
+
 def get_number_format(step):
     number_format = ".2f"
     if "." in str(step):
@@ -13,6 +14,7 @@ def get_number_format(step):
         except Exception as e:
             pass
     return number_format
+
 
 class Slider:
     def __init__(
@@ -62,7 +64,7 @@ class Slider:
                 step=step,
                 style={"description_width": "initial"},
                 disabled=disabled,
-                readout_format=number_format
+                readout_format=number_format,
             )
             WidgetsManager.add_widget(self.slider.model_id, self.code_uid, self.slider)
         display(self)

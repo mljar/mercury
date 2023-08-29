@@ -14,9 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import json 
+import json
+
 
 def user():
     data = os.environ.get("MERCURY_USER_INFO", "{}")
     return json.loads(data)
-

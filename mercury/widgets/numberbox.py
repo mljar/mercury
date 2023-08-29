@@ -54,7 +54,7 @@ class NumberBox:
                 if isinstance(b, NumberBox):
                     # we dont set position for last item
                     # because we dont need to add margin for it
-                    if i != len(self.data)-1:
+                    if i != len(self.data) - 1:
                         b.position = i
                     bloxs += b._repr_html_()
 

@@ -6,6 +6,7 @@ from IPython.display import display
 from .manager import WidgetException, WidgetsManager
 from .slider import get_number_format
 
+
 class Range:
     def __init__(
         self,
@@ -58,7 +59,7 @@ class Range:
                 step=step,
                 style={"description_width": "initial"},
                 disabled=disabled,
-                readout_format=number_format
+                readout_format=number_format,
             )
             WidgetsManager.add_widget(self.range.model_id, self.code_uid, self.range)
         display(self)

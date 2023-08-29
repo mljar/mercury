@@ -45,6 +45,7 @@ from widgets.chat import Chat
 from widgets.numberbox import NumberBox
 from widgets.in_mercury import in_mercury
 from widgets.user import user
+from widgets.pdf import PDF
 
 def print_version():
     try:
