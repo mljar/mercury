@@ -37,7 +37,11 @@ class NBWorker(WSClient):
         self.start_time = time.time()
 
         # monitor notebook file updates if running locally
-        if "127.0.0.1" in ws_address:
+        if (
+            "127.0.0.1" in ws_address
+            and os.environ.get("MERCURY_DISABLE_AUTO_RELOAD", "NO") != "YES"
+        ):
+            print("reloading is on!")
             threading.Thread(target=self.nb_file_watch, daemon=True).start()
         threading.Thread(target=self.process_msgs, daemon=True).start()
         self.ws.run_forever(ping_interval=10, ping_timeout=5)

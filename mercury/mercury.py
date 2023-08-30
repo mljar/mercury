@@ -47,17 +47,21 @@ from widgets.in_mercury import in_mercury
 from widgets.user import user
 from widgets.pdf import PDF
 
+
 def print_version():
     try:
         mercury_version = ""
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "__init__.py")) as fin:
+        with open(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "__init__.py")
+        ) as fin:
             for l in fin.readlines():
                 if l.startswith("__version__"):
-                    mercury_version = l.split("\"")[1]
+                    mercury_version = l.split('"')[1]
         if mercury_version:
             print(f"Version: {mercury_version}")
     except Exception:
         pass
+
 
 def main():
     """Run administrative tasks."""
@@ -105,10 +109,18 @@ def main():
         print(logo)
         print_version()
 
+        if "--disable-auto-reload" in sys.argv:
+            sys.argv.remove("--disable-auto-reload")
+            # disable automatic reloading of notebooks after file change
+            # when running Mercury locally
+            os.environ["MERCURY_DISABLE_AUTO_RELOAD"] = "YES"
+
         if "dry" in sys.argv:
             import django
+
             django.setup()
             import apps.workers.utils
+
             sys.exit(1)
 
         if "clear" in sys.argv:
@@ -197,7 +209,7 @@ def main():
                 "1",
                 "-E",
                 "-Q",
-                "celery,ws"
+                "celery,ws",
             ]
             if VERBOSE == 0:
                 worker = subprocess.Popen(
@@ -241,7 +253,7 @@ def main():
                 for i in sys.argv:
                     if "0.0.0.0" in i:
                         running_local = False
-                        
+
                 if running_local:
                     # open web browser if we are running a server
                     url = "http://127.0.0.1:8000"
