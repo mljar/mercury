@@ -34,16 +34,18 @@ app.conf.task_routes = {
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     try:
-        sender.add_periodic_task(
-                crontab(
-                    minute="*",
-                    hour="*",
-                    day_of_month="*",
-                    month_of_year="*",
-                    day_of_week="*",
-                ),
-                scale_down_task.s(),
-            )
+        # add scale down task only in cloud env
+        if os.environ.get("MERCURY_CLOUD", "0") == "1":
+            sender.add_periodic_task(
+                    crontab(
+                        minute="*",
+                        hour="*",
+                        day_of_month="*",
+                        month_of_year="*",
+                        day_of_week="*",
+                    ),
+                    scale_down_task.s(),
+                )
 
         # from apps.notebooks.models import Notebook
 
