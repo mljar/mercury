@@ -26,7 +26,7 @@ services:
             - static_volume:/app/mercury/django_static
             - media_volume:/app/mercury/media
         expose:
-            - 8000    
+            - 9000    
         environment:
             DEBUG: ${DEBUG}
             SERVE_STATIC: ${SERVE_STATIC}

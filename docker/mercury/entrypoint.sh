@@ -34,7 +34,7 @@ celery -A server worker --loglevel=info -P gevent --concurrency 4 -E -Q celery,w
 
 celery -A server beat --loglevel=error --max-interval 60 &
 
-daphne server.asgi:application --bind 0.0.0.0 --port 8000
+daphne server.asgi:application --bind 0.0.0.0 --port 9000
 
 #gunicorn server.wsgi --bind 0.0.0.0:8000 --workers 4 --threads 4
 
