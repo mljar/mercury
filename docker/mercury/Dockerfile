@@ -11,7 +11,7 @@ RUN apt-get update && \
             libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 \ 
             lsb-release xdg-utils wget libcairo-gobject2 libxinerama1 libgtk2.0-0 libpangoft2-1.0-0 libthai0 libpixman-1-0 \ 
             libxcb-render0 libharfbuzz0b libdatrie1 libgraphite2-3 libgbm1 \
-            libpq-dev
+            libpq-dev libarchive13 
 
 # Install Miniconda using official installer script
 RUN wget -qO /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -24,7 +24,7 @@ WORKDIR /app
 ADD ./mercury/requirements.txt /app/mercury/
 
 RUN conda install --yes mamba -c conda-forge
-RUN mamba install --yes --file mercury/requirements.txt -c conda-forge
+RUN mamba install --yes python=3.8 --file mercury/requirements.txt -c conda-forge
 RUN mamba install --yes gunicorn psycopg2 daphne -c conda-forge
 RUN mamba install --yes mercury -c conda-forge
 
