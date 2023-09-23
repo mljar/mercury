@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
+import { Link } from "react-router-dom";
 import LoginButton from "./LoginButton";
 import UserButton from "./UserButton";
 
@@ -35,14 +36,14 @@ export default function NavBar({
         <div className="col-4"></div>
         <div className="col-4 text-center">
           {logoSrc !== "" && logoSrc !== "loading" && (
-            <a href="/">
+            <Link to="/">
               <img alt="" src={logoSrc} style={{ height: "40px" }} />
-            </a>
+            </Link>
           )}
           {logoSrc === "loading" && (
-            <a href="/">
+            <Link to="/">
               <div style={{ height: "40px" }} />
-            </a>
+            </Link>
           )}
         </div>
         <div

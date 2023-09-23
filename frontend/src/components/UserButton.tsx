@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../slices/authSlice";
 
 type UserButtonProps = {
@@ -31,20 +31,21 @@ export default function UserButton({ username }: UserButtonProps) {
           aria-labelledby="dropdownMenuLink"
         >
           <li>
-            <a className="dropdown-item" href="/account">
+            <Link className="dropdown-item" to="/account">
               <i className="fa fa-user" aria-hidden="true"></i> Account
-            </a>
+            </Link>
           </li>
           <li>
             <hr className="dropdown-divider" />
           </li>
           <li>
-            <a
+            <Link
+              to={"/"}
               className="dropdown-item"
               onClick={() => dispatch(logout(navigate))}
             >
               <i className="fa fa-sign-out" aria-hidden="true"></i> Log out
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

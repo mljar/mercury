@@ -30,6 +30,7 @@ import {
 import axios from "axios";
 
 import DefaultLogoSrc from "../components/DefaultLogo";
+import { Link } from "react-router-dom";
 
 export default function HomeView() {
   const dispatch = useDispatch();
@@ -140,8 +141,8 @@ export default function HomeView() {
               src={`${notebook.default_view_path.replace(".html", ".png")}`}
             ></img> */}
           </div>
-          <a
-            href={`/app/${notebook.slug}`}
+          <Link
+            to={`/app/${notebook.slug}`}
             style={{ textDecoration: "none", color: "black" }}
             className="title-card"
             onMouseEnter={() => {
@@ -150,6 +151,7 @@ export default function HomeView() {
             onMouseLeave={() => {
               setShowButton("");
             }}
+            reloadDocument
           >
             <div
               className="card-body"
@@ -163,10 +165,6 @@ export default function HomeView() {
               <p className="card-text">
                 {firstLetters(notebook.params.description, 100)}
               </p>
-
-              {/* <a href={`/app/${notebook.id}`} className="btn btn-primary">
-              Open <i className="fa fa-arrow-right" aria-hidden="true"></i>
-            </a> */}
             </div>
             {showButton === notebook.slug && (
               <button
@@ -187,7 +185,7 @@ export default function HomeView() {
                 <i className="fa fa-chevron-right" aria-hidden="true" />
               </button>
             )}
-          </a>
+          </Link>
         </div>
       </div>
     );

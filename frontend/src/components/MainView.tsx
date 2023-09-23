@@ -9,6 +9,7 @@ import { getNotebookSrc, setNotebookSrc } from "../slices/wsSlice";
 
 import InnerHTML from "dangerously-set-html-content";
 import { getSelectedNotebook } from "../slices/notebooksSlice";
+import { Link } from "react-router-dom";
 
 type MainViewProps = {
   appView: string;
@@ -169,9 +170,9 @@ export default function MainView({
           {loadingState === "error" && username === "" && (
             <p style={{ margin: "20px" }}>
               <h5>Please log in to see the notebook</h5>
-              <a href="/login" className="btn btn-primary btn-sm ">
+              <Link to="/login" className="btn btn-primary btn-sm" reloadDocument>
                 <i className="fa fa-sign-in" aria-hidden="true"></i> Log in
-              </a>
+              </Link>
             </p>
           )}
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 type ProFeatureProps = {
   featureName: string;
@@ -25,9 +26,9 @@ export default function ProFeatureAlert({ featureName }: ProFeatureProps) {
         <br />
         <br />
         <br />
-        <a href="/">
+        <Link to="/">
           <i className="fa fa-home" aria-hidden="true" /> Back to home
-        </a>
+        </Link>
       </div>
     </div>
   );
