@@ -24,7 +24,7 @@ export default function Footer({ footerText }: FooterProps) {
             {" "}
             <a
               style={{ textDecoration: "none", color: "gray" }}
-              
+              href="https://runmercury.com"
               target="_blank"
               rel="noreferrer"
             >
