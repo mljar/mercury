@@ -21,14 +21,14 @@ export default function Footer({ footerText }: FooterProps) {
       {footerText === "" && (
         <div className="container">
           <span className="text-muted" style={{ color: "gray" }}>
-            Mercury ©{" "}
+            {" "}
             <a
               style={{ textDecoration: "none", color: "gray" }}
-              href="https://mljar.com"
+              href="https://runmercury.com"
               target="_blank"
               rel="noreferrer"
             >
-              MLJAR
+              Powered by Mercury
             </a>
           </span>
           <span className="text-muted" style={{ float: "right" }}>
