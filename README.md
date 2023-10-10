@@ -62,6 +62,7 @@ Mercury provides multiple widgets. There are 3 types of widgets:
     alt="Mercury convert Jupyter Notebook to Web App"
     src="https://raw.githubusercontent.com/mljar/visual-identity/main/mercury/readme/widgets_black.png#gh-dark-mode-only" width="100%" />  
 </p>
+
 ## Integrations
  
 Mercury works with virtually every Python package!
