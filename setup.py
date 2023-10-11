@@ -13,7 +13,7 @@ def list_files(directory):
 
 setup(
     name="mercury",
-    version="2.3.4",
+    version="2.3.5",
     author="MLJAR Sp. z o.o.",
     maintainer="MLJAR Sp. z o.o.",
     maintainer_email="contact@mljar.com",
