@@ -74,6 +74,7 @@ export interface ITextWidget {
   url_key: string;
   disabled: boolean;
   hidden: boolean;
+  sanitize: boolean;
 }
 
 export interface IOutputFilesWidget {
