@@ -543,7 +543,7 @@ export const fetchNotebookWithSlug =
         if (!silent) {
           dispatch(setLoadingStateSelected("error"));
 
-          if (err.response!.status === 404) {
+          if (err.response?.status === 404) {
             // switch to notebook not found view
             dispatch(setSiteStatus(SiteStatus.NotebookNotFound))
           }

@@ -16,8 +16,9 @@ class MultiSelect:
         self.code_uid = WidgetsManager.get_code_uid("MultiSelect", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
-        choices = list(choices)
-        value = list(value)
+        choices = [i for i in list(choices) if isinstance(i, str)]
+        value = [i for i in list(value) if isinstance(i, str)]
+        
         if WidgetsManager.widget_exists(self.code_uid):
             self.select = WidgetsManager.get_widget(self.code_uid)
             if list(self.select.options) != choices:
