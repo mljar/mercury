@@ -12,20 +12,21 @@ from .manager import WidgetsManager
 
 class File:
     def __init__(
-        self, label="File upload", max_file_size="100MB", disabled=False, hidden=False
+        self, label="File upload", max_file_size="100MB", disabled=False, hidden=False, multiple=False
     ):
         self.max_file_size = max_file_size
         self.code_uid = WidgetsManager.get_code_uid("File")
         self.temp_dir = None
         atexit.register(self.cleanup)
         self.hidden = hidden
+        self.multiple = multiple
 
         if WidgetsManager.widget_exists(self.code_uid):
             self.file = WidgetsManager.get_widget(self.code_uid)
             self.file.description = label
             self.file.disabled = disabled
         else:
-            self.file = ipywidgets.FileUpload(description=label, disabled=disabled)
+            self.file = ipywidgets.FileUpload(description=label, disabled=disabled, multiple=multiple)
             self.file.filepath = None
             self.file.filename = None
             WidgetsManager.add_widget(self.file.model_id, self.code_uid, self.file)
@@ -33,9 +34,10 @@ class File:
 
     @property
     def value(self):
-        if len(self.file.value):
+        if self.multiple:
+            return [file.content for file in self.file.value]
+        elif len(self.file.value):
             return self.file.value[0].content
-
         if self.file.filepath is not None:
             # read that file
             with open(self.file.filepath, "rb") as fin:
@@ -45,7 +47,9 @@ class File:
 
     @property
     def filename(self):
-        if len(self.file.value):
+        if self.multiple:
+            return [file.name for file in self.file.value]
+        elif len(self.file.value):
             return self.file.value[0].name
         if self.file.filename is not None:
             return self.file.filename
@@ -55,21 +59,27 @@ class File:
     def filepath(self):
         if self.file.filepath is not None:
             return self.file.filepath
-
         if (
             len(self.file.value)
             and self.filename is not None
             and self.value is not None
         ):
-            # store file in temp dir
-            # and return the path
             self.temp_dir = tempfile.mkdtemp()
-            self.file.filepath = os.path.join(self.temp_dir, self.filename)
-
-            with open(self.file.filepath, "wb") as fout:
-                fout.write(self.value)
-
-            return self.file.filepath
+            if self.multiple:
+                # create filepath list, write all files, return path
+                self.file.filepath = []
+                for fn,val in zip(self.filename,self.value):
+                    path = os.path.join(self.temp_dir,fn)
+                    self.file.filepath.append(path)
+                    with open(path, "wb") as fout:
+                        fout.write(val)
+                return self.file.filepath
+            else:
+                # create filepath, write file, return path
+                self.file.filepath = os.path.join(self.temp_dir, self.filename)
+                with open(self.file.filepath, "wb") as fout:
+                    fout.write(self.value)
+                return self.file.filepath
 
         return None
 
