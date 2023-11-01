@@ -7,6 +7,65 @@ from .manager import WidgetsManager
 
 
 class Checkbox:
+    """
+    The Checkbox class creates an interactive checkbox widget manifested as a 
+    toggle switch in the Mercury UI sidebar.
+
+    This widget allows users to toggle a selection (i.e., checked or unchecked) in 
+    the UI, which can then be used to control the logic in the application. This class 
+    also supports synchronizing the state of the checkbox with URL parameters for 
+    easy sharing.
+
+    Parameters
+    ----------
+    value : bool, default True
+        The initial state of the checkbox. If True, the checkbox is checked; if False, 
+        it's unchecked.
+
+    label : str, default 'Checkbox'
+        The text label displayed alongside the checkbox. If an empty string 
+        is provided, the checkbox will display no text.
+
+    url_key : str, default ''
+        If provided, this allows the checkbox's state to be synchronized with a URL 
+        parameter. The state of the checkbox can then be set and shared via the URL.
+
+    disabled : bool, default False
+        If True, the checkbox is rendered inactive in the UI and cannot be interacted 
+        with.
+
+    hidden : bool, default False
+        If True, the checkbox is not visible in the sidebar. The default is False, 
+        meaning the checkbox is visible.
+
+    Attributes
+    ----------
+    value : bool
+        A property that can be set or retrieved to change or get the checkbox's 
+        current state.
+
+    Examples
+    --------
+    Creating a Checkbox with a label, and checking its state.
+    >>> import mercury as mr
+    >>> my_flag = mr.Checkbox(value=True, label="Switch me")
+    >>> if my_flag.value:
+    >>>     print("Checkbox is ON")
+    >>> else:
+    >>>     print("Checkbox is OFF")
+
+    Creating a Checkbox with a URL key, which allows its state to be shared via 
+    the URL. This feature is useful for sharing the current state of the application 
+    with others by just sharing the URL.
+    >>> my_flag = mr.Checkbox(value=True, label="Switch me", url_key="flag")
+    >>> # The state of the checkbox can now be reflected in the URL.
+    >>> # For instance, if the checkbox is checked, and you click the 'Share' button 
+    >>> # in the Mercury sidebar, it will generate a URL like: 
+    >>> # https://your-server-address.com/app/notebook-name?flag=true
+    >>> # The '?flag=true' at the end of the URL indicates that the checkbox is checked.
+    >>> print(my_flag.value)  # Prints: True
+    """
+
     def __init__(self, value=True, label="Checkbox", url_key="", disabled=False, hidden=False):
         self.code_uid = WidgetsManager.get_code_uid("Checkbox", key=url_key)
         self.url_key = url_key

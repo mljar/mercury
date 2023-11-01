@@ -8,6 +8,65 @@ from .slider import get_number_format
 
 
 class Range:
+    """
+    The Range class provides a double-slider widget in the Mercury UI sidebar, 
+    enabling users to select a numeric range.
+
+    The widget can be used to capture a range of numeric inputs and provides 
+    an interactive and visual way to select ranges.
+
+    Parameters
+    ----------
+    value : list of two ints or floats, default [0, 1]
+        Initial values of the range widget, specifying the lower and upper bounds.
+
+    min : int or float, default 0
+        The minimum allowed value for the range slider.
+
+    max : int or float, default 10
+        The maximum allowed value for the range slider.
+
+    label : str, default 'Range'
+        Label that will be displayed alongside the range widget in the UI.
+        If an empty string is provided, it will display no text.
+
+    step : int or float, default 1
+        Incremental step value for the slider movement.
+
+    url_key : str, default ''
+        If set, enables the widget's value to be influenced by URL parameters, 
+        thus facilitating the sharing of the widget's state via the URL.
+
+    disabled : bool, default False
+        If True, the range widget will be displayed in the UI but will be inactive, 
+        preventing user interactions.
+
+    hidden : bool, default False
+        If True, the widget will not be visible in the UI.
+    
+    Attributes
+    ----------
+    value : list of two ints or floats
+        Retrieves the current range selected by the user in the widget.
+
+    Examples
+    --------
+    Initializing a Range widget:
+    >>> import mercury as mr
+    >>> my_range = mr.Range(value=[1, 6], min=0, max=10, label="Select a range", step=1)
+    >>> print(f"Selected range: {my_range.value[0]} to {my_range.value[1]}")
+
+    Using a URL key allows for the widget's current range to be reflected in the URL, 
+    enabling sharing of the widget's state:
+    >>> my_range_url = mr.Range(value=[2, 7], min=0, max=10, label="Select a range", 
+    >>>                         step=1, url_key="range")
+    >>> # After selection, and clicking 'Share' in the Mercury sidebar, the URL might be: 
+    >>> # https://your-server-address.com/app/notebook?range=3,5
+    >>> # The '?range=3,5' at the end of the URL indicates that the range widget's
+    >>> # content is a list of integer 3 and 5.
+    >>> print(f"Your range starts at {my_range_url.value[0]} ends at {my_range_url.value[1]}")
+    """
+
     def __init__(
         self,
         value=[0, 1],

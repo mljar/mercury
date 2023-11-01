@@ -7,6 +7,53 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Button:
+    """
+    The Button class creates an interactive button widget in the Mercury UI sidebar.
+    
+    The button is displayed below the code cell in a Jupyter Notebook or in the sidebar 
+    within Mercury.
+
+    Parameters
+    ----------
+    label : str, default 'Button'
+        The text displayed on the button. If an empty string is provided, the button 
+        will display no text.
+
+    style : str, default 'primary'
+        The style of the button, which changes its color. Valid styles include 
+        "primary", "success", "info", "warning", and "danger". If an invalid 
+        style is provided, it defaults to 'primary'.
+
+    disabled : bool, default False
+        If set to True, the button is disabled and cannot be clicked. The default 
+        is False, meaning the button is active.
+
+    hidden : bool, default False
+        If True, the button is not visible in the sidebar. The default is False, 
+        meaning the button is visible.
+
+    Attributes
+    ----------
+    clicked : bool
+        A read-only property. Returns True if the button has been clicked since the 
+        last check, otherwise False. It resets to False after being read.
+
+    Examples
+    --------
+    Creating a Mercury Button.
+    >>> import mercury as mr
+    >>> button = mr.Button(label="Click Me")
+    >>> if button.clicked:              # after button clicked this will be true
+    >>>     print("Button clicked!")    # but it will be true only once!
+    >>> if button.clicked:              # second read will return false
+    >>>     print("It will not be printed!")
+    
+    Creating a Mercury Button with a specific style.
+    >>> button = mr.Button(label="Click Me", style="success")
+    >>> if button.clicked:
+    >>>     print("Button clicked!")
+    """
+
     def __init__(self, label="Button", style="primary", disabled=False, hidden=False):
         self.code_uid = WidgetsManager.get_code_uid("Button")
 

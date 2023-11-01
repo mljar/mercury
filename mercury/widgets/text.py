@@ -7,6 +7,64 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Text:
+    """
+    The Text class introduces a text widget in the Mercury UI sidebar.
+    This widget can function as a text field when `rows=1` or as a text area 
+    when `rows` is greater than one.
+
+    By using this widget, users can input text data into Mercury applications 
+    dynamically. Once created, the value of the text can be accessed programmatically.
+
+    Parameters
+    ----------
+    value : str, default ''
+        The initial content of the text widget. Defaults to an empty string.
+
+    label : str, default 'Text'
+        The label that will appear alongside the text widget in the UI. 
+        If an empty string is provided, it will display no text.
+
+    rows : int, default 1
+        Determines the height of the text widget:
+        - When `rows=1`, the widget behaves as a single-line text field.
+        - When `rows` is greater than one, the widget behaves as a multi-line text area.
+
+    url_key : str, default ''
+        If set, this allows the widget's value to be influenced by URL parameters, 
+        facilitating the sharing of the widget's state via the URL. Defaults to an 
+        empty string.
+
+    disabled : bool, default False
+        If set to True, the text widget will be displayed in the UI but will be inactive, 
+        preventing user interactions. Defaults to False.
+
+    hidden : bool, default False
+        If set to True, the widget will not be visible in the UI. Defaults to False.
+    
+    Attributes
+    ----------
+    value : str
+        Retrieves the current content of the text widget.
+    
+    Examples
+    --------
+    Creating a Text widget:
+    >>> import mercury as mr
+    >>> name = mr.Text(value="Piotr", label="What is your name?", rows=1)
+    >>> # Prints: "Hello Piotr!"
+    >>> print(f"Hello {name.value}!")
+
+    Creating a Text widget with a URL key allows its current value to be 
+    reflected in the URL, facilitating the sharing of the widget's state with others:
+    >>> name_url = mr.Text(value="Piotr", label="What is your name?", rows=1, url_key="name")
+    >>> # If the text widget's content is "Piotr" and you click the 'Share' button in the 
+    >>> # Mercury sidebar, it might produce a URL like: 
+    >>> # https://your-server-address.com/app/notebook-name?name=Piotr
+    >>> # The '?name=Piotr' at the end of the URL indicates that the text widget's 
+    >>> # content is "Piotr".
+    >>> print(f"Hello {name_url.value}!")
+    """
+
     def __init__(
         self, value="", label="Text", rows=1, url_key="", disabled=False, hidden=False
     ):
