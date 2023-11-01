@@ -8,8 +8,8 @@ from .manager import WidgetsManager
 class App:
     def __init__(
         self,
-        title="",
-        description="",
+        title="Title",
+        description="Description",
         show_code=False,
         show_prompt=False,
         output="app",
