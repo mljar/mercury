@@ -12,7 +12,7 @@ class NoteText:
 
 
 class Note:
-    def __init__(self, text=""):
+    def __init__(self, text="*Note*"):
         self.code_uid = WidgetsManager.get_code_uid("Note")
 
         if WidgetsManager.widget_exists(self.code_uid):
