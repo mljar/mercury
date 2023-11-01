@@ -8,7 +8,7 @@ from .manager import WidgetsManager
 
 class Select:
     def __init__(
-        self, value=None, choices=[], label="", url_key="", disabled=False, hidden=False
+        self, value=None, choices=[], label="Select", url_key="", disabled=False, hidden=False
     ):
         if value is None and len(choices) > 1:
             value = choices[0]

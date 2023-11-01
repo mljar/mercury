@@ -13,7 +13,7 @@ class Range:
         value=[0, 1],
         min=0,
         max=10,
-        label="",
+        label="Range",
         step=1,
         url_key="",
         disabled=False,

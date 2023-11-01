@@ -7,7 +7,7 @@ from .manager import WidgetException, WidgetsManager
 
 
 class Button:
-    def __init__(self, label="", style="primary", disabled=False, hidden=False):
+    def __init__(self, label="Button", style="primary", disabled=False, hidden=False):
         self.code_uid = WidgetsManager.get_code_uid("Button")
 
         if style not in ["primary", "success", "info", "warning", "danger", ""]:

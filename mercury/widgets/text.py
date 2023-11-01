@@ -8,7 +8,7 @@ from .manager import WidgetException, WidgetsManager
 
 class Text:
     def __init__(
-        self, value="", label="", rows=1, url_key="", disabled=False, hidden=False
+        self, value="", label="Text", rows=1, url_key="", disabled=False, hidden=False
     ):
         self.rows = rows
 

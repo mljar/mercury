@@ -22,7 +22,7 @@ class Slider:
         value=0,
         min=0,
         max=10,
-        label="",
+        label="Slider",
         step=1,
         url_key="",
         disabled=False,

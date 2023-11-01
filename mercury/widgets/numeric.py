@@ -12,7 +12,7 @@ class Numeric:
         value=0,
         min=0,
         max=10,
-        label="",
+        label="Numeric",
         step=1,
         url_key="",
         disabled=False,
