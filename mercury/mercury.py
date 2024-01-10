@@ -47,7 +47,6 @@ from widgets.in_mercury import in_mercury
 from widgets.user import user
 from widgets.pdf import PDF
 
-
 def print_version():
     try:
         mercury_version = ""
@@ -197,7 +196,10 @@ def main():
             or "runworker" in sys.argv
             or "--runworker" in sys.argv
         ):
+            py_executable = sys.executable
             worker_command = [
+                py_executable,
+                "-m",
                 "celery",
                 "-A",
                 "mercury.server" if sys.argv[0].endswith("mercury") else "server",
@@ -220,6 +222,8 @@ def main():
 
             # celery worker beat for periodic tasks
             beat_command = [
+                py_executable,
+                "-m",
                 "celery",
                 "-A",
                 "mercury.server" if sys.argv[0].endswith("mercury") else "server",
