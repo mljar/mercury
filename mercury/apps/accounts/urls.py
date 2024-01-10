@@ -18,20 +18,6 @@ from apps.accounts.views.secrets import (
     WorkerListSecrets,
 )
 from apps.accounts.views.subscription import SubscriptionView
-from django import template
-
-register = template.Library()
-@register.filter
-def replace(value, arg):
-    """
-    Replacing filter
-    Use `{{ "aaa"|replace:"a|b" }}`
-    """
-    if len(arg.split('|')) != 2:
-        return value
-
-    what, to = arg.split('|')
-    return value.replace(what, to)
 
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
