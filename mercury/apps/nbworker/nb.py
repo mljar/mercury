@@ -297,6 +297,7 @@ class NBWorker(WSClient):
                 name = s.get("name", "")
                 secret = s.get("secret", "")
                 cmd += f'os.environ["{name}"] = "{secret}"'
+                cmd += "\n" # add new line between secrets
             log.debug("Set secrets")
             self.nbrun.run_code(cmd)
 
