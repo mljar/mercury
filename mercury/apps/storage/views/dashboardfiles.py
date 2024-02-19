@@ -88,8 +88,8 @@ class PresignedUrl(APIView):
 
 FILE_LIMITS = {
     PLAN_STARTER: {
-        "files": 10,
-        "size": 10,
+        "files": 2,
+        "size": 5,
     },
     PLAN_PRO: {"files": 25, "size": 50},
     PLAN_BUSINESS: {"files": 50, "size": 100},  # MB
