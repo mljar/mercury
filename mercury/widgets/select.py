@@ -5,6 +5,8 @@ from IPython.display import display
 
 from .manager import WidgetsManager
 
+import warnings
+
 
 class Select:
     """
@@ -88,8 +90,16 @@ class Select:
     def __init__(
         self, value=None, choices=[], label="Select", url_key="", disabled=False, hidden=False
     ):
-        if value is None and len(choices) > 1:
+        if len(choices) == 0:
+            raise Exception("Please provide choices list. God bless you <3")
+
+        if value is None:
             value = choices[0]
+        
+        if value not in choices:
+            value = choices[0]
+            warnings.warn("\nYour value is not included in choices. Automatically set value to first element from choices.")
+
 
         self.code_uid = WidgetsManager.get_code_uid("Select", key=url_key)
         self.url_key = url_key
