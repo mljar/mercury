@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 
@@ -8,6 +9,10 @@ from apps.workers.models import Worker, WorkerSession
 from apps.workers.constants import WorkerSessionState
 from apps.ws.utils import client_group, worker_group
 
+logging.basicConfig(
+    format="WORKER %(asctime)s %(message)s",
+    level=os.getenv("DJANGO_LOG_LEVEL", "ERROR"),
+)
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +30,7 @@ class WorkerProxy(WebsocketConsumer):
         if not workers:
             self.close()
 
-        log.debug(
+        log.info(
             f"Worker ({self.worker_id}) connect to {self.session_id}, notebook id {self.notebook_id}"
         )
 
