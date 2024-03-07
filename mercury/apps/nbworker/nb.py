@@ -320,9 +320,9 @@ class NBWorker(WSClient):
             stop_on_error=self.stop_on_error(),
             user_info=self.get_user_info(),
         )
-
-        self.install_new_packages()
+        
         self.provision_secrets()
+        self.install_new_packages()
 
         # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook
