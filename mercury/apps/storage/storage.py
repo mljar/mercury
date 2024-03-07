@@ -36,7 +36,7 @@ class StorageManager:
         return local_filename
 
     def provision_uploaded_files(self):
-        log.debug(f"Provision uploaded files")
+        log.info(f"Provision uploaded files")
         if STORAGE == STORAGE_MEDIA:
             pass
         elif STORAGE == STORAGE_S3:
@@ -47,25 +47,25 @@ class StorageManager:
             # download files
             for url in download_urls:
                 f = StorageManager.download_file(url)
-                log.debug(f"Downloaded {f}")
+                log.info(f"Downloaded {f}")
 
     @staticmethod
     def create_dir(dir_path):
         if not os.path.exists(dir_path):
             try:
-                log.debug(f"Create directory {dir_path}")
+                log.info(f"Create directory {dir_path}")
                 os.mkdir(dir_path)
             except Exception as e:
                 log.exception(f"Exception when create {dir_path}")
                 raise Exception(f"Cant create {dir_path}")
         else:
-            log.debug(f"Directory {dir_path} already exists")
+            log.info(f"Directory {dir_path} already exists")
 
     @staticmethod
     def delete_dir(dir_path):
         if os.path.exists(dir_path):
             try:
-                log.debug(f"Delete directory {dir_path}")
+                log.info(f"Delete directory {dir_path}")
                 shutil.rmtree(dir_path, ignore_errors=True)
             except Exception as e:
                 log.exception(f"Exception when delete {dir_path}")
@@ -79,7 +79,7 @@ class StorageManager:
                 str(MEDIA_ROOT), self.session_id, f"output_{self.worker_id}"
             )
             StorageManager.create_dir(output_dir)
-            log.debug(f"Worker output directory: {output_dir}")
+            log.info(f"Worker output directory: {output_dir}")
             return output_dir
         elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
@@ -89,7 +89,7 @@ class StorageManager:
     def delete_worker_output_dir(self):
         if STORAGE == STORAGE_MEDIA:
             first_dir = os.path.join(str(MEDIA_ROOT), self.session_id)
-            log.debug(f"Delete Worker output directory: {first_dir}")
+            log.info(f"Delete Worker output directory: {first_dir}")
             StorageManager.delete_dir(first_dir)
         elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
@@ -108,7 +108,7 @@ class StorageManager:
                     if entry.is_file():
                         print(entry, entry.path)
                         local_files += [entry]
-            log.debug(f"Sync {local_files}")
+            log.info(f"Sync {local_files}")
 
             action = "put_object"
             for entry in local_files:
@@ -204,7 +204,7 @@ class StorageManager:
             # export to PDF
             pdf_path = html_path.replace(".html", ".pdf")
             pdf_url = html_url.replace(".html", ".pdf")
-            log.debug(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
+            log.info(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
         elif STORAGE == STORAGE_S3:
@@ -215,13 +215,13 @@ class StorageManager:
             )
             pdf_path = os.path.abspath(os.path.join(self.worker_output_dir(), fname))
 
-            log.debug(f"Dump to HTML {html_path}")
+            log.info(f"Dump to HTML {html_path}")
             with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(nb_html_body)
             # check if we need postfix
             slides_postfix = "?print-pdf" if is_presentation else ""
             # export to PDF
-            log.debug(f"Export HTML {html_path}{slides_postfix} to PDF {pdf_path}")
+            log.info(f"Export HTML {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
             # 1.
@@ -252,9 +252,9 @@ class StorageManager:
         return h[:8]
 
     def get_user_uploaded_file(self, value):
-        log.debug("get user uploaded file " * 33)
+        log.info("get user uploaded file " * 33)
         if STORAGE == STORAGE_MEDIA:
-            log.debug(f"Get file {value[0]} from id={value[1]}")
+            log.info(f"Get file {value[0]} from id={value[1]}")
             import django
 
             django.setup()
@@ -263,7 +263,7 @@ class StorageManager:
             tu = TemporaryUpload.objects.get(upload_id=value[1])
             value[1] = tu.get_file_path()
             value[1] = value[1].replace("\\", "\\\\")
-            log.debug(f"File path is {value[1]}")
+            log.info(f"File path is {value[1]}")
         elif STORAGE == STORAGE_S3:
             # get link
 
@@ -273,6 +273,6 @@ class StorageManager:
             download_url = response.json().get("url")
             # download file
             f = StorageManager.download_file(download_url)
-            log.debug(f"Downloaded {f}")
+            log.info(f"Downloaded {f}")
             value[1] = f
         return value

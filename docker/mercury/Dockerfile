@@ -28,9 +28,9 @@ RUN mamba install --yes python=3.10 --file mercury/requirements.txt -c conda-for
 RUN mamba install --yes gunicorn psycopg2 daphne -c conda-forge
 RUN mamba install --yes mercury -c conda-forge
 
-ADD ./mercury/apps /app/mercury/apps
-ADD ./mercury/server /app/mercury/server
 ADD ./mercury/templates /app/mercury/templates
+ADD ./mercury/server /app/mercury/server
+ADD ./mercury/apps /app/mercury/apps
 ADD ./mercury/*.py /app/mercury/
 ADD ./mercury/widgets /app/mercury/widgets
 ADD ./docker /app/docker

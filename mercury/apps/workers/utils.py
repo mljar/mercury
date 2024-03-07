@@ -36,4 +36,4 @@ def need_instance(worker_id):
 
 
 def scale_down():
-    log.debug("Scale instances down")
+    log.info("Scale instances down")

@@ -117,7 +117,7 @@ def task_init_notebook(
             "notify": {},
         }
         nb = None
-
+        log.info(f"Read notebook from {notebook_path}")
         with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
             parse_params(nb, params)
