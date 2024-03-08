@@ -25,7 +25,7 @@ class SubscriptionView(APIView):
 
         url = f"https://checkout.paddle.com/api/1.0/order?checkout_id={checkout_id}"
         print(url)
-        response = requests.get(url)
+        response = requests.get(url, timeout=15)
         user = request.user
         if response.status_code != 200:
             user.profile.info = json.dumps(
@@ -90,7 +90,7 @@ class SubscriptionView(APIView):
                 "subscription_id": subscription_id,
                 "state": "active",
             }
-            response = requests.post(url, data=data)
+            response = requests.post(url, data=data, timeout=15)
             if response.status_code != 200:
                 raise ValidationError("Error when get information from Paddle")
 

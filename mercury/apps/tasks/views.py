@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from requests import request
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
