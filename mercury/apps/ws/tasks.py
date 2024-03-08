@@ -64,16 +64,17 @@ def task_start_websocket_worker(self, job_params):
                     worker_id = job_params["worker_id"]
                     worker_url = f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}"
                     log.info(f"Try to start worker {worker_url}")
-                    response = requests.get(worker_url)
+                    response = requests.get(worker_url, timeout=3)
                     log.info(f"Response from worker {response.status_code}")
                     if response.status_code == 200:
                         if response.json().get("msg", "") == "ok":
                             all_busy = False
                             break
-            
-            if all_busy:
-                log.info("Defer task start ws worker")
-                need_instance(job_params["worker_id"])
-                task_start_websocket_worker.s(job_params).apply_async(countdown=15)
         except Exception as e:
-            log.error(f"Error when starting new worker, {str(e)}")
+            log.error(f"Error when starting a new worker, {str(e)}")    
+        
+        if all_busy:
+            log.info("Defer task start ws worker")
+            need_instance(job_params["worker_id"])
+            task_start_websocket_worker.s(job_params).apply_async(countdown=15)
+        
