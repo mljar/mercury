@@ -64,7 +64,7 @@ def task_start_websocket_worker(self, job_params):
                     worker_id = job_params["worker_id"]
                     worker_url = f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}"
                     log.info(f"Try to start worker {worker_url}")
-                    response = requests.get(worker_url, timeout=2)
+                    response = requests.get(worker_url, timeout=5)
                     log.info(f"Response from worker {response.status_code}")
                     if response.status_code == 200:
                         if response.json().get("msg", "") == "ok":
