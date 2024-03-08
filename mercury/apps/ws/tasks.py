@@ -48,33 +48,32 @@ def task_start_websocket_worker(self, job_params):
             worker = subprocess.Popen(command)
     else:
         machines = get_running_machines()
+        log.info(f'Machines {machines}')
         machines = shuffle_machines(machines)
-
+        log.info(f'Shuffled machines {machines}')
         workers_ips = [m.ipv4 for m in machines]
-
         all_busy = True
-
-        for worker_ip in workers_ips:
-            try:
+        log.info(f'Worker IPs {workers_ips}')
+        try:
+            for worker_ip in workers_ips:
                 workers = Worker.objects.filter(machine_id=worker_ip)
-
-                log.info(f"Workers count: {len(workers)} machine_id={ worker_ip }")
-
+                log.info(f"Job count: {len(workers)} in machine_id={ worker_ip }")
                 if len(workers) <= settings.NBWORKERS_PER_MACHINE:
                     notebook_id = job_params["notebook_id"]
                     session_id = job_params["session_id"]
                     worker_id = job_params["worker_id"]
-                    response = requests.get(
-                        f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}"
-                    )
+                    worker_url = f"http://{worker_ip}/start/{notebook_id}/{session_id}/{worker_id}"
+                    log.info(f"Try to start worker {worker_url}")
+                    response = requests.get(worker_url)
+                    log.info(f"Response from worker {response.status_code}")
                     if response.status_code == 200:
                         if response.json().get("msg", "") == "ok":
                             all_busy = False
                             break
-            except Exception as e:
-                pass
-
-        if all_busy:
-            log.info("Defer task start ws worker")
-            need_instance(job_params["worker_id"])
-            task_start_websocket_worker.s(job_params).apply_async(countdown=15)
+            
+            if all_busy:
+                log.info("Defer task start ws worker")
+                need_instance(job_params["worker_id"])
+                task_start_websocket_worker.s(job_params).apply_async(countdown=15)
+        except Exception as e:
+            log.error(f"Error when starting new worker, {str(e)}")
