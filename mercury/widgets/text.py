@@ -41,6 +41,11 @@ class Text:
     hidden : bool, default False
         If set to True, the widget will not be visible in the UI. Defaults to False.
     
+    sanitize : bool, default True
+        If set to True, the string value will be sanitized, for example characters like
+        quotes or parentheses will be removed.
+    
+        
     Attributes
     ----------
     value : str
