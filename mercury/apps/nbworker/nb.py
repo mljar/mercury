@@ -64,10 +64,10 @@ class NBWorker(WSClient):
             ):
                 checksum = NBWorker.md5(self.notebook.path)
 
-                log.debug(f"Checksum {checksum} prev {self.prev_md5}")
+                log.info(f"Checksum {checksum} prev {self.prev_md5}")
 
                 if self.prev_md5 is None or checksum != self.prev_md5:
-                    log.debug("Notebook file changed!")
+                    log.info("Notebook file changed!")
                     msg = json.dumps({"purpose": Purpose.InitNotebook})
                     self.queue.put(msg)
 
@@ -80,7 +80,7 @@ class NBWorker(WSClient):
         global stop_event
         while not stop_event.is_set():
             item = self.queue.get()
-            log.debug(f"Porcess msg {item}")
+            log.info(f"Porcess msg {item}")
             json_data = json.loads(item)
 
             self.last_execution_time = time.time()
@@ -107,8 +107,8 @@ class NBWorker(WSClient):
     def worker_pong(self):
         total_run_time = time.time() - self.start_time
         elapsed_from_last_execution = time.time() - self.last_execution_time
-        log.debug(f"Total run time {total_run_time}")
-        log.debug(f"Elapsed from last execution {elapsed_from_last_execution}")
+        log.info(f"Total run time {total_run_time}")
+        log.info(f"Elapsed from last execution {elapsed_from_last_execution}")
 
         close_worker = True
         if total_run_time > self.max_run_time:
@@ -126,7 +126,7 @@ class NBWorker(WSClient):
             self.queue.put(json.dumps({"purpose": Purpose.CloseWorker}))
 
     def run_notebook(self, json_params):
-        log.debug(f"Run notebook with {json_params}")
+        log.info(f"Run notebook with {json_params}")
         self.update_worker_state(WorkerState.Busy)
 
         widgets = json.loads(json_params.get("widgets", "{}"))
@@ -145,7 +145,7 @@ class NBWorker(WSClient):
         self.prev_body = copy.deepcopy(body)
 
     def update_nb(self, widgets):
-        log.debug(f"Update nb {widgets}")
+        log.info(f"Update nb {widgets}")
 
         index_execute_from = None
         # fill notebook with widgets values
@@ -154,17 +154,17 @@ class NBWorker(WSClient):
             value = widgets[widget_key]
 
             widget_type = WidgetsManager.parse_widget_type(widget_key)
-            log.debug(
+            log.info(
                 f"Update widget code_uid={widget_key} value={value} widget type {widget_type}"
             )
 
             if widget_type == "File" and len(value) == 2:
-                log.debug(f"Get file {value[0]} from id={value[1]}")
+                log.info(f"Get file {value[0]} from id={value[1]}")
                 # tu = TemporaryUpload.objects.get(upload_id=value[1])
                 # value[1] = tu.get_file_path()
                 # value[1] = value[1].replace("\\", "\\\\")
                 value = self.sm.get_user_uploaded_file(value)
-                log.debug(f"File path is {value[1]}")
+                log.info(f"File path is {value[1]}")
 
                 code = (
                     f'WidgetsManager.update("{widget_key}", field="filename", new_value="{value[0]}")\n'
@@ -180,16 +180,16 @@ class NBWorker(WSClient):
             else:
                 code = f'WidgetsManager.update("{widget_key}", field="value", new_value={value})'
 
-            log.debug(f"Execute code {code}")
+            log.info(f"Execute code {code}")
 
             r = self.nbrun.run_code(code)
 
             updated = "True" in str(r)
-            log.debug(f"Update reponse {r}, updated={updated}")
+            log.info(f"Update reponse {r}, updated={updated}")
 
             if updated:
                 cell_index = WidgetsManager.parse_cell_index(widget_key)
-                log.debug(f"Widget updated, update nb from {cell_index}")
+                log.info(f"Widget updated, update nb from {cell_index}")
 
                 if index_execute_from is None:
                     index_execute_from = cell_index
@@ -207,7 +207,7 @@ class NBWorker(WSClient):
             self.send_widgets(self.nb, expected_widgets_keys=widgets.keys())
             self.prev_nb = copy.deepcopy(self.nb)
         else:
-            log.debug("Skip nb execution, no changes in widgets")
+            log.info("Skip nb execution, no changes in widgets")
 
     def send_widgets(self, nb, expected_widgets_keys, init_widgets=False):
         nb_widgets_keys = []
@@ -217,14 +217,14 @@ class NBWorker(WSClient):
                 if "data" in output:
                     if "application/mercury+json" in output["data"]:
                         w = output["data"]["application/mercury+json"]
-                        log.debug(w)
+                        log.info(w)
                         w = json.loads(w)
 
                         # prepare msg to send by ws
                         msg = WidgetsManager.frontend_format(w)
                         if msg:
                             msg["widgetKey"] = w.get("code_uid")
-                            log.debug(f"Update widget {msg}")
+                            log.info(f"Update widget {msg}")
                             if init_widgets:
                                 widgets_params += [msg]
                             else:
@@ -258,8 +258,8 @@ class NBWorker(WSClient):
 
         if init_widgets:
             msg = {"purpose": Purpose.InitWidgets, "widgets": widgets_params}
-            log.debug("Init widgets")
-            log.debug(msg)
+            log.info("Init widgets")
+            log.info(msg)
             self.ws.send(json.dumps(msg))
         else:
             # check if hide some widgets
@@ -269,7 +269,7 @@ class NBWorker(WSClient):
                 if widget_key not in nb_widgets_keys:
                     hide_widgets += [widget_key]
 
-            log.debug(f"Hide widgets {hide_widgets}")
+            log.info(f"Hide widgets {hide_widgets}")
             if hide_widgets:
                 msg = {"purpose": Purpose.HideWidgets, "keys": hide_widgets}
                 self.ws.send(json.dumps(msg))
@@ -285,8 +285,8 @@ class NBWorker(WSClient):
         if "127.0.0.1" not in self.ws_address and "localhost" not in self.ws_address:
             fname = "requirements.txt"
             if os.path.exists(fname):
-                log.debug(f"Install new packages from requirements.txt")
-                cmd = f"pip install -r {fname}"
+                log.info(f"Install new packages from requirements.txt")
+                cmd = f"pip install --no-input -r {fname}"
                 self.nbrun.run_code(cmd)
 
     def provision_secrets(self):
@@ -297,11 +297,12 @@ class NBWorker(WSClient):
                 name = s.get("name", "")
                 secret = s.get("secret", "")
                 cmd += f'os.environ["{name}"] = "{secret}"'
-            log.debug("Set secrets")
+                cmd += "\n" # add new line between secrets
+            log.info("Set secrets")
             self.nbrun.run_code(cmd)
 
     def init_notebook(self):
-        log.debug(f"Init notebook, show_code={self.show_code()}")
+        log.info(f"Init notebook, show_code={self.show_code()}")
 
         self.sm.provision_uploaded_files()
 
@@ -319,9 +320,9 @@ class NBWorker(WSClient):
             stop_on_error=self.stop_on_error(),
             user_info=self.get_user_info(),
         )
-
-        self.install_new_packages()
+        
         self.provision_secrets()
+        self.install_new_packages()
 
         # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook
@@ -339,7 +340,7 @@ class NBWorker(WSClient):
 
         # update database ...
 
-        log.debug(f"Executed params {json.dumps(params, indent=4)}")
+        log.info(f"Executed params {json.dumps(params, indent=4)}")
         update_database = self.update_notebook(params)
 
         # update_database = False
@@ -384,8 +385,8 @@ class NBWorker(WSClient):
         self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
         self.nbrun.set_stop_on_error(nb_params.get("stop_on_error", False))
 
-        log.debug(params)
-        log.debug(f"Exporter show_code {self.nbrun.exporter.show_code}")
+        log.info(params)
+        log.info(f"Exporter show_code {self.nbrun.exporter.show_code}")
 
         self.nb = copy.deepcopy(self.nb_original)
 
@@ -404,7 +405,7 @@ class NBWorker(WSClient):
         self.update_worker_state(WorkerState.Running)
 
     # def save_notebook(self):
-    #     log.debug(f"Save notebook")
+    #     log.info(f"Save notebook")
     #     # save nb in HTML
     #     if self.is_presentation():
     #         nb_body = self.nbrun.export_html(self.nb, full_header=True)
@@ -423,16 +424,16 @@ class NBWorker(WSClient):
     #         params=json.dumps(self.prev_widgets),
     #         result=nb_path,
     #     )
-    #     log.debug(f"Task ({task.id}) created")
+    #     log.info(f"Task ({task.id}) created")
 
     #     # send notice that nb saved
     #     self.ws.send(json.dumps({"purpose": Purpose.SavedNotebook}))
 
     def display_notebook(self, json_params):
-        log.debug(f"Display notebook ({json_params})")
+        log.info(f"Display notebook ({json_params})")
 
     def download_html(self):
-        log.debug(f"Download HTML")
+        log.info(f"Download HTML")
         # save nb in HTML with full header
         if self.is_presentation():
             nb_body = self.nbrun.export_html(self.nb, full_header=True)
@@ -453,7 +454,7 @@ class NBWorker(WSClient):
         )
 
     def download_pdf(self):
-        log.debug(f"Download PDF")
+        log.info(f"Download PDF")
         # save nb in HTML with full header
         nb_body = self.nbrun.export_html(self.nb, full_header=True)
 

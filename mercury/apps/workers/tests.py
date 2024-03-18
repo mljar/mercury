@@ -1,5 +1,4 @@
 from django.test import TestCase
-import requests
 
 from django.contrib.auth.models import User
 from apps.accounts.models import Site

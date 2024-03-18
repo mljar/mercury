@@ -88,8 +88,8 @@ class PresignedUrl(APIView):
 
 FILE_LIMITS = {
     PLAN_STARTER: {
-        "files": 10,
-        "size": 10,
+        "files": 2,
+        "size": 5,
     },
     PLAN_PRO: {"files": 25, "size": 50},
     PLAN_BUSINESS: {"files": 50, "size": 100},  # MB
@@ -107,10 +107,27 @@ def upload_allowed_check_limits(user, site_id, filesize):
         return False
 
     total_files = UploadedFile.objects.filter(hosted_on__id=site_id)
-    if total_files.count() > files_count_limit:
+    if total_files.count() >= files_count_limit:
         return False
 
     return True
+
+
+class GetUploadCountLimit(APIView):
+    def get(self, request, site_id, format=None):
+        site = get_site(request.user, site_id)
+        if site is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        if not is_cloud_version():
+            # no limit for local version
+            return Response({"count": 1000})
+        
+        plan = get_plan(request.user)
+        count_limit = FILE_LIMITS[plan]["files"]
+        total_files = UploadedFile.objects.filter(hosted_on__id=site_id)
+        
+        return Response({"count": count_limit - total_files.count()})
 
 
 class PresignedUrlPut(APIView):

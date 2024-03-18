@@ -1,5 +1,4 @@
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -20,6 +19,8 @@ load_dotenv("../.env")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MERCURY_DATA_DIR = Path(os.getenv('MERCURY_DATA_DIR', BASE_DIR))
+
 FRONTEND_BUILD_DIR = str(BASE_DIR / "frontend-dist")
 FRONTEND_STATIC_DIR = str(BASE_DIR / "frontend-dist" / "static")
 
@@ -28,12 +29,12 @@ STORAGE_S3 = "s3"
 STORAGE = STORAGE_MEDIA
 if os.environ.get("STORAGE", STORAGE_MEDIA) == STORAGE_S3:
     STORAGE = STORAGE_S3
-DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(BASE_DIR / "uploads-temp")
-DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(BASE_DIR / "uploads")
+DJANGO_DRF_FILEPOND_UPLOAD_TMP = str(MERCURY_DATA_DIR / "uploads-temp")
+DJANGO_DRF_FILEPOND_FILE_STORE_PATH = str(MERCURY_DATA_DIR / "uploads")
 
 
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "sqla+sqlite:///celery.sqlite")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", f"sqla+sqlite:///{str(MERCURY_DATA_DIR)}/celery.sqlite")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", f"db+sqlite:///{str(MERCURY_DATA_DIR)}/celery.sqlite")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -177,7 +178,7 @@ DB_POSTGRESQL = "postgresql"
 DATABASES_ALL = {
     DB_SQLITE: {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": MERCURY_DATA_DIR / "db.sqlite3",
     },
     DB_POSTGRESQL: {
         "ENGINE": "django.db.backends.postgresql",
@@ -231,12 +232,12 @@ if DEBUG or SERVE_STATIC:
     STATIC_URL = "/static/"
     STATICFILES_DIRS = [FRONTEND_BUILD_DIR, FRONTEND_STATIC_DIR]
     if SERVE_STATIC:
-        STATIC_ROOT = str(BASE_DIR / "static")
+        STATIC_ROOT = str(MERCURY_DATA_DIR / "static")
 else:
     STATIC_URL = "/django_static/"
     STATIC_ROOT = str(BASE_DIR / "django_static")
 
-MEDIA_ROOT = str(BASE_DIR / "media")
+MEDIA_ROOT = str(MERCURY_DATA_DIR / "media")
 
 if not os.path.exists(MEDIA_ROOT):
     try:
@@ -287,6 +288,18 @@ LOGGING = {
             "handlers": ["console", "file"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "ERROR"),
             "propagate": False,
+        },
+        'daphne': {
+            'handlers': [
+                'console', "file"
+            ],
+            'level': os.getenv("DJANGO_LOG_LEVEL", "ERROR")
+        },
+        'channels': {
+            'handlers': [
+                'console', "file"
+            ],
+            'level': os.getenv("DJANGO_LOG_LEVEL", "ERROR")
         },
     },
 }

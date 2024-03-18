@@ -24,7 +24,7 @@ def machine_uuid():
     if os.environ.get("USE_WORKER_IP") is not None:
         try:
             # fast way to get IP
-            response = requests.get("http://checkip.amazonaws.com")
+            response = requests.get("http://checkip.amazonaws.com", timeout=15)
             my_ip = response.content.decode("UTF-8").replace("\n", "")
             return my_ip
 

@@ -12,7 +12,36 @@ class NoteText:
 
 
 class Note:
-    def __init__(self, text=""):
+    """
+    The Note class provides an interface for adding Markdown-formatted notes within 
+    the Mercury UI sidebar.
+    
+    This class supports Markdown, a lightweight and easy-to-use syntax for styling 
+    all forms of writing on the Mercury platform. Users can add notes with emphasis, 
+    lists, links, and more using the standard Markdown syntax.
+
+    Parameters
+    ----------
+    text : str, default '*Note*'
+        The Markdown-formatted text to be displayed in the Mercury UI sidebar. 
+        If an empty string is provided, the note will display no text.
+
+    Attributes
+    ----------
+    value : str
+        The current Markdown text of the note. This can be set or retrieved at any time.
+
+    Examples
+    --------
+    Adding a new Markdown note to the Mercury sidebar.
+    >>> import mercury as mr
+    >>> my_note = mr.Note(text="Some **Markdown** text")
+
+    The note with the text "Some **Markdown** text" (with "Markdown" bolded) is now 
+    displayed in the sidebar.
+    """
+
+    def __init__(self, text="*Note*"):
         self.code_uid = WidgetsManager.get_code_uid("Note")
 
         if WidgetsManager.widget_exists(self.code_uid):

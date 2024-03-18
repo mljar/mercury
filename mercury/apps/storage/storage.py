@@ -36,36 +36,36 @@ class StorageManager:
         return local_filename
 
     def provision_uploaded_files(self):
-        log.debug(f"Provision uploaded files")
+        log.info(f"Provision uploaded files")
         if STORAGE == STORAGE_MEDIA:
             pass
         elif STORAGE == STORAGE_S3:
             # get links
             url = f"{self.server_url}/api/v1/worker/uploaded-files-urls/{self.session_id}/{self.worker_id}/{self.notebook_id}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)
             download_urls = response.json().get("urls")
             # download files
             for url in download_urls:
                 f = StorageManager.download_file(url)
-                log.debug(f"Downloaded {f}")
+                log.info(f"Downloaded {f}")
 
     @staticmethod
     def create_dir(dir_path):
         if not os.path.exists(dir_path):
             try:
-                log.debug(f"Create directory {dir_path}")
+                log.info(f"Create directory {dir_path}")
                 os.mkdir(dir_path)
             except Exception as e:
                 log.exception(f"Exception when create {dir_path}")
                 raise Exception(f"Cant create {dir_path}")
         else:
-            log.debug(f"Directory {dir_path} already exists")
+            log.info(f"Directory {dir_path} already exists")
 
     @staticmethod
     def delete_dir(dir_path):
         if os.path.exists(dir_path):
             try:
-                log.debug(f"Delete directory {dir_path}")
+                log.info(f"Delete directory {dir_path}")
                 shutil.rmtree(dir_path, ignore_errors=True)
             except Exception as e:
                 log.exception(f"Exception when delete {dir_path}")
@@ -79,7 +79,7 @@ class StorageManager:
                 str(MEDIA_ROOT), self.session_id, f"output_{self.worker_id}"
             )
             StorageManager.create_dir(output_dir)
-            log.debug(f"Worker output directory: {output_dir}")
+            log.info(f"Worker output directory: {output_dir}")
             return output_dir
         elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
@@ -89,7 +89,7 @@ class StorageManager:
     def delete_worker_output_dir(self):
         if STORAGE == STORAGE_MEDIA:
             first_dir = os.path.join(str(MEDIA_ROOT), self.session_id)
-            log.debug(f"Delete Worker output directory: {first_dir}")
+            log.info(f"Delete Worker output directory: {first_dir}")
             StorageManager.delete_dir(first_dir)
         elif STORAGE == STORAGE_S3:
             output_dir = f"output_{self.worker_id}"
@@ -108,13 +108,13 @@ class StorageManager:
                     if entry.is_file():
                         print(entry, entry.path)
                         local_files += [entry]
-            log.debug(f"Sync {local_files}")
+            log.info(f"Sync {local_files}")
 
             action = "put_object"
             for entry in local_files:
                 # upload them to s3
                 url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{entry.name}"
-                response = requests.get(url)
+                response = requests.get(url, timeout=5)
                 upload_url = response.json().get("url")
 
                 with open(entry.path, "rb") as fin:
@@ -133,7 +133,7 @@ class StorageManager:
                     "output_dir": output_dir,
                     "local_filepath": entry.path,
                 }
-                response = requests.post(url, data)
+                response = requests.post(url, data, timeout=5)
                 # that's all
 
     def list_worker_files_urls(self):
@@ -174,11 +174,11 @@ class StorageManager:
             action = "put_object"
             output_dir = "downdload-html"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             upload_url = response.json().get("url")
             # 2.
             # upload file
-            response = requests.put(upload_url, nb_html_body.encode("utf-8"))
+            response = requests.put(upload_url, nb_html_body.encode("utf-8"), timeout=15)
             if response.status_code != 200:
                 raise Exception(f"Notebook not uploaded {response}")
             # 3.
@@ -186,7 +186,7 @@ class StorageManager:
             action = "get_object"
             output_dir = "downdload-html"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             html_url = response.json().get("url")
 
         return html_path, html_url
@@ -204,7 +204,7 @@ class StorageManager:
             # export to PDF
             pdf_path = html_path.replace(".html", ".pdf")
             pdf_url = html_url.replace(".html", ".pdf")
-            log.debug(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
+            log.info(f"Export {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
         elif STORAGE == STORAGE_S3:
@@ -215,13 +215,13 @@ class StorageManager:
             )
             pdf_path = os.path.abspath(os.path.join(self.worker_output_dir(), fname))
 
-            log.debug(f"Dump to HTML {html_path}")
+            log.info(f"Dump to HTML {html_path}")
             with open(html_path, "w", encoding="utf-8", errors="ignore") as fout:
                 fout.write(nb_html_body)
             # check if we need postfix
             slides_postfix = "?print-pdf" if is_presentation else ""
             # export to PDF
-            log.debug(f"Export HTML {html_path}{slides_postfix} to PDF {pdf_path}")
+            log.info(f"Export HTML {html_path}{slides_postfix} to PDF {pdf_path}")
             to_pdf(f"{html_path}{slides_postfix}", pdf_path)
 
             # 1.
@@ -229,7 +229,7 @@ class StorageManager:
             action = "put_object"
             output_dir = "downdload-pdf"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             upload_url = response.json().get("url")
             # 2.
             # upload file
@@ -242,7 +242,7 @@ class StorageManager:
             action = "get_object"
             output_dir = "downdload-pdf"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             pdf_url = response.json().get("url")
 
         return pdf_path, pdf_url
@@ -252,9 +252,9 @@ class StorageManager:
         return h[:8]
 
     def get_user_uploaded_file(self, value):
-        log.debug("get user uploaded file " * 33)
+        log.info("get user uploaded file " * 33)
         if STORAGE == STORAGE_MEDIA:
-            log.debug(f"Get file {value[0]} from id={value[1]}")
+            log.info(f"Get file {value[0]} from id={value[1]}")
             import django
 
             django.setup()
@@ -263,16 +263,16 @@ class StorageManager:
             tu = TemporaryUpload.objects.get(upload_id=value[1])
             value[1] = tu.get_file_path()
             value[1] = value[1].replace("\\", "\\\\")
-            log.debug(f"File path is {value[1]}")
+            log.info(f"File path is {value[1]}")
         elif STORAGE == STORAGE_S3:
             # get link
 
             url = f"{self.server_url}/api/v1/worker/user-uploaded-file/{self.session_id}/{self.worker_id}/{self.notebook_id}/{value[0]}"
             print(url)
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             download_url = response.json().get("url")
             # download file
             f = StorageManager.download_file(download_url)
-            log.debug(f"Downloaded {f}")
+            log.info(f"Downloaded {f}")
             value[1] = f
         return value

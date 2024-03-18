@@ -28,7 +28,7 @@ class WSClient(RESTClient):
 
     def connect(self, ws_address):
         try:
-            log.debug(f"WS connect to {ws_address}")
+            log.info(f"WS connect to {ws_address}")
             self.ws = websocket.WebSocketApp(
                 ws_address,
                 on_open=lambda ws: self.on_open(ws),
@@ -62,10 +62,10 @@ class WSClient(RESTClient):
             sys.exit(1)
 
     def on_error(self, ws, msg):
-        log.debug(f"WS on_error, {msg}")
+        log.info(f"WS on_error, {msg}")
 
     def on_message(self, ws, msg):
-        log.debug(f"WS on_message {msg}")
+        log.info(f"WS on_message {msg}")
 
         json_data = json.loads(msg)
         if json_data.get("purpose", "") == Purpose.WorkerPing:
@@ -77,7 +77,7 @@ class WSClient(RESTClient):
 
     def send_state(self):
         try:
-            log.debug(f"Send state {self.worker_state()}")
+            log.info(f"Send state {self.worker_state()}")
             msg = {
                 "purpose": Purpose.WorkerState,
                 "state": self.worker_state(),

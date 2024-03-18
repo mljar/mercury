@@ -4,6 +4,7 @@ from apps.storage.views.dashboardfiles import (
     GetStorageType,
     DeleteFile,
     FileUploaded,
+    GetUploadCountLimit,
     ListFiles,
     PresignedUrl,
     PresignedUrlPut,
@@ -46,6 +47,10 @@ storage_urlpatterns = [
     re_path(
         "api/v1/delete-file",
         DeleteFile.as_view(),
+    ),
+    re_path(
+        "api/v1/upload-limit/(?P<site_id>.+)",
+        GetUploadCountLimit.as_view(),
     ),
     #
     # style files

@@ -10,7 +10,6 @@ from shutil import which
 from subprocess import PIPE, Popen
 
 import nbformat
-import yaml
 from allauth.account.admin import EmailAddress
 from celery import shared_task
 from croniter import croniter
@@ -117,7 +116,7 @@ def task_init_notebook(
             "notify": {},
         }
         nb = None
-
+        log.info(f"Read notebook from {notebook_path}")
         with open(notebook_path, encoding="utf-8", errors="ignore") as f:
             nb = nbformat.read(f, as_version=4)
             parse_params(nb, params)

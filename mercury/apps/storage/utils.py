@@ -14,7 +14,10 @@ if os.environ.get("STORAGE", STORAGE_MEDIA) == STORAGE_S3:
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-MEDIA_ROOT = str(BASE_DIR / "media")
+
+MERCURY_DATA_DIR = Path(os.getenv('MERCURY_DATA_DIR', BASE_DIR))
+
+MEDIA_ROOT = str(MERCURY_DATA_DIR / "media")
 MEDIA_URL = "/media/"
 
 

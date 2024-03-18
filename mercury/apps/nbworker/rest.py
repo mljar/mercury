@@ -28,9 +28,10 @@ class RESTClient:
 
     def load_notebook(self):
         try:
-            log.debug(f"Load notebook id={self.notebook_id}")
+            log.info(f"Load notebook id={self.notebook_id}")
             response = requests.get(
-                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb"
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb",
+                timeout=5
             )
             if response.status_code != 200:
                 raise Exception("Cant load notebook")
@@ -41,9 +42,10 @@ class RESTClient:
 
     def load_owner_and_user(self):
         try:
-            log.debug("Load owner and user")
+            log.info("Load owner and user")
             response = requests.get(
-                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/owner-and-user"
+                f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/owner-and-user",
+                timeout=5
             )
             if response.status_code != 200:
                 raise Exception("Cant load onwer and user information")
@@ -63,7 +65,7 @@ class RESTClient:
         return json.dumps(self.user.__dict__)
 
     def update_notebook(self, new_params):
-        log.debug(f"Executed params {json.dumps(new_params, indent=4)}")
+        log.info(f"Executed params {json.dumps(new_params, indent=4)}")
 
         update_database = False
         if new_params.get("title", "") != "" and self.notebook.title != new_params.get(
@@ -98,10 +100,11 @@ class RESTClient:
 
         if update_database:
             try:
-                log.debug(f"Update notebook id={self.notebook_id}")
+                log.info(f"Update notebook id={self.notebook_id}")
                 response = requests.post(
                     f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/update-nb",
                     {"title": self.notebook.title, "params": json.dumps(nb_params)},
+                    timeout=5
                 )
                 if response.status_code != 200:
                     raise Exception(f"Cant update notebook {response}")
@@ -114,7 +117,7 @@ class RESTClient:
     def is_presentation(self):
         try:
             isIt = self.notebook.output == "slides"
-            log.debug(f"Check if notebook is presentation ({isIt})")
+            log.info(f"Check if notebook is presentation ({isIt})")
             return isIt
         except Exception:
             log.exception("Exception when check if notebook is presentation")
@@ -125,7 +128,7 @@ class RESTClient:
             show_it = str(
                 json.loads(self.notebook.params).get("show-code", "false")
             ).lower()
-            log.debug(f"Check if show code from notebook ({show_it})")
+            log.info(f"Check if show code from notebook ({show_it})")
             return show_it == "true"
         except Exception:
             log.exception("Exception when check if show code from notebook")
@@ -136,7 +139,7 @@ class RESTClient:
             show_it = str(
                 json.loads(self.notebook.params).get("show-prompt", "false")
             ).lower()
-            log.debug(f"Check if show prompt from notebook ({show_it})")
+            log.info(f"Check if show prompt from notebook ({show_it})")
             return show_it == "true"
         except Exception:
             log.exception("Exception when check if show promtp from notebook")
@@ -151,7 +154,7 @@ class RESTClient:
             stop_on_error = str(
                 json.loads(self.notebook.params).get("stop_on_error", "false")
             ).lower()
-            log.debug(f"Check if stop_on_error ({stop_on_error})")
+            log.info(f"Check if stop_on_error ({stop_on_error})")
             return stop_on_error == "true"
         except Exception:
             log.exception("Exception when check if stop_on_error")
@@ -162,7 +165,7 @@ class RESTClient:
 
     def set_worker_state(self, new_state):
         try:
-            log.debug(
+            log.info(
                 f"Worker id={self.worker_id} set state {new_state} uuid {machine_uuid()}"
             )
             self.state = new_state
@@ -172,6 +175,7 @@ class RESTClient:
             response = requests.post(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/set-worker-state",
                 {"state": new_state, "machine_id": machine_uuid()},
+                timeout=5
             )
             if response.status_code != 200:
                 raise Exception(f"Problem when set worker state {response}")
@@ -182,11 +186,12 @@ class RESTClient:
     @staticmethod
     def delete_worker_in_db(session_id, worker_id, notebook_id):
         try:
-            log.debug(f"Delete worker id={worker_id}")
+            log.info(f"Delete worker id={worker_id}")
             server_url = os.environ.get("MERCURY_SERVER_URL", "http://127.0.0.1:8000")
 
             response = requests.post(
                 f"{server_url}/api/v1/worker/{session_id}/{worker_id}/{notebook_id}/delete-worker",
+                timeout=5
             )
             if response.status_code != 204:
                 raise Exception(f"Problem when delete worker {response}")
@@ -202,10 +207,11 @@ class RESTClient:
 
     def worker_exists(self):
         try:
-            log.debug(f"Worker id={self.worker_id} exists")
+            log.info(f"Worker id={self.worker_id} exists")
 
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker",
+                timeout=5
             )
             self.worker = SimpleNamespace(**response.json())
 
@@ -218,10 +224,11 @@ class RESTClient:
         try:
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/is-worker-stale",
+                timeout=5
             )
             if response.status_code == 200:
                 is_stale = response.json().get("is_stale", True)
-                log.debug(f"Check worker id={self.worker_id} is stale {is_stale}")
+                log.info(f"Check worker id={self.worker_id} is stale {is_stale}")
                 return is_stale
             return True
 
@@ -235,6 +242,7 @@ class RESTClient:
         try:
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker-secrets",
+                timeout=5
             )
             if response.status_code == 200:
                 return response.json()
