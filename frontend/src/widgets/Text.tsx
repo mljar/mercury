@@ -13,6 +13,7 @@ type TextProps = {
   runNb: () => void;
   continuousUpdate: boolean;
   url_key: string;
+  sanitize: boolean;
 };
 
 export default function TextWidget({
@@ -25,6 +26,7 @@ export default function TextWidget({
   runNb,
   continuousUpdate,
   url_key,
+  sanitize,
 }: TextProps) {
   const dispatch = useDispatch();
   const [apply, showApply] = useState(false);
@@ -71,7 +73,7 @@ export default function TextWidget({
             dispatch(
               setWidgetValue({
                 key: widgetKey,
-                value: sanitizeString(e.target.value),
+                value: sanitize ? sanitizeString(e.target.value) : e.target.value,
               })
             );
           }}
@@ -97,7 +99,7 @@ export default function TextWidget({
             dispatch(
               setWidgetValue({
                 key: widgetKey,
-                value: sanitizeString(e.target.value),
+                value: sanitize ? sanitizeString(e.target.value) : e.target.value,
               })
             );
           }}

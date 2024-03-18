@@ -308,6 +308,7 @@ export default function SideBar({
             runNb={runNb}
             continuousUpdate={continuousUpdate}
             url_key={widgetParams?.url_key}
+            sanitize={widgetParams?.sanitize}
           />
         );
       } else if (isMarkdownWidget(widgetParams)) {
