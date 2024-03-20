@@ -286,7 +286,7 @@ class NBWorker(WSClient):
             fname = "requirements.txt"
             if os.path.exists(fname):
                 log.info(f"Install new packages from requirements.txt")
-                cmd = f"pip install -r {fname}"
+                cmd = f"pip install --no-input -r {fname}"
                 self.nbrun.run_code(cmd)
 
     def provision_secrets(self):

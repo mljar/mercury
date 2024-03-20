@@ -61,6 +61,7 @@ Available parameters:
 - `label` - the label above the widget,
 - `value` - the default value of the widget, should be a string,
 - `rows` - the number of rows in the text area (default is set to 1),
+- `sanitize` - if input should be sanitized when user updates the value
 
 Example YAML:
 

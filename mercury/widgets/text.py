@@ -41,6 +41,11 @@ class Text:
     hidden : bool, default False
         If set to True, the widget will not be visible in the UI. Defaults to False.
     
+    sanitize : bool, default True
+        If set to True, the string value will be sanitized, for example characters like
+        quotes or parentheses will be removed.
+    
+        
     Attributes
     ----------
     value : str
@@ -66,13 +71,14 @@ class Text:
     """
 
     def __init__(
-        self, value="", label="Text", rows=1, url_key="", disabled=False, hidden=False
+        self, value="text", label="", rows=1, url_key="", disabled=False, hidden=False, sanitize=True
     ):
         self.rows = rows
 
         self.code_uid = WidgetsManager.get_code_uid("Text", key=url_key)
         self.url_key = url_key
         self.hidden = hidden
+        self.sanitize = sanitize
         if WidgetsManager.widget_exists(self.code_uid):
             self.text = WidgetsManager.get_widget(self.code_uid)
             self.text.description = label
@@ -108,6 +114,7 @@ class Text:
             view = {
                 "widget": "Text",
                 "value": self.text.value,
+                "sanitize": self.sanitize,
                 "rows": self.rows,
                 "label": self.text.description,
                 "model_id": self.text.model_id,

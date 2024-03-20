@@ -8,10 +8,7 @@ from apps.accounts.serializers import MembershipSerializer
 
 from apps.accounts.views.permissions import HasEditRights
 
-
-import os
 import json
-import requests
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView

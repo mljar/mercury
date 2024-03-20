@@ -10,7 +10,6 @@ from shutil import which
 from subprocess import PIPE, Popen
 
 import nbformat
-import yaml
 from allauth.account.admin import EmailAddress
 from celery import shared_task
 from croniter import croniter

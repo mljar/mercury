@@ -154,6 +154,7 @@ class WidgetsManager:
                 "url_key": output.get("url_key", ""),
                 "disabled": output.get("disabled", False),
                 "hidden": output.get("hidden", False),
+                "sanitize": output.get("sanitize", True),
             }
         elif widget_type == "File":
             return {

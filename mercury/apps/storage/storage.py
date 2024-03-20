@@ -42,7 +42,7 @@ class StorageManager:
         elif STORAGE == STORAGE_S3:
             # get links
             url = f"{self.server_url}/api/v1/worker/uploaded-files-urls/{self.session_id}/{self.worker_id}/{self.notebook_id}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)
             download_urls = response.json().get("urls")
             # download files
             for url in download_urls:
@@ -114,7 +114,7 @@ class StorageManager:
             for entry in local_files:
                 # upload them to s3
                 url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{entry.name}"
-                response = requests.get(url)
+                response = requests.get(url, timeout=5)
                 upload_url = response.json().get("url")
 
                 with open(entry.path, "rb") as fin:
@@ -133,7 +133,7 @@ class StorageManager:
                     "output_dir": output_dir,
                     "local_filepath": entry.path,
                 }
-                response = requests.post(url, data)
+                response = requests.post(url, data, timeout=5)
                 # that's all
 
     def list_worker_files_urls(self):
@@ -174,11 +174,11 @@ class StorageManager:
             action = "put_object"
             output_dir = "downdload-html"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             upload_url = response.json().get("url")
             # 2.
             # upload file
-            response = requests.put(upload_url, nb_html_body.encode("utf-8"))
+            response = requests.put(upload_url, nb_html_body.encode("utf-8"), timeout=15)
             if response.status_code != 200:
                 raise Exception(f"Notebook not uploaded {response}")
             # 3.
@@ -186,7 +186,7 @@ class StorageManager:
             action = "get_object"
             output_dir = "downdload-html"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             html_url = response.json().get("url")
 
         return html_path, html_url
@@ -229,7 +229,7 @@ class StorageManager:
             action = "put_object"
             output_dir = "downdload-pdf"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             upload_url = response.json().get("url")
             # 2.
             # upload file
@@ -242,7 +242,7 @@ class StorageManager:
             action = "get_object"
             output_dir = "downdload-pdf"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             pdf_url = response.json().get("url")
 
         return pdf_path, pdf_url
@@ -269,7 +269,7 @@ class StorageManager:
 
             url = f"{self.server_url}/api/v1/worker/user-uploaded-file/{self.session_id}/{self.worker_id}/{self.notebook_id}/{value[0]}"
             print(url)
-            response = requests.get(url)
+            response = requests.get(url, timeout=15)
             download_url = response.json().get("url")
             # download file
             f = StorageManager.download_file(download_url)
