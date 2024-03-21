@@ -20,6 +20,7 @@ logging.basicConfig(
 
 log = logging.getLogger(__name__)
 
+CUSTOM_TASK_SERVER_URL = os.getenv("MERCURY_TASK_SERVER_URL")
 
 @shared_task(bind=True)
 def task_start_websocket_worker(self, job_params):
@@ -42,7 +43,7 @@ def task_start_websocket_worker(self, job_params):
                 str(job_params["notebook_id"]),
                 str(job_params["session_id"]),
                 str(job_params["worker_id"]),
-                job_params["server_url"],
+                CUSTOM_TASK_SERVER_URL or job_params["server_url"],
             ]
             log.info("Start " + " ".join(command))
             worker = subprocess.Popen(command)
