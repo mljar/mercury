@@ -24,6 +24,7 @@
     "font-awesome": "^4.7.0",
     "history": "^5.1.0",
     "js-file-download": "^0.4.12",
+    "mercury": "rmkolany/mercury#multiple-files-widget"
     "popper": "^1.0.1",
     "react": "^17.0.2",
     "react-block-ui": "^1.3.5",

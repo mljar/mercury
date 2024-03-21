@@ -31,6 +31,7 @@ type FileProps = {
   maxFileSize: string | null;
   disabled: boolean;
   hidden: boolean;
+  multiple: boolean;
   value: string[];
   runNb: () => void;
 };
@@ -41,6 +42,7 @@ export default function FileWidget({
   maxFileSize,
   disabled,
   hidden,
+  multiple,
   value,
   runNb,
 }: FileProps) {
