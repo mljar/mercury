@@ -183,8 +183,10 @@ export default function HomeView() {
                 title={`Open ${notebook.title}`}
               >
                 <i className="fa fa-chevron-right" aria-hidden="true" />
+                <i className="fa fa-chevron-right" aria-hidden="true" />
               </button>
             )}
+            
           </Link>
         </div>
       </div>
