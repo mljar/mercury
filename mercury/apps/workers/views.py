@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import logging
 from datetime import timedelta
 
 from django.conf import settings
@@ -24,6 +25,7 @@ from apps.accounts.models import Membership, Site
 
 MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
+log = logging.getLogger(__name__)
 
 class WorkerGetNb(APIView):
     authentication_classes = []
@@ -197,6 +199,7 @@ class MachineInfo(APIView):
 class AnalyticsView(APIView):
     def get(self, request, site_id, format=None):
         try:
+            log.info(f"Get analytics for side id {site_id}")
             user = request.user
             if user.is_anonymous:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -218,7 +221,6 @@ class AnalyticsView(APIView):
                 .annotate(nbcount=Count("notebook"))
                 .filter(site=site, created_at__gte=timezone.now() - timedelta(days=30))
             )
-
             # generate empty data for all notebooks
             days_list = []
             start = datetime.datetime.now()
@@ -232,12 +234,17 @@ class AnalyticsView(APIView):
             nb_names = [nb.path.split("/")[-1] for nb in notebooks]
             for nb in nb_names:
                 usage_data[nb] = {"x": days_list, "y": [0] * len(days_list)}
-
+            
             for session in sessions:
                 nb = session["notebook__path"].split("/")[-1]
                 if nb in usage_data:
-                    usage_data[nb]["y"][days_index[session["day"]]] = session["nbcount"]
-
+                    if isinstance(session["day"], str):
+                        day = session["day"]
+                    else:
+                        day = session["day"].strftime("%Y-%m-%d")
+                    if day in days_index:
+                        usage_data[nb]["y"][days_index[day]] = session["nbcount"]   
+            
             users_data = []
             logged_users_sessions = (
                 WorkerSession.objects.extra(select={"day": "date( updated_at )"})
@@ -260,6 +267,6 @@ class AnalyticsView(APIView):
                 {"usage_data": usage_data, "users_data": users_data},
                 status=status.HTTP_200_OK,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            log.error(f"User analytics error, {str(e)}")
         return Response(status=status.HTTP_404_NOT_FOUND)
