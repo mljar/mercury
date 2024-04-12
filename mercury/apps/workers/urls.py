@@ -9,6 +9,7 @@ from apps.workers.views import (
     WorkerUpdateNb,
     MachineInfo,
     WorkerGetOwnerAndUser,
+    AnalyticsView,
 )
 
 workers_urlpatterns = [
@@ -44,4 +45,9 @@ workers_urlpatterns = [
         "api/v1/machine-info",
         MachineInfo.as_view(),
     ),
+    re_path(
+        "api/v1/(?P<site_id>.+)/analytics",
+        AnalyticsView.as_view(),
+    ),
+ 
 ]

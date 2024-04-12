@@ -12,18 +12,98 @@ from datetime import datetime
 
 from allauth.account.admin import EmailAddress
 from django.contrib.auth.models import User
-from django.core import mail
 from django.utils.timezone import make_aware
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 
-from apps.accounts.models import Membership, Secret, Site
+
+from apps.accounts.models import Site
 from apps.notebooks.models import Notebook
 from apps.workers.models import Worker
 
 # Create your tests here.
 # python manage.py test apps.workers -v 2
+
+# python manage.py test apps.workers.tests.AnalyticsTestCase
+class AnalyticsTestCase(TestCase):
+
+    login_url = "/api/v1/auth/login/"
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="developer",
+            email="developer@example.com",
+            password="developer",
+        )
+        EmailAddress.objects.create(
+            user=self.user, email=self.user.email, verified=True, primary=True
+        )
+        self.site = Site.objects.create(
+            title="Mercury",
+            slug="single-site",
+            share=Site.PUBLIC,
+            created_by=self.user,
+        )
+
+        self.nb = Notebook.objects.create(
+            title="some",
+            slug="some",
+            path="some",
+            created_by=self.user,
+            hosted_on=self.site,
+            file_updated_at=make_aware(datetime.now()),
+        )
+        self.nb2 = Notebook.objects.create(
+            title="some2",
+            slug="some2",
+            path="some2",
+            created_by=self.user,
+            hosted_on=self.site,
+            file_updated_at=make_aware(datetime.now()),
+        )
+
+        self.user2 = User.objects.create_user(
+            username="developer2",
+            email="developer2@example.com",
+            password="developer2",
+        )
+        EmailAddress.objects.create(
+            user=self.user2, email=self.user2.email, verified=True, primary=True
+        )
+
+    def test_get_analytics_data(self):
+        login_params = {"email": self.user.email, "password":  "developer"}
+        response = self.client.post(self.login_url, login_params)
+        token = response.json()["key"]
+        headers = {"HTTP_AUTHORIZATION": "Token " + token}
+        
+        for i in range(10): 
+            WorkerSession.objects.create(
+                ipv4="0.0.0.0",
+                state=WorkerSessionState.Running,
+                owned_by=self.user,
+                site=self.site,
+                notebook=self.nb,
+            )
+            WorkerSession.objects.create(
+                ipv4="0.0.0.0",
+                state=WorkerSessionState.Running,
+                owned_by=self.user,
+                site=self.site,
+                notebook=self.nb2,
+            )
+            WorkerSession.objects.create(
+                ipv4="0.0.0.0",
+                state=WorkerSessionState.Running,
+                owned_by=self.user,
+                site=self.site,
+                notebook=self.nb2,
+                run_by=self.user2
+            )
+
+        analytics_url = f"/api/v1/{self.site.id}/analytics"
+        response = self.client.get(analytics_url, **headers)
+        
+        self.assertTrue("usage_data" in response.json())
+        self.assertTrue("users_data" in response.json())
 
 
 class ManageMachinesTestCase(TestCase):

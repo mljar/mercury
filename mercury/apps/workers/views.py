@@ -1,14 +1,12 @@
 import os
 import json
+import datetime
 from datetime import timedelta
 
 from django.conf import settings
-from django.db import transaction
-from django.db.models import Q
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import status, viewsets
+from django.db.models import Count
+from rest_framework import status 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -22,7 +20,7 @@ from apps.workers.models import (
 from apps.workers.constants import WorkerState, MachineState, WorkerSessionState
 from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
-from apps.accounts.serializers import UserSerializer
+from apps.accounts.models import Membership, Site
 
 MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
@@ -191,6 +189,77 @@ class MachineInfo(APIView):
                     m.save()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception:
+            pass
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class AnalyticsView(APIView):
+    def get(self, request, site_id, format=None):
+        try:
+            user = request.user
+            if user.is_anonymous:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            site = Site.objects.get(pk=site_id)
+            # check if have EDIT rights
+            if site.created_by != user:
+                m = Membership.objects.filter(
+                    user=user, host=site, rights=Membership.EDIT
+                )
+                if not m:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+            usage_data = {}
+            sessions = (
+                WorkerSession.objects.extra(select={"day": "date( updated_at )"})
+                .select_related("notebook", "run_by")
+                .values("notebook__path", "day")
+                .annotate(nbcount=Count("notebook"))
+                .filter(site=site, created_at__gte=timezone.now() - timedelta(days=30))
+            )
+
+            # generate empty data for all notebooks
+            days_list = []
+            start = datetime.datetime.now()
+            days_index = {}
+            for index, day in enumerate(reversed(range(31))):
+                day = (start - timedelta(days=day)).strftime("%Y-%m-%d")
+                days_list += [day]
+                days_index[day] = index
+            # fill data
+            notebooks = Notebook.objects.filter(hosted_on=site)
+            nb_names = [nb.path.split("/")[-1] for nb in notebooks]
+            for nb in nb_names:
+                usage_data[nb] = {"x": days_list, "y": [0] * len(days_list)}
+
+            for session in sessions:
+                nb = session["notebook__path"].split("/")[-1]
+                if nb in usage_data:
+                    usage_data[nb]["y"][days_index[session["day"]]] = session["nbcount"]
+
+            users_data = []
+            logged_users_sessions = (
+                WorkerSession.objects.extra(select={"day": "date( updated_at )"})
+                .select_related("notebook", "run_by")
+                .values("notebook__path", "day", "run_by__username")
+                .filter(site=site, created_at__gte=timezone.now() - timedelta(days=30))
+                .exclude(run_by__isnull=True)
+                .distinct()
+            )
+            for session in logged_users_sessions:
+                users_data += [
+                    {
+                        "day": session["day"],
+                        "username": session["run_by__username"],
+                        "notebook": session["notebook__path"].split("/")[-1],
+                    }
+                ]
+
+            return Response(
+                {"usage_data": usage_data, "users_data": users_data},
+                status=status.HTTP_200_OK,
+            )
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
