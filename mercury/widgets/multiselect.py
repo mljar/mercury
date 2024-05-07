@@ -101,7 +101,7 @@ class MultiSelect:
             self.select.disabled = disabled
         else:
             self.select = ipywidgets.SelectMultiple(
-                value=value,
+                value=WidgetsManager.get_preset_value(url_key, value),
                 options=choices,
                 description=label,
                 style={"description_width": "initial"},

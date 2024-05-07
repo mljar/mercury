@@ -115,7 +115,7 @@ class Select:
             self.dropdown.disabled = disabled
         else:
             self.dropdown = ipywidgets.Dropdown(
-                value=value,
+                value=WidgetsManager.get_preset_value(url_key, value),
                 options=choices,
                 description=label,
                 style={"description_width": "initial"},

@@ -131,7 +131,7 @@ class Slider:
                 number_format = get_number_format(step)
 
             self.slider = SliderConstructor(
-                value=value,
+                value=WidgetsManager.get_preset_value(url_key, value),
                 min=min,
                 max=max,
                 description=label,

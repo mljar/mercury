@@ -76,7 +76,7 @@ class Checkbox:
             self.checkbox.disabled = disabled
         else:
             self.checkbox = ipywidgets.Checkbox(
-                value=value,
+                value=WidgetsManager.get_preset_value(url_key, value),
                 description=label,
                 style={"description_width": "initial"},
                 disabled=disabled,

@@ -23,6 +23,8 @@ from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
 from apps.accounts.models import Membership, Site
 
+from apps.tasks.models import RestAPITask
+
 MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
 log = logging.getLogger(__name__)
@@ -36,7 +38,18 @@ class WorkerGetNb(APIView):
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
             nb = Notebook.objects.get(pk=notebook_id)
-            return Response(NotebookSerializer(nb).data)
+            nb_data = NotebookSerializer(nb).data
+
+            rest_tasks = RestAPITask.objects.filter(session_id=session_id, notebook__id=notebook_id)
+
+            if rest_tasks:
+                nb_data["task_id"] = rest_tasks[0].session_id
+                nb_data["task_params"] = rest_tasks[0].params
+            else:
+                nb_data["task_id"] = ""
+                nb_data["task_params"] = ""
+
+            return Response(nb_data)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -269,4 +282,29 @@ class AnalyticsView(APIView):
             )
         except Exception as e:
             log.error(f"User analytics error, {str(e)}")
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+class UpdateRestApiTask(APIView):
+    authentication_classes = []
+
+    def post(self, request, session_id, format=None):
+        try:
+            session_id = session_id.replace("/", "")
+            task = RestAPITask.objects.filter(session_id=session_id).latest("id")
+            state = request.data.get("state", "")
+            response = request.data.get("response", "")
+            nb_html_path = request.data.get("html_path", "")
+            
+            if state != "":
+                task.state = state
+            if response != "":
+                task.response = response
+            if nb_html_path != "":
+                task.nb_html_path = nb_html_path
+            task.save()
+            return Response(status=status.HTTP_200_OK)
+        except Exception:
+            pass
         return Response(status=status.HTTP_404_NOT_FOUND)

@@ -22,6 +22,16 @@ class WidgetsManager:
     code2model = {}  # code generated uid  -> model_id
     cell_index = 0  # current cell index
 
+    preset_values = {} # url_key -> value
+
+    @staticmethod
+    def set_preset_value(url_key, value):
+        WidgetsManager.preset_values[url_key] = value
+
+    @staticmethod
+    def get_preset_value(url_key, value=None):
+        return WidgetsManager.preset_values.get(url_key, value)
+    
     @staticmethod
     def rand_uid():
         if os.environ.get("RUN_MERCURY") is None:
@@ -203,6 +213,11 @@ class WidgetsManager:
                 "style": output.get("style", "primary"),
                 "disabled": output.get("disabled", False),
                 "hidden": output.get("hidden", False),
+            }
+        elif widget_type == "APIResponse":
+            return {
+                "output": "apiresponse",
+                "value": "",
             }
 
         return {}

@@ -2,9 +2,7 @@
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  scrapeSlidesHash,
-} from "../slices/tasksSlice";
+import { listRestTasks, scrapeSlidesHash } from "../slices/tasksSlice";
 import CheckboxWidget from "../widgets/Checkbox";
 import NumericWidget from "../widgets/Numeric";
 import RangeWidget from "../widgets/Range";
@@ -23,6 +21,7 @@ import {
   IWidget,
   isOutputFilesWidget,
   isButtonWidget,
+  isAPIResponseWidget,
 } from "../widgets/Types";
 
 import {
@@ -54,6 +53,7 @@ import {
 import ButtonWidget from "../widgets/Button";
 import RunButton from "./RunButton";
 import BlockUi from "react-block-ui";
+import { getSiteId } from "../slices/sitesSlice";
 
 type SideBarProps = {
   notebookTitle: string;
@@ -100,7 +100,7 @@ export default function SideBar({
   const workerState = useSelector(getWorkerState);
   const widgetsInitialized = useSelector(getWidgetsInitialized);
   const urlValuesUsed = useSelector(getUrlValuesUsed);
-
+  const siteId = useSelector(getSiteId);
   const ws = useContext(WebSocketContext);
 
   const runNb = () => {
@@ -132,6 +132,12 @@ export default function SideBar({
       );
     }
   };
+
+  useEffect(() => {
+    if (siteId !== undefined && notebookId !== undefined) {
+      dispatch(listRestTasks(siteId, notebookId));
+    }
+  }, [dispatch, notebookId, siteId]);
 
   useEffect(() => {
     if (widgetsInitialized && urlValuesUsed) {
@@ -333,6 +339,8 @@ export default function SideBar({
           />
         );
       } else if (isOutputFilesWidget(widgetParams)) {
+        // do nothing
+      } else if (isAPIResponseWidget(widgetParams)) {
         // do nothing
       } else {
         console.log("Unknown widget type", widgetParams);

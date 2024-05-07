@@ -42,8 +42,21 @@ class NBWorker(WSClient):
             and os.environ.get("MERCURY_DISABLE_AUTO_RELOAD", "NO") != "YES"
         ):
             threading.Thread(target=self.nb_file_watch, daemon=True).start()
-        threading.Thread(target=self.process_msgs, daemon=True).start()
-        self.ws.run_forever(ping_interval=10, ping_timeout=5)
+
+        if self.is_task_mode():
+            log.info(f"Worker processing task {self.notebook.task_id}")
+            self.init_notebook()
+        else:
+            log.info("Starting worker processing thread")
+            threading.Thread(target=self.process_msgs, daemon=True).start()
+            self.ws.run_forever(ping_interval=10, ping_timeout=5)
+
+    def is_task_mode(self):
+        log.info("is task mode")
+        log.info(self.notebook)
+        if self.notebook.task_id != "":
+            return True
+        return False
 
     @staticmethod
     def md5(fname):
@@ -297,12 +310,29 @@ class NBWorker(WSClient):
                 name = s.get("name", "")
                 secret = s.get("secret", "")
                 cmd += f'os.environ["{name}"] = "{secret}"'
-                cmd += "\n" # add new line between secrets
+                cmd += "\n"  # add new line between secrets
             log.info("Set secrets")
             self.nbrun.run_code(cmd)
 
     def init_notebook(self):
         log.info(f"Init notebook, show_code={self.show_code()}")
+
+        if self.notebook.task_id != "":
+            log.info(
+                f"Task available {self.notebook.task_id}, params {self.notebook.params}"
+            )
+            try:
+                if hasattr(self.notebook, "task_params"):
+                    task_params = self.notebook.task_params
+                    if task_params != "":
+                        task_params = json.loads(task_params)
+                        for k in task_params:
+                            if k != "":
+                                WidgetsManager.set_preset_value(url_key=k, value=task_params[k])
+            except Exception as e:
+                log.error(f"Error when initialize notebook, {str(e)}")
+                self.update_rest_api_task(state="ERROR", response="Error parsing input data")
+                return
 
         self.sm.provision_uploaded_files()
 
@@ -310,7 +340,8 @@ class NBWorker(WSClient):
         self.prev_widgets = {}
         self.prev_body = ""
 
-        self.update_worker_state(WorkerState.Busy)
+        if not self.is_task_mode():
+            self.update_worker_state(WorkerState.Busy)
 
         self.nbrun = NbRun(
             show_code=self.show_code(),
@@ -320,7 +351,7 @@ class NBWorker(WSClient):
             stop_on_error=self.stop_on_error(),
             user_info=self.get_user_info(),
         )
-        
+
         self.provision_secrets()
         self.install_new_packages()
 
@@ -332,77 +363,49 @@ class NBWorker(WSClient):
 
         self.nbrun.run_notebook(self.nb_original)
 
-        self.sm.sync_output_dir()
-
-        # TODO: update params in db if needed"
-        params = {}
-        parse_params(nb2dict(self.nb_original), params)
-
-        # update database ...
-
-        log.info(f"Executed params {json.dumps(params, indent=4)}")
-        update_database = self.update_notebook(params)
-
-        # update_database = False
-        # if params.get("title", "") != "" and self.notebook.title != params.get(
-        #     "title", ""
-        # ):
-        #     self.notebook.title = params.get("title", "")
-        #     update_database = True
-
-        # nb_params = json.loads(self.notebook.params)
-        # for property in [
-        #     "show-code",
-        #     "show-prompt",
-        #     "continuous_update",
-        #     "static_notebook",
-        #     "description",
-        #     "show_sidebar",
-        #     "full_screen",
-        #     "allow_download",
-        # ]:
-        #     if params.get(property) is not None and nb_params.get(
-        #         property
-        #     ) != params.get(property):
-        #         nb_params[property] = params.get(property)
-        #         update_database = True
-        # # save widgets params
-        # if json.dumps(nb_params.get("params", {})) != json.dumps(
-        #     params.get("params", {})
-        # ):
-        #     nb_params["params"] = params["params"]
-        #     update_database = True
-
-        # if update_database:
-        #     self.notebook.params = json.dumps(nb_params)
-        #     self.notebook.save()
-
-        nb_params = json.loads(self.notebook.params)
-
-        self.nbrun.set_show_code_and_prompt(
-            nb_params.get("show-code", False), nb_params.get("show-prompt", True)
-        )
-        self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
-        self.nbrun.set_stop_on_error(nb_params.get("stop_on_error", False))
-
-        log.info(params)
-        log.info(f"Exporter show_code {self.nbrun.exporter.show_code}")
-
-        self.nb = copy.deepcopy(self.nb_original)
-
-        if self.is_presentation():
-            body = self.nbrun.export_html(self.nb, full_header=True)
+        if self.is_task_mode():
+            log.info("Task mode, update response")
+            self.nb = copy.deepcopy(self.nb_original)
+            self.save_nb_task_to_html()
         else:
-            body = self.nbrun.export_html(self.nb, full_header=False)
+            log.info("Websocket mode, update db and send reponse")
 
-        msg = {"purpose": Purpose.ExecutedNotebook, "body": body}
-        if update_database:
-            msg["reloadNotebook"] = True
-        self.ws.send(json.dumps(msg))
-        self.prev_body = copy.deepcopy(body)
+            self.sm.sync_output_dir()
+            
+            # TODO: update params in db if needed"
+            params = {}
+            parse_params(nb2dict(self.nb_original), params)
 
-        self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)
-        self.update_worker_state(WorkerState.Running)
+            # update database ...
+            log.info(f"Executed params {json.dumps(params, indent=4)}")
+            update_database = self.update_notebook(params)
+
+            nb_params = json.loads(self.notebook.params)
+
+            self.nbrun.set_show_code_and_prompt(
+                nb_params.get("show-code", False), nb_params.get("show-prompt", True)
+            )
+            self.nbrun.set_is_presentation(nb_params.get("output", "app") == "slides")
+            self.nbrun.set_stop_on_error(nb_params.get("stop_on_error", False))
+
+            log.info(params)
+            log.info(f"Exporter show_code {self.nbrun.exporter.show_code}")
+
+            self.nb = copy.deepcopy(self.nb_original)
+
+            if self.is_presentation():
+                body = self.nbrun.export_html(self.nb, full_header=True)
+            else:
+                body = self.nbrun.export_html(self.nb, full_header=False)
+
+            msg = {"purpose": Purpose.ExecutedNotebook, "body": body}
+            if update_database:
+                msg["reloadNotebook"] = True
+            self.ws.send(json.dumps(msg))
+            self.prev_body = copy.deepcopy(body)
+
+            self.send_widgets(self.nb, expected_widgets_keys=[], init_widgets=True)
+            self.update_worker_state(WorkerState.Running)
 
     # def save_notebook(self):
     #     log.info(f"Save notebook")
@@ -431,6 +434,41 @@ class NBWorker(WSClient):
 
     def display_notebook(self, json_params):
         log.info(f"Display notebook ({json_params})")
+
+    
+        
+    def get_task_api_response(self):
+        log.info("Get task APIResponse")
+        try:
+            for cell in self.nb.cells:
+                for output in cell.get("outputs", []):
+
+                    if "data" in output:
+                        if "application/mercury+json" in output["data"]:
+                            w = output["data"]["application/mercury+json"]
+                            log.info(w)
+                            w = json.loads(w)
+                            if w["widget"] == "APIResponse":
+                                return json.dumps(w["value"])
+        except Exception as e:
+            log.error(f"Problem when parsing task APIResponse, {str(e)}")
+            return ""
+        return ""
+
+    def save_nb_task_to_html(self):
+        log.info(f"Save notebook task to HTML")
+        # save nb in HTML with full header
+        if self.is_presentation():
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+        else:
+            nb_body = self.nbrun.export_html(self.nb, full_header=True)
+
+        html_path, _ = self.sm.save_nb_html(nb_body, get_download_link=False, output_dir="rest-api-notebooks")
+
+        response = self.get_task_api_response()
+        # save nb_path in task
+        self.update_rest_api_task(state="DONE", response=response, html_path = html_path)
+
 
     def download_html(self):
         log.info(f"Download HTML")

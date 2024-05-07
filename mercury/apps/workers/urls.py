@@ -10,6 +10,7 @@ from apps.workers.views import (
     MachineInfo,
     WorkerGetOwnerAndUser,
     AnalyticsView,
+    UpdateRestApiTask,
 )
 
 workers_urlpatterns = [
@@ -48,6 +49,10 @@ workers_urlpatterns = [
     re_path(
         "api/v1/(?P<site_id>.+)/analytics",
         AnalyticsView.as_view(),
+    ),
+    re_path(
+        "api/v1/update-rest-task/(?P<session_id>.+)",
+        UpdateRestApiTask.as_view(),
     ),
  
 ]

@@ -12,6 +12,7 @@ from apps.tasks.views import (
     ListOutputFilesView,
     ListWorkerOutputFilesView,
     TaskCreateView,
+    ListRestAPITasks
 )
 
 tasks_urlpatterns = [
@@ -32,13 +33,16 @@ tasks_urlpatterns = [
         "api/v1/clear_tasks/(?P<notebook_id>.+)/(?P<session_id>.+)",
         ClearTasksView.as_view(),
     ),
-    # used by notebook as REST API
-    re_path("run/(?P<notebook_slug>.+)", CreateRestAPITask.as_view()),
-    re_path("get/(?P<session_id>.+)", GetRestAPITask.as_view()),
+    # 
     re_path("export_pdf", ExportPDF.as_view()),
     re_path("get_pdf/(?P<job_id>.+)", GetPDFAddress.as_view()),
     re_path(
         "api/v1/execution_history/(?P<notebook_id>.+)/(?P<session_id>.+)",
         ExecutionHistoryView.as_view(),
     ),
+
+    # used by notebook as REST API
+    re_path("api/v1/(?P<site_id>.+)/run/(?P<notebook_slug>.+)", CreateRestAPITask.as_view()),
+    re_path("api/v1/get/(?P<task_id>.+)", GetRestAPITask.as_view()),
+    re_path("api/v1/(?P<site_id>.+)/(?P<notebook_id>.+)/list-rest-tasks", ListRestAPITasks.as_view()),
 ]
