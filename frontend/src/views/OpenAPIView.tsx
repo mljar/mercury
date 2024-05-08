@@ -1,9 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getUsername,
-} from "../slices/authSlice";
+import { getUsername } from "../slices/authSlice";
 import Footer from "../components/Footer";
 import HomeNavBar from "../components/HomeNavBar";
 import {
@@ -17,7 +15,14 @@ import axios from "axios";
 
 import DefaultLogoSrc from "../components/DefaultLogo";
 import { fetchNotebooks, getNotebooks } from "../slices/notebooksSlice";
-import { isSelectWidget, isSliderWidget } from "../widgets/Types";
+import {
+  isCheckboxWidget,
+  isNumericWidget,
+  isRangeWidget,
+  isSelectWidget,
+  isSliderWidget,
+  isTextWidget,
+} from "../widgets/Types";
 
 export default function OpenAPIView() {
   const dispatch = useDispatch();
@@ -113,7 +118,7 @@ export default function OpenAPIView() {
             "description": "${w.label}",
             "required": false,
             "schema": {
-                "type": "integer"
+                "type": "number"
                 }
             }`;
           }
@@ -129,7 +134,56 @@ export default function OpenAPIView() {
                 }
             }`;
           }
+        } else if (isCheckboxWidget(w)) {
+          if (w.url_key !== "") {
+            return `{
+            "name": "${w.url_key}",
+            "in": "body",
+            "description": "${w.label}",
+            "required": false,
+            "schema": {
+                "type": "boolean"
+                }
+            }`;
+          }
+        } else if (isNumericWidget(w)) {
+          if (w.url_key !== "") {
+            return `{
+            "name": "${w.url_key}",
+            "in": "body",
+            "description": "${w.label}",
+            "required": false,
+            "schema": {
+                "type": "number"
+                }
+            }`;
+          }
+        } else if (isRangeWidget(w)) {
+          if (w.url_key !== "") {
+            return `{
+            "name": "${w.url_key}",
+            "in": "body",
+            "description": "${w.label}, parameter should be string with comma separated values, for example 3,5",
+            "required": false,
+            "schema": {
+                "type": "string"
+                }
+            }`;
+          }
+        } else if (isTextWidget(w)) {
+          if (w.url_key !== "") {
+            return `{
+            "name": "${w.url_key}",
+            "in": "body",
+            "description": "${w.label}",
+            "required": false,
+            "schema": {
+                "type": "string"
+                }
+            }`;
+          }
         }
+
         return ``;
       })
       .filter((s) => s !== "");
@@ -148,7 +202,7 @@ export default function OpenAPIView() {
     desc += `}}`;
     return desc;
   });
-  
+
   const schema = `{
     "openapi": "3.0",
     "info": {
