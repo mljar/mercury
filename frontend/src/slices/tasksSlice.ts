@@ -21,16 +21,6 @@ export interface ITask {
     result: string;
 }
 
-export interface IRestTask {
-    id: number;
-    state: "CREATED" | "RECEIVED" | "DONE" | "ERROR";
-    params: string;
-    response: string;
-    session_id: string;
-    created_at: Date;
-    updated_at: Date;
-}
-
 const initialState = {
     currentTask: {} as ITask,
     historicTask: {} as ITask,
@@ -40,7 +30,6 @@ const initialState = {
     exportToPDFJobId: '',
     exportToPDFCounter: 0,
     executionHistory: [] as ITask[],
-    restTasks: [] as IRestTask[],
 };
 
 const tasksSlice = createSlice({
@@ -84,9 +73,6 @@ const tasksSlice = createSlice({
         },
         clearExecutionHistory(state) {
             state.executionHistory = [];
-        },
-        setRestTasks(state, action: PayloadAction<IRestTask[]>) {
-            state.restTasks = action.payload;
         }
     },
 });
@@ -105,8 +91,7 @@ export const {
     increaseExportToPDFCounter,
     stopPDFExport,
     setExecutionHistory,
-    clearExecutionHistory,
-    setRestTasks
+    clearExecutionHistory
 } = tasksSlice.actions;
 
 export const getShowCurrent = (state: RootState) => state.tasks.showCurrent;
@@ -117,7 +102,6 @@ export const getExportingToPDF = (state: RootState) => state.tasks.exportingToPD
 export const getExportToPDFJobId = (state: RootState) => state.tasks.exportToPDFJobId;
 export const getExportToPDFCounter = (state: RootState) => state.tasks.exportToPDFCounter;
 export const getExecutionHistory = (state: RootState) => state.tasks.executionHistory;
-export const getRestTasks = (state: RootState) => state.tasks.restTasks;
 
 export const fetchCurrentTask =
     (notebookId: number) =>
@@ -263,19 +247,5 @@ export const fetchExecutionHistory =
                 dispatch(clearExecutionHistory());
             }
 
-        };
-
-
-export const listRestTasks =
-    (siteId: number, notebookId: number) =>
-        async (dispatch: Dispatch<AnyAction>) => {
-            try {
-                dispatch(setRestTasks([]));
-                const url = `/api/v1/${siteId}/${notebookId}/list-rest-tasks/`;
-                const { data } = await axios.get(url);
-                dispatch(setRestTasks(data));
-            } catch (error) {
-                dispatch(setRestTasks([]));
-            }
         };
 
