@@ -273,13 +273,13 @@ class GetRestAPITask(APIView):
 
 class ListRestAPITasks(APIView):
     
-    #permission_classes = [permissions.IsAuthenticated, HasEditRights]
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
     
     def get(self, requset, site_id, notebook_id):
         try:
-            print(site_id, notebook_id)
+            
             tasks = RestAPITask.objects.filter(notebook_id=notebook_id)
-            print(tasks)
+            
             tasks_data = []
             for t in tasks:
                 task = {
