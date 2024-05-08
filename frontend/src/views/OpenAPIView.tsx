@@ -1,19 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUsername } from "../slices/authSlice";
-import Footer from "../components/Footer";
-import HomeNavBar from "../components/HomeNavBar";
-import {
-  getFooterText,
-  getLogoFilename,
-  getNavbarColor,
-  getSiteId,
-  isPublic,
-} from "../slices/sitesSlice";
+import { getSiteId } from "../slices/sitesSlice";
 import axios from "axios";
 
-import DefaultLogoSrc from "../components/DefaultLogo";
 import { fetchNotebooks, getNotebooks } from "../slices/notebooksSlice";
 import {
   isCheckboxWidget,
@@ -26,16 +16,7 @@ import {
 
 export default function OpenAPIView() {
   const dispatch = useDispatch();
-
-  const [logoSrc, setLogoSrc] = useState("loading");
-
-  const username = useSelector(getUsername);
-
-  const isSitePublic = useSelector(isPublic);
-  const logoFilename = useSelector(getLogoFilename);
   const siteId = useSelector(getSiteId);
-  const navbarColor = useSelector(getNavbarColor);
-  const footerText = useSelector(getFooterText);
   const notebooks = useSelector(getNotebooks);
 
   useEffect(() => {
@@ -44,64 +25,23 @@ export default function OpenAPIView() {
     }
   }, [dispatch, siteId]);
 
-  document.body.style.backgroundColor = "white";
-
-  useEffect(() => {
-    if (siteId !== undefined) {
-      if (logoFilename === "") {
-        setLogoSrc(DefaultLogoSrc);
-      } else {
-        axios
-          .get(`/api/v1/get-style/${siteId}/${logoFilename}`)
-          .then((response) => {
-            const { url } = response.data;
-            setLogoSrc(url);
-          });
-      }
-    }
-  }, [dispatch, logoFilename, siteId]);
-
-  const responses = `, "responses": {
-    "200": {
-        "description": "OK",
+  const createTaskResponse = `, "responses": {
+    "201": {
+        "description": "Request accepted for preprocessing, please check the processing state of the request using task_id",
         "content": {
             "application/json": {
                 "schema": {
                     "type": "object",
                     "properties": {
-                      "state": {
-                        "type": "string"
-                      },
-                      "message": {
-                        "type": "string"
-                      },
-                      "result": {
-                        "type": "string"
+                        "task_id": {
+                          "type": "string"
                       }
+                    }
                   }
                 }
-            }
-        }
-    },
-    "202": {
-      "description": "Request accepted",
-      "content": {
-          "application/json": {
-              "schema": {
-                  "type": "object",
-                  "properties": {
-                    "state": {
-                      "type": "string"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                }
               }
-          }
-      }
-  }  
-}`;
+            }
+          }`;
 
   const notebookApis = notebooks.map((nb) => {
     const endpoint = `/api/v1/${siteId}/run/${nb.slug}`;
@@ -115,7 +55,7 @@ export default function OpenAPIView() {
             return `{
             "name": "${w.url_key}",
             "in": "body",
-            "description": "${w.label}",
+            "description": "${w.label}, value should be from range ${w.min} to ${w.max}",
             "required": false,
             "schema": {
                 "type": "number"
@@ -127,7 +67,9 @@ export default function OpenAPIView() {
             return `{
             "name": "${w.url_key}",
             "in": "body",
-            "description": "${w.label}",
+            "description": "${
+              w.label
+            }, value should be from list [${w.choices.join(",")}]",
             "required": false,
             "schema": {
                 "type": "string"
@@ -151,7 +93,7 @@ export default function OpenAPIView() {
             return `{
             "name": "${w.url_key}",
             "in": "body",
-            "description": "${w.label}",
+            "description": "${w.label}, value should be in range  ${w.min} to ${w.max}",
             "required": false,
             "schema": {
                 "type": "number"
@@ -163,7 +105,7 @@ export default function OpenAPIView() {
             return `{
             "name": "${w.url_key}",
             "in": "body",
-            "description": "${w.label}, parameter should be string with comma separated values, for example 3,5",
+            "description": "${w.label}, parameter should be string with comma separated values, for example 3,5, allowed range is ${w.min} to ${w.max}",
             "required": false,
             "schema": {
                 "type": "string"
@@ -179,7 +121,7 @@ export default function OpenAPIView() {
             "required": false,
             "schema": {
                 "type": "string"
-                }
+              }
             }`;
           }
         }
@@ -198,10 +140,74 @@ export default function OpenAPIView() {
       desc += parameters.join(",");
       desc += `]`;
     }
-    desc += responses;
-    desc += `}}`;
+    desc += createTaskResponse;
+    desc += `
+        }
+      }
+    `;
     return desc;
   });
+
+  const getTaskResponse = `"responses": {
+    "200": {
+        "description": "Request processing completed successfully",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "result": {
+                        "type": "string"
+                      }
+                  }
+                }
+            }
+        }
+    },
+    "202": {
+      "description": "Request is still processing, please retry in 3 seconds",
+      "content": {
+          "application/json": {
+              "schema": {
+                  "type": "object",
+                  "properties": {
+                    "state": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }  
+        }`;
+
+  const getTask = `, "/api/v1/get/{task_id}": {
+    "get" : {
+      "operationId": "Get state and result of processed request",
+      "description": "Use this endpoint to check if request processing state and result",
+      "parameters": [
+        {
+          "name": "task_id",
+          "in": "path",
+          "description": "task_id of your request",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      ${getTaskResponse}
+      }
+    }`;
 
   const schema = `{
     "openapi": "3.0",
@@ -217,37 +223,9 @@ export default function OpenAPIView() {
     ],
     "paths": {
         ${notebookApis.join(",")}
-    }
+        ${getTask}
+  }
 }`;
 
-  return (
-    <div className="App">
-      <HomeNavBar
-        isSitePublic={isSitePublic}
-        username={username}
-        logoSrc={logoSrc}
-        navbarColor={navbarColor}
-      />
-
-      <div className="container">
-        <div className="mx-auto" style={{ width: "700px" }}>
-          <div className="row" style={{ marginTop: "40px" }}>
-            <h2>OpenAPI schema</h2>
-          </div>
-          <pre
-            style={{
-              border: "1px solid #eee",
-              borderRadius: "10px",
-              padding: "10px",
-              marginBottom: "80px",
-            }}
-          >
-            {JSON.stringify(JSON.parse(schema), null, 2)}
-          </pre>
-        </div>
-      </div>
-
-      <Footer footerText={footerText} />
-    </div>
-  );
+  return <pre>{schema}</pre>;
 }
