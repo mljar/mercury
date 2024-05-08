@@ -153,7 +153,8 @@ export default function OpenAPIView() {
     "openapi": "3.0",
     "info": {
         "description": "Execute Python notebook and get JSON response",
-        "title": "Mercury OpenAPI"
+        "title": "Mercury OpenAPI",
+        "version": "1.0.0"
     },
     "servers": [
         {
