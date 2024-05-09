@@ -19,6 +19,9 @@ from apps.accounts.views.secrets import (
 )
 from apps.accounts.views.subscription import SubscriptionView
 
+from apps.accounts.views.apikey import (GetApiKey, RegenerateApiKey)
+
+
 router = DefaultRouter()
 router.register(r"api/v1/sites", SiteViewSet, basename="sites")
 router.register(r"api/v1/(?P<site_id>.+)/members", MembershipViewSet, basename="sites")
@@ -69,4 +72,7 @@ accounts_urlpatterns += [
         SubscriptionView.as_view(),
     ),
     re_path("api/v1/auth/delete-account/", DeleteAccount.as_view()),
+    # api keys
+    re_path("api/v1/auth/api-key", GetApiKey.as_view()),
+    re_path("api/v1/auth/regenerate-api-key", RegenerateApiKey.as_view()),
 ]
