@@ -30,7 +30,7 @@ from apps.ws.tasks import task_start_websocket_worker
 from apps.tasks.models import RestAPITask
 
 from rest_framework import permissions
-from apps.accounts.views.permissions import HasEditRights
+from apps.accounts.views.permissions import HasEditRights, apiKeyToUser
 
 
 class TaskCreateView(CreateAPIView):
@@ -197,6 +197,7 @@ class ExecutionHistoryView(ListAPIView):
 
 class CreateRestAPITask(APIView):
     def post(self, request, site_id, notebook_slug):
+        apiKeyToUser(request)
         try:
             notebook = (
                 notebooks_queryset(request, site_id).filter(slug=notebook_slug).latest("id")

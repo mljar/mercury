@@ -163,7 +163,6 @@ class ApiKey(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        print("save", self.key)
         if not self.key:
             self.key = self.generate_key()
         return super().save(*args, **kwargs)
