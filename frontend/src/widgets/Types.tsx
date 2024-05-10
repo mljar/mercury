@@ -98,6 +98,12 @@ export interface IButtonWidget {
   hidden: boolean;
 }
 
+export interface IAPIResponseWidget {
+  output: string
+  input: null;
+  value: string;
+}
+
 
 export type IWidget =
   | ISelectWidget
@@ -109,7 +115,8 @@ export type IWidget =
   | ITextWidget
   | IOutputFilesWidget
   | IMarkdownWidget
-  | IButtonWidget;
+  | IButtonWidget
+  | IAPIResponseWidget;
 
 export function isSelectWidget(widget: IWidget): widget is ISelectWidget {
   return (widget as ISelectWidget).input === "select";
@@ -149,4 +156,8 @@ export function isMarkdownWidget(widget: IWidget): widget is IMarkdownWidget {
 
 export function isButtonWidget(widget: IWidget): widget is IButtonWidget {
   return (widget as IButtonWidget).input === "button";
+}
+
+export function isAPIResponseWidget(widget: IWidget): widget is IAPIResponseWidget {
+  return (widget as IAPIResponseWidget).output === "apiresponse";
 }

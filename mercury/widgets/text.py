@@ -85,7 +85,7 @@ class Text:
             self.text.disabled = disabled
         else:
             self.text = ipywidgets.Textarea(
-                value=value, description=label, disabled=disabled
+                value=WidgetsManager.get_preset_value(url_key, value), description=label, disabled=disabled
             )
             WidgetsManager.add_widget(self.text.model_id, self.code_uid, self.text)
         display(self)

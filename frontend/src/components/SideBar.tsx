@@ -2,9 +2,7 @@
 import React, { useContext } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  scrapeSlidesHash,
-} from "../slices/tasksSlice";
+import { scrapeSlidesHash } from "../slices/tasksSlice";
 import CheckboxWidget from "../widgets/Checkbox";
 import NumericWidget from "../widgets/Numeric";
 import RangeWidget from "../widgets/Range";
@@ -23,6 +21,7 @@ import {
   IWidget,
   isOutputFilesWidget,
   isButtonWidget,
+  isAPIResponseWidget,
 } from "../widgets/Types";
 
 import {
@@ -102,7 +101,6 @@ export default function SideBar({
   const workerState = useSelector(getWorkerState);
   const widgetsInitialized = useSelector(getWidgetsInitialized);
   const urlValuesUsed = useSelector(getUrlValuesUsed);
-
   const ws = useContext(WebSocketContext);
 
   const runNb = () => {
@@ -335,6 +333,8 @@ export default function SideBar({
           />
         );
       } else if (isOutputFilesWidget(widgetParams)) {
+        // do nothing
+      } else if (isAPIResponseWidget(widgetParams)) {
         // do nothing
       } else {
         console.log("Unknown widget type", widgetParams);

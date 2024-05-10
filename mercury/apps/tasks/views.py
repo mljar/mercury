@@ -24,6 +24,14 @@ from apps.tasks.serializers import TaskSerializer
 from apps.tasks.tasks import task_execute
 from apps.tasks.tasks_export import export_to_pdf
 
+from apps.workers.models import Worker
+from apps.ws.tasks import task_start_websocket_worker
+
+from apps.tasks.models import RestAPITask
+
+from rest_framework import permissions
+from apps.accounts.views.permissions import HasEditRights, apiKeyToUser
+
 
 class TaskCreateView(CreateAPIView):
     serializer_class = TaskSerializer
@@ -139,59 +147,6 @@ class ClearTasksView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CreateRestAPITask(APIView):
-    def post(self, request, notebook_slug):
-        try:
-            notebook = (
-                notebooks_queryset(request).filter(slug=notebook_slug).latest("id")
-            )
-        except Notebook.DoesNotExist:
-            raise Http404()
-        try:
-            with transaction.atomic():
-                task = Task(
-                    session_id=uuid.uuid4().hex,
-                    state="CREATED",
-                    notebook=notebook,
-                    params=json.dumps(request.data),
-                )
-                task.save()
-                job_params = {"db_id": task.id}
-                transaction.on_commit(lambda: task_execute.delay(job_params))
-            return Response({"id": task.session_id}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            raise APIException(str(e))
-
-
-class GetRestAPITask(APIView):
-    def get(self, requset, session_id):
-        try:
-            task = Task.objects.filter(
-                session_id=session_id,
-            ).latest("id")
-
-            if task.state == "DONE":
-                response = {}
-                try:
-                    fname = os.path.join(
-                        settings.MEDIA_ROOT, task.session_id, "response.json"
-                    )
-                    if os.path.exists(fname):
-                        with open(fname) as fin:
-                            response = json.loads(fin.read())
-                except Exception as e:
-                    return Response(
-                        str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-                return Response(response, status=status.HTTP_200_OK)
-            if task.state == "ERROR":
-                return Response(
-                    task.result, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            return Response({"state": "running"}, status=status.HTTP_202_ACCEPTED)
-        except Task.DoesNotExist:
-            raise Http404()
-
 
 class ExportPDF(APIView):
     def post(self, request):
@@ -238,3 +193,107 @@ class ExecutionHistoryView(ListAPIView):
             notebook_id=notebook.id,
             session_id=self.kwargs["session_id"],
         )
+
+
+class CreateRestAPITask(APIView):
+    def post(self, request, site_id, notebook_slug):
+        apiKeyToUser(request)
+        try:
+            notebook = (
+                notebooks_queryset(request, site_id).filter(slug=notebook_slug).latest("id")
+            )
+        except Notebook.DoesNotExist:
+            raise Http404()
+        try:
+            with transaction.atomic():
+                task = RestAPITask(
+                    session_id=uuid.uuid4().hex,
+                    state="CREATED",
+                    notebook=notebook,
+                    params=json.dumps(request.data),
+                )
+                if not request.user.is_anonymous:
+                    task.created_by = request.user
+                task.save()
+
+                worker = Worker(
+                    session_id=task.session_id,
+                    notebook_id=notebook.id,
+                    state="Queued",
+                )
+                if not request.user.is_anonymous:
+                    worker.run_by = request.user
+                worker.save()
+                
+                server_address = request.build_absolute_uri('/')
+                job_params = {
+                    "notebook_id": notebook.id,
+                    "session_id": task.session_id,
+                    "worker_id": worker.id,
+                    #
+                    # ugly hack for docker deployment
+                    #
+                    "server_url": server_address
+                    if "0.0.0.0" not in server_address
+                    else server_address + ":9000",
+                }
+                
+                transaction.on_commit(lambda: task_start_websocket_worker.delay(job_params))
+
+            return Response({"task_id": task.session_id}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            raise APIException(str(e))
+
+
+class GetRestAPITask(APIView):
+    def get(self, requset, task_id):
+        try:
+            task_id = task_id.replace("/", "")
+            tasks = RestAPITask.objects.filter(
+                session_id=task_id
+            )
+            if not tasks:
+                raise Http404()
+            task = tasks.latest("id")
+            
+            if task.state == "DONE":
+                result = {"state": "done", "message": "Request successfully computed", "result": {}}
+                if task.response != "":
+                    result["result"] = json.loads(task.response)
+                #if task.nb_html_path != "":
+                #    result["notebook_html"] = task.nb_html_path
+
+                return Response(result, status=status.HTTP_200_OK)
+            if task.state == "ERROR":
+                return Response(
+                    {"state": "error", "message": f"Error when processing task, {task.response}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            return Response({"state": "running", "message": "Still processing your request, please retry in 3 seconds"}, status=status.HTTP_202_ACCEPTED)
+        except RestAPITask.DoesNotExist:
+            raise Http404()
+
+class ListRestAPITasks(APIView):
+    
+    permission_classes = [permissions.IsAuthenticated, HasEditRights]
+    
+    def get(self, requset, site_id, notebook_id):
+        try:
+            
+            tasks = RestAPITask.objects.filter(notebook_id=notebook_id)
+            
+            tasks_data = []
+            for t in tasks:
+                task = {
+                    "id": t.id,
+                    "state": t.state,
+                    "params": t.params,
+                    "response": t.response,
+                    "session_id": t.session_id,
+                    "created_at": t.created_at,
+                    "updated_at": t.updated_at
+                }
+                tasks_data += [task]
+            return Response(tasks_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+            raise Http404()

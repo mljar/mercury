@@ -110,8 +110,26 @@ class Range:
                 RangeConstructor = ipywidgets.FloatRangeSlider
                 number_format = get_number_format(step)
 
+            try:
+                init_value = WidgetsManager.get_preset_value(url_key, None)
+                if init_value is None:
+                    init_value = value
+                else:
+                    init_value = init_value.split(",")
+                    if len(init_value) != 2:
+                        init_value = value
+                    else:
+                        if isinstance(step, float):
+                            init_value[0] = float(init_value[0])
+                            init_value[1] = float(init_value[1])
+                        else:
+                            init_value[0] = int(init_value[0])
+                            init_value[1] = int(init_value[1])
+            except Exception:
+                init_value = value
+
             self.range = RangeConstructor(
-                value=value,
+                value=init_value,
                 min=min,
                 max=max,
                 description=label,

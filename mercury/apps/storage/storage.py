@@ -10,6 +10,9 @@ from apps.nbworker.utils import stop_event
 from apps.storage.utils import get_worker_bucket_key
 from apps.tasks.export_pdf import to_pdf
 from apps.storage.utils import STORAGE, STORAGE_MEDIA, STORAGE_S3, MEDIA_ROOT, MEDIA_URL
+from apps.storage.utils import (
+    get_worker_bucket_key,
+)
 
 
 log = logging.getLogger(__name__)
@@ -159,8 +162,8 @@ class StorageManager:
     #         write_nb(nb, fpath)
     #     return fpath
 
-    def save_nb_html(self, nb_html_body):
-        html_path, url = None, None
+    def save_nb_html(self, nb_html_body, get_download_link=True, output_dir = "downdload-html"):
+        html_path, html_url, url = None, None, None
         fname = f"download-notebook-{self.some_hash()}.html"
 
         if STORAGE == STORAGE_MEDIA:
@@ -172,7 +175,6 @@ class StorageManager:
             # 1.
             # get upload link
             action = "put_object"
-            output_dir = "downdload-html"
             url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
             response = requests.get(url, timeout=15)
             upload_url = response.json().get("url")
@@ -181,13 +183,19 @@ class StorageManager:
             response = requests.put(upload_url, nb_html_body.encode("utf-8"), timeout=15)
             if response.status_code != 200:
                 raise Exception(f"Notebook not uploaded {response}")
-            # 3.
-            # get download link
-            action = "get_object"
-            output_dir = "downdload-html"
-            url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
-            response = requests.get(url, timeout=15)
-            html_url = response.json().get("url")
+            
+            html_path = get_worker_bucket_key(
+                self.session_id, output_dir, fname.replace(" ", "-")
+            )
+
+            if get_download_link:
+                # 3.
+                # get download link
+                action = "get_object"
+                output_dir = "downdload-html"
+                url = f"{self.server_url}/api/v1/worker/presigned-url/{action}/{self.session_id}/{self.worker_id}/{self.notebook_id}/{output_dir}/{fname}"
+                response = requests.get(url, timeout=15)
+                html_url = response.json().get("url")
 
         return html_path, html_url
 

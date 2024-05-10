@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from apps.accounts.models import Membership, Site
+from apps.accounts.models import Membership, Site, ApiKey
 
 
 class HasEditRights(permissions.BasePermission):
@@ -22,3 +22,15 @@ class HasEditRights(permissions.BasePermission):
             )
             or obj.host.created_by == request.user
         )
+
+
+def apiKeyToUser(request):
+    try:
+        token = request.META.get("HTTP_AUTHORIZATION", "")
+        if "Bearer" in token:
+            apiKey = token.split(" ")[1]
+            keys = ApiKey.objects.filter(key=apiKey)
+            if keys:
+                request.user = keys[0].user
+    except Exception:
+        pass

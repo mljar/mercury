@@ -1,4 +1,6 @@
+import os
 import json
+import binascii
 from enum import Enum
 
 from django.contrib.auth.models import User
@@ -8,7 +10,7 @@ from django.dispatch import receiver
 
 from apps.accounts.fields import AutoCreatedField, AutoLastModifiedField
 from apps.accounts.views.utils import is_cloud_version
-
+from rest_framework.authtoken.models import Token
 
 class SiteStatus(str, Enum):
     CREATED = "Created"
@@ -153,3 +155,21 @@ class Secret(models.Model):
     created_at = AutoCreatedField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     hosted_on = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+
+class ApiKey(models.Model):
+    key = models.CharField(max_length=40, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.key:
+            self.key = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    @classmethod
+    def generate_key(cls):
+        return binascii.hexlify(os.urandom(20)).decode()
+
+    def __str__(self):
+        return self.key

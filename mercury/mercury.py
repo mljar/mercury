@@ -47,6 +47,7 @@ from widgets.in_mercury import in_mercury
 from widgets.user import user
 from widgets.pdf import PDF
 from widgets.table import Table
+from widgets.apiresponse import APIResponse
 
 def print_version():
     try:

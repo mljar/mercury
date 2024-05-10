@@ -31,8 +31,9 @@ class RESTClient:
             log.info(f"Load notebook id={self.notebook_id}")
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/nb",
-                timeout=5
+                timeout=5,
             )
+            log.info(response.json())
             if response.status_code != 200:
                 raise Exception("Cant load notebook")
             self.notebook = SimpleNamespace(**response.json())
@@ -45,7 +46,7 @@ class RESTClient:
             log.info("Load owner and user")
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/owner-and-user",
-                timeout=5
+                timeout=5,
             )
             if response.status_code != 200:
                 raise Exception("Cant load onwer and user information")
@@ -105,7 +106,7 @@ class RESTClient:
                 response = requests.post(
                     f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/update-nb",
                     {"title": self.notebook.title, "params": json.dumps(nb_params)},
-                    timeout=5
+                    timeout=5,
                 )
                 if response.status_code != 200:
                     raise Exception(f"Cant update notebook {response}")
@@ -176,7 +177,7 @@ class RESTClient:
             response = requests.post(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/set-worker-state",
                 {"state": new_state, "machine_id": machine_uuid()},
-                timeout=5
+                timeout=5,
             )
             if response.status_code != 200:
                 raise Exception(f"Problem when set worker state {response}")
@@ -192,7 +193,7 @@ class RESTClient:
 
             response = requests.post(
                 f"{server_url}/api/v1/worker/{session_id}/{worker_id}/{notebook_id}/delete-worker",
-                timeout=5
+                timeout=5,
             )
             if response.status_code != 204:
                 raise Exception(f"Problem when delete worker {response}")
@@ -212,7 +213,7 @@ class RESTClient:
 
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker",
-                timeout=5
+                timeout=5,
             )
             self.worker = SimpleNamespace(**response.json())
 
@@ -225,7 +226,7 @@ class RESTClient:
         try:
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/is-worker-stale",
-                timeout=5
+                timeout=5,
             )
             if response.status_code == 200:
                 is_stale = response.json().get("is_stale", True)
@@ -243,10 +244,24 @@ class RESTClient:
         try:
             response = requests.get(
                 f"{self.server_url}/api/v1/worker/{self.session_id}/{self.worker_id}/{self.notebook_id}/worker-secrets",
-                timeout=5
+                timeout=5,
             )
             if response.status_code == 200:
                 return response.json()
         except Exception:
             log.exception(f"Exception when list worker id={self.worker_id} secrets")
         return []
+
+
+    def update_rest_api_task(self, state="", response="", html_path=""):
+        try:
+            log.info("Update Rest API Task")
+            response = requests.post(
+                f"{self.server_url}/api/v1/update-rest-task/{self.session_id}",
+                {"state": state, "response": response, "html_path": html_path},
+                timeout=5,
+            )
+            if response.status_code != 200:
+                raise Exception(f"Problem when update rest api task {response}")
+        except Exception:
+            log.exception("Exception when update rest api task")

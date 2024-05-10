@@ -18,6 +18,7 @@ import LoginView from "./views/LoginView";
 import { fetchSite } from "./slices/sitesSlice";
 import RequireAuth from "./components/RequireAuth";
 import WebSocketProvider from "./websocket/Provider";
+import OpenAPIView from "./views/OpenAPIView";
 type Props = {
   children: ReactNode;
 };
@@ -69,6 +70,7 @@ export default function AppRoutes() {
               }
             />
             <Route path="/account" element={<AccountView />} />
+            <Route path="/openapi" element={<OpenAPIView />} />
           </Route>
           <Route path="/login" element={<LoginView />} />
         </Routes>

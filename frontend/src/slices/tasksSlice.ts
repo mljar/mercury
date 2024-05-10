@@ -91,7 +91,7 @@ export const {
     increaseExportToPDFCounter,
     stopPDFExport,
     setExecutionHistory,
-    clearExecutionHistory,
+    clearExecutionHistory
 } = tasksSlice.actions;
 
 export const getShowCurrent = (state: RootState) => state.tasks.showCurrent;
@@ -248,3 +248,4 @@ export const fetchExecutionHistory =
             }
 
         };
+

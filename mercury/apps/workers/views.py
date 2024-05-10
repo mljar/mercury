@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import logging
 from datetime import timedelta
 
 from django.conf import settings
@@ -22,8 +23,11 @@ from apps.workers.serializers import WorkerSerializer
 from apps.storage.s3utils import clean_worker_files
 from apps.accounts.models import Membership, Site
 
+from apps.tasks.models import RestAPITask
+
 MACHINE_SPELL = os.environ.get("MACHINE_SPELL")
 
+log = logging.getLogger(__name__)
 
 class WorkerGetNb(APIView):
     authentication_classes = []
@@ -34,7 +38,18 @@ class WorkerGetNb(APIView):
                 pk=worker_id, session_id=session_id, notebook__id=notebook_id
             )
             nb = Notebook.objects.get(pk=notebook_id)
-            return Response(NotebookSerializer(nb).data)
+            nb_data = NotebookSerializer(nb).data
+
+            rest_tasks = RestAPITask.objects.filter(session_id=session_id, notebook__id=notebook_id)
+
+            if rest_tasks:
+                nb_data["task_id"] = rest_tasks[0].session_id
+                nb_data["task_params"] = rest_tasks[0].params
+            else:
+                nb_data["task_id"] = ""
+                nb_data["task_params"] = ""
+
+            return Response(nb_data)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -197,6 +212,7 @@ class MachineInfo(APIView):
 class AnalyticsView(APIView):
     def get(self, request, site_id, format=None):
         try:
+            log.info(f"Get analytics for side id {site_id}")
             user = request.user
             if user.is_anonymous:
                 return Response(status=status.HTTP_404_NOT_FOUND)
@@ -218,7 +234,6 @@ class AnalyticsView(APIView):
                 .annotate(nbcount=Count("notebook"))
                 .filter(site=site, created_at__gte=timezone.now() - timedelta(days=30))
             )
-
             # generate empty data for all notebooks
             days_list = []
             start = datetime.datetime.now()
@@ -232,12 +247,17 @@ class AnalyticsView(APIView):
             nb_names = [nb.path.split("/")[-1] for nb in notebooks]
             for nb in nb_names:
                 usage_data[nb] = {"x": days_list, "y": [0] * len(days_list)}
-
+            
             for session in sessions:
                 nb = session["notebook__path"].split("/")[-1]
                 if nb in usage_data:
-                    usage_data[nb]["y"][days_index[session["day"]]] = session["nbcount"]
-
+                    if isinstance(session["day"], str):
+                        day = session["day"]
+                    else:
+                        day = session["day"].strftime("%Y-%m-%d")
+                    if day in days_index:
+                        usage_data[nb]["y"][days_index[day]] = session["nbcount"]   
+            
             users_data = []
             logged_users_sessions = (
                 WorkerSession.objects.extra(select={"day": "date( updated_at )"})
@@ -260,6 +280,31 @@ class AnalyticsView(APIView):
                 {"usage_data": usage_data, "users_data": users_data},
                 status=status.HTTP_200_OK,
             )
+        except Exception as e:
+            log.error(f"User analytics error, {str(e)}")
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+class UpdateRestApiTask(APIView):
+    authentication_classes = []
+
+    def post(self, request, session_id, format=None):
+        try:
+            session_id = session_id.replace("/", "")
+            task = RestAPITask.objects.filter(session_id=session_id).latest("id")
+            state = request.data.get("state", "")
+            response = request.data.get("response", "")
+            nb_html_path = request.data.get("html_path", "")
+            
+            if state != "":
+                task.state = state
+            if response != "":
+                task.response = response
+            if nb_html_path != "":
+                task.nb_html_path = nb_html_path
+            task.save()
+            return Response(status=status.HTTP_200_OK)
         except Exception:
             pass
         return Response(status=status.HTTP_404_NOT_FOUND)

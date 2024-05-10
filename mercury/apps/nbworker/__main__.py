@@ -9,7 +9,9 @@ BACKEND_DIR = os.path.join(CURRENT_DIR, "..")
 sys.path.insert(0, BACKEND_DIR)
 
 LOG_LEVEL = (
-    logging.ERROR if os.environ.get("DJANGO_LOG_LEVEL", "ERROR") == "ERROR" else logging.INFO
+    logging.ERROR
+    if os.environ.get("DJANGO_LOG_LEVEL", "ERROR") == "ERROR"
+    else logging.INFO
 )
 
 logging.basicConfig(
@@ -64,4 +66,7 @@ if __name__ == "__main__":
             session_id,
             worker_id,
         )
-        time.sleep(RECONNECT_WAIT_TIME)
+        if nb_worker.is_task_mode():
+            break
+        else:
+            time.sleep(RECONNECT_WAIT_TIME)

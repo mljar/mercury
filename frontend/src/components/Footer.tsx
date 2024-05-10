@@ -19,8 +19,19 @@ export default function Footer({ footerText }: FooterProps) {
       }}
     >
       {footerText === "" && (
-        <div className="container">
-          <span className="text-muted" style={{ color: "gray" }}>
+        <div className="container" style={{ textAlign: "center"}}>
+          
+          <span className="text-muted" style={{ color: "gray", float: "left" }}>
+            {" "}
+            <a
+              style={{ textDecoration: "none", color: "gray" }}
+              href="/openapi"
+            >
+              OpenAPI
+            </a>
+          </span>
+
+          <span className="text-muted" style={{ color: "gray", margin: "auto", display: "inline-block" }}>
             {" "}
             <a
               style={{ textDecoration: "none", color: "gray" }}
@@ -28,9 +39,10 @@ export default function Footer({ footerText }: FooterProps) {
               target="_blank"
               rel="noreferrer"
             >
-              Powered by Mercury
+              Notebooks served as Web Apps with Mercury
             </a>
           </span>
+
           <span className="text-muted" style={{ float: "right" }}>
             <a
               style={{ textDecoration: "none", color: "gray" }}
