@@ -41,6 +41,7 @@ export interface INotebookParams {
   show_sidebar: boolean;
   full_screen: boolean;
   allow_download: boolean;
+  allow_share: boolean;
 }
 
 export interface INotebook {

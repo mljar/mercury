@@ -15,6 +15,7 @@ import { setShowShareDialog } from "../slices/appSlice";
 
 type Props = {
   allowDownload: boolean;
+  allowShare: boolean;
   waiting: boolean;
   continuousUpdate: boolean;
   staticNotebook: boolean;
@@ -27,6 +28,7 @@ type Props = {
 
 export default function StatusBar({
   allowDownload,
+  allowShare,
   waiting,
   continuousUpdate,
   staticNotebook,
@@ -121,11 +123,13 @@ export default function StatusBar({
         {allowDownload && (
           <div
             className="dropdown mx-2 btn-group"
-            style={{
-              //display: "inline",
-              // width: "47%",
-              // float: continuousUpdate ? "left" : "right",
-            }}
+            style={
+              {
+                //display: "inline",
+                // width: "47%",
+                // float: continuousUpdate ? "left" : "right",
+              }
+            }
           >
             <button
               className="btn btn-sm btn-primary dropdown-toggle"
@@ -199,31 +203,33 @@ export default function StatusBar({
             </ul>
           </div>
         )}
-        <button
-          className="btn btn-sm btn-primary"
-          onClick={() => dispatch(setShowShareDialog(true))}
-          disabled={waiting}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {allowShare && (
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={() => dispatch(setShowShareDialog(true))}
+            disabled={waiting}
           >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-            <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-            <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-            <path d="M8.7 10.7l6.6 -3.4"></path>
-            <path d="M8.7 13.3l6.6 3.4"></path>
-          </svg>{" "}
-          Share
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              strokeWidth="2"
+              stroke="currentColor"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+              <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+              <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+              <path d="M8.7 10.7l6.6 -3.4"></path>
+              <path d="M8.7 13.3l6.6 3.4"></path>
+            </svg>{" "}
+            Share
+          </button>
+        )}
       </div>
     </div>
   );

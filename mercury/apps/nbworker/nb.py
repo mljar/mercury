@@ -360,6 +360,7 @@ class NBWorker(WSClient):
         #     "show_sidebar",
         #     "full_screen",
         #     "allow_download",
+        #     "allow_share",
         # ]:
         #     if params.get(property) is not None and nb_params.get(
         #         property
