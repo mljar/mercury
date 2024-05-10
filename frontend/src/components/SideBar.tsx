@@ -71,6 +71,7 @@ type SideBarProps = {
   continuousUpdate: boolean;
   staticNotebook: boolean;
   allowDownload: boolean;
+  allowShare: boolean;
 };
 
 export default function SideBar({
@@ -90,6 +91,7 @@ export default function SideBar({
   continuousUpdate,
   staticNotebook,
   allowDownload,
+  allowShare,
 }: SideBarProps) {
   const dispatch = useDispatch();
   const widgetsValues: Record<string, WidgetValueType> = useSelector(
@@ -516,6 +518,7 @@ export default function SideBar({
                 notebookTitle={notebookTitle}
                 staticNotebook={staticNotebook}
                 allowDownload={allowDownload}
+                allowShare={allowShare}
                 waiting={waiting}
                 continuousUpdate={continuousUpdate}
                 runDownloadHTML={runDownloadHTML}

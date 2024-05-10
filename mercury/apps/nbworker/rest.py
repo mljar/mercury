@@ -85,6 +85,7 @@ class RESTClient:
             "show_sidebar",
             "full_screen",
             "allow_download",
+            "allow_share",
             "stop_on_error",
         ]:
             if new_params.get(property) is not None and nb_params.get(

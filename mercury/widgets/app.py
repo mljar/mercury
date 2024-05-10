@@ -69,6 +69,10 @@ class App:
         If True (the default), a Download button is available to export results as 
         a PDF or HTML file. Set to False to hide the Download button.
 
+    allow_share : bool, default True
+        If True (the default), a Share button is available to export results as a 
+        URL. Set to False to hide the Share button.
+
     stop_on_error : bool, default False
         If True, the notebook will stop execution when an error occurs in a cell. 
         The default is False, meaning the notebook will execute all cells even with 
@@ -100,6 +104,7 @@ class App:
         show_sidebar=True,
         full_screen=True,
         allow_download=True,
+        allow_share=True,
         stop_on_error=False,
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
@@ -115,6 +120,7 @@ class App:
         self.show_sidebar = show_sidebar
         self.full_screen = full_screen
         self.allow_download = allow_download
+        self.allow_share = allow_share
         self.stop_on_error = stop_on_error
         display(self)
 
@@ -141,6 +147,7 @@ class App:
             "show_sidebar": self.show_sidebar,
             "full_screen": self.full_screen,
             "allow_download": self.allow_download,
+            "allow_share": self.allow_share,
             "stop_on_error": self.stop_on_error,
             "model_id": "mercury-app",
             "code_uid": self.code_uid,

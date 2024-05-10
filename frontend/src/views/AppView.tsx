@@ -189,6 +189,16 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
     return true;
   };
 
+  const doAllowShare = () => {
+    if (notebook !== undefined && notebook !== null) {
+      return notebook?.params?.allow_share !== undefined &&
+        notebook?.params?.allow_share !== null
+        ? notebook.params.allow_share
+        : true;
+    }
+    return true;
+  }
+
   useEffect(() => {
     if (logoFilename === "") {
       setLogoSrc(DefaultLogoSrc);
@@ -243,6 +253,7 @@ function App({ isSingleApp, notebookSlug, displayEmbed }: AppProps) {
                 continuousUpdate={notebook?.params?.continuous_update}
                 staticNotebook={notebook?.params?.static_notebook}
                 allowDownload={doAllowDownload()}
+                allowShare={doAllowShare()}
               />
             )}
 

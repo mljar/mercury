@@ -133,6 +133,7 @@ def parse_params(nb, params={}):
                         "show_sidebar",
                         "full_screen",
                         "allow_download",
+                        "allow_share",
                         "stop_on_error",
                     ]:
                         if view.get(property) is not None:
@@ -159,6 +160,8 @@ def parse_params(nb, params={}):
         params["full_screen"] = True
     if params.get("allow_download") is None:
         params["allow_download"] = True
+    if params.get("allow_share") is None:
+        params["allow_share"] = True
     if params.get("stop_on_error") is None:
         params["stop_on_error"] = False
 
