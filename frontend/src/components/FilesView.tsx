@@ -21,7 +21,11 @@ export default function FilesView({
 
   let filesLinks = [];
 
-  for (let f of files) {
+  let myFiles = [...files]; 
+  
+  myFiles.sort();
+
+  for (let f of myFiles) {
     let fname = f.split("/").pop();
     fname = fname?.split("?")[0];
 
