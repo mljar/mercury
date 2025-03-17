@@ -18,7 +18,7 @@ import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import emoji from "remark-emoji";
 import rehypeRaw from "rehype-raw";
-import { getToken, getUsername } from "../slices/authSlice";
+import { getToken, getUsername, fetchLayout } from "../slices/authSlice";
 import {
   getFooterText,
   getLogoFilename,
@@ -47,9 +47,26 @@ export default function HomeView() {
   const logoFilename = useSelector(getLogoFilename);
   const navbarColor = useSelector(getNavbarColor);
   const footerText = useSelector(getFooterText);
+  const [searchNotebook, setSetNotebook] = useState("");
+  const [notebooksLook, setNotebooksLook] = useState(
+    localStorage.getItem("layout")
+  );
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSetNotebook(event.target.value);
+  };
+
+  const handleChangeLook = (look: string) => {
+    setNotebooksLook(look);
+    localStorage.setItem("layout", look);
+  };
 
   useEffect(() => {
-    console.log({logoFilename})
+    dispatch(fetchLayout());
+  }, [dispatch, notebooksLook]);
+
+  useEffect(() => {
+    console.log({ logoFilename });
     if (siteId !== undefined) {
       if (logoFilename === "") {
         setLogoSrc(DefaultLogoSrc);
@@ -81,117 +98,190 @@ export default function HomeView() {
     }
     return "";
   };
+  const lowerCaseSearchNotebook = searchNotebook.toLowerCase();
+  const notebookItems = notebooks
+    .filter(
+      (notebook) =>
+        notebook.title.toLowerCase().includes(lowerCaseSearchNotebook) ||
+        notebook.params.description
+          ?.toLowerCase()
+          .includes(lowerCaseSearchNotebook)
+    )
+    .map((notebook, index) => {
+      let nbPath = notebook.default_view_path;
 
-  const notebookItems = notebooks.map((notebook, index) => {
-    let nbPath = notebook.default_view_path;
-
-    if (window.location.origin.startsWith("https")) {
-      nbPath = nbPath.replace("http://", "https://");
-    }
-
-    if (window.location.origin === "http://localhost:3000") {
-      if (nbPath.startsWith("/media")) {
-        nbPath = "https://127.0.0.1:8000" + nbPath;
+      if (window.location.origin.startsWith("https")) {
+        nbPath = nbPath.replace("http://", "https://");
       }
-    }
 
-    // if (window.location.origin !== "http://localhost:3000") {
-    //   if (nbPath.startsWith("https://127.0.0.1:8000")) {
-    //     nbPath = nbPath.replace(
-    //       "https://127.0.0.1:8000",
-    //       window.location.origin
-    //     );
-    //   }
-    //   if (nbPath.startsWith("http://127.0.0.1:8000")) {
-    //     nbPath = nbPath.replace(
-    //       "http://127.0.0.1:8000",
-    //       window.location.origin
-    //     );
-    //   }
-    // }
+      if (window.location.origin === "http://localhost:3000") {
+        if (nbPath.startsWith("/media")) {
+          nbPath = "https://127.0.0.1:8000" + nbPath;
+        }
+      }
 
-    return (
-      <div
-        className="col-md-4"
-        style={{ paddingBottom: "20px" }}
-        key={`notebook-${notebook.id}}`}
-      >
-        <div className="card">
+      // if (window.location.origin !== "http://localhost:3000") {
+      //   if (nbPath.startsWith("https://127.0.0.1:8000")) {
+      //     nbPath = nbPath.replace(
+      //       "https://127.0.0.1:8000",
+      //       window.location.origin
+      //     );
+      //   }
+      //   if (nbPath.startsWith("http://127.0.0.1:8000")) {
+      //     nbPath = nbPath.replace(
+      //       "http://127.0.0.1:8000",
+      //       window.location.origin
+      //     );
+      //   }
+      // }
+      if (notebooksLook === "grid") {
+        return (
           <div
-            style={{
-              height: "200px",
-              width: "100%",
-              padding: "1px",
-              overflow: "hidden",
-            }}
+            className="col-md-4"
+            style={{ paddingBottom: "20px" }}
+            key={`notebook-${notebook.id}}`}
           >
-            <iframe
-              className="thumbnailIframe"
-              width="200%"
-              height={800}
-              src={nbPath}
-              title="display"
-              scrolling="no"
-            ></iframe>
+            <div className="card">
+              <div
+                style={{
+                  height: "200px",
+                  width: "100%",
+                  padding: "1px",
+                  overflow: "hidden",
+                }}
+              >
+                <iframe
+                  className="thumbnailIframe"
+                  width="200%"
+                  height={800}
+                  src={nbPath}
+                  title="display"
+                  scrolling="no"
+                ></iframe>
+              </div>
+              <Link
+                to={`/app/${notebook.slug}`}
+                style={{ textDecoration: "none", color: "black" }}
+                className="title-card"
+                onMouseEnter={() => {
+                  setShowButton(notebook.slug);
+                }}
+                onMouseLeave={() => {
+                  setShowButton("");
+                }}
+                reloadDocument
+              >
+                <div
+                  className="card-body"
+                  style={{
+                    borderTop: "1px solid rgba(0,0,0,0.1)",
+                    height: "110px",
+                  }}
+                >
+                  <h5 className="card-title">
+                    {firstLetters(notebook.title, 40)}
+                  </h5>
 
-            {/* <img
-              alt="some alt" 
-              
-              width="100%"
-              src={`${notebook.default_view_path.replace(".html", ".png")}`}
-            ></img> */}
+                  <p className="card-text">
+                    {firstLetters(notebook.params.description, 100)}
+                  </p>
+                </div>
+                {showButton === notebook.slug && (
+                  <button
+                    className="btn btn-outline-primary"
+                    type="button"
+                    style={{
+                      zIndex: "101",
+                      border: "none",
+                      margin: "5px",
+                      position: "absolute",
+                      right: "0px",
+                      bottom: "0px",
+                    }}
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title={`Open ${notebook.title}`}
+                  >
+                    <i className="fa fa-chevron-right" aria-hidden="true" />
+                    <i className="fa fa-chevron-right" aria-hidden="true" />
+                  </button>
+                )}
+              </Link>
+            </div>
           </div>
-          <Link
-            to={`/app/${notebook.slug}`}
-            style={{ textDecoration: "none", color: "black" }}
-            className="title-card"
-            onMouseEnter={() => {
-              setShowButton(notebook.slug);
+        );
+      }
+      if (notebooksLook === "list") {
+        return (
+          <div
+            className="row"
+            style={{
+              padding: "15px 0",
+              borderTop: "2px solid #ccc",
             }}
-            onMouseLeave={() => {
-              setShowButton("");
-            }}
-            reloadDocument
+            key={`notebook-${notebook.id}`}
+            onMouseEnter={() => setShowButton(notebook.slug)}
+            onMouseLeave={() => setShowButton("")}
           >
             <div
-              className="card-body"
+              className="col-md-3"
               style={{
-                borderTop: "1px solid rgba(0,0,0,0.1)",
-                height: "110px",
+                height: "100px",
+                overflow: "hidden",
               }}
             >
-              <h5 className="card-title">{firstLetters(notebook.title, 40)}</h5>
-
-              <p className="card-text">
-                {firstLetters(notebook.params.description, 100)}
-              </p>
-            </div>
-            {showButton === notebook.slug && (
-              <button
-                className="btn btn-outline-primary"
-                type="button"
+              <iframe
+                className="thumbnailIframe"
+                width="200%"
+                height="400px"
+                src={nbPath}
+                title="display"
+                scrolling="no"
                 style={{
-                  zIndex: "101",
                   border: "none",
-                  margin: "5px",
-                  position: "absolute",
-                  right: "0px",
-                  bottom: "0px",
+                  transform: "scale(0.5)",
+                  transformOrigin: "0 0",
+                  borderRadius: "20px",
+                  boxShadow: "0 3px 8px rgba(0, 0, 0, 0.2)",
+                  margin: "auto",
                 }}
-                data-toggle="tooltip"
-                data-placement="right"
-                title={`Open ${notebook.title}`}
+              />
+            </div>
+            <div className="col-md-9" style={{ position: "relative" }}>
+              <Link
+                to={`/app/${notebook.slug}`}
+                style={{ textDecoration: "none", color: "black" }}
+                reloadDocument
               >
-                <i className="fa fa-chevron-right" aria-hidden="true" />
-                <i className="fa fa-chevron-right" aria-hidden="true" />
-              </button>
-            )}
-            
-          </Link>
-        </div>
-      </div>
-    );
-  });
+                <h5 style={{ marginTop: 0 }}>
+                  {firstLetters(notebook.title, 40)}
+                </h5>
+                <p>{firstLetters(notebook.params.description, 100)}</p>
+
+                {showButton === notebook.slug && (
+                  <button
+                    className="btn btn-outline-primary"
+                    type="button"
+                    style={{
+                      border: "none",
+                      position: "absolute",
+                      right: 0,
+                      bottom: 0,
+                    }}
+                    data-toggle="tooltip"
+                    data-placement="right"
+                    title={`Open ${notebook.title}`}
+                  >
+                    <i className="fa fa-chevron-right" aria-hidden="true" />
+                    <i className="fa fa-chevron-right" aria-hidden="true" />
+                  </button>
+                )}
+              </Link>
+            </div>
+          </div>
+        );
+      }
+    });
 
   document.body.style.backgroundColor = "white";
 
@@ -221,7 +311,45 @@ export default function HomeView() {
             </ReactMarkdown>
           </div>
         )}
-
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "5px",
+            marginBottom: "15px",
+          }}
+        >
+          <input
+            className="search-bar"
+            type="text"
+            maxLength={30}
+            placeholder="Search Notebooks... "
+            value={searchNotebook}
+            onChange={handleInputChange}
+          />
+          <button
+            className={`btn ${
+              notebooksLook === "list"
+                ? `selected-button`
+                : `btn-outline-primary`
+            }`}
+            onClick={() => handleChangeLook("list")}
+            title="Show list"
+          >
+            <i className="fa fa-list"></i>
+          </button>
+          <button
+            className={`btn ${
+              notebooksLook === "grid"
+                ? `selected-button`
+                : `btn-outline-primary`
+            }`}
+            onClick={() => handleChangeLook("grid")}
+            title="Show grid"
+          >
+            <i className="fa fa-th-large"></i>
+          </button>
+        </div>
         <div className="row">
           {loadingState === "loading" && (
             <p>Loading notebooks. Please wait ...</p>
@@ -238,7 +366,13 @@ export default function HomeView() {
               Mercury administrator.
             </p>
           )}
-          {notebookItems}
+          {notebookItems.length !== 0 ? (
+            notebookItems
+          ) : (
+            <div>
+              <p>No Notebook contains this phrase.</p>
+            </div>
+          )}
         </div>
       </div>
       <Footer footerText={footerText} />
