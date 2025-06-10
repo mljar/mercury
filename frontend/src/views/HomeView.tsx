@@ -49,7 +49,7 @@ export default function HomeView() {
   const footerText = useSelector(getFooterText);
   const [searchNotebook, setSetNotebook] = useState("");
   const [notebooksLook, setNotebooksLook] = useState(
-    localStorage.getItem("layout")
+    localStorage.getItem("layout") || "grid"
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -311,45 +311,47 @@ export default function HomeView() {
             </ReactMarkdown>
           </div>
         )}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "5px",
-            marginBottom: "15px",
-          }}
-        >
-          <input
-            className="search-bar"
-            type="text"
-            maxLength={30}
-            placeholder="Search Notebooks... "
-            value={searchNotebook}
-            onChange={handleInputChange}
-          />
-          <button
-            className={`btn ${
-              notebooksLook === "list"
-                ? `selected-button`
-                : `btn-outline-primary`
-            }`}
-            onClick={() => handleChangeLook("list")}
-            title="Show list"
+        {notebooks.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "5px",
+              marginBottom: "15px",
+            }}
           >
-            <i className="fa fa-list"></i>
-          </button>
-          <button
-            className={`btn ${
-              notebooksLook === "grid"
-                ? `selected-button`
-                : `btn-outline-primary`
-            }`}
-            onClick={() => handleChangeLook("grid")}
-            title="Show grid"
-          >
-            <i className="fa fa-th-large"></i>
-          </button>
-        </div>
+            <input
+              className="search-bar"
+              type="text"
+              maxLength={30}
+              placeholder="Search Notebooks... "
+              value={searchNotebook}
+              onChange={handleInputChange}
+            />
+            <button
+              className={`btn ${
+                notebooksLook === "list"
+                  ? `selected-button`
+                  : `btn-outline-primary`
+              }`}
+              onClick={() => handleChangeLook("list")}
+              title="Show list"
+            >
+              <i className="fa fa-list"></i>
+            </button>
+            <button
+              className={`btn ${
+                notebooksLook === "grid"
+                  ? `selected-button`
+                  : `btn-outline-primary`
+              }`}
+              onClick={() => handleChangeLook("grid")}
+              title="Show grid"
+            >
+              <i className="fa fa-th-large"></i>
+            </button>
+          </div>
+        )}
         <div className="row">
           {loadingState === "loading" && (
             <p>Loading notebooks. Please wait ...</p>
