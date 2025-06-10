@@ -226,24 +226,22 @@ export default function HomeView() {
             <div
               className="col-md-3"
               style={{
-                height: "100px",
+                height: "200px",
                 overflow: "hidden",
               }}
             >
               <iframe
                 className="thumbnailIframe"
                 width="200%"
-                height="400px"
+                height="800px"
                 src={nbPath}
                 title="display"
                 scrolling="no"
                 style={{
-                  border: "none",
+                  border: "1px solid rgba(0, 0, 0, 0.2)",
                   transform: "scale(0.5)",
                   transformOrigin: "0 0",
                   borderRadius: "20px",
-                  boxShadow: "0 3px 8px rgba(0, 0, 0, 0.2)",
-                  margin: "auto",
                 }}
               />
             </div>
@@ -265,7 +263,7 @@ export default function HomeView() {
                     style={{
                       border: "none",
                       position: "absolute",
-                      right: 0,
+                      // right: 0,
                       bottom: 0,
                     }}
                     data-toggle="tooltip"
