@@ -43,3 +43,16 @@ IFrame(src="{fname}", width=100, height=100)"""
         nbrun = NbRun(stop_on_error=True)
         nbrun.run_notebook(nb)
         self.assertTrue(len(nb.cells[2].outputs) == 0)
+
+
+    def test_hide_errors(self):
+        nb = test_notebook(code=["not-working"])
+        nb = dict2nb(nb)
+
+        nbrun = NbRun(hide_errors=False)
+        nbrun.run_notebook(nb)
+        self.assertTrue(len(nb.cells[0].outputs) > 0)
+
+        nbrun = NbRun(hide_errors=True)
+        nbrun.run_notebook(nb)
+        self.assertTrue(len(nb.cells[0].outputs) == 0)

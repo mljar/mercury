@@ -78,6 +78,11 @@ class App:
         The default is False, meaning the notebook will execute all cells even with 
         errors.
 
+    hide_errors : bool, default True
+        If True, the notebook will not display errors and exceptions from notebook
+        execution. Please set to False if you would like to see error messages and 
+        traceback in the notebook.
+
     Examples
     --------
     Constructing Mercury App with `title` and `description` arguments.
@@ -106,6 +111,7 @@ class App:
         allow_download=True,
         allow_share=True,
         stop_on_error=False,
+        hide_errors=True,
     ):
         self.code_uid = WidgetsManager.get_code_uid("App")
         self.title = title
@@ -122,6 +128,7 @@ class App:
         self.allow_download = allow_download
         self.allow_share = allow_share
         self.stop_on_error = stop_on_error
+        self.hide_errors = hide_errors
         display(self)
 
     def __repr__(self):
@@ -149,6 +156,7 @@ class App:
             "allow_download": self.allow_download,
             "allow_share": self.allow_share,
             "stop_on_error": self.stop_on_error,
+            "hide_errors": self.hide_errors,
             "model_id": "mercury-app",
             "code_uid": self.code_uid,
         }

@@ -87,6 +87,7 @@ class RESTClient:
             "allow_download",
             "allow_share",
             "stop_on_error",
+            "hide_errors"
         ]:
             if new_params.get(property) is not None and nb_params.get(
                 property
@@ -160,6 +161,17 @@ class RESTClient:
             return stop_on_error == "true"
         except Exception:
             log.exception("Exception when check if stop_on_error")
+        return False
+    
+    def hide_errors(self):
+        try:
+            hide_errors = str(
+                json.loads(self.notebook.params).get("hide_errors", "true")
+            ).lower()
+            log.info(f"Check if hide_errors ({hide_errors})")
+            return hide_errors == "true"
+        except Exception:
+            log.exception("Exception when check if hide_errors")
         return False
 
     def worker_state(self):

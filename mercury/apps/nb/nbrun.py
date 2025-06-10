@@ -25,6 +25,7 @@ class NbRun:
         is_presentation=False,
         reveal_theme="white",
         stop_on_error=False,
+        hide_errors=True,
         user_info=None,
     ):
         self.exporter = Exporter(show_code, show_prompt, is_presentation, reveal_theme)
@@ -38,9 +39,13 @@ class NbRun:
             init_code += f"os.environ['MERCURY_USER_INFO']='{user_info}'"
         self.shell.run(init_code)
         self.stop_on_error = stop_on_error
+        self.hide_errors = hide_errors
 
     def set_stop_on_error(self, new_stop_on_error):
         self.stop_on_error = new_stop_on_error
+
+    def set_hide_errors(self, new_hide_errors):
+        self.hide_errors = new_hide_errors
 
     def set_show_code(self, new_show_code):
         self.exporter.set_show_code(new_show_code)
@@ -80,6 +85,9 @@ class NbRun:
                         return False
                     if self.stop_on_error and output.get("output_type", "") == "error":
                         return False
+                    if self.hide_errors and output.get("output_type", "") == "error":
+                        cell.outputs = []
+                        break
 
             except Exception as e:
                 pass

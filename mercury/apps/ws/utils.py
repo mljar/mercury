@@ -135,6 +135,7 @@ def parse_params(nb, params={}):
                         "allow_download",
                         "allow_share",
                         "stop_on_error",
+                        "hide_errors"
                     ]:
                         if view.get(property) is not None:
                             params[property] = view.get(property)
@@ -164,6 +165,8 @@ def parse_params(nb, params={}):
         params["allow_share"] = True
     if params.get("stop_on_error") is None:
         params["stop_on_error"] = False
+    if params.get("hide_errors") is None:
+        params["hide_errors"] = True
 
     if no_outputs:
         params["version"] = "2"
