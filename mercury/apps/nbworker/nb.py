@@ -146,6 +146,8 @@ class NBWorker(WSClient):
 
         self.update_nb(widgets)
 
+        self.sm.clear_output_dir()
+
         self.sm.sync_output_dir()
 
         body = self.nbrun.export_html(self.nb, full_header=self.is_presentation())

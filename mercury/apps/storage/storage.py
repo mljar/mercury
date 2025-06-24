@@ -284,3 +284,12 @@ class StorageManager:
             log.info(f"Downloaded {f}")
             value[1] = f
         return value
+
+    def clear_output_dir(self): 
+        log.info("Clearing output directory before notebook execution.")
+        output_dir = self.worker_output_dir()
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)
+            log.info(f"Removed existing output directory: {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
+        log.info(f"Recreated output directory: {output_dir}")
