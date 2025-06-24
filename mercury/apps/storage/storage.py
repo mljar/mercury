@@ -283,4 +283,11 @@ class StorageManager:
             f = StorageManager.download_file(download_url)
             log.info(f"Downloaded {f}")
             value[1] = f
-        return value
+        return value 
+    
+    def clear_output_dir(self): 
+        output_dir = self.worker_output_dir()
+        log.info(f"[CLEAR OUTPUT DIR] Attempting to clear: {output_dir}")
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir, ignore_errors=True)
+        self.create_dir(output_dir)

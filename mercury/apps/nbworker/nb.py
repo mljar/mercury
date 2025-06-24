@@ -16,6 +16,7 @@ from apps.nbworker.ws import WSClient
 from apps.workers.constants import WorkerState
 from apps.ws.utils import parse_params
 from apps.accounts.views.utils import get_idle_time, get_max_run_time
+from apps.storage.storage import StorageManager
 from widgets.manager import WidgetsManager
 
 log = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class NBWorker(WSClient):
         self.max_run_time = get_max_run_time(self.owner)
         self.last_execution_time = time.time()
         self.start_time = time.time()
+        self.sm = StorageManager(self.session_id, self.worker_id, self.notebook_id)
 
         # monitor notebook file updates if running locally
         if (
@@ -54,7 +56,7 @@ class NBWorker(WSClient):
     def is_task_mode(self):
         log.info("is task mode")
         log.info(self.notebook)
-        if self.notebook.task_id != "":
+        if getattr(self.notebook, "task_id", "") != "":
             return True
         return False
 
@@ -146,12 +148,11 @@ class NBWorker(WSClient):
 
         self.update_nb(widgets)
 
+        self.sm.clear_output_dir()
+       
         self.sm.sync_output_dir()
 
         body = self.nbrun.export_html(self.nb, full_header=self.is_presentation())
-
-        # with open(f"test_{counter}.html", "w") as fout:
-        #    fout.write(body)
 
         self.ws.send(json.dumps({"purpose": Purpose.ExecutedNotebook, "body": body}))
         self.update_worker_state(WorkerState.Running)
@@ -210,6 +211,8 @@ class NBWorker(WSClient):
                     index_execute_from = min(index_execute_from, cell_index)
 
         if index_execute_from is not None:
+            self.sm.clear_output_dir()
+
             if self.prev_nb is not None:
                 self.nb = copy.deepcopy(self.prev_nb)
             else:
@@ -317,7 +320,7 @@ class NBWorker(WSClient):
     def init_notebook(self):
         log.info(f"Init notebook, show_code={self.show_code()}")
 
-        if self.notebook.task_id != "":
+        if getattr(self.notebook, "task_id", "") != "":
             log.info(
                 f"Task available {self.notebook.task_id}, params {self.notebook.params}"
             )
@@ -359,6 +362,8 @@ class NBWorker(WSClient):
         # we need to initialize the output dir always
         # even if there is no OutputDir in the notebook
         self.initialize_outputdir()
+ 
+        self.sm.clear_output_dir()
 
         self.nb_original = read_nb(self.notebook.path)
 
