@@ -23,11 +23,11 @@ ENV PATH="/opt/conda/bin:${PATH}"
 WORKDIR /app
 ADD ./mercury/requirements.txt /app/mercury/
 
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main --channel https://repo.anaconda.com/pkgs/r
 RUN conda install --yes mamba -c conda-forge
-RUN mamba install --yes python=3.10 --file mercury/requirements.txt -c conda-forge
-RUN mamba install --yes gunicorn psycopg2 daphne -c conda-forge
-RUN mamba install --yes mercury -c conda-forge
-
+RUN mamba install --yes python=3.10 gunicorn psycopg2 daphne mercury -c conda-forge
+RUN mamba install --yes celery>=5.2 -c conda-forge
+RUN pip install -r mercury/requirements.txt
 ADD ./mercury/templates /app/mercury/templates
 ADD ./mercury/server /app/mercury/server
 ADD ./mercury/apps /app/mercury/apps
