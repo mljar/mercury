@@ -60,7 +60,7 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
             "fullStaticUrl": ujoin(self.base_url, "static", self.name),
             "frontendUrl": ujoin(self.base_url, "mercury/"),
             "notebookPath": notebook_path,
-            "title": MAIN_CONFIG.get("title", "Mercury"),
+            "title": MAIN_CONFIG.get("title", "Mercury")
         }
 
         mathjax_config = self.settings.get("mathjax_config", "TeX-AMS_HTML-full,Safe")
