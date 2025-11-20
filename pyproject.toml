@@ -7,7 +7,7 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "mercury-dev"
+name = "mercury"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
@@ -38,7 +38,7 @@ packages = ["mercury", "mercury_app"]
 
 [tool.hatch.build.targets.sdist]
 artifacts = ["mercury_app/labextension", "mercury_app/schemas", "mercury_app/static"]
-exclude = [".github", "binder", "marvenv"]
+exclude = [".github", "binder", "venv"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "mercury_app/labextension" = "share/jupyter/labextensions/@mljar/mercury-extension"
