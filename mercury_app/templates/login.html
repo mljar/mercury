@@ -1,0 +1,147 @@
+{% extends "page.html" %}
+
+{% block stylesheet %}
+<style>
+  html, body {
+    padding: 0; margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: #f9fafb; color: #0f172a; line-height: 1.55;
+    font-size: 12px; 
+  }
+ 
+
+  /* a { color: #0ea5e9; text-decoration: none; }
+    a:hover { text-decoration: underline; } */
+
+    /* Header */
+    .hdr {
+      position: sticky; top: 0; z-index: 50;
+      background: #0b0b0c;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      height: 52px;
+    }
+    .hdr-inner {
+      margin: 0 auto; max-width: 56rem;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .9rem .75rem;
+    }
+    .brand {
+      font-weight: 750; letter-spacing: -.01em;
+      color: #f3f4f6; font-size: clamp(14px, 2vw, 20px);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      border: 1px solid #e5e7eb;
+      background: #fff; color: #374151;
+      padding: .45rem .75rem; font-size: 13px; border-radius: .5rem;
+      transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .btn:hover { text-decoration: none; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+    .caret { transition: transform .15s ease; }
+
+
+
+
+  /* Centered box */
+  .mrc-main { padding: 2rem 1rem; }
+  .mrc-box {
+    margin: 2rem auto;
+    background:#fff; border:1px solid #e2e8f0; border-radius:1rem;
+    padding: 2rem 2rem; max-width: 40rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .mrc-title {
+    font-size:2.2rem; font-weight:700; margin:0 0 1rem 0;
+  }
+  .mrc-row { margin: 1rem 0; }
+  .mrc-label { display:block; font-weight:600; margin-bottom:.35rem; }
+  .mrc-input {
+    width:100%; box-sizing:border-box;
+    padding:.6rem .7rem; border:1px solid #e5e7eb; border-radius:.6rem;
+    font-size:14px;
+  }
+  .mrc-btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:.55rem .9rem; border-radius:.6rem; border:1px solid #e5e7eb;
+    background:#fff; color:#374151; font-size:14px; cursor:pointer;
+    transition: box-shadow .15s ease;
+  }
+  .mrc-btn:hover { box-shadow:0 1px 8px rgba(0,0,0,.06); }
+
+  .mrc-msg { margin-top:1rem; padding:.75rem .9rem; border-radius:.5rem; font-size:14px; }
+  .mrc-msg.info { background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; }
+  .mrc-msg.warn { background:#fff7ed; color:#7c2d12; border:1px solid #fed7aa; }
+  .mrc-msg.error { background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
+
+  .mrc-subtitle { margin-top:1.25rem; font-weight:700; font-size:1.1rem; }
+  pre { background:#f8fafc; border:1px solid #e5e7eb; padding:.75rem; border-radius:.5rem; overflow:auto; }
+  a { color:#0ea5e9; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+</style>
+{% endblock %}
+
+{% block site %}
+
+ 
+
+<header class="hdr">
+    <div class="hdr-inner">
+      <div class="brand">{{ page_title or 'Mercury'}}</div>
+    </div>
+  </header>
+
+
+<main class="mrc-main">
+  <div class="mrc-box">
+    {% if login_available %}
+      <div class="mrc-title">{% trans %}Log in{% endtrans %}</div>
+      <form action="{{ base_url }}login?next={{ next }}" method="post">
+        {{ xsrf_form_html() | safe }}
+
+        <div class="mrc-row">
+          <label for="password_input" class="mrc-label">
+            {% if token_available %}
+              <strong>{% trans %}Password:{% endtrans %}</strong>
+            {% else %}
+              <strong>{% trans %}Password:{% endtrans %}</strong>
+            {% endif %}
+          </label>
+          <input type="password" name="password" id="password_input" class="mrc-input">
+        </div>
+
+        <div class="mrc-row">
+          <button type="submit" class="mrc-btn" id="login_submit">
+            {% trans %}Log in{% endtrans %}
+          </button>
+        </div>
+      </form>
+    {% else %}
+      <p>{% trans %}No login available, you shouldn't be seeing this page.{% endtrans %}</p>
+    {% endif %}
+
+    {% if message %}
+      <div class="mrc-row">
+        {% for key in message %}
+          <div class="mrc-msg {{ key }}">{{ message[key] }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if token_available %}
+      {% block token_message %}
+      <!-- <div class="mrc-row">
+        <div class="rendered_html">
+          <div class="mrc-subtitle">Token authentication is enabled</div>
+        </div>
+      </div> -->
+      {% endblock token_message %}
+    {% endif %}
+  </div>
+</main>
+
+{% endblock %}
+
+{% block script %}
+{# no extra JS needed #}
+{% endblock %}

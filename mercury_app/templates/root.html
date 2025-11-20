@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{page_title or 'Mercury'}}</title>
+  <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url("mercury/logo/favicon.ico") }}">
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f9fafb;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #0f172a;
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    .hdr {
+      position: sticky; top: 0; z-index: 50;
+      background: #0b0b0c;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .hdr-inner {
+      margin: 0 auto; max-width: 56rem;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem .75rem;
+    }
+    .brand {
+      font-weight: 750; letter-spacing: -.01em;
+      color: #f3f4f6; font-size: clamp(14px, 2vw, 20px);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      border: 1px solid #e5e7eb;
+      background: #fff; color: #374151;
+      padding: .45rem .75rem; font-size: 13px; border-radius: .5rem;
+      transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .btn:hover { text-decoration: none; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+    .caret { transition: transform .15s ease; }
+
+    /* Menu (context dropdown) */
+    .menu{
+      position:absolute; right:0; margin-top:.5rem; width:22rem; max-height:28rem; overflow:auto;
+      border:1px solid rgba(0,0,0,.08); border-radius:1rem;
+      background:rgba(255,255,255,.95); backdrop-filter:blur(8px);
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    .menu-list{ padding:.4rem; }
+    .menu-item{
+      display:flex; align-items:center; gap:.7rem;
+      padding:.6rem .65rem; border-radius:.75rem;
+      color:#111827; font-size:14px;
+      text-decoration:none;
+      transition: background-color .12s ease, transform .12s ease;
+    }
+    .menu-item:hover{ background:#f8fafc; text-decoration:none; }
+    .menu a:hover { text-decoration: none; }
+    .menu-item:active{ transform: translateY(0.5px); }
+    .menu-thumb{
+      width:36px; height:28px; border-radius:.6rem;
+      display:grid; place-items:center; font-weight:700; line-height:1;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.03);
+    }
+
+    /* Main layout */
+    .main { flex: 1; padding: 0 1rem; }
+    .wrap { max-width: 56rem; margin: 0 auto; padding: 2rem 0 2.5rem; }
+
+    .h1 { font-size: clamp(26px, 3.5vw, 34px); font-weight: 800; letter-spacing: -.02em; margin: 0 0 .25rem; }
+    .lead { color: #4b5563; margin: 0.25rem 0 0; }
+    .lead b { color: #111827; }
+    .lead2 { color: #4b5563; margin: .15rem 0 2rem; }
+
+    /* Top row: title + search */
+    .toprow{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:1rem; flex-wrap:wrap; margin:1.5rem 0 1rem;
+    }
+    .section-title{ font-size:22px; font-weight:700; margin:0; }
+
+    .search-wrap{
+      position:relative; width:min(14rem, 100%);
+      margin-left:auto; z-index:1;
+    }
+    @media (max-width: 900px){ .search-wrap{ width:100%; } }
+    .search{
+      width:100%; box-sizing:border-box; height:38px;
+      border:1px solid #e5e7eb; background:#fff; border-radius:14px;
+      padding:0 .9rem; padding-right:2.1rem; font-size:14px; color:#111827;
+      outline:none; transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .search:focus{ border-color:#c7d2fe; box-shadow:0 0 0 3px rgba(59,130,246,.15); }
+    .search::placeholder{ color:#9ca3af; }
+    .search-ico{
+      position:absolute; right:.6rem; top:0; bottom:0; display:flex; align-items:center;
+      color:#9ca3af; pointer-events:none;
+    }
+
+    /* Grid / Card */
+    .grid { display: grid; gap: 1.25rem; }
+    @media (min-width: 700px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card {
+      position: relative; display: flex; align-items: center; gap: 1rem;
+      min-height: 112px; padding: 1.1rem;
+      border: 1px solid #e6eaf0; border-radius: 1.2rem;
+      background: #fff;
+      box-shadow: 0 1px 0 rgba(16,24,40,.02), 0 1px 3px rgba(16,24,40,.06);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .15s ease;
+    }
+    .card:hover { transform: translateY(-1px); border-color: #dde3ea; box-shadow: 0 5px 10px rgba(16,24,40,.08); text-decoration: none; }
+    .thumb {
+      width: 64px; height: 64px; border-radius: 1rem; display: grid; place-items: center;
+      font-weight: 700; text-align: center; line-height: 1.1; padding: 4px; flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.02);
+    }
+    .name { font-size: 19px; font-weight: 750; letter-spacing: -.01em; margin: 0; color: #111827; }
+    .desc { margin: .25rem 0 0; color: #475569; }
+
+    /* Panels & skeletons */
+    .panel {
+      border: 1px solid rgba(0,0,0,.06);
+      background: rgba(255,255,255,.92); backdrop-filter: blur(6px);
+      border-radius: 1rem; padding: 1.4rem; text-align: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    }
+    .panel .emoji { font-size: 34px; margin-bottom: .3rem; }
+    .panel .title { font-size: 16px; margin: 0 0 .1rem; }
+    .panel .muted { color: #6b7280; font-size: 14px; }
+
+    .pulse { animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% {opacity:.6} 50% {opacity:1} }
+    .skel { display: grid; gap: 1.25rem; }
+    @media (min-width: 700px) { .skel { grid-template-columns: 1fr 1fr; } }
+    .skel-card { display:flex; align-items:center; gap:1rem; padding: 1.1rem; min-height:112px; background:#fff; border:1px solid #e6eaf0; border-radius:1.2rem; }
+    .skel-box { background:#e5e7eb; border-radius:.8rem; }
+    .skel-thumb { width:64px; height:64px; }
+    .skel-line1 { width: 190px; height: 14px; border-radius:.4rem; }
+    .skel-line2 { width: 260px; height: 12px; border-radius:.4rem; }
+
+    /* Footer */
+    .ftr { background:#fff; border-top:1px solid #e5e7eb; color:#6b7280; font-size:14px; }
+    .ftr-inner { padding: .6rem 1rem; text-align: center; }
+
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="hdr" role="banner">
+    <div class="hdr-inner">
+      <a class="brand" href="{{ base_url or '/' }}">{{ page_title or 'Mercury'}}</a>
+
+      <!-- Render menu button ONLY when there are notebooks -->
+      {% if notebooks %}
+      <div style="position:relative">
+        <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
+          Notebooks
+          <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+
+        <div id="nbMenu" class="menu hidden" role="menu" aria-label="Notebook list">
+          <div id="nbMenuList" class="menu-list" role="none"></div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main" role="main">
+    <div class="wrap">
+      <section aria-labelledby="welcome">
+        <h1 id="welcome" class="h1">{{ header }}</h1>
+        
+        {% if message and message != 'empty' %}
+            <p class="lead">{{ message|safe }}</p>
+        {% else %}
+            {% if not message or message == '' or message == 'empty' %}
+                {# show nothing #}
+            {% else %}
+                <p class="lead"><b>Welcome to Mercury.</b> You're viewing notebooks turned into user-friendly apps.</p>
+                <p class="lead2">Feel free to interact and explore - everything is designed to be <b>simple and safe</b>.</p>
+            {% endif %}
+        {% endif %}
+        
+      </section>
+
+      {% if notebooks %}
+      <div class="toprow">
+        <h2 class="section-title">Notebooks</h2>
+        <div class="search-wrap">
+          <label for="nb-search" class="hidden">Search notebooks</label>
+          <input id="nb-search" class="search" placeholder="Search notebooks…" />
+          <div class="search-ico" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div id="err" class="panel hidden" role="status" aria-live="polite">
+        <div class="emoji">⚠️</div>
+        <div class="title">Failed to load notebooks</div>
+        <div class="muted">Please refresh the page.</div>
+      </div>
+
+      <div id="empty" class="panel hidden" aria-live="polite">
+        <div class="emoji">📚</div>
+        <div class="title">No notebooks found</div>
+        <div class="muted">Create your first notebook to get started</div>
+      </div>
+
+      <div id="skel" class="skel" aria-hidden="true">
+        <div class="skel-card pulse">
+          <div class="skel-box skel-thumb"></div>
+          <div>
+            <div class="skel-box skel-line1"></div>
+            <div style="height:8px"></div>
+            <div class="skel-box skel-line2"></div>
+          </div>
+        </div>
+        <div class="skel-card pulse">
+          <div class="skel-box skel-thumb"></div>
+          <div>
+            <div class="skel-box skel-line1"></div>
+            <div style="height:8px"></div>
+            <div class="skel-box skel-line2"></div>
+          </div>
+        </div>
+      </div>
+
+      {% if not notebooks %}
+      <div id="empty-no-notebooks" class="panel" aria-live="polite">
+        <div class="emoji">📚</div>
+        <div class="title">No notebooks found</div>
+        <div class="muted">Create your first notebook to get started</div>
+      </div>
+      {% endif %}
+
+      <div id="grid" class="grid">
+        {% if notebooks %}
+          {% for nb in notebooks %}
+            <a class="card nb-card"
+               href="{{ nb.slug }}"
+               data-name="{{ nb.name|e }}"
+               data-desc="{{ (nb.description or '')|e }}"
+               data-thumb-text="{{ (nb.thumbnail_text or '📒')|e }}"
+               data-thumb-bg="{{ (nb.thumbnail_bg or '#f1f5f9')|e }}"
+               data-thumb-color="{{ (nb.thumbnail_text_color or '#0f172a')|e }}">
+              <div class="thumb"
+                   style="background: {{ nb.thumbnail_bg or '#f1f5f9' }}; color: {{ nb.thumbnail_text_color or '#0f172a' }};"
+                   data-font-size="auto">{{ nb.thumbnail_text or '📒' }}</div>
+              <div>
+                <h3 class="name">{{ nb.name }}</h3>
+                {% if nb.description %}<p class="desc">{{ nb.description }}</p>{% endif %}
+              </div>
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </main>
+
+  <footer class="ftr">
+    <div class="ftr-inner">{{ footer or 'MLJAR - next generation of AI tools' }}</div>
+  </footer>
+
+  <script>
+    const qs  = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
+
+    const $grid = qs('#grid');
+    const $skel = qs('#skel');
+    const $empty = qs('#empty');
+    const $search = qs('#nb-search');
+    const $menu = qs('#nbMenu');
+    const $btn = qs('#nbBtn');
+    const $caret = qs('#nbCaret');
+    const $menuList = qs('#nbMenuList');
+
+    $skel?.classList.add('hidden');
+
+    function sizeThumb(el) {
+      const txt = (el.textContent || '').trim();
+      let fs = '2.0rem';
+      if (txt.length > 6) fs = '0.9rem';
+      else if (txt.length > 4) fs = '1.1rem';
+      else if (txt.length > 2) fs = '1.4rem';
+      el.style.fontSize = fs;
+    }
+    qsa('.thumb[data-font-size="auto"]').forEach(sizeThumb);
+
+    function sizeThumbMenu(el) {
+      const txt = (el.textContent || '').trim();
+      let fs = '1.0rem';
+      if (txt.length > 6) fs = '0.4rem';
+      else if (txt.length > 4) fs = '0.6rem';
+      else if (txt.length > 2) fs = '0.8rem';
+      el.style.fontSize = fs;
+    }
+
+    const cards = qsa('.nb-card').map(card => {
+      const name = (card.dataset.name || '').toLowerCase();
+      const desc = (card.dataset.desc || '').toLowerCase();
+      return { card, name, desc };
+    });
+
+    // If no cards exist, hide menu button (in case template couldn't detect)
+    if (cards.length === 0) {
+      if ($btn) $btn.style.display = 'none';
+      if ($menu) $menu.remove?.();
+    }
+
+    function renderMenu(){
+      if(!$menuList || cards.length === 0) return;
+      const frag = document.createDocumentFragment();
+      cards.forEach(({ card }) => {
+        const a = document.createElement('a');
+        a.className = 'menu-item';
+        a.href = card.getAttribute('href') || '#';
+        a.setAttribute('role','menuitem');
+
+        const t = document.createElement('div');
+        t.className = 'menu-thumb';
+        t.style.background = card.dataset.thumbBg || '#f1f5f9';
+        t.style.color      = card.dataset.thumbColor || '#0f172a';
+        t.textContent      = card.dataset.thumbText || '📒';
+        sizeThumbMenu(t);
+
+        const span = document.createElement('span');
+        span.textContent = card.dataset.name || 'Notebook';
+
+        a.appendChild(t); a.appendChild(span);
+        frag.appendChild(a);
+      });
+      $menuList.innerHTML = '';
+      $menuList.appendChild(frag);
+    }
+    renderMenu();
+
+    function applySearch(q) {
+      const s = (q || '').trim().toLowerCase();
+      let visible = 0;
+      for (const item of cards) {
+        const hit = !s || item.name.includes(s) || item.desc.includes(s);
+        item.card.style.display = hit ? '' : 'none';
+        if (hit) visible++;
+      }
+      if (visible === 0) $empty?.classList.remove('hidden');
+      else $empty?.classList.add('hidden');
+    }
+    $search?.addEventListener('input', e => applySearch(e.target.value));
+
+    function setMenu(open) {
+      if (!$menu) return;
+      $menu.classList.toggle('hidden', !open);
+      $btn?.setAttribute('aria-expanded', String(open));
+      if ($caret) $caret.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+    let menuOpen = false;
+    $btn?.addEventListener('click', () => { menuOpen = !menuOpen; setMenu(menuOpen); });
+    document.addEventListener('click', (e) => {
+      if (!menuOpen) return;
+      if (!$menu.contains(e.target) && !$btn.contains(e.target)) {
+        menuOpen = false; setMenu(false);
+      }
+    });
+    document.addEventListener('keydown', e => {
+      const key = String(e.key).toLowerCase();
+      if (key === 'escape') { menuOpen = false; setMenu(false); }
+      if ((e.metaKey || e.ctrlKey) && key === 'k') { e.preventDefault(); $search?.focus(); $search?.select(); }
+    });
+  </script>
+</body>
+</html>

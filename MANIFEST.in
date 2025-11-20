@@ -1,4 +1,11 @@
-recursive-include mercury/frontend-dist/ *
-recursive-include mercury/frontend-single-site-dist/ *
-include mercury/requirements.txt
-include README.md
+exclude mervenv/*
+recursive-exclude mervenv *
+
+
+recursive-include mercury_app/labextension *.*
+recursive-include mercury_app/schemas *.*
+recursive-include mercury_app/templates *.*
+recursive-include portal/backend *.*
+recursive-include mercury *.*
+include install.json
+include jupyter-config/server-config/*.json

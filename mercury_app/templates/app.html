@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{page_title or 'Mercury'}}</title>
+  <link id="favicon" rel="shortcut icon" type="image/x-icon" href="{{ static_url("mercury/logo/favicon.ico") }}">
+
+  <style>
+    /* Base reset / typography */
+    html, body {
+      padding: 0;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #0f172a;
+      line-height: 1.55;
+      background: #f9fafb;
+    }
+    a { color: inherit; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    .hdr {
+      position: sticky; top: 0; z-index: 50;
+      background: #0b0b0c;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .hdr-inner {
+      margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem .75rem;
+    }
+    .brand {
+      font-weight: 750; letter-spacing: -.01em;
+      color: #f3f4f6; font-size: clamp(14px, 2vw, 20px);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      border: 1px solid #e5e7eb;
+      background: #fff; color: #374151;
+      padding: .45rem .75rem; font-size: 13px; border-radius: .5rem;
+      transition: box-shadow .15s ease, transform .15s ease;
+    }
+    .btn:hover { text-decoration: none; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
+    .caret { transition: transform .15s ease; }
+
+    /* ===== Persistent loader overlay (below header), mobile-friendly ===== */
+    :root {
+      /* default fallback; JS will set the real header height */
+      --header-height: 52px;
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    /* Background overlay BELOW the header + safe area */
+    html::before {
+      content: "";
+      position: fixed;
+      top: calc(var(--header-height) + var(--safe-top));
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2147483647;
+      background: rgba(249,250,251,0.96);
+      /* Prevent scroll behind on mobile */
+      -webkit-overflow-scrolling: touch;
+      touch-action: none;
+    }
+
+    /* Coffee box centered BELOW the header */
+    html::after {
+      content: "☕\A Starting the web app for you…";
+      white-space: pre;
+      position: fixed;
+      top: calc(var(--header-height) + var(--safe-top) + 50%);
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2147483648;
+
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      color: #334155;
+
+      /* Mobile-friendly sizing */
+      width: min(92vw, 28rem);
+      box-sizing: border-box;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    /* Small screens: tighten spacing and font size */
+    @media (max-width: 480px) {
+      html::after {
+        padding: 1.25rem 1.25rem;
+        font-size: 16px;
+        border-radius: .75rem;
+        width: min(94vw, 24rem);
+      }
+    }
+
+    /* Hide overlay when ready */
+    html.hide-loader::before,
+    html.hide-loader::after { display: none !important; }
+  </style>
+</head>
+
+<body>
+
+  {# Copy so we do not modify the page_config with updates. #}
+  {% set page_config_full = page_config.copy() %}
+  {% set _ = page_config_full.update(baseUrl=base_url, wsUrl=ws_url) %}
+
+  <script id="jupyter-config-data" type="application/json">
+    {{ page_config_full | tojson }}
+  </script>
+  <script src="{{page_config['fullStaticUrl'] | e}}/bundle.js" main="index"></script>
+
+  <script type="text/javascript">
+    /* Remove token from URL. */
+    (function () {
+      var parsedUrl = new URL(window.location.href);
+      if (parsedUrl.searchParams.get('token')) {
+        parsedUrl.searchParams.delete('token');
+        window.history.replaceState({}, '', parsedUrl.href);
+      }
+    })();
+
+    /* Expose a helper to hide the persistent loader when ready */
+    window.hideMercuryLoader = function () {
+      document.documentElement.classList.add('hide-loader');
+    };
+
+    /* Dynamically set --header-height to the real header height for perfect positioning */
+    (function () {
+      function setHeaderHeightVar() {
+        var hdr = document.querySelector('.hdr');
+        if (!hdr) return;
+        var h = hdr.offsetHeight || 52;
+        document.documentElement.style.setProperty('--header-height', h + 'px');
+      }
+      // Initial + on resize + when fonts finish loading
+      window.addEventListener('load', setHeaderHeightVar);
+      window.addEventListener('resize', setHeaderHeightVar);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(setHeaderHeightVar).catch(function(){});
+      }
+      // In case Jupyter reflows, try again shortly after boot
+      setTimeout(setHeaderHeightVar, 300);
+      setTimeout(setHeaderHeightVar, 1000);
+    })();
+
+    // Auto-hide example if you want:
+    window.addEventListener('load', function(){
+      setTimeout(() => window.hideMercuryLoader(), 800);
+    });
+  </script>
+
+  <header class="hdr" role="banner">
+    <div class="hdr-inner">
+      <a class="brand" href="{{ base_url or '/' }}">{{page_config['title'] or 'Mercury'}}</a>
+      <div style="position:relative">
+        <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
+          Notebooks
+          <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body may be replaced by the app; overlay stays visible and responsive. -->
+
+</body>
+</html>

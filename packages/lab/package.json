@@ -1,0 +1,132 @@
+{
+    "name": "@mljar/mercury-extension",
+    "version": "0.3.0",
+    "description": "Run notebooks as web apps with Mercury inside JupyterLab.",
+    "keywords": [
+        "jupyter",
+        "jupyterlab",
+        "jupyterlab-extension"
+    ],
+    "homepage": "https://github.com/mljar/mercury-extension",
+    "bugs": {
+        "url": "https://github.com/mljar/mercury-extension/issues"
+    },
+    "license": "Apache-2.0",
+    "author": {
+        "name": "MLJAR Sp. z o.o.",
+        "email": "contact@mljar.com"
+    },
+    "files": [
+        "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+        "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    ],
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "style": "style/index.css",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mljar/mercury-extension.git"
+    },
+    "scripts": {
+        "build": "jlpm build:lib && jlpm build:labextension:dev",
+        "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
+        "build:labextension": "jupyter labextension build .",
+        "build:labextension:dev": "jupyter labextension build --development True .",
+        "build:lib": "tsc --sourceMap",
+        "build:lib:prod": "tsc",
+        "clean": "jlpm clean:lib",
+        "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+        "clean:lintcache": "rimraf .eslintcache .stylelintcache",
+        "clean:labextension": "rimraf mercury_app/labextension mercury_app/_version.py",
+        "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
+        "eslint": "jlpm eslint:check --fix",
+        "eslint:check": "eslint . --cache --ext .ts,.tsx",
+        "install:extension": "jlpm build",
+        "lint": "jlpm stylelint && jlpm prettier && jlpm eslint",
+        "lint:check": "jlpm stylelint:check && jlpm prettier:check && jlpm eslint:check",
+        "prettier": "jlpm prettier:base --write --list-different",
+        "prettier:base": "prettier \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+        "prettier:check": "jlpm prettier:base --check",
+        "stylelint": "jlpm stylelint:check --fix",
+        "stylelint:check": "stylelint --cache \"style/**/*.css\"",
+        "test": "jest --coverage",
+        "watch": "run-p watch:src watch:labextension",
+        "watch:src": "tsc -w --sourceMap",
+        "watch:labextension": "jupyter labextension watch ."
+    },
+    "dependencies": {
+        "@jupyter-widgets/base": "^6.0.6",
+        "@jupyter-widgets/jupyterlab-manager": "^5.0.9",
+        "@jupyter/ydoc": "^1.0.0 || ^ 2.0.0 || ^3.0.0",
+        "@jupyterlab/application": "^4.0.0",
+        "@jupyterlab/apputils": "^4.0.0",
+        "@jupyterlab/cells": "^4.0.0",
+        "@jupyterlab/codeeditor": "^4.0.0",
+        "@jupyterlab/coreutils": "^6.0.0",
+        "@jupyterlab/docregistry": "^4.0.0",
+        "@jupyterlab/notebook": "^4.0.0",
+        "@jupyterlab/observables": "^5.0.0",
+        "@jupyterlab/outputarea": "^4.0.0",
+        "@jupyterlab/rendermime": "^4.0.0",
+        "@jupyterlab/services": "^7.0.0",
+        "@jupyterlab/translation": "^4.0.0",
+        "@jupyterlab/ui-components": "^4.0.0",
+        "@lumino/algorithm": "^2.0.0",
+        "@lumino/commands": "^2.0.0",
+        "@lumino/coreutils": "^2.0.0",
+        "@lumino/disposable": "^2.0.0",
+        "@lumino/messaging": "^2.0.1",
+        "@lumino/signaling": "^2.0.0",
+        "@lumino/widgets": "^2.0.0",
+        "@mljar/mercury-tokens": "workspace:*",
+        "yjs": "^13.5.40"
+    },
+    "devDependencies": {
+        "@jupyterlab/builder": "^4.0.0",
+        "@jupyterlab/testutils": "^4.0.0",
+        "@types/jest": "^29.2.0",
+        "@types/json-schema": "^7.0.11",
+        "@types/react": "^18.0.26",
+        "@types/react-addons-linked-state-mixin": "^0.14.22",
+        "@typescript-eslint/eslint-plugin": "^6.1.0",
+        "@typescript-eslint/parser": "^6.1.0",
+        "css-loader": "^6.7.1",
+        "eslint": "^8.36.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-prettier": "^5.0.0",
+        "jest": "^29.2.0",
+        "npm-run-all": "^4.1.5",
+        "prettier": "^3.0.0",
+        "rimraf": "^5.0.1",
+        "source-map-loader": "^1.0.2",
+        "style-loader": "^3.3.1",
+        "stylelint": "^15.10.1",
+        "stylelint-config-recommended": "^13.0.0",
+        "stylelint-config-standard": "^34.0.0",
+        "stylelint-csstree-validator": "^3.0.0",
+        "stylelint-prettier": "^4.0.0",
+        "typescript": "~5.0.2"
+    },
+    "sideEffects": [
+        "style/*.css",
+        "style/index.js"
+    ],
+    "styleModule": "style/index.js",
+    "publishConfig": {
+        "access": "public"
+    },
+    "jupyterlab": {
+        "extension": true,
+        "outputDir": "../../mercury_app/labextension",
+        "sharedPackages": {
+            "@jupyter-widgets/base": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@jupyter-widgets/jupyterlab-manager": {
+                "bundled": false,
+                "singleton": true
+            }
+        }
+    }
+}

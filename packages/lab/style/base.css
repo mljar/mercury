@@ -1,0 +1,328 @@
+/* Make the Mercury toolbar a proper flex container that can shrink */
+/* Toolbar as flex container */
+.mercury-Toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex-wrap: wrap;  /* we WANT wrapping */
+}
+
+/* Default order for toolbar items */
+.mercury-Toolbar > .jp-Toolbar-item {
+  order: 1;
+}
+
+/* Text inputs layout (like you already have) */
+.mercury-Toolbar .mercury-toolbar-title,
+.mercury-Toolbar .mercury-toolbar-desc,
+.mercury-Toolbar .mercury-toolbar-thumbtext {
+  flex: 1 1 120px;
+  min-width: 0;
+  max-width: 150px;
+}
+
+/* Keep color + checkbox items compact */
+.mercury-Toolbar .mercury-toolbar-color,
+.mercury-Toolbar .mercury-toolbar-checkbox {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* 🔹 The 'More commands' opener (three dots) */
+.mercury-Toolbar > .jp-Toolbar-responsive-opener {
+  order: 2;          /* come AFTER normal items, but BEFORE auto-rerun */
+  margin-left: auto; /* push to the far right of the first row */
+  flex: 0 0 auto;
+  align-self: center;
+  display: flex;
+  align-items: center;
+}
+
+/* 🔹 Auto re-run row on its own line, full width */
+.mercury-Toolbar > .jp-Toolbar-item.mercury-toolbar-auto-rerun {
+  order: 3;          /* always last */
+  flex: 1 1 100%;    /* take full row */
+}
+
+/* (Optional) remove weird height tricks that can misalign items */
+.mercury-toolbar-title,
+.mercury-toolbar-desc,
+.mercury-toolbar-thumbtext {
+  height: auto !important;  /* or a fixed px height if you prefer */
+}
+/******************************************************************************/
+
+.mercury-panel {
+  padding: 0;
+}
+
+.hide-element {
+  display: none;
+}
+
+.mercury-main-panel {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+}
+
+.mercury-sidebar-toggle {
+  /* position: absolute; */
+  position: fixed;
+  z-index: 1000;
+  background: #222;
+  color: #fff;
+  border: none;
+
+  cursor: pointer;
+  font-size: 1.5em;
+  opacity: 0.7;
+  /* box-shadow: 1px 1px 6px #0002; */
+  transition:
+    left 0.2s,
+    opacity 0.2s;
+
+  width: 21px;
+  height: 25px;
+
+  border-radius: 10px 0px 0px 10px !important;
+}
+
+.mercury-sidebar-collapse {
+  right: -2px;
+  top: 5px;
+}
+
+.mercury-sidebar-expand {
+  left: -4px;
+  background: #0d6efd;
+  color: #fff;
+  border-radius: 0px 10px 10px 0px !important;
+  /* box-shadow: 1px 1px 6px #0004; */
+}
+
+.mercury-left-panel {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow: hidden auto;
+  box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%);
+  min-width: 250px;
+}
+
+/* Hide collapse button by default */
+.mercury-left-panel .mercury-sidebar-collapse {
+  display: none;
+}
+
+/* Show collapse button only when hovering over sidebar */
+.mercury-left-panel:hover .mercury-sidebar-collapse {
+  display: block;
+}
+
+.mercury-right-top-panel {
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+}
+
+.mercury-right-bottom-panel {
+  overflow: hidden !important;  
+  border-top: 1px solid var(--jp-border-color2);
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+
+}
+
+/* Hide output prompt in sidebar */
+.mercury-left-panel .jp-OutputArea-prompt,
+.mercury-left-panel .jp-OutputArea-promptOverlay {
+  display: none;
+}
+
+.mercury-right-bottom-panel .jp-OutputArea-prompt,
+.mercury-right-bottom-panel .jp-OutputArea-promptOverlay {
+  display: none;
+}
+
+/* needed for markdown */
+.mercury-right-top-panel .jp-InputPrompt,
+.mercury-right-top-panel .jp-InputCollapser {
+  display: none;
+}
+
+.mercury-right-top-panel .jp-OutputArea-prompt,
+.mercury-right-top-panel .jp-OutputArea-promptOverlay {
+  display: none;
+}
+
+.mercury-right-bottom-panel,
+.mercury-right-top-panel {
+  overflow-y: auto;
+}
+
+.widget-text {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.widget-text input {
+  width: 100%;
+  box-sizing: border-box; /* ensures padding and border are included in width */
+  padding: 8px;
+  margin-top: 4px;
+}
+
+.mercury-main-panel > .lm-SplitPanel-handle {
+  background: lightgrey;
+  width: 0px !important;
+  cursor: ew-resize;
+}
+
+.mercury-panel-with-margin {
+  /* max-width: 1280px; */
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+
+/*********************************************************/
+/* Mercury App Toolbar */
+
+.mercury-toolbar-title {
+  width: 150px;
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  margin-right: 4px;
+  font: inherit;
+  color: var(--jp-ui-font-color1);
+  background: var(--jp-layout-color1);
+  height: 70% !important;
+  font-size: 0.8rem !important;
+}
+
+.mercury-toolbar-desc {
+  width: 150px;
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  margin-right: 4px;
+  font: inherit;
+  color: var(--jp-ui-font-color1);
+  background: var(--jp-layout-color1);
+  height: 70% !important;
+  font-size: 0.8rem !important;
+}
+
+.mercury-toolbar-checkbox {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 0.8rem;
+  color: var(--jp-ui-font-color1);
+}
+
+/* Mercury App Toolbar – Thumbnail Text */
+.mercury-toolbar-thumbtext {
+  width: 100px; /* enough for ≤10 chars */
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  margin-right: 4px;
+  font: inherit;
+  color: var(--jp-ui-font-color1);
+  background: var(--jp-layout-color1);
+  height: 70% !important;
+  font-size: 0.8rem !important;
+}
+
+/* Mercury App Toolbar – Color Inputs (text + bg) */
+.mercury-toolbar-color {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 0.8rem;
+  color: var(--jp-ui-font-color1);
+}
+
+.mercury-toolbar-color input[type='color'] {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  margin-right: 6px;
+  border: 1px solid var(--jp-border-color2);
+  border-radius: 4px;
+  background: var(--jp-layout-color1);
+  cursor: pointer;
+}
+
+/* App title */
+.mercury-left-panel .mercury-sidebar-title {
+  font-weight: 600;
+  font-size: 18px;
+  padding: 10px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* --- Left footer container line */
+/* .mercury-left-footer {} */
+.mercury-runall-btn {
+  width: 100%; /* calc(100% - 16px); */
+  margin: 0px;
+  margin-top: 5px;
+  padding: 10px 0px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  background: linear-gradient(180deg, #38d36e 0%, #19b96c 100%);
+  color: #fff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 3px 6px rgba(22, 179, 100, 0.25); /* smaller + softer shadow */
+  transition:
+    transform 100ms ease,
+    box-shadow 120ms ease,
+    filter 120ms ease;
+}
+
+.mercury-runall-btn:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 4px 10px rgba(22, 179, 100, 0.3);
+}
+
+.mercury-runall-btn:active {
+  transform: translateY(1px);
+  filter: brightness(0.97);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.06) inset,
+    0 2px 6px rgba(22, 179, 100, 0.25);
+}
+
+.mercury-runall-btn:focus-visible {
+  outline: 2px solid rgba(60, 207, 119, 0.3);
+  outline-offset: 2px;
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="1;url={{ open_url }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starting ...</title>
+  <link id="favicon" rel="shortcut icon" type="image/x-icon" href="static/mercury/logo/favicon.ico">
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f9fafb;
+      color: #0f172a;
+      line-height: 1.55;
+    }
+
+    a { color: #0ea5e9; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    .hdr {
+      background: #0b0b0c;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      height: 52px;
+    }
+    .hdr-inner {
+      /* display: flex;
+      align-items: center;
+      padding: .75rem 1rem;
+       */
+      margin: 0 auto; max-width: 56rem;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem .75rem;
+    }
+    .brand {
+      font-weight: 750;
+      color: #f3f4f6;
+      font-size: clamp(16px, 2vw, 20px);
+      letter-spacing: -0.01em;
+    }
+
+    /* Static info box */
+    .box {
+      margin: 3rem auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      max-width: 32rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .box-emoji {
+      font-size: 48px;
+      margin-bottom: 1rem;
+    }
+    .box-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .box-text {
+      color: #334155;
+      font-size: 15px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="hdr">
+    <div class="hdr-inner">
+      <div class="brand">{{ page_title or 'Mercury'}}</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="box">
+      <div class="box-emoji">☕</div>
+
+      <div class="box-title">Starting your app ...</div> 
+
+      <div class="box-text">
+        You will be redirected automatically.<br>
+        If it doesn’t happen in a moment,
+        <a href="{{ open_url }}">click here to open app</a>.
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

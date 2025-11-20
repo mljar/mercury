@@ -1,0 +1,266 @@
+---
+title: testowanie
+description: A guide in my new Starlight docs site.
+---
+
+import { Card } from '@astrojs/starlight/components';
+import { LinkCard } from '@astrojs/starlight/components';
+import { CardGrid } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+import { FileTree } from '@astrojs/starlight/components';
+import { Icon } from '@astrojs/starlight/components';
+import { LinkButton } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+
+## Cards
+
+
+<Card title="Check this out">Interesting content you want to highlight.</Card>
+
+
+<Card title="Stars" icon="star">
+ Sirius, Vega, Betelgeuse
+</Card>
+
+
+
+
+## Link Cards
+
+
+<LinkCard title="Testowanie" href="/examples/testowanie/" />
+<LinkCard
+ title="Testowanie with description"
+ href="/examples/testowanie/"
+ description="this is example description for linkcard "
+/>
+
+
+## Card Grids
+
+
+<CardGrid>
+ <Card title="Check this out" icon="open-book">
+   Interesting content you want to highlight.
+ </Card>
+ <Card title="Other feature" icon="information">
+   More information you want to share.
+ </Card>
+</CardGrid>
+
+
+## Asides
+
+
+<Aside>Some content in an aside.</Aside>
+<Aside type="caution">Some cautionary content.</Aside>
+<Aside type="tip">
+Other content is also supported in asides.
+
+
+```js
+// A code snippet, for example.
+```
+
+
+</Aside>
+<Aside type="danger">Do not give your password to anyone.</Aside>
+
+
+## Badges
+
+
+<Badge text="Note" variant="note" />
+
+
+<Badge text="Success" variant="success" />
+
+
+<Badge text="Tip" variant="tip" />
+
+
+<Badge text="Caution" variant="caution" />
+
+
+<Badge text="Danger" variant="danger" />
+
+
+#### example
+
+
+- <Badge text="New" size="small" />
+- <Badge text="New and improved" size="medium" />
+- <Badge text="New, improved, and bigger" size="large" />
+
+
+
+
+## Code
+
+
+export const exampleCode = `console.log('This could come from a file or CMS!');`;
+export const fileName = 'example.js';
+export const highlights = ['file', 'CMS'];
+
+
+<Code code={exampleCode} lang="js" title={fileName} mark={highlights} />
+
+
+import importedCode from '/tsconfig.json?raw';
+
+
+<Code code={importedCode} lang="json" title="tsconfig.json" />
+
+
+## File Tree
+
+
+<FileTree>
+
+
+- astro.config.mjs
+- package.json
+- src
+ - components
+   - Header.astro
+   - Title.astro
+ - pages/
+
+
+</FileTree>
+
+
+<FileTree>
+
+
+- src
+ - components
+   - **Header.astro**
+   - Title.astro
+
+
+</FileTree>
+
+
+<FileTree>
+
+
+- src
+ - components
+   - Header.astro an **important** file
+   - Title.astro
+
+
+</FileTree>
+
+
+<FileTree>
+
+
+- src
+ - components
+   - Header.astro
+   - …
+
+
+</FileTree>
+
+
+## Icons
+
+
+<Icon name="star" />
+<Icon name="starlight" label="The Starlight logo" />
+
+
+<Icon name="star" color="goldenrod" size="2rem" />
+<Icon name="rocket" color="var(--sl-color-text-accent)" />
+
+
+## Link Buttons
+
+
+<LinkButton href="/examples/testowanie/">Get started</LinkButton>
+<LinkButton href="/examples/testowanie/" variant="secondary">
+ Configuration Reference
+</LinkButton>
+
+
+**example text**
+
+
+<LinkButton
+ href="/examples/testowanie/"
+ variant="secondary"
+ icon="external"
+ iconPlacement="start"
+>
+ Related: Astro
+</LinkButton>
+
+
+## Steps
+
+
+<Steps>
+
+
+1. Import the component into your MDX file:
+
+
+  ```js
+  import { Steps } from '@astrojs/starlight/components';
+  ```
+
+
+2. Wrap `<Steps>` around your ordered list items.
+
+
+</Steps>
+
+
+
+
+## Tabs
+
+
+<Tabs>
+ <TabItem label="Stars">Sirius, Vega, Betelgeuse</TabItem>
+ <TabItem label="Moons">Io, Europa, Ganymede</TabItem>
+</Tabs>
+
+
+
+
+_Some stars:_
+
+
+<Tabs syncKey="constellations">
+ <TabItem label="Orion">Bellatrix, Rigel, Betelgeuse</TabItem>
+ <TabItem label="Gemini">Pollux, Castor A, Castor B</TabItem>
+</Tabs>
+
+
+_Some exoplanets:_
+
+
+<Tabs syncKey="constellations">
+ <TabItem label="Orion">HD 34445 b, Gliese 179 b, Wasp-82 b</TabItem>
+ <TabItem label="Gemini">Pollux b, HAT-P-24b, HD 50554 b</TabItem>
+</Tabs>
+
+
+<Tabs>
+ <TabItem label="Stars" icon="star">
+   Sirius, Vega, Betelgeuse
+ </TabItem>
+ <TabItem label="Moons" icon="moon">
+   Io, Europa, Ganymede
+ </TabItem>
+</Tabs>
+

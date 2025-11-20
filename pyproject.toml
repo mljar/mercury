@@ -1,6 +1,82 @@
 [build-system]
 requires = [
-  "setuptools >= 50.0.0",
-  "wheel",
+    "hatchling>=1.5.0",
+    "jupyterlab>=4.0.0,<5",
+    "hatch-nodejs-version>=0.3.2",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+
+[project]
+name = "mercury-dev"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+dependencies = [
+    "jupyterlab>=4,<5",
+    "jupyter_server>=2.0.1,<3",
+    "jupyterlab_server>=2,<3",
+    "anywidget>=0.9.0",   
+    "toml",
+    "markdown"
+    ]
+dynamic = ["version", "description", "authors", "urls", "keywords"]
+
+[project.scripts]
+mercury = "mercury_app.__main__:main" # start mercury server
+
+[tool.hatch.version]
+source = "nodejs"
+
+[tool.hatch.metadata.hooks.nodejs]
+fields = ["description", "authors", "urls"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mercury", "mercury_app"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"mercury_app/static" = "mercury_app/static"
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["mercury_app/labextension", "mercury_app/schemas", "mercury_app/static"]
+exclude = [".github", "binder", "marvenv"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"mercury_app/labextension" = "share/jupyter/labextensions/@mljar/mercury-extension"
+"install.json" = "share/jupyter/labextensions/@mljar/mercury-extension/install.json"
+"jupyter-config/server-config" = "etc/jupyter/jupyter_server_config.d"
+
+[tool.hatch.build.hooks.version]
+path = "mercury_app/_version.py"
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.5"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = [
+    "mercury_app/labextension/static/style.js",
+    "mercury_app/labextension/package.json",
+]
+skip-if-exists = ["mercury_app/labextension/static/style.js"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "build"
+npm = ["jlpm"]
+source_dir = "src"
+build_dir = "mercury_app/labextension"
+
+[tool.jupyter-releaser.options]
+version-cmd = "npm version --workspaces --include-workspace-root --workspaces-update false --git-tag-version false"
+
+[tool.jupyter-releaser.hooks]
+before-build-npm = [
+    "python -m pip install 'jupyterlab>=4.0.0,<5'",
+    "jlpm",
+    "jlpm build:prod",
+]
+before-build-python = ["jlpm clean"]
+
+[tool.check-wheel-contents]
+ignore = ["W002"]

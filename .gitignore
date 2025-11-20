@@ -1,3 +1,57 @@
 *.egg-info*
 dist/
 .env
+
+app/build/
+
+
+*.bundle.*
+lib/
+*/node_modules/
+*.log
+.eslintcache
+.stylelintcache
+*.egg-info/
+.ipynb_checkpoints
+*.tsbuildinfo
+mercury_app/labextension
+# Version file is handled by hatchling
+mercury_app/_version.py
+mercury_app/schemas
+mercury_app/static/*
+!mercury_app/static/logo
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+.vscode
+.yarn
+*/node_modules/*
+
+# Node modules (monorepo)
+node_modules/
+**/node_modules/
+
+# Yarn Berry
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+.pnp.*
+.yarnrc.yml
+
+# Build artifacts
+lib/
+dist/
+build/
+**/lib/
+**/dist/
+**/build/
+
+venv/

@@ -1,0 +1,126 @@
+---
+title: Indicator
+description: How to use the Indicator widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+
+import simpleIndicatorImg from '../../../../assets/simple-indicator.webp'
+import styledIndicatorImg from '../../../../assets/styled-indicator.webp'
+import multiIndicatorsImg from '../../../../assets/two-indicators-inline.webp';
+
+
+
+The **Indicator** widget displays a key numeric value with an optional label and change indicator.
+It is useful for showing metrics such as performance, growth, or status in a clear and visual way.
+
+## Import 
+
+<Code code={`from mercury.indicator import Indicator`} lang="python"/>
+
+## Usage 
+
+To create an Indicator, only the value is required, but it’s recommended to also include a label for clarity.
+
+**Code**
+
+<Code code={`simple_indicator = Indicator(value="$12,450", label="Monthly Sales")`} lang="python"/>
+
+**Preview** 
+
+<Image 
+  src={simpleIndicatorImg} 
+  alt="Simple Indicator" 
+  class="docs-image"
+/>
+
+### Add delta and styles 
+
+You can easily customize your Indicator with a few additional parameters.
+
+**Code**
+
+<Code code={`
+styled_indicator = Indicator(
+    value="$12,450",
+    label="Monthly Sales",
+    delta=8.3,
+    background_color="#f9f9ff",
+    border_color="#dcdcff",
+    value_color="#1a1a1a",
+    label_color="#5555aa"
+)
+`} lang="python"/>
+
+**Preview**
+
+<Image 
+  src={styledIndicatorImg} 
+  alt="Simple Indicator" 
+  class="docs-image"
+/>
+
+### Indicators Grid
+
+You can also display multiple Indicators side by side to build a responsive metric grid.
+
+**Code**
+
+<Code code={`Indicator([simple_indicator,styled_indicator])`} lang="python"/>
+
+**Preview**
+
+<Image 
+  src={multiIndicatorsImg} 
+  alt="Two Indicators in one line" 
+  class="docs-image"
+/>
+
+## Indicator Props
+
+### value (required)
+
+**type:** `number` or `string`
+
+The main data to be displayed (shown in the largest font).
+
+### label 
+
+**type:** `string`
+
+Description of the value, displayed above the main number.
+
+### delta 
+
+**type:** `number`
+
+Shows the change or difference; positive values are displayed in green, negative in red.
+
+### background_color
+
+**type:** `string`
+
+Sets the background color of the indicator card. Default is `#fff`.
+
+### border_color
+
+**type:** `string`
+
+Sets the border color of the indicator card. Default is `#ebebeb`.
+
+### value_color
+
+**type:** `string`
+
+Sets the color of the main value text. Default is `#222`.
+
+### label_color
+
+**type:** `string`
+
+Sets the color of the label. Default is `#555`.
+
+
+<Aside>Colors in the **Indicator** should be defined using [HTML color names](https://www.w3schools.com/tags/ref_colornames.asp) or [hex strings](https://www.w3schools.com/html/html_colors_hex.asp).</Aside>
