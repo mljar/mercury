@@ -7,7 +7,7 @@
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  flex-wrap: wrap;  /* we WANT wrapping */
+  flex-wrap: wrap; /* we WANT wrapping */
 }
 
 /* Default order for toolbar items */
@@ -35,13 +35,13 @@
 
 /* Spacer item we add from TS */
 .mercury-Toolbar > .jp-Toolbar-item.mercury-toolbar-spacer {
-  flex: 1 1 auto;   /* take all remaining space */
+  flex: 1 1 auto; /* take all remaining space */
   min-width: 0;
 }
 
 /* The 'More commands' opener (three dots) */
 .mercury-Toolbar > .jp-Toolbar-responsive-opener {
-  order: 2;          /* come AFTER normal items, but BEFORE auto-rerun */
+  order: 2; /* come AFTER normal items, but BEFORE auto-rerun */
   /* margin-left: auto; push to the far right of the first row */
   flex: 0 0 auto;
   align-self: center;
@@ -51,15 +51,15 @@
 
 /* Auto re-run behaves like other checkboxes */
 .mercury-Toolbar > .jp-Toolbar-item.mercury-toolbar-auto-rerun {
-  order: 1;          /* same group as other items */
-  flex: 0 0 auto;    /* no forced full-width row */
+  order: 1; /* same group as other items */
+  flex: 0 0 auto; /* no forced full-width row */
 }
 
 /* (Optional) remove weird height tricks that can misalign items */
 .mercury-toolbar-title,
 .mercury-toolbar-desc,
 .mercury-toolbar-thumbtext {
-  height: auto !important;  /* or a fixed px height if you prefer */
+  height: auto !important; /* or a fixed px height if you prefer */
 }
 /******************************************************************************/
 
@@ -87,7 +87,7 @@
 
   cursor: pointer;
   font-size: 1.5em;
-  opacity: 0.7; 
+  opacity: 0.7;
   transition:
     left 0.2s,
     opacity 0.2s;
@@ -107,7 +107,7 @@
   left: -4px;
   background: #0d6efd;
   color: #fff;
-  border-radius: 0px 10px 10px 0px !important; 
+  border-radius: 0px 10px 10px 0px !important;
 }
 
 .mercury-left-panel {
@@ -138,13 +138,12 @@
 }
 
 .mercury-right-bottom-panel {
-  overflow: hidden !important;  
+  overflow: hidden !important;
   border-top: 1px solid var(--jp-border-color2);
   padding-top: 5px;
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 5px;
-
 }
 
 .mercury-right-top-panel.mercury-right-limited,
@@ -160,7 +159,6 @@
   margin-left: auto;
   margin-right: auto;
 }
-
 
 /* Hide output prompt in sidebar */
 .mercury-left-panel .jp-OutputArea-prompt,

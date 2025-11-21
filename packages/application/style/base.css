@@ -38,7 +38,7 @@
 }
 
 .mercury-loader::after {
-  content: '';  
+  content: '';
   box-sizing: border-box;
   position: absolute;
   left: 50%;
@@ -58,4 +58,4 @@
   100% {
     transform: rotate(360deg);
   }
-} 
+}
