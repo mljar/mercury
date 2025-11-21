@@ -1,7 +1,7 @@
 {
     "name": "@mljar/mercury-extension",
-    "version": "3.0.0-alpha.1",
-    "description": "Run notebooks as web apps with Mercury inside JupyterLab.",
+    "version": "3.0.0-alpha.2",
+    "description": "Mercury core logic and extension to preview apps inside JupyterLab.",
     "keywords": [
         "jupyter",
         "jupyterlab",

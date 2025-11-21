@@ -1,7 +1,7 @@
 {
     "name": "@mljar/mercury-meta",
-    "version": "3.0.0-alpha.1",
-    "description": "Run notebooks as web apps with Mercury inside JupyterLab.",
+    "version": "3.0.0-alpha.2",
+    "description": "Mercury Framework",
     "keywords": [
         "jupyter",
         "jupyterlab",
@@ -14,9 +14,9 @@
         "ui-tests",
         "packages/*"
     ],
-    "homepage": "https://github.com/mljar/mercury-extension",
+    "homepage": "https://github.com/mljar/mercury",
     "bugs": {
-        "url": "https://github.com/mljar/mercury-extension/issues"
+        "url": "https://github.com/mljar/mercury/issues"
     },
     "license": "Apache-2.0",
     "author": {
@@ -25,7 +25,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/mljar/mercury-extension.git"
+        "url": "https://github.com/mljar/mercury.git"
     },
     "scripts": {
         "build": "jlpm run clean && jlpm workspaces foreach -Atp run build && jlpm run check:artifacts",
