@@ -33,20 +33,26 @@
   flex: 0 0 auto;
 }
 
-/* 🔹 The 'More commands' opener (three dots) */
+/* Spacer item we add from TS */
+.mercury-Toolbar > .jp-Toolbar-item.mercury-toolbar-spacer {
+  flex: 1 1 auto;   /* take all remaining space */
+  min-width: 0;
+}
+
+/* The 'More commands' opener (three dots) */
 .mercury-Toolbar > .jp-Toolbar-responsive-opener {
   order: 2;          /* come AFTER normal items, but BEFORE auto-rerun */
-  margin-left: auto; /* push to the far right of the first row */
+  /* margin-left: auto; push to the far right of the first row */
   flex: 0 0 auto;
   align-self: center;
   display: flex;
   align-items: center;
 }
 
-/* 🔹 Auto re-run row on its own line, full width */
+/* Auto re-run behaves like other checkboxes */
 .mercury-Toolbar > .jp-Toolbar-item.mercury-toolbar-auto-rerun {
-  order: 3;          /* always last */
-  flex: 1 1 100%;    /* take full row */
+  order: 1;          /* same group as other items */
+  flex: 0 0 auto;    /* no forced full-width row */
 }
 
 /* (Optional) remove weird height tricks that can misalign items */
@@ -81,8 +87,7 @@
 
   cursor: pointer;
   font-size: 1.5em;
-  opacity: 0.7;
-  /* box-shadow: 1px 1px 6px #0002; */
+  opacity: 0.7; 
   transition:
     left 0.2s,
     opacity 0.2s;
@@ -102,8 +107,7 @@
   left: -4px;
   background: #0d6efd;
   color: #fff;
-  border-radius: 0px 10px 10px 0px !important;
-  /* box-shadow: 1px 1px 6px #0004; */
+  border-radius: 0px 10px 10px 0px !important; 
 }
 
 .mercury-left-panel {
@@ -142,6 +146,21 @@
   padding-bottom: 5px;
 
 }
+
+.mercury-right-top-panel.mercury-right-limited,
+.mercury-right-bottom-panel.mercury-right-limited {
+  box-sizing: border-box;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.mercury-right-top-panel.mercury-right-limited > .lm-Widget,
+.mercury-right-bottom-panel.mercury-right-limited > .lm-Widget {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 
 /* Hide output prompt in sidebar */
 .mercury-left-panel .jp-OutputArea-prompt,

@@ -62,6 +62,22 @@ function readTitleFromContext(
   return typeof v === 'string' && v.trim() ? v.trim() : undefined;
 }
 
+function readFullWidthFromContext(
+  context: DocumentRegistry.IContext<INotebookModel>
+): boolean {
+  const shared = (context.model as any)?.sharedModel;
+  if (shared?.getMetadata) {
+    const all = shared.getMetadata() ?? {};
+    const v = (all as any)?.mercury?.fullWidth;
+    // default: false
+    return typeof v === 'boolean' ? v : false;
+  }
+  const md = context.model?.metadata as unknown as IObservableJSON | undefined;
+  const mercury = (md?.get?.('mercury') as any) ?? {};
+  const v = mercury?.fullWidth;
+  return typeof v === 'boolean' ? v : false; // default false
+}
+
 function readAutoRerunFromContext(
   context: DocumentRegistry.IContext<INotebookModel>
 ): boolean {
@@ -225,6 +241,7 @@ export class AppWidget extends Panel {
   private _leftFooter!: Panel;
   private _runAllBtn!: HTMLButtonElement;
   private _busy?: BusyIndicator;
+  private _fullWidth = false;   
 
   constructor(model: AppModel) {
     super();
@@ -267,6 +284,12 @@ export class AppWidget extends Panel {
       if (newTitle !== this._sidebarTitle) {
         this.setSidebarTitle(newTitle);
       }
+      // update fullWidth
+      const newFull = readFullWidthFromContext(this._model.context);
+      if (newFull !== this._fullWidth) {
+        this._fullWidth = newFull;
+        this.applyFullWidthLayout();
+      }
       // refresh autoRerun state + UI
       const newAuto = readAutoRerunFromContext(this._model.context);
       if (newAuto !== this._autoRerun) {
@@ -281,6 +304,10 @@ export class AppWidget extends Panel {
     // Sidebar set title
     this._sidebarTitle = readTitleFromContext(this._model.context);
     this.setSidebarTitle(this._sidebarTitle);
+
+    // fill width
+    this._fullWidth = readFullWidthFromContext(this._model.context);
+    this.applyFullWidthLayout();
 
     // Auto Rerun
     this._autoRerun = readAutoRerunFromContext(this._model.context);
@@ -629,6 +656,7 @@ export class AppWidget extends Panel {
       this.setSidebarTitle(readTitleFromContext(this._model.context));
       this._autoRerun = readAutoRerunFromContext(this._model.context);
       this.syncAutoRerunUI();
+      this.applyFullWidthLayout();
     } catch (err) {
       console.error('[Mercury][rebuild] failed to recreate panels:', err);
     }
@@ -1107,6 +1135,26 @@ export class AppWidget extends Panel {
   // ────────────────────────────────────────────────────────────────────────────
   // Layout helpers
   // ────────────────────────────────────────────────────────────────────────────
+
+  private applyFullWidthLayout(): void {
+    if (!this._rightTop || !this._rightBottom) {
+      return;
+    }
+
+    const nodes = [this._rightTop.node, this._rightBottom.node];
+
+    if (!this._fullWidth) {
+      // max 1024px + auto margin
+      for (const node of nodes) {
+        node.classList.add('mercury-right-limited');
+      }
+    } else {
+      // full width no margins
+      for (const node of nodes) {
+        node.classList.remove('mercury-right-limited');
+      }
+    }
+  }
 
   private syncAutoRerunUI(): void {
     // button visible only when autoRerun is false

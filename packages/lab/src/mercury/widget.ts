@@ -219,7 +219,6 @@ export class MercuryWidget extends DocumentWidget<MercuryPanel, INotebookModel> 
 
       void context.ready.then(() => {
         const meta = readMercuryMeta(context);
-        // domyślne białe tło
         thumbBgInput.value = String(meta.thumbnail_bg ?? '#ffffff');
       });
 
@@ -261,6 +260,45 @@ export class MercuryWidget extends DocumentWidget<MercuryPanel, INotebookModel> 
       this.toolbar.addItem('show-code', new Widget({ node: showCodeWrap }));
 
       /* ────────────────────────────────────────────────────────────────────
+       * Full width checkbox → metadata.mercury.fullWidth (default false)
+       * ──────────────────────────────────────────────────────────────────── */
+      const fullWidthWrap = document.createElement('label');
+      fullWidthWrap.className = 'mercury-toolbar-checkbox';
+      fullWidthWrap.title = 'Use full width layout, default is 1024px width';
+
+      const fullWidthInput = document.createElement('input');
+      fullWidthInput.type = 'checkbox';
+      fullWidthInput.setAttribute('aria-label', 'Full width');
+      fullWidthInput.style.marginRight = '6px';
+
+      const fullWidthText = document.createElement('span');
+      fullWidthText.textContent = 'Full width';
+      fullWidthWrap.append(fullWidthInput, fullWidthText);
+
+      void context.ready.then(() => {
+        const meta = readMercuryMeta(context);
+        // default: false
+        fullWidthInput.checked = !!meta.fullWidth;
+      });
+
+      fullWidthInput.addEventListener('change', () => {
+        if (!context.model) return;
+        patchMercuryMeta(context, { fullWidth: !!fullWidthInput.checked });
+        void context.save();
+      });
+
+      const fullWidthWidget = new Widget({ node: fullWidthWrap });
+      fullWidthWidget.addClass('mercury-toolbar-full-width');
+      this.toolbar.addItem('full-width', fullWidthWidget);
+
+      /* ────────────────────────────────────────────────────────────────────
+       * Spacer between left items and the "..." opener (no deprecated API)
+       * ──────────────────────────────────────────────────────────────────── */
+      const spacer = new Widget();
+      spacer.addClass('mercury-toolbar-spacer');
+      this.toolbar.addItem('mercury-spacer', spacer);
+
+      /* ────────────────────────────────────────────────────────────────────
        * Auto re-run checkbox → metadata.mercury.autoRerun (default true)
        * ──────────────────────────────────────────────────────────────────── */
       const autoRerunWrap = document.createElement('label');
@@ -290,7 +328,6 @@ export class MercuryWidget extends DocumentWidget<MercuryPanel, INotebookModel> 
         void context.save();
       });
 
-      // this.toolbar.addItem('auto-rerun', new Widget({ node: autoRerunWrap }));
       const autoRerunWidget = new Widget({ node: autoRerunWrap });
       autoRerunWidget.addClass('mercury-toolbar-auto-rerun');
       this.toolbar.addItem('auto-rerun', autoRerunWidget);
