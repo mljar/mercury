@@ -78,24 +78,27 @@
 }
 
 .mercury-sidebar-toggle {
-  /* position: absolute; */
+  
   position: fixed;
   z-index: 1000;
-  background: #222;
+
+  background: #0d6efd;
   color: #fff;
-  border: none;
 
-  cursor: pointer;
-  font-size: 1.5em;
-  opacity: 0.7;
-  transition:
-    left 0.2s,
-    opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  width: 21px;
+  width: 25px;
   height: 25px;
 
-  border-radius: 10px 0px 0px 10px !important;
+  background: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.4em;
+
+  transition: left 0.2s, opacity 0.2s;
+  border-radius: 0px 10px 10px 0px !important;
 }
 
 .mercury-sidebar-collapse {
