@@ -6,6 +6,7 @@ from .multiselect import MultiSelect
 from .slider import Slider
 from .indicator import Indicator
 from .tabs import Tabs
+from .table import Table
 
 from .chat.chat import Chat
 from .chat.chatinput import ChatInput
