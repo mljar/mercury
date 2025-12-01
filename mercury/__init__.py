@@ -1,3 +1,5 @@
+__version__ = "3.0.0a2"
+
 from .expander import Expander
 from .columns import Columns
 from .button import Button

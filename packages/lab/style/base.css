@@ -89,16 +89,16 @@
   align-items: center;
   justify-content: center;
 
+  opacity: 0.8;
   width: 25px;
   height: 25px;
 
-  background: white;
   border: none;
   cursor: pointer;
   font-size: 1.4em;
 
   transition: left 0.2s, opacity 0.2s;
-  border-radius: 0px 10px 10px 0px !important;
+  border-radius: 10px 0px 0px 10px !important;
 }
 
 .mercury-sidebar-collapse {
@@ -111,6 +111,7 @@
   background: #0d6efd;
   color: #fff;
   border-radius: 0px 10px 10px 0px !important;
+  opacity: 0.8;
 }
 
 .mercury-left-panel {
