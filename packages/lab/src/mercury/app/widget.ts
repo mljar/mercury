@@ -241,7 +241,7 @@ export class AppWidget extends Panel {
   private _leftFooter!: Panel;
   private _runAllBtn!: HTMLButtonElement;
   private _busy?: BusyIndicator;
-  private _fullWidth = false;   
+  private _fullWidth = false;
 
   constructor(model: AppModel) {
     super();
@@ -501,6 +501,10 @@ export class AppWidget extends Panel {
 
     // Update visibility/sizing of panels after placement
     this.updatePanelVisibility();
+
+    if (target === this._rightBottom) {
+      requestAnimationFrame(() => this.adjustBottomHeight());
+    }
   }
 
   // ────────────────────────────────────────────────────────────────────────────
@@ -1293,21 +1297,23 @@ export class AppWidget extends Panel {
       }
     } else {
       this._rightBottom?.show();
-      this.adjustBottomHeight();
+      // this.adjustBottomHeight();
       // Measure after layout settles
       requestAnimationFrame(() => this.adjustBottomHeight());
     }
     this._lastBottomVisible = bottomHasContent;
   }
 
-  private static readonly MAX_BOTTOM_PX = 280;
+  private static readonly MAX_BOTTOM_PX = 320;
 
   private adjustBottomHeight(maxPx = AppWidget.MAX_BOTTOM_PX): void {
+    console.log('adjustBottomHeight', maxPx);
     if (!this._rightSplit || !this._rightBottom) {
       return;
     }
 
     // If the split (or bottom) isn’t laid out yet, try again next frame
+    this._rightSplit.node.clientHeight;
     const totalH = this._rightSplit.node.clientHeight || 0;
 
     if (totalH === 0) {
@@ -1329,6 +1335,8 @@ export class AppWidget extends Panel {
     const minBottomRatio = Math.min(minBottomPx / totalH, 0.05); // up to 5%
     const finalBottom =
       bottomRatio > 0 ? Math.max(bottomRatio, minBottomRatio) : 0;
+
+    console.log('finalBottom', finalBottom);
 
     this._rightSplit.setRelativeSizes([1 - finalBottom, finalBottom]);
 

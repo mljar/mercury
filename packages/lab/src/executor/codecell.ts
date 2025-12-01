@@ -13,6 +13,14 @@ export async function codeCellExecute(
 ): Promise<KernelMessage.IExecuteReplyMsg | void> {
   const model = cell.model;
   const code = model.sharedModel.getSource();
+
+  if (!code.trim() || !sessionContext.session?.kernel) {
+    model.sharedModel.transact(() => {
+      model.clearExecution();
+      cell.outputArea.model.clear();
+    }, false);
+    return;
+  }
   // if (!code.trim() || !sessionContext.session?.kernel) {
   //   model.sharedModel.transact(() => {
   //     model.clearExecution();

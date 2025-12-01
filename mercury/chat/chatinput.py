@@ -131,6 +131,8 @@ class ChatInputWidget(anywidget.AnyWidget):
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
         font-size: {THEME.get('font_size', '14px')};
         color: {THEME.get('text_color', '#222')};
+        padding-top: 5px;
+        padding-bottom: 5px;
     }}
 
     .mljar-chatinput-input {{

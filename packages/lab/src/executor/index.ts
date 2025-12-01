@@ -15,7 +15,6 @@ export const mercuryCellExecutor: JupyterFrontEndPlugin<IMercuryCellExecutor> =
     autoStart: true,
     provides: IMercuryCellExecutor,
     activate: () => {
-      console.log('Activate MercuryCellExecutor mercury mememem');
       return new NotebookCellExecutor();
     }
   };
@@ -27,7 +26,6 @@ export const defaultCellExecutor: JupyterFrontEndPlugin<INotebookCellExecutor> =
     autoStart: true,
     provides: INotebookCellExecutor,
     activate: (): INotebookCellExecutor => {
-      console.log('Default NotebookCellExecutor heheheh');
       return Object.freeze({ runCell });
     }
   };
