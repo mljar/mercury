@@ -323,8 +323,8 @@ export class AppWidget extends Panel {
     }
 
     // style for bottom panel
-    this._rightBottom.node.style.backgroundColor =
-      pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
+    //this._rightBottom.node.style.backgroundColor =
+    //  pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
 
     this._model.context.sessionContext.statusChanged.connect((_, status) => {
       if (status === 'busy') this._busy?.begin();
