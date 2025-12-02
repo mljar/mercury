@@ -78,13 +78,16 @@ class MercuryApp(LabServerApp):
         self.handlers.append(("/mercury/api/notebooks", NotebooksAPIHandler))
         self.handlers.append(("/mercury/api/theme", ThemeHandler))
         self.handlers.append((f"/mercury{path_regex}", MercuryHandler))
-        if sys.argv[0].endswith("mercury_app/__main__.py"):
+        if sys.argv[0].endswith("mercury_app/__main__.py") or \
+           sys.argv[0].endswith("mercury"):
             self.handlers.append((r"/api/contents/(.*\.ipynb)$", MercuryContentsHandler))
         super().initialize_handlers()
 
     def initialize_templates(self):
         super().initialize_templates()
-        if sys.argv[0].endswith("mercury_app/__main__.py"):
+        print(sys.argv[0])
+        if sys.argv[0].endswith("mercury_app/__main__.py") or \
+           sys.argv[0].endswith("mercury"):
             self.static_dir = os.path.join(HERE, "static")
             static_paths = self.static_paths[:] if hasattr(self, "static_paths") else []
             if self.static_dir not in static_paths:
