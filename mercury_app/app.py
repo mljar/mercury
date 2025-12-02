@@ -84,11 +84,12 @@ class MercuryApp(LabServerApp):
 
     def initialize_templates(self):
         super().initialize_templates()
-        self.static_dir = os.path.join(HERE, "static")
-        static_paths = self.static_paths[:] if hasattr(self, "static_paths") else []
-        if self.static_dir not in static_paths:
-            static_paths.insert(0, self.static_dir)
-        self.static_paths = static_paths
+        if sys.argv[0].endswith("mercury_app/__main__.py"):
+            self.static_dir = os.path.join(HERE, "static")
+            static_paths = self.static_paths[:] if hasattr(self, "static_paths") else []
+            if self.static_dir not in static_paths:
+                static_paths.insert(0, self.static_dir)
+            self.static_paths = static_paths
 
     def initialize_settings(self):
         super().initialize_settings()
