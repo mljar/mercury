@@ -1,0 +1,118 @@
+---
+title: Table
+description: How to use the Table widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+
+import simpleTable from "../../../../assets/table/simple-table.webp"
+import tableWithFeatures from "../../../../assets/table/table-with-features.webp"
+import customizedTable from "../../../../assets/table/customized-table.webp"
+
+The **Table** widget displays data in a structured, interactive tabular format. It supports column sorting (ascending/descending), quick filtering, and row selection for easier data exploration.
+
+## Import 
+
+<Code code={`from mercury import Table`} lang="python"/>
+
+## Usage 
+
+To use the Table widget, you only need to provide data. It works best with DataFrames (pandas or polars), but you can also pass lists of dict or dicts.
+
+**Example data** 
+
+<Code code={`import pandas as pd
+
+countries = ["Poland", "Germany", "France"]
+
+df = pd.DataFrame({
+    "Country": [countries[i % 3] for i in range(100)],
+    "Year": [2020 + (i % 10) for i in range(100)],
+    "GDP": [500 + (i * 25) for i in range(100)],
+})`} lang={"python"}/>
+
+**Code**
+
+<Code code={`t = Table(df)`} lang="python"/>
+
+**Preview**
+
+<Image 
+  src={simpleTable} 
+  alt="Simple Table" 
+  class="docs-image"
+/>
+
+### Table with features 
+
+You can easily add more features to your table, such as row selection or filtering.
+
+**Code**
+
+<Code code={`t = Table(df, search=True, select_rows=True)`} lang="python"/>
+
+**Preview**
+
+<Image 
+  src={tableWithFeatures} 
+  alt="Table with features" 
+  class="docs-image"
+/>
+
+### Get selected rows
+
+After enabling row selection, you may want to access all selected rows in one place — this is very easy to do.
+
+**Code** 
+
+<Code code={`# t is the variable that you assign the Table to
+t.selected_rows`} lang="python"/>
+
+### Customize your Table 
+
+You can also customize the Table’s appearance by changing the page size (number of rows per page) or adjusting its width.
+
+**Code**
+
+<Code code={`t = Table(df, search=True, select_rows=True, page_size=20, width="700px")`} lang="python"/>
+
+**Preview**
+
+<Image 
+  src={customizedTable} 
+  alt="Customized Table" 
+  class="docs-image"
+/>
+
+## Table Props
+
+### data (required)
+
+**type:** `DataFrame` or `list[dict]` or `dict` 
+
+The dataset displayed in the table. Accepts pandas/polars DataFrames or standard Python structures like lists of dictionaries.
+
+### page_size 
+
+**type:** `Integer`
+
+Sets how many rows are shown on a single page. Default is `50`.
+
+### select_rows
+
+**type:** `boolean`
+
+Enables selecting rows in the table. It's off by default (`False`).
+
+### search
+
+**type:** `boolean`
+
+Enables the search bar and allows filtering table. It's off by default (`False`).
+
+### width 
+
+**type:** `string`
+
+Sets the width of the table component. Accepts values like `100%`, `800px`, or other valid CSS size units. Default is `100%`.

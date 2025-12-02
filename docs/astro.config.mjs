@@ -17,6 +17,10 @@ export default defineConfig({
       ],
       sidebar: [
         {
+          label: "Get Started",
+          slug: "get-started-with-mercury"
+        },
+        {
           label: 'Widgets',
           items: [
             {
@@ -25,7 +29,9 @@ export default defineConfig({
             },
             {
               label: 'Output Widgets',
-              items: [{ label: 'Indicator', slug: 'widgets/output/indicator' }]
+              items: [{ label: 'Indicator', slug: 'widgets/output/indicator' },
+              { label: 'Table', slug: 'widgets/output/table' }
+            ]
             }
           ]
         }
