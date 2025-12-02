@@ -7,13 +7,17 @@ import datetime
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 
 
-def Table(*args, key: str = "", **kwargs):
-    code_uid = WidgetsManager.get_code_uid("Table", key=key, args=args, kwargs=kwargs)
+def Table(data, *args, page_size=50, search=False, select_rows=False, width="100%", key: str = "", **kwargs):
+    kwargs.setdefault("page_size", page_size)
+    kwargs.setdefault("search", search)
+    kwargs.setdefault("select_rows", select_rows)
+    kwargs.setdefault("width", width)
+    code_uid = WidgetsManager.get_code_uid("Table", key=key, args=(data, *args), kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
         display(cached)
         return cached
-    instance = TableWidget(*args, **kwargs)
+    instance = TableWidget(data, *args, **kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
@@ -211,7 +215,7 @@ function render({ model, el }) {
     }
   }
 
-  const rowsSelectionEnabled = () => model.get('rows_selection');
+  const rowsSelectionEnabled = () => model.get('select_rows');
 
   const rowsEqual = (a, b) => {
     const aKeys = Object.keys(a);
@@ -348,7 +352,7 @@ function render({ model, el }) {
     }
     filteredLength = filteredLength || 0;
 
-    const searchActive = model.get('search_active');
+    const searchActive = model.get('search');
 
     if (!searchActive && (filteredLength === 0 || filteredLength <= pageSize)) {
       return;
@@ -683,17 +687,17 @@ export default { render };
 
     # traits synced to JS
     data = DataFrameTrait().tag(sync=True)
-    page = traitlets.Int(1).tag(sync=True)
     page_size = traitlets.Int(50).tag(sync=True)
-    search_active = traitlets.Bool(False).tag(sync=True)
+    search = traitlets.Bool(False).tag(sync=True)
+    select_rows = traitlets.Bool(False).tag(sync=True)
     width = traitlets.Unicode("100%").tag(sync=True)
 
     search_query = traitlets.Unicode("").tag(sync=True)
+    page = traitlets.Int(1).tag(sync=True)
     sort_column = traitlets.Unicode("").tag(sync=True)
     sort_direction = traitlets.Int(0).tag(sync=True)  # 0 none, 1 asc, 2 desc
     _filtered_length = traitlets.Int(0).tag(sync=True)
     search_version = traitlets.Int(0).tag(sync=True)
-    rows_selection = traitlets.Bool(False).tag(sync=True)
     selected_rows = DataFrameTrait().tag(sync=True)
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
@@ -713,27 +717,30 @@ export default { render };
         name = change["name"]
 
         if name == "search_query":
-            self._apply_filter()
             self.page = 1
-            self._apply_sort()
-            self._paginate()
+            self._handle_refresh(("filter", "sort", "paginate"))
             self.search_version += 1
 
         elif name in ("sort_column", "sort_direction"):
             self.page = 1
-            self._apply_sort()
-            self._paginate()
+            self._handle_refresh(("sort", "paginate"))
 
         elif name in ("page", "page_size"):
-            self._paginate()
+            self._handle_refresh(("paginate"))
 
         else:
-            self._apply_filter()
-            self._apply_sort()
-            self._paginate()
+            self._handle_refresh(("filter", "sort", "paginate"))
 
     # -------- dispatcher: frame vs list --------
 
+    def _handle_refresh(self, steps=("filter", "sort", "paginate")):
+      if "filter" in steps:
+        self._apply_filter()
+      if "sort" in steps:
+        self._apply_sort()
+      if "paginate" in steps:
+        self._paginate()
+    
     def _apply_filter(self):
         if self._use_frame_backend:
             self._apply_filter_frame()
@@ -954,16 +961,12 @@ export default { render };
 
             if frame_used:
                 # fast path: DataFrame backend
-                self._apply_filter()
-                self._apply_sort()
-                self._paginate()
+                self._handle_refresh(("filter", "sort", "paginate"))
             else:
                 # generic path: list[dict] backend
                 trait = DataFrameTrait()
                 self._full_data = trait.validate(self, data)
-                self._apply_filter()
-                self._apply_sort()
-                self._paginate()
+                self._handle_refresh(("filter", "sort", "paginate"))
         else:
             self._full_data = []
             self._filtered_data = []
