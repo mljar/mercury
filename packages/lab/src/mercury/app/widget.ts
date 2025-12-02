@@ -23,7 +23,7 @@ import {
   getWidgetModelIdsFromCell
 } from './ipyWidgetsHelpers';
 
-import { removeElements } from './domHelpers';
+import { removeElements, removePromptsOnChange } from './domHelpers';
 import { OutputStamper } from './outputStamper';
 
 // --- metadata helpers for showCode (JL4 sharedModel first, legacy fallback)
@@ -705,6 +705,21 @@ export class AppWidget extends Panel {
 
         this.outputStamper.attach(cell);
 
+        // adjust height
+        const oa = cell.outputArea;
+        const syncOutputVisibility = () => {
+          const hasOutputs = oa.model.length > 0;
+          oa.node.style.display = hasOutputs ? '' : 'none';
+          this.updatePanelVisibility();
+          if (oa.parent === this._rightBottom) {
+            requestAnimationFrame(() => this.adjustBottomHeight());
+          }
+        };
+        syncOutputVisibility();
+        oa.model.changed.connect(() => {
+          syncOutputVisibility();
+        });
+
         // Look for MERCURY metadata to decide placement
         for (let i = 0; i < cell.outputArea.model.length; i++) {
           const output = cell.outputArea.model.get(i);
@@ -1218,6 +1233,11 @@ export class AppWidget extends Panel {
     const rightBottom = new Panel();
     rightBottom.addClass('mercury-right-bottom-panel');
 
+    removePromptsOnChange(rightBottom.node, () => {
+      // po zmianie DOM-u w bottom panelu – popraw wysokość
+      requestAnimationFrame(() => this.adjustBottomHeight());
+    });
+
     const rightSplit = new SplitPanel();
     rightSplit.orientation = 'vertical';
     rightSplit.addClass('mercury-right-split-panel');
@@ -1307,7 +1327,6 @@ export class AppWidget extends Panel {
   private static readonly MAX_BOTTOM_PX = 320;
 
   private adjustBottomHeight(maxPx = AppWidget.MAX_BOTTOM_PX): void {
-    console.log('adjustBottomHeight', maxPx);
     if (!this._rightSplit || !this._rightBottom) {
       return;
     }
@@ -1335,8 +1354,6 @@ export class AppWidget extends Panel {
     const minBottomRatio = Math.min(minBottomPx / totalH, 0.05); // up to 5%
     const finalBottom =
       bottomRatio > 0 ? Math.max(bottomRatio, minBottomRatio) : 0;
-
-    console.log('finalBottom', finalBottom);
 
     this._rightSplit.setRelativeSizes([1 - finalBottom, finalBottom]);
 

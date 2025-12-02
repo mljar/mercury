@@ -1,19 +1,26 @@
 /** Remove descendants by className from an HTMLElement. */
 export function removeElements(node: HTMLElement, className: string): void {
-  const elements = node.getElementsByClassName(className);
-  for (let i = 0; i < elements.length; i++) {
-    elements[i].remove();
+  const elements = Array.from(node.getElementsByClassName(className));
+  for (const el of elements) {
+    el.remove();
   }
 }
 
 /**
  * Remove prompts when output area mutates.
+ * Optional `onChange` callback is called after DOM cleanup.
  * Returns the observer so callers may disconnect if desired.
  */
-export function removePromptsOnChange(node: HTMLElement): MutationObserver {
+export function removePromptsOnChange(
+  node: HTMLElement,
+  onChange?: () => void
+): MutationObserver {
   const remove = () => {
     removeElements(node, 'jp-OutputPrompt');
     removeElements(node, 'jp-OutputArea-promptOverlay');
+    if (onChange) {
+      onChange();
+    }
   };
   remove();
   const observer = new MutationObserver(remove);
