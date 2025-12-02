@@ -55,6 +55,22 @@ export interface IWidgetUpdate {
   cellModelId?: string;
 }
 
+/**
+ * Execution error payload
+ */
+export interface IExecutionError {
+  /** Cell model id where error occurred */
+  cellId: string;
+  /** Error type, e.g. NameError, ZeroDivisionError */
+  ename: string;
+  /** Error message / value */
+  evalue: string;
+  /** Full traceback as list of lines (raw from kernel) */
+  traceback: string[];
+  /** Timestamp (ms since epoch) */
+  timestamp: number;
+}
+
 /*************************************************
  * AppModel
  *************************************************/
@@ -202,6 +218,11 @@ export class AppModel {
     { cellId: string; position: string }
   > {
     return this._mercuryWidgetAdded;
+  }
+
+  /** Signal emitted when a cell execution produced an error output. */
+  get executionError(): ISignal<this, IExecutionError> {
+    return this._executionError;
   }
 
   dispose(): void {
@@ -597,6 +618,30 @@ export class AppModel {
 
     // List new/updated
     for (const output of toList) {
+      try {
+        const raw = output.toJSON() as any;
+        if (raw && raw.output_type === 'error') {
+          const cellId = this._outputsToCell.get(outputs) ?? '';
+          const ename = String(raw.ename ?? '');
+          const evalue = String(raw.evalue ?? '');
+          const traceback: string[] = Array.isArray(raw.traceback)
+            ? raw.traceback.map((l: any) => String(l))
+            : [];
+
+          const event: IExecutionError = {
+            cellId,
+            ename,
+            evalue,
+            traceback,
+            timestamp: Date.now()
+          };
+
+          this._executionError.emit(event);
+        }
+      } catch (e) {
+        // console.log('[Mercury][OutputError][parse-failed]', e);
+      }
+
       const payload = this._readMercuryPayload(output);
       if (!payload?.model_id) {
         continue;
@@ -735,6 +780,8 @@ export class AppModel {
     this,
     { cellId: string; position: string }
   >(this);
+  /** Signal for execution errors (per cell). */
+  private _executionError = new Signal<this, IExecutionError>(this);
 
   private readonly _mutex = createMutex();
   private _disconnectedNotified = false; // add this

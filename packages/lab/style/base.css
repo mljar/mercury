@@ -347,3 +347,56 @@
   outline: 2px solid rgba(60, 207, 119, 0.3);
   outline-offset: 2px;
 }
+
+
+/*********** mercury error toast ****************/
+.mercury-toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;  
+}
+
+.mercury-toast {
+  pointer-events: auto;
+  min-width: 260px;
+  max-width: 420px;
+  padding: 8px 12px 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  background: #222;
+  color: #fff;
+  font-size: 13px;
+}
+
+.mercury-toast-error {
+  border-left: 4px solid #e55353;
+}
+
+.mercury-toast-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mercury-toast-body {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.mercury-toast-close {
+  float: right;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  margin: 0 0 4px 8px;
+}
+/*********** mercury error toast ****************/

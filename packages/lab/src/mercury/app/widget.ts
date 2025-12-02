@@ -12,7 +12,12 @@ import { Message } from '@lumino/messaging';
 import { Signal } from '@lumino/signaling';
 import { Panel, SplitPanel, Widget } from '@lumino/widgets';
 import { CellItemWidget } from './item/widget';
-import { AppModel, MERCURY_MIMETYPE, type IWidgetUpdate } from './model';
+import {
+  AppModel,
+  MERCURY_MIMETYPE,
+  type IWidgetUpdate,
+  type IExecutionError
+} from './model';
 import {
   codeCellExecute,
   executeWidgetsManagerClearValues
@@ -23,7 +28,11 @@ import {
   getWidgetModelIdsFromCell
 } from './ipyWidgetsHelpers';
 
-import { removeElements, removePromptsOnChange } from './domHelpers';
+import {
+  hideErrorOutputsOnChange,
+  removeElements,
+  removePromptsOnChange
+} from './domHelpers';
 import { OutputStamper } from './outputStamper';
 
 // --- metadata helpers for showCode (JL4 sharedModel first, legacy fallback)
@@ -242,6 +251,7 @@ export class AppWidget extends Panel {
   private _runAllBtn!: HTMLButtonElement;
   private _busy?: BusyIndicator;
   private _fullWidth = false;
+  private _toastContainer?: HTMLDivElement;
 
   constructor(model: AppModel) {
     super();
@@ -271,6 +281,8 @@ export class AppWidget extends Panel {
 
     // Add root container to this widget
     this.addWidget(this._split);
+
+    this.createToastContainer();
 
     const scheduleRebuild = debounce(() => this.rebuildForShowCodeChange(), 80);
     bindShowCodeListener(this._model.context, () => {
@@ -322,6 +334,8 @@ export class AppWidget extends Panel {
       this._mercuryWidgetAddedConnected = true;
     }
 
+    this._model.executionError.connect(this.onExecutionError, this);
+
     // style for bottom panel
     //this._rightBottom.node.style.backgroundColor =
     //  pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
@@ -335,6 +349,64 @@ export class AppWidget extends Panel {
       try {
         void this._model.context.sessionContext.session?.kernel?.interrupt();
       } catch { }
+    });
+  }
+
+  private createToastContainer(): void {
+    if (this._toastContainer) {
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'mercury-toast-container';
+    this.node.appendChild(el);
+    this._toastContainer = el;
+  }
+
+  private onExecutionError(_model: AppModel, err: IExecutionError): void {
+    if (!this._toastContainer) {
+      this.createToastContainer();
+      if (!this._toastContainer) {
+        return;
+      }
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'mercury-toast mercury-toast-error';
+
+    const title = document.createElement('div');
+    title.className = 'mercury-toast-title';
+    title.textContent = err.ename || 'Error';
+
+    const msg = document.createElement('div');
+    msg.className = 'mercury-toast-body';
+    msg.textContent = err.evalue || 'Execution error';
+
+    const close = document.createElement('button');
+    close.className = 'mercury-toast-close';
+    close.type = 'button';
+    close.textContent = '×';
+
+    // zamknięcie po kliknięciu
+    close.onclick = () => {
+      toast.remove();
+    };
+
+    toast.appendChild(close);
+    toast.appendChild(title);
+    toast.appendChild(msg);
+
+    this._toastContainer.appendChild(toast);
+
+    // auto-hide po kilku sekundach (np. 8s)
+    const timeout = window.setTimeout(() => {
+      try {
+        toast.remove();
+      } catch { /* ignore */ }
+    }, 8000);
+
+    // jeśli user zamknie ręcznie – wyczyść timeout
+    toast.addEventListener('remove', () => {
+      window.clearTimeout(timeout);
     });
   }
 
@@ -381,7 +453,12 @@ export class AppWidget extends Panel {
     if (this.isDisposed) {
       return;
     }
-
+    try {
+      if (this._toastContainer) {
+        this._toastContainer.remove();
+        this._toastContainer = undefined;
+      }
+    } catch { }
     try {
       if (this._widgetUpdatedConnected) {
         this._model?.widgetUpdated?.disconnect(this.onWidgetUpdate, this);
@@ -704,6 +781,9 @@ export class AppWidget extends Panel {
         cell.readOnly = true;
 
         this.outputStamper.attach(cell);
+
+        // hide error outputs
+        hideErrorOutputsOnChange(cell.outputArea.node);
 
         // adjust height
         const oa = cell.outputArea;
