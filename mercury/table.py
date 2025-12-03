@@ -189,7 +189,7 @@ function render({ model, el }) {
     Object.assign(document.createElement(tag), props);
 
   let data = model.get('data') || [];
-  let page = model.get('page');
+  let page = model.get('table_page');
   const pageSize = model.get('page_size');
 
   let isLoading = false;
@@ -290,8 +290,8 @@ function render({ model, el }) {
     cols.forEach(col => {
       const th = c('th', { textContent: col });
 
-      const sCol = model.get('sort_column');
-      const sDir = model.get('sort_direction');
+      const sCol = model.get('table_sort_column');
+      const sDir = model.get('table_sort_direction');
 
       if (sCol === col && sDir === 1) th.textContent += ' ▲';
       if (sCol === col && sDir === 2) th.textContent += ' ▼';
@@ -300,9 +300,9 @@ function render({ model, el }) {
         let dir = 1;
         if (sCol === col) dir = (sDir + 1) % 3;
 
-        model.set('sort_column', col);
-        model.set('sort_direction', dir);
-        model.set('page', 1);
+        model.set('table_sort_column', col);
+        model.set('table_sort_direction', dir);
+        model.set('table_page', 1);
         model.save_changes();
       };
 
@@ -368,7 +368,7 @@ function render({ model, el }) {
         className: 'pager-btn'
       });
       prev.onclick = () => {
-        model.set('page', page - 1);
+        model.set('table_page', page - 1);
         model.save_changes();
       };
 
@@ -391,7 +391,7 @@ function render({ model, el }) {
         if (val < 1) val = 1;
         if (val > total) val = total;
 
-        model.set('page', val);
+        model.set('table_page', val);
         model.save_changes();
       };
 
@@ -414,7 +414,7 @@ function render({ model, el }) {
         className: 'pager-btn'
       });
       next.onclick = () => {
-        model.set('page', page + 1);
+        model.set('table_page', page + 1);
         model.save_changes();
       };
 
@@ -441,8 +441,8 @@ function render({ model, el }) {
 
           clearTimeout(searchTimeout);
           searchTimeout = setTimeout(() => {
-            model.set('search_query', value);
-            model.set('page', 1);
+            model.set('table_search_query', value);
+            model.set('table_page', 1);
             model.save_changes();
           }, 250);
         };
@@ -451,7 +451,7 @@ function render({ model, el }) {
       }
 
       // keep input element, only update its value (focus is preserved)
-      const currentQuery = model.get('search_query') || '';
+      const currentQuery = model.get('table_search_query') || '';
       if (searchBox.value !== currentQuery) {
         searchBox.value = currentQuery;
       }
@@ -466,7 +466,7 @@ function render({ model, el }) {
 
   const rerender = () => {
     data = model.get('data') || [];
-    page = model.get('page');
+    page = model.get('table_page');
     renderTable();
     renderPager();
 
@@ -475,9 +475,9 @@ function render({ model, el }) {
   };
 
   model.on('change:data', rerender);
-  model.on('change:sort_column', rerender);
-  model.on('change:sort_direction', rerender);
-  model.on('change:page', rerender);
+  model.on('change:table_sort_column', rerender);
+  model.on('change:table_sort_direction', rerender);
+  model.on('change:table_page', rerender);
   model.on('change:_filtered_length', rerender);
   model.on('change:search_version', rerender);
   model.on('change:selected_rows', rerender);
@@ -692,10 +692,10 @@ export default { render };
     select_rows = traitlets.Bool(False).tag(sync=True)
     width = traitlets.Unicode("100%").tag(sync=True)
 
-    search_query = traitlets.Unicode("").tag(sync=True)
-    page = traitlets.Int(1).tag(sync=True)
-    sort_column = traitlets.Unicode("").tag(sync=True)
-    sort_direction = traitlets.Int(0).tag(sync=True)  # 0 none, 1 asc, 2 desc
+    table_search_query = traitlets.Unicode("").tag(sync=True)
+    table_page = traitlets.Int(1).tag(sync=True)
+    table_sort_column = traitlets.Unicode("").tag(sync=True)
+    table_sort_direction = traitlets.Int(0).tag(sync=True)  # 0 none, 1 asc, 2 desc
     _filtered_length = traitlets.Int(0).tag(sync=True)
     search_version = traitlets.Int(0).tag(sync=True)
     selected_rows = DataFrameTrait().tag(sync=True)
@@ -716,16 +716,16 @@ export default { render };
 
         name = change["name"]
 
-        if name == "search_query":
-            self.page = 1
+        if name == "table_search_query":
+            self.table_page = 1
             self._handle_refresh(("filter", "sort", "paginate"))
             self.search_version += 1
 
-        elif name in ("sort_column", "sort_direction"):
-            self.page = 1
+        elif name in ("table_sort_column", "table_sort_direction"):
+            self.table_page = 1
             self._handle_refresh(("sort", "paginate"))
 
-        elif name in ("page", "page_size"):
+        elif name in ("table_page", "table_page_size"):
             self._handle_refresh(("paginate"))
 
         else:
@@ -763,7 +763,7 @@ export default { render };
 
     def _apply_filter_list(self):
         records = self._full_data or []
-        q = (self.search_query or "").strip().lower()
+        q = (self.table_search_query or "").strip().lower()
 
         if not q:
             self._filtered_data = records
@@ -782,8 +782,8 @@ export default { render };
 
     def _apply_sort_list(self):
         records = self._filtered_data or []
-        col = self.sort_column
-        direction = self.sort_direction
+        col = self.table_sort_column
+        direction = self.table_sort_direction
 
         if not col or direction == 0:
             self._sorted_data = records
@@ -817,10 +817,10 @@ export default { render };
         total = len(records)
         max_page = max((total - 1) // size + 1, 1)
 
-        page = max(int(self.page), 1)
+        page = max(int(self.table_page), 1)
         if page > max_page:
             page = max_page
-            self.page = page
+            self.table_page = page
 
         start = (page - 1) * size
         end = start + size
@@ -837,7 +837,7 @@ export default { render };
             self._filtered_length = 0
             return
 
-        q = (self.search_query or "").strip()
+        q = (self.table_search_query or "").strip()
         if not q:
             self._filtered_df = df
             self._filtered_length = getattr(df, "shape", (0,))[0] if self._frame_lib == "pandas" else df.height
@@ -880,8 +880,8 @@ export default { render };
             self._sorted_df = None
             return
 
-        col = self.sort_column
-        direction = self.sort_direction
+        col = self.table_sort_column
+        direction = self.table_sort_direction
 
         if not col or direction == 0 or col not in df.columns:
             self._sorted_df = df
@@ -913,10 +913,10 @@ export default { render };
 
         max_page = max((total - 1) // size + 1, 1)
 
-        page = max(int(self.page), 1)
+        page = max(int(self.table_page), 1)
         if page > max_page:
             page = max_page
-            self.page = page
+            self.table_page = page
 
         start = (page - 1) * size
 
@@ -974,9 +974,9 @@ export default { render };
             self.data = []
 
         self.observe(self._react, names=[
-            "page", "page_size",
-            "search_query",
-            "sort_column", "sort_direction",
+            "table_page", "page_size",
+            "table_search_query",
+            "table_sort_column", "table_sort_direction",
         ])
 
     def _repr_mimebundle_(self, **kwargs):

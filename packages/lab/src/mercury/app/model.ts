@@ -506,6 +506,7 @@ export class AppModel {
 
     let commId = '';
     let updateCellId: string | undefined = '';
+    let skipEmit = false;
     switch (msg.header.msg_type) {
       case 'comm_msg': {
         const content = (msg as ICommMsgMsg<'iopub'>).content;
@@ -531,6 +532,16 @@ export class AppModel {
               s && typeof s === 'object' && !Array.isArray(s)
                 ? ((s as any).cell_id as string | undefined)
                 : undefined;
+
+            const keys = Object.keys(s);
+            if (
+              keys.includes('table_sort_column') ||
+              keys.includes('table_sort_direction') ||
+              keys.includes('table_page') ||
+              keys.includes('table_search_query')
+            ) {
+              skipEmit = true;
+            }
           }
         }
         break;
@@ -565,10 +576,12 @@ export class AppModel {
     if (updateCellId && updateCellId !== '') {
       this._ipywidgetToCellId.set(commId, updateCellId);
     } else {
-      this._widgetUpdated.emit({
-        widgetModelId: commId,
-        cellModelId: this._ipywidgetToCellId.get(commId)
-      });
+      if (!skipEmit) {
+        this._widgetUpdated.emit({
+          widgetModelId: commId,
+          cellModelId: this._ipywidgetToCellId.get(commId)
+        });
+      }
     }
   }
 
