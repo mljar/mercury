@@ -1,6 +1,6 @@
 {
   "name": "mercury-app",
-  "version": "3.0.0-alpha.2",
+  "version": "3.0.0-alpha.4",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
@@ -40,7 +40,7 @@
     "@jupyterlab/rendermime-extension": "^4.0.0",
     "@jupyterlab/shortcuts-extension": "^4.0.0",
     "@jupyterlab/statusbar": "^4.0.0",
-    "@jupyterlab/translation-extension": "^4.0.0",
+    "@jupyterlab/translation-extension": "^4.4.0",
     "@jupyterlab/vega5-extension": "^4.0.0",
     "@lezer/common": "^1.0.0",
     "@lezer/highlight": "^1.0.0",

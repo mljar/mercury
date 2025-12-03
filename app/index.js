@@ -117,9 +117,14 @@ async function main() {
     import('@jupyterlab/rendermime-extension'),
     import('@jupyterlab/shortcuts-extension'),
     // import('@jupyterlab/theme-light-extension'),
+    // import('@jupyterlab/translation-extension').then(mod =>
+    //   mod.default.filter(({ id }) =>
+    //     ['@jupyterlab/translation:translator'].includes(id)
+    //   )
+    // )
     import('@jupyterlab/translation-extension').then(mod =>
       mod.default.filter(({ id }) =>
-        ['@jupyterlab/translation:translator'].includes(id)
+        ['@jupyterlab/translation-extension:translator'].includes(id)
       )
     )
   ];
