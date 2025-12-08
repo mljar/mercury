@@ -1,13 +1,24 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightUITweaks from 'starlight-ui-tweaks';
+import starlightSidebarTopics from 'starlight-sidebar-topics';
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [
     starlight({
-      title: 'Mercury Docs',
+      title: 'Mercury',
       customCss: ['./src/styles/custom.css'],
+      plugins: [
+        starlightUITweaks({
+          navbarLinks: [
+            { label: 'Tutorials', href: '/tutorials/' },
+            { label: 'Examples', href: '/examples/' },
+            { label: 'API', href: '/api/' },
+          ],
+        }),
+      ],
       social: [
         {
           icon: 'github',
