@@ -102,6 +102,54 @@ def _parse_and_inject(argv):
                 new_argv.append(f"--IdentityProvider.hashed_password='{hashed}'")
                 new_argv.append(f"--ServerApp.password='{hashed}'")
 
+
+    # ----------------------------
+    # MERCURY_APP: KEEP SESSION (from ENV)
+    # Priority: existing CLI/config > env
+    # ----------------------------
+    keep_session_env = os.getenv("MERCURY_KEEP_SESSION")
+    keep_session_already_set = any(
+        a.startswith("--MercuryApp.keepSession")
+        or a.startswith("--keep-session")
+        for a in new_argv
+    )
+
+    if keep_session_env is not None and not keep_session_already_set:
+        # Normalize env to bool-like
+        val = str(keep_session_env).strip().lower()
+        if val in ("1", "true", "yes", "on", "True"):
+            new_argv.append("--MercuryApp.keepSession=True")
+        elif val in ("0", "false", "no", "off", "False"):
+            new_argv.append("--MercuryApp.keepSession=False")
+        else:
+            logging.warning(
+                "Invalid MERCURY_KEEP_SESSION value %r, expected True/False/1/0. Ignoring.",
+                keep_session_env,
+            )
+
+    # ----------------------------
+    # MERCURY_APP: TIMEOUT (from ENV)
+    # Priority: existing CLI/config > env
+    # ----------------------------
+    timeout_env = os.getenv("MERCURY_TIMEOUT")
+    timeout_already_set = any(
+        a.startswith("--MercuryApp.timeout") or a.startswith("--timeout=")
+        for a in new_argv
+    )
+
+    if timeout_env and not timeout_already_set:
+        try:
+            timeout_int = int(timeout_env)
+            if timeout_int < 0:
+                raise ValueError("timeout must be >= 0")
+        except ValueError:
+            logging.warning(
+                "Invalid MERCURY_TIMEOUT value %r, expected non-negative integer seconds. Ignoring.",
+                timeout_env,
+            )
+        else:
+            new_argv.append(f"--MercuryApp.timeout={timeout_int}")
+
     # ----------------------------
     # OTHER DEFAULTS
     # ----------------------------
