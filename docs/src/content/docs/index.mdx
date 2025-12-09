@@ -1,9 +1,9 @@
 ---
-title: Turn Your Notebooks into Web Apps
+title: Easily share your discoveries
 description: Turn your Python Notebook into a web app with the open-source Mercury framework. Share your results with non-technical users in a few simple steps.
 template: splash
 hero:
-  tagline: Mercury helps you share discoveries - from simple insights to life-changing breakthroughs.
+  tagline: Mercury helps you share discoveries with non-technical users, from simple insights to life-changing breakthroughs. 
   image:
     file: ../../assets/mercury-hq.png
   actions:
@@ -17,11 +17,13 @@ hero:
 ---
 
 import { Card, LinkCard, CardGrid } from '@astrojs/starlight/components';
+import UseCaseCards from '../../components/UseCaseCards.astro';
 
-## Welcome to Mercury
+
+## What is Mercury?
 
 Mercury is an open-source framework that makes it **simple to share Python notebooks with non-technical users**.  
-You write your analysis in a notebook; Mercury turns it into a **clean, responsive web app** with interactive widgets and no custom frontend code.
+You write your analysis in a notebook; Mercury turns it into a **clean, responsive web app** with interactive widgets and no frontend code.
 
 Our goal is to help people - especially in **science, research, and data-heavy work** - share their results easily ❤️
 
@@ -29,7 +31,7 @@ Our goal is to help people - especially in **science, research, and data-heavy w
 
 ## Why Mercury?
 
-<CardGrid stagger>
+<CardGrid >
 
   <Card title="No frontend required" icon="pen">
     Stay in Python and your notebook. Mercury takes care of the web layout, navigation, and styling automatically.
@@ -57,22 +59,7 @@ Our goal is to help people - especially in **science, research, and data-heavy w
 
 </CardGrid>
 
----
-
-## Who is Mercury for?
-
-- **Researchers & scientists**  
-  Turn your analysis into a small application that your team, lab, or collaborators can use without writing code.
-
-- **Data scientists & analysts**  
-  Share dashboards with business users. Let them adjust parameters, run scenarios, and download results – all from a simple web UI.
-
-- **Educators & trainers**  
-  Build interactive teaching materials and exercises in notebooks, then expose them as apps to your students.
-
----
-
-## How Mercury works
+## How does Mercury work?
 
 1. **Create a notebook in Python**  
    Use your usual environment: JupyterLab or MLJAR Studio.
@@ -88,7 +75,13 @@ Our goal is to help people - especially in **science, research, and data-heavy w
 
 ---
 
-## Next steps
+## How Mercury can be used?
+
+
+<UseCaseCards />
+
+
+## Start here
 
 <CardGrid>
 

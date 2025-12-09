@@ -18,3 +18,16 @@
 .site-title {
   font-weight: 900;
 }
+
+h1 {
+  font-weight: 900;
+}
+
+
+html[data-theme='light'] .custom-link {
+  color: black !important;
+}
+
+html[data-theme='dark'] .custom-link {
+  color: white !important;
+}
