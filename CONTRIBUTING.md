@@ -84,6 +84,12 @@ from mercury import *
 
 ---
 
+#### Venv available in JupyterLab
+
+```
+python -m ipykernel install --user --name venv
+```
+
 # 2. 🧪 Developing the JupyterLab Extension (`packages/lab/`)
 
 This is the TypeScript code that:
@@ -103,7 +109,7 @@ jlpm install
 jlpm build
 ```
 
-You can build the selected extension only. Please go into the extension directory:
+Please go into the extension directory:
 
 ```bash
 cd packages/lab
@@ -203,7 +209,7 @@ This directory contains the custom Python server used for:
 2. Restart the Mercury server:
 
 ```bash
-mercury run
+mercury
 ```
 
 (or if running inside JupyterLab, restart JupyterLab)
