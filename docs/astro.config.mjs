@@ -3,14 +3,18 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightUITweaks from 'starlight-ui-tweaks';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
+import starlightLlmsTxt from 'starlight-llms-txt'
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://RunMercury.com',
+  output: 'static',
   integrations: [
     starlight({
       title: 'Mercury',
       customCss: ['./src/styles/custom.css'],
       plugins: [
+        starlightLlmsTxt(),
         starlightUITweaks({
           navbarLinks: [
             { label: 'Documentation', href: '/docs/' },
