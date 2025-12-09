@@ -98,21 +98,18 @@ Install editable Python package:
 
 ```bash
 pip install -e .
+jupyter labextension develop . --overwrite
+jlpm install
+jlpm build
 ```
 
-Then go into the extension directory:
+You can build the selected extension only. Please go into the extension directory:
 
 ```bash
 cd packages/lab
 ```
 
-Install JS dependencies (only once, please run in main directory):
-
-```bash
-jlpm install
-```
-
-### Start watching the extension:
+and start watching the extension:
 
 ```bash
 jlpm run watch
