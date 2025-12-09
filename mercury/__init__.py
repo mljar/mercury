@@ -4,6 +4,7 @@ from .expander import Expander
 from .columns import Columns
 from .button import Button
 from .md import Markdown
+from .select import Select
 from .multiselect import MultiSelect
 from .slider import Slider
 from .indicator import Indicator

@@ -1,21 +1,85 @@
 import anywidget
 import traitlets
 import json
-# from IPython.display import display
+from IPython.display import display
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 from .theme import THEME
 
 
-def Select(*args, key="", **kwargs):
+from typing import Any, List, Literal
+from IPython.display import display
+
+Position = Literal["sidebar", "inline", "bottom"]
+
+def Select(
+    label: str = "Select",
+    value: Any = "",
+    choices: List[Any] = [],
+    position: Position = "sidebar",
+    disabled: bool = False,
+    hidden: bool = False,
+    key: str = ""
+):
+    """
+    Create (or retrieve) a Mercury Select widget.
+
+    This function instantiates a `SelectWidget` with the given label,
+    initial value, and list of choices. If a widget with the same
+    configuration (identified by a unique code UID generated from
+    widget type, arguments, and keyword arguments) already exists in
+    the `WidgetsManager`, the existing instance is returned and
+    displayed instead of creating a new one.
+
+    Parameters
+    ----------
+    label : str
+        Human-readable label shown next to the widget.
+    value : Any
+        The initial selected value in the dropdown.
+    choices : list[Any]
+        Options available for selection.
+    position : {"sidebar", "inline", "bottom"}, optional
+        Controls where the widget is displayed:
+
+        - `"sidebar"` — place the widget in the left sidebar panel (default).
+        - `"inline"` — render the widget directly in the notebook flow
+          (where the code cell is executed).
+        - `"bottom"` — render the widget after all notebook cells.
+    disabled : bool, optional
+        If True, the widget is rendered but cannot be interacted with.
+    hidden : bool, optional
+        If True, the widget exists but is not visible in the UI.
+    key : str, optional
+        Unique identifier used to differentiate widgets with the same parameters.
+
+    Returns
+    -------
+    SelectWidget
+        The created or retrieved Select widget instance.
+    """
+
+    args = [label, value, choices, position, disabled, hidden, key]
+    kwargs = {
+        "label": label,
+        "value": value,
+        "choices": choices,
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
+        "key": key,
+    }
+
     code_uid = WidgetsManager.get_code_uid("Select", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
         display(cached)
         return cached
-    instance = SelectWidget(*args, **kwargs)
+
+    instance = SelectWidget(**kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
+
 
 
 class SelectWidget(anywidget.AnyWidget):
@@ -67,13 +131,6 @@ class SelectWidget(anywidget.AnyWidget):
 
       container.appendChild(select);
       el.appendChild(container);
-
-      const css = model.get("custom_css");
-      if (css && css.trim().length > 0) {
-        let styleTag = document.createElement("style");
-        styleTag.textContent = css;
-        el.appendChild(styleTag);
-      }
 
       // ---- read cell id (no DOM modifications) ----
       const ID_ATTR = 'data-cell-id';
@@ -140,13 +197,11 @@ class SelectWidget(anywidget.AnyWidget):
     label = traitlets.Unicode(default_value="Select option").tag(sync=True)
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)
-    custom_css = traitlets.Unicode(default_value="", help="Extra CSS").tag(sync=True)
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
         default_value="sidebar",
         help="Widget placement"
     ).tag(sync=True)
-    # NEW: synced cell id
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     def __init__(self, **kwargs):
