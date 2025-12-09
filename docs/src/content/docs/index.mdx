@@ -1,36 +1,137 @@
 ---
-title: Welcome to Mercury
-description: Create interactive dashboards and shareable web apps directly from Python notebooks. Mercury lets you build and deploy data apps with no frontend code.
-template: splash 
+title: Turn Your Notebooks into Web Apps
+description: Turn your Python Notebook into a web app with the open-source Mercury framework. Share your results with non-technical users in a few simple steps.
+template: splash
 hero:
-  tagline: Turn Python notebooks into interactive dashboards & web apps — no frontend needed.
+  tagline: Mercury helps you share discoveries - from simple insights to life-changing breakthroughs.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/mercury-hq.png
   actions:
-    - text: Get Started
+    - text: Get started with Mercury
       link: /get-started-with-mercury/
       icon: right-arrow
+    - text: See widget examples
+      link: /widgets/overview/
+      icon: open-book
+      variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+## Welcome to Mercury
+
+Mercury is an open-source framework that makes it **simple to share Python notebooks with non-technical users**.  
+You write your analysis in a notebook; Mercury turns it into a **clean, responsive web app** with interactive widgets and no custom frontend code.
+
+Our goal is to help people - especially in **science, research, and data-heavy work** - share their results easily ❤️
+
+---
+
+## Why Mercury?
+
+<CardGrid stagger>
+
+  <Card title="No frontend required" icon="pen">
+    Stay in Python and your notebook. Mercury takes care of the web layout, navigation, and styling automatically.
+  </Card>
+
+  <Card title="Rich interactive widgets" icon="setting">
+    Build interactive apps with a wide library of widgets. When a widget value changes, cells below it are automatically recomputed — no callbacks to maintain.
+  </Card>
+
+  <Card title="Designed for non-technical users" icon="comment">
+    Share results with colleagues who do not code. They get a simple, friendly web interface; you keep full control in Python.
+  </Card>
+
+  <Card title="Clean layout by default" icon="laptop">
+    Mercury gives your notebook a nice, consistent layout out of the box. You focus on the analysis, not on CSS or HTML.
+  </Card>
+
+  <Card title="Easy deployment" icon="rocket">
+    Run your app in Docker or deploy to our cloud with no complex setup. From notebook to shared app in minutes.
+  </Card>
+
+  <Card title="Live preview while you work" icon="magnifier">
+    See a live preview of your app directly in **MLJAR Studio** or **JupyterLab** (via our extension). Adjust widgets and layout and instantly see the result.
+  </Card>
+
+</CardGrid>
+
+---
+
+## Who is Mercury for?
+
+- **Researchers & scientists**  
+  Turn your analysis into a small application that your team, lab, or collaborators can use without writing code.
+
+- **Data scientists & analysts**  
+  Share dashboards with business users. Let them adjust parameters, run scenarios, and download results – all from a simple web UI.
+
+- **Educators & trainers**  
+  Build interactive teaching materials and exercises in notebooks, then expose them as apps to your students.
+
+---
+
+## How Mercury works
+
+1. **Create a notebook in Python**  
+   Use your usual environment: JupyterLab or MLJAR Studio.
+
+2. **Add Mercury widgets**  
+   Insert widgets in your notebook cells. They are interactive and automatically trigger re-execution of cells below them.
+
+3. **Preview your app live**  
+   Use the built-in extension to see how your notebook looks as a web app while you edit.
+
+4. **Deploy with Docker or cloud**  
+   Package your notebook with Docker or use our cloud deployment. No complicated server setup needed.
+
+---
 
 ## Next steps
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+<CardGrid>
+
+  <LinkCard
+    title="Start the quickstart"
+    icon="rocket"
+    href="/get-started-with-mercury/"
+    description="Install Mercury, run your first notebook app, and see the full workflow in a few minutes."
+  />
+
+  <LinkCard
+    title="Explore widgets"
+    icon="setting"
+    href="/widgets/overview/"
+    description="Learn about the widget library and how to make your notebooks interactive without writing callbacks."
+  />
+
+  <LinkCard
+    title="Live preview in MLJAR Studio"
+    icon="magnifier"
+    href="/guides/mljar-studio-preview/"
+    description="See how to work with Mercury apps directly inside MLJAR Studio, with live preview."
+  />
+
+  <LinkCard
+    title="Deploy with Docker or cloud"
+    icon="seti:docker"
+    href="/deployment/overview/"
+    description="Discover how to share your notebook as a web app using Docker or our cloud – with almost no setup."
+  />
+
+  {/* <LinkCard
+    title="Configuration & layout"
+    icon="laptop"
+    href="/configuration/overview/"
+    description="Learn how to configure your apps and adjust layout while still keeping things simple."
+  />
+
+  <LinkCard
+    title="Read the Starlight docs"
+    icon="open-book"
+    href="https://starlight.astro.build/"
+    description="Learn more about the Starlight documentation system that powers this site."
+  /> */}
+
 </CardGrid>

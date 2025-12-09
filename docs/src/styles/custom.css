@@ -6,6 +6,15 @@
     max-width: 90%
 }
 
+
+:root[data-theme='light'] {
+  --sl-color-text-accent: #007bff;
+}
+
 :root {
-  --sl-color-text-accent: red;
+  --sl-color-text-accent: #4da3ff;
+}
+
+.site-title {
+  font-weight: 900;
 }
