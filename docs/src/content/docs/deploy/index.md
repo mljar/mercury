@@ -1,6 +1,6 @@
 ---
-title: Tutorials
-description: Step-by-step guides for using the API.
+title: Deploy
+description: How to deploy Python notebooks as Mercury web apps
 # Optional: no right-side ToC on this index
 #tableOfContents: false
 ---

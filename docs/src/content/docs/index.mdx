@@ -8,16 +8,17 @@ hero:
     file: ../../assets/mercury-hq.png
   actions:
     - text: Get started with Mercury
-      link: /get-started-with-mercury/
+      link: /docs/
       icon: right-arrow
-    - text: See widget examples
-      link: /widgets/overview/
+    - text: See wep app examples
+      link: /examples/
       icon: open-book
       variant: minimal
 ---
 
 import { Card, LinkCard, CardGrid } from '@astrojs/starlight/components';
 import UseCaseCards from '../../components/UseCaseCards.astro';
+import { Steps } from '@astrojs/starlight/components';
 
 
 ## What is Mercury?
@@ -59,7 +60,11 @@ Our goal is to help people - especially in **science, research, and data-heavy w
 
 </CardGrid>
 
+
+
 ## How does Mercury work?
+
+<Steps>
 
 1. **Create a notebook in Python**  
    Use your usual environment: JupyterLab or MLJAR Studio.
@@ -73,7 +78,7 @@ Our goal is to help people - especially in **science, research, and data-heavy w
 4. **Deploy with Docker or cloud**  
    Package your notebook with Docker or use our cloud deployment. No complicated server setup needed.
 
----
+</Steps>
 
 ## How Mercury can be used?
 
