@@ -155,8 +155,38 @@ def _parse_and_inject(argv):
     # ----------------------------
     new_argv.append("--ContentsManager.allow_hidden=True")
     new_argv.append("--MappingKernelManager.default_kernel_name='python3'")
-    # Enable gzip compression for responses unless explicitly overridden
-    new_argv.append("--ServerApp.tornado_settings={'compress_response': True}")
+
+    # Build ServerApp.tornado_settings if not already provided
+    tornado_already_set = any(
+        a.startswith("--ServerApp.tornado_settings") for a in new_argv
+    )
+
+    if not tornado_already_set:
+        # Base tornado settings: enable gzip compression
+        tornado_settings = {
+            "compress_response": True,
+        }
+
+        # Optional: allow embedding in iframes based on MERCURY_IFRAME_ALLOW
+        #
+        # Examples:
+        #   MERCURY_IFRAME_ALLOW="*"                         -> frame-ancestors *
+        #   MERCURY_IFRAME_ALLOW="https://docs.foo.com"      -> frame-ancestors https://docs.foo.com
+        #   MERCURY_IFRAME_ALLOW="https://a.com, https://b.com"
+        #       -> frame-ancestors https://a.com https://b.com
+        iframe_allow = os.getenv("MERCURY_IFRAME_ALLOW")
+
+        if iframe_allow:
+            # Normalize env into space-separated origins
+            origins = " ".join(iframe_allow.replace(",", " ").split())
+            if origins:
+                csp_value = f"frame-ancestors {origins}"
+                tornado_settings["headers"] = {
+                    "Content-Security-Policy": csp_value
+                }
+
+        # Use repr() so traitlets parses it as a Python dict literal
+        new_argv.append(f"--ServerApp.tornado_settings={tornado_settings!r}")
 
     return new_argv
 

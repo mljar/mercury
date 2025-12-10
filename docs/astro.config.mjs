@@ -27,29 +27,31 @@ export default defineConfig({
             firstColumn: {
               title: "Product",
               links: [
-                // { label: "Features", href: "/features" },
-                // { label: "Pricing", href: "/pricing" },
+                 { label: "GitHub", href: "https://github.com/mljar/mercury" },
+                 { label: "MLJAR Studio", href: "https://mljar.com" },
               ],
             },
             secondColumn: {
               title: "Resources",
               links: [
-                // { label: "Documentation", href: "/docs" },
-                // { label: "Guides", href: "/guides" },
+                 { label: "Documentation", href: "/docs" },
+                 { label: "Examples", href: "/examples" },
+                 { label: "Tutorials", href: "/tutorials" },
+                 { label: "Deploy", href: "/deploy" },
               ],
             },
             thirdColumn: {
               title: "Support",
               links: [
-                // { label: "Help Center", href: "/help" },
+                 { label: "Issues", href: "https://github.com/mljar/mercury/issues" },
                 // { label: "Community", href: "/community" },
               ],
             },
             fourthColumn: {
               title: "Company",
               links: [
-                // { label: "About", href: "/about" },
-                // { label: "Blog", href: "/blog" },
+                 { label: "About", href: "https://mljar.com/about" },
+                 { label: "Blog", href: "https://mljar.com/blog" },
               ],
             },
           },
@@ -66,7 +68,8 @@ export default defineConfig({
                   label: "Documentation",
                   slug: "docs"
                 },
-                { label: 'Input Widgets', autogenerate: { directory: 'docs/widgets/input' } },
+                { label: 'Input Widgets', autogenerate: { directory: 'docs/input' } },
+                { label: 'Input Widgets 2', autogenerate: { directory: 'docs/widgets/input' } },
                 { label: 'Output Widgets', autogenerate: { directory: 'docs/widgets/output' } },
               ]
             ,
