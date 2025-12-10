@@ -378,6 +378,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
       align-items: center;
       justify-content: center;
       opacity: 0.7;
+      color: {THEME.get('text_color', '#222')};
     }}
 
     .mljar-ms-chip-x:hover {{
@@ -458,7 +459,34 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-item input[type="checkbox"] {{
+      appearance: none;
+      -webkit-appearance: none;
       margin: 0;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #444;
+      border-radius: 3px; 
+      background: #fff; 
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+    }}
+ 
+    .mljar-ms-item input[type="checkbox"]:checked {{
+      background: #228be6; 
+      border-color: #228be6;
+    }}
+ 
+    .mljar-ms-item input[type="checkbox"]:checked::after {{
+      content: "";
+      position: absolute;
+      top: 0px;
+      left: 3px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
     }}
     """
 

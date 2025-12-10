@@ -220,6 +220,7 @@ class SelectWidget(anywidget.AnyWidget):
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
+      color: {THEME.get('text_color', '#222')}; 
     }}
 
     .mljar-select-input:disabled {{
