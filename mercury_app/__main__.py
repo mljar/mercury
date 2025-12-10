@@ -155,6 +155,8 @@ def _parse_and_inject(argv):
     # ----------------------------
     new_argv.append("--ContentsManager.allow_hidden=True")
     new_argv.append("--MappingKernelManager.default_kernel_name='python3'")
+    # Enable gzip compression for responses unless explicitly overridden
+    new_argv.append("--ServerApp.tornado_settings={'compress_response': True}")
 
     return new_argv
 
