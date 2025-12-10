@@ -155,13 +155,9 @@
       setTimeout(setHeaderHeightVar, 1000);
     })();
 
-    // Auto-hide example if you want:
-    window.addEventListener('load', function(){
-      setTimeout(() => window.hideMercuryLoader(), 800);
-    });
   </script>
 
-  <header class="hdr" role="banner">
+  <header class="hdr" role="banner" id="mercuryInitHeader">
     <div class="hdr-inner">
       <a class="brand" href="{{ base_url or '/' }}">{{page_config['title'] or 'Mercury'}}</a>
       <div style="position:relative">
@@ -174,6 +170,19 @@
       </div>
     </div>
   </header>
+  <script>
+    // Auto-hide example if you want:
+    window.addEventListener('load', function(){
+      setTimeout(() => window.hideMercuryLoader(), 800);
+    });
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('no-navbar')) {
+        const header = document.getElementById('mercuryInitHeader');
+        if (header) header.remove();
+      }
+    })();
+  </script>
 
   <!-- Body may be replaced by the app; overlay stays visible and responsive. -->
 

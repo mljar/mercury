@@ -85,7 +85,6 @@ class MercuryApp(LabServerApp):
 
     def initialize_templates(self):
         super().initialize_templates()
-        print(sys.argv[0])
         if sys.argv[0].endswith("mercury_app/__main__.py") or \
            sys.argv[0].endswith("mercury"):
             self.static_dir = os.path.join(HERE, "static")

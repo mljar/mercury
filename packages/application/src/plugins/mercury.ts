@@ -13,7 +13,7 @@ import { PromiseDelegate } from '@lumino/coreutils';
 import { type AppWidget, type MercuryWidget } from '@mljar/mercury-extension';
 import { IMercuryCellExecutor } from '@mljar/mercury-tokens';
 
-import { MercuryNavbar } from './navbar'; // <-- NEW
+import { MercuryNavbar } from './navbar';
 
 /**
  * Open the notebook with Mercury.
@@ -31,12 +31,9 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     sessionContextDialogs: ISessionContextDialogs | null,
     translator: ITranslator | null
   ) => {
-    console.log('My opener 123');
-
     const { mimeTypeService } = editorServices ?? {};
     Promise.all([app.started, app.restored]).then(async () => {
       const notebookPath = PageConfig.getOption('notebookPath');
-      console.log('notebookPath', notebookPath);
       const mercuryPanel = documentManager.open(
         notebookPath,
         'Mercury'
@@ -48,44 +45,53 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
       // ------- Navbar: create and mount (separate file) -------
       const baseUrl = PageConfig.getBaseUrl() || '/';
-      const navbar = new MercuryNavbar({
-        baseUrl,
-        title: PageConfig.getOption('title') || 'Mercury',
-        apiUrl: `${baseUrl}mercury/api/notebooks`,
-        onHeightChange: (px) => {
-          // add top padding below fixed header
-          const mercuryMainPanel = mercuryPanel.node.querySelector('.mercury-main-panel') as HTMLElement | null;
-          if (mercuryMainPanel) {
-            mercuryMainPanel.style.paddingTop = `${px}px`;
-          } else {
-            const notebookPanel = mercuryPanel.node.querySelector('.jp-Notebook') as HTMLElement | null;
-            if (notebookPanel) notebookPanel.style.paddingTop = `${px}px`;
-          }
-        }
-      });
-      await navbar.mount();
 
-      // Clean up if panel is disposed
-      mercuryPanel.disposed.connect(() => navbar.destroy());
+      const urlParams = new URLSearchParams(window.location.search);
+      const skipNavbar = urlParams.has('no-navbar');
+
+      if (!skipNavbar) {
+        const navbar = new MercuryNavbar({
+          baseUrl,
+          title: PageConfig.getOption('title') || 'Mercury',
+          apiUrl: `${baseUrl}mercury/api/notebooks`,
+          onHeightChange: px => {
+            // add top padding below fixed header
+            const mercuryMainPanel = mercuryPanel.node.querySelector(
+              '.mercury-main-panel'
+            ) as HTMLElement | null;
+            if (mercuryMainPanel) {
+              mercuryMainPanel.style.paddingTop = `${px}px`;
+            } else {
+              const notebookPanel = mercuryPanel.node.querySelector(
+                '.jp-Notebook'
+              ) as HTMLElement | null;
+              if (notebookPanel) {
+                notebookPanel.style.paddingTop = `${px}px`;
+              }
+            }
+          }
+        });
+        await navbar.mount();
+
+        // Clean up if panel is disposed
+        mercuryPanel.disposed.connect(() => navbar.destroy());
+      }
 
       // ---------- Execute notebook cells once kernel is ready ----------
       mercuryPanel.context.ready.then(async () => {
         let session = mercuryPanel.context.sessionContext.session;
-        console.log('session', session);
         if (!session) {
           const [, changes] = await signalToPromise(
             mercuryPanel.context.sessionContext.sessionChanged
           );
           session = changes.newValue!;
         }
-        console.log('session2', session);
         let kernelConnection = session?.kernel;
         if (!kernelConnection) {
           const [, changes] = await signalToPromise(session.kernelChanged);
           kernelConnection = changes.newValue!;
         }
 
-        console.log(kernelConnection);
         const executeAll = async () => {
           if (
             kernelConnection?.connectionStatus === 'connected' &&
