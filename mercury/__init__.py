@@ -1,4 +1,4 @@
-__version__ = "3.0.0a6"
+__version__ = "3.0.0a7"
 
 from .expander import Expander
 from .columns import Columns
