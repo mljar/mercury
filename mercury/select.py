@@ -1,5 +1,6 @@
 # Copyright MLJAR Sp. z o.o.
 # Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
 import warnings
 from typing import List, Literal
 
@@ -236,7 +237,7 @@ class SelectWidget(anywidget.AnyWidget):
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
         default_value="sidebar",
-        help="Widget placement"
+        help="Widget placement: sidebar, inline, or bottom",
     ).tag(sync=True)
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
