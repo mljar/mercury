@@ -80,3 +80,24 @@ before-build-python = ["jlpm clean"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "isort>=5",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra"
+testpaths = ["mercury/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["mercury", "mercury_app"]
+multi_line_output = 3
+include_trailing_comma = true

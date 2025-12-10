@@ -1,27 +1,28 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+import warnings
+from typing import List, Literal
+
 import anywidget
 import traitlets
-import json
 from IPython.display import display
-from .manager import WidgetsManager, MERCURY_MIMETYPE
+
+from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
-
-
-from typing import Any, List, Literal
-from IPython.display import display
 
 Position = Literal["sidebar", "inline", "bottom"]
 
 def Select(
     label: str = "Select",
-    value: Any = "",
-    choices: List[Any] = [],
+    value: str = "",
+    choices: List[str] = [],
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
     key: str = ""
 ):
     """
-    Create (or retrieve) a Mercury Select widget.
+    Create and display a Select widget.
 
     This function instantiates a `SelectWidget` with the given label,
     initial value, and list of choices. If a widget with the same
@@ -34,10 +35,13 @@ def Select(
     ----------
     label : str
         Human-readable label shown next to the widget.
-    value : Any
-        The initial selected value in the dropdown.
-    choices : list[Any]
+        The default is `"Select"`.
+    value : str
+        The initial selected value in the dropdown. 
+        The default is `""`.
+    choices : list[str]
         Options available for selection.
+        The default is `[]`.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed:
 
@@ -46,9 +50,9 @@ def Select(
           (where the code cell is executed).
         - `"bottom"` — render the widget after all notebook cells.
     disabled : bool, optional
-        If True, the widget is rendered but cannot be interacted with.
+        If `True`, the widget is rendered but cannot be interacted with. 
     hidden : bool, optional
-        If True, the widget exists but is not visible in the UI.
+        If `True`, the widget exists but is not visible in the UI. 
     key : str, optional
         Unique identifier used to differentiate widgets with the same parameters.
 
@@ -56,7 +60,39 @@ def Select(
     -------
     SelectWidget
         The created or retrieved Select widget instance.
+
+    Examples
+    --------
+    Basic usage:
+
+    >>> from mercury import Select
+    >>> fruit = Select(
+    ...     label="Choose fruit",
+    ...     choices=["Apple", "Banana", "Cherry"]
+    ... )
+
+    Now the widget appears in the UI. To display the current value:
+
+    >>> fruit.value
+    'Apple'
+
+    After a user changes the selection in the UI:
+
+    >>> fruit.value
+    'Banana'
+
+    The value always reflects the latest selection chosen by the user.
     """
+
+    if len(choices) == 0:
+        raise Exception("Please provide choices list. God bless you <3")
+
+    if value == "":
+        value = choices[0]
+    
+    if value not in choices:
+        value = choices[0]
+        warnings.warn("\nYour value is not included in choices. Automatically set value to first element from choices.")
 
     args = [label, value, choices, position, disabled, hidden, key]
     kwargs = {
@@ -194,7 +230,7 @@ class SelectWidget(anywidget.AnyWidget):
 
     value = traitlets.Unicode(default_value="").tag(sync=True)
     choices = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
-    label = traitlets.Unicode(default_value="Select option").tag(sync=True)
+    label = traitlets.Unicode(default_value="Select").tag(sync=True)
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)
     position = traitlets.Enum(

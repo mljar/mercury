@@ -42,7 +42,7 @@ cd mercury
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -e .
+pip install -e .[dev]
 ```
 
 ## 3. Install JS dependencies
@@ -81,6 +81,11 @@ from mercury import *
 
 👉 **No build step required.**
 👉 Mercury automatically picks up widget changes through Python import.
+
+
+### Widget tests
+
+Widget tests are located in `mercury/tests` directory.
 
 ---
 
