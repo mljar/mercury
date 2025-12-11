@@ -184,21 +184,28 @@ def _parse_and_inject(argv):
                 tornado_settings["headers"] = {
                     "Content-Security-Policy": csp_value
                 }
-            tornado_settings["cookie_options"] = {'SameSite': 'None', 'Secure': True}
-            cookie_opts_already_set = any(
-                a.startswith("--IdentityProvider.cookie_options")
-                for a in new_argv
-            )
-            if not cookie_opts_already_set:
-                cookie_opts = {"SameSite": "None", "Secure": True}
-                new_argv.append(
-                    f"--IdentityProvider.cookie_options={cookie_opts!r}"
+
+                # 🔑 Make XSRF cookie usable from third-party iframe
+                # Tornado expects *lowercase* keys here.
+                tornado_settings["xsrf_cookie_kwargs"] = {
+                    "samesite": "None",
+                    "secure": True,
+                }
+
+                # Optional but nice: align IdentityProvider cookie options too
+                cookie_opts_already_set = any(
+                    a.startswith("--IdentityProvider.cookie_options")
+                    for a in new_argv
                 )
-        # Use repr() so traitlets parses it as a Python dict literal
+                if not cookie_opts_already_set:
+                    cookie_opts = {"SameSite": "None", "Secure": True}
+                    new_argv.append(
+                        f"--IdentityProvider.cookie_options={cookie_opts!r}"
+                    )
+
+        print(tornado_settings)
         new_argv.append(f"--ServerApp.tornado_settings={tornado_settings!r}")
 
-    print(new_argv)
-    
     return new_argv
 
 def main(argv=None):

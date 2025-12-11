@@ -133,7 +133,7 @@ class SelectWidget(anywidget.AnyWidget):
       }
 
       let select = document.createElement("select");
-      select.classList.add("mljar-select-input");
+      select.classList.add("mljar-select-widget-input");
 
       if (model.get("disabled")) {
         select.disabled = true;
@@ -213,7 +213,7 @@ class SelectWidget(anywidget.AnyWidget):
       font-weight: 600;
     }}
 
-    .mljar-select-input {{
+    .mljar-select-widget-input {{
       width: 100%;
       padding: 6px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
@@ -223,7 +223,7 @@ class SelectWidget(anywidget.AnyWidget):
       color: {THEME.get('text_color', '#222')}; 
     }}
 
-    .mljar-select-input:disabled {{
+    .mljar-select-widget-input:disabled {{
       background: #f5f5f5;
       color: #888;
       cursor: not-allowed;
