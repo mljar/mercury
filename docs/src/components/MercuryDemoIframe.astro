@@ -1,0 +1,84 @@
+---
+interface Props {
+  iframeSrc: string;
+  notebookUrl?: string;
+  height?: number;
+}
+
+const { iframeSrc, notebookUrl, height = 500 } = Astro.props;
+const cloudUrl = 'https://platform.mljar.com';
+---
+
+<div class="mercury-demo">
+  <iframe
+    src={iframeSrc}
+    loading="lazy"
+    style={`height: ${height}px;`}
+    class="mercury-demo__iframe"
+  ></iframe>
+
+  <div class="mercury-demo__footer">
+    {notebookUrl && (
+      <a
+        href={notebookUrl}
+        target="_blank"
+        rel="noreferrer"
+        class="mercury-demo__link"
+      >
+        🛠️ Source code
+      </a>
+    )}
+
+    <a
+      href={cloudUrl}
+      target="_blank"
+      rel="noreferrer"
+      class="mercury-demo__link mercury-demo__cloud-link"
+    >
+      ⛅ Mercury Cloud
+    </a>
+  </div>
+</div>
+
+<style>
+  .mercury-demo {
+    margin-top: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .mercury-demo__iframe {
+    width: 100%;
+    border: 0;
+    display: block;
+  }
+
+  .mercury-demo__footer {
+    display: flex;
+    align-items: center;
+    background: #f2f2f2;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+    border-top: 1px solid #ddd;
+    gap: 0.75rem;
+  }
+
+  .mercury-demo__link {
+    color: #555;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .mercury-demo__link:hover {
+    text-decoration: underline;
+  }
+
+  /* Push cloud link to the right when both links are present.
+     When notebookUrl is missing, it’s the only link and still sits on the right. */
+  .mercury-demo__cloud-link {
+    margin-left: auto;
+  }
+</style>
