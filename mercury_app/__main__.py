@@ -203,7 +203,6 @@ def _parse_and_inject(argv):
                         f"--IdentityProvider.cookie_options={cookie_opts!r}"
                     )
 
-        print(tornado_settings)
         new_argv.append(f"--ServerApp.tornado_settings={tornado_settings!r}")
 
     return new_argv

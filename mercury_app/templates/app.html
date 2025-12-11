@@ -171,10 +171,7 @@
     </div>
   </header>
   <script>
-    // Auto-hide example if you want:
-    window.addEventListener('load', function(){
-      setTimeout(() => window.hideMercuryLoader(), 800);
-    });
+    // Remove navbar if requested
     (function () {
       const params = new URLSearchParams(window.location.search);
       if (params.has('no-navbar')) {
@@ -182,8 +179,48 @@
         if (header) header.remove();
       }
     })();
+  
+    // Smart loader: observe DOM and hide when JupyterLab shell appears
+    (function () {
+      function appRootFound() {
+        // Heuristics: typical JupyterLab / Mercury root containers
+        return document.querySelector('.jp-LabShell') ||
+               document.querySelector('#jp-main-dock-panel') ||
+               document.querySelector('.jp-NotebookPanel') ||
+               document.querySelector('[data-mercury-app-ready]');
+      }
+  
+      // In case it's already there (very fast load)
+      if (appRootFound()) {
+        window.hideMercuryLoader();
+        return;
+      }
+  
+      // Otherwise, watch for DOM changes
+      const observer = new MutationObserver(() => {
+        if (appRootFound()) {
+          observer.disconnect();
+          window.hideMercuryLoader();
+        }
+      });
+  
+      // Start observing body once it exists
+      function startObserving() {
+        if (!document.body) {
+          // If body not yet there, retry on next frame (no hard timeout)
+          requestAnimationFrame(startObserving);
+          return;
+        }
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
+  
+      startObserving();
+  
+      // Clean up on navigation
+      window.addEventListener('beforeunload', () => observer.disconnect());
+    })();
   </script>
-
+  
   <!-- Body may be replaced by the app; overlay stays visible and responsive. -->
 
 </body>
