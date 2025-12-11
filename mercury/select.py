@@ -205,8 +205,8 @@ class SelectWidget(anywidget.AnyWidget):
       font-size: {THEME.get('font_size', '14px')};
       color: {THEME.get('text_color', '#222')};
       margin-bottom: 8px;
-      padding-left: 8px;
-      padding-right: 8px;
+      padding-left: 4px;
+      padding-right: 4px;
     }}
 
     .mljar-select-label {{
