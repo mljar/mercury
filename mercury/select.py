@@ -232,7 +232,6 @@ class SelectWidget(anywidget.AnyWidget):
       cursor: not-allowed;
     }}
     """
-    print('select')
 
     value = traitlets.Unicode(default_value="").tag(sync=True)
     choices = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
