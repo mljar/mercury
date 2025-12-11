@@ -201,11 +201,12 @@ class SelectWidget(anywidget.AnyWidget):
     .mljar-select-container {{
       display: flex;
       flex-direction: column;
-      width: 100%;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
       color: {THEME.get('text_color', '#222')};
       margin-bottom: 8px;
+      padding-left: 8px;
+      padding-right: 8px;
     }}
 
     .mljar-select-label {{

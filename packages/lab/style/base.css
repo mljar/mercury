@@ -400,3 +400,7 @@
   margin: 0 0 4px 8px;
 }
 /*********** mercury error toast ****************/
+
+.jp-MarkdownOutput {
+  padding-left: 0px !important;
+}
