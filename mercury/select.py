@@ -220,7 +220,10 @@ class SelectWidget(anywidget.AnyWidget):
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
-      color: {THEME.get('text_color', '#222')}; 
+      
+      appearance: none !important;
+      background-color: #ffffff !important;
+      color: {THEME.get('text_color', '#222')} !important; 
     }}
 
     .mljar-select-widget-input:disabled {{
@@ -229,6 +232,7 @@ class SelectWidget(anywidget.AnyWidget):
       cursor: not-allowed;
     }}
     """
+    print('select')
 
     value = traitlets.Unicode(default_value="").tag(sync=True)
     choices = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
