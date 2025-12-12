@@ -98,14 +98,14 @@ The default is `False`.
 
 **type:** `bool`
 If `True`, the widget exists in the UI state but is not rendered.
-
-Useful for internal state management.
 The default is `False`.
+
 ---
 
 ### key
 
 **type:** `string`
+
 Unique identifier to distinguish widgets with identical arguments.
 
 <Aside>
@@ -116,7 +116,7 @@ The `key` value is needed if widgets are created in the loop.
 
 ---
 
-## Behavior Notes
+## Notes
 
 * When no `value` is provided, the widget selects the **first choice**.
 * If the provided `value` is not in `choices`, it is replaced with the first element and a warning is shown.

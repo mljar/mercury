@@ -1,0 +1,221 @@
+---
+title: MultiSelect
+description: How to use the MultiSelect widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **MultiSelect** widget displays a dropdown menu that allows users to choose **multiple values** from a list.
+It is well suited for filtering data, selecting multiple categories, or controlling more complex logic in your Mercury App.
+
+## Import
+
+<Code code={`from mercury import MultiSelect`} lang="python" />
+
+## Usage
+
+To create a MultiSelect widget, you must provide a non-empty list of `choices`.
+You may optionally provide a list of default selected values using the `value` argument.
+
+If no `value` is provided (or if it is `None`), the widget selects the **first element from `choices` by default**.
+
+
+### Basic Example
+
+**Code**
+
+```python
+fruits = MultiSelect(
+    label="Choose fruits",
+    choices=["Apple", "Banana", "Cherry"]
+)
+````
+
+In this case, the initial value will be:
+
+```python
+["Apple"]
+```
+
+### Default Values
+
+You can specify one or more default selections using the `value` argument.
+
+**Code**
+
+```python
+fruits = MultiSelect(
+    label="Choose fruits",
+    choices=["Apple", "Banana", "Cherry"],
+    value=["Banana", "Cherry"]
+)
+```
+
+If any values provided in `value` are not present in `choices`, they are automatically removed and a warning is shown.
+If all provided values are invalid, the widget falls back to selecting the **first available choice** during initialization.
+
+### Layout
+
+Use the `position` argument to control where the widget is displayed.
+The default is `position="sidebar"`, which renders the widget in the left sidebar.
+
+Other available values are:
+
+* `"inline"` — displays the widget in the main notebook output,
+* `"bottom"` — displays the widget after all notebook cells.
+
+**Code**
+
+```python
+countries = MultiSelect(
+    label="Countries",
+    choices=["USA", "Poland", "Japan"],
+    position="inline"
+)
+```
+
+## MultiSelect Props
+
+### label
+
+**type:** `string`
+Text displayed above the widget.
+The default is `"Select"`.
+
+---
+
+### value
+
+**type:** `list[str] | None`
+
+Initial list of selected values.
+
+* If `None` or omitted, the first element from `choices` is selected.
+* Invalid values are removed during initialization.
+* After user interaction, the value may become an **empty list**.
+
+The widget value is **never `None` at runtime**.
+
+---
+
+### choices (required)
+
+**type:** `list[str]`
+
+List of available options.
+Must be non-empty, otherwise an exception is raised.
+
+---
+
+### placeholder
+
+**type:** `string`
+
+Text displayed when no values are selected.
+This is visible, for example, after the user clears all selections.
+
+The default is an empty string.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the widget is visible but cannot be interacted with.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+
+This is useful for internal state management.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different <code>key</code> is specified.
+
+The <code>key</code> value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* The widget value is always a **list of strings**.
+* During initialization, at least one value is selected by default.
+* During user interaction, the value may become an **empty list** (for example when the user clears all selections).
+* Invalid values are removed automatically.
+* The current selection is always available via `.value`.
+
+---
+
+### Example
+
+```python
+fruits = MultiSelect(
+    label="Fruits",
+    choices=["Apple", "Banana", "Cherry"]
+)
+
+fruits.value
+```
+
+**Output**
+
+```text
+['Apple']
+```
+
+After clearing selections in the UI:
+
+```text
+[]
+```
+
+After selecting new values:
+
+```text
+['Banana', 'Cherry']
+```
+
+---
+
+## Live Demo
+
+You can try the MultiSelect widget directly in this interactive example:
+
+<MercuryDemo
+iframeSrc="https://demo.ismvp.org/mercury/multiselect-basic?no-navbar"
+notebookUrl="https://demo.ismvp.org/mercury/multiselect-basic"
+/>
+
+```
+
