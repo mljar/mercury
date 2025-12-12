@@ -72,6 +72,15 @@ export default defineConfig({
                   label: "Documentation",
                   slug: "docs"
                 },
+                {
+                  label: "Installation",
+                  slug: "docs/install"
+                },
+                {
+                  label: "Quick Start",
+                  slug: "docs/quickstart"
+                },
+                
                 { label: 'Input Widgets', autogenerate: { directory: 'docs/input' } },
                 { label: 'Input Widgets 2', autogenerate: { directory: 'docs/widgets/input' } },
                 { label: 'Output Widgets', autogenerate: { directory: 'docs/widgets/output' } },

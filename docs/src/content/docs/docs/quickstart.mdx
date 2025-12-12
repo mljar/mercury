@@ -1,0 +1,82 @@
+---
+title: Quick Start
+description: Quick start into Mercury framework 
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import { Aside } from '@astrojs/starlight/components';
+
+import noNotebooksImg from "../../../assets/quickstart/no-notebooks.png"
+import liveAppPreviewImg from "../../../assets/quickstart/live-app-preview.png"
+import oneNotebookImg from "../../../assets/quickstart/one-notebook.png"
+import simpleAppImg from "../../../assets/quickstart/simple-app.png"
+
+Mercury detects all Python notebooks available in the current directory and serve them as web apps. Please run the following command to start server:
+
+<Code code={`mercury`} lang='bash' title='Start Mercury Server'/>
+
+It should open a web page at `localhost:8888` with information that no notebooks found if there are no notebooks (`*.ipynb` files) in the current directory you should see 
+
+<Image 
+  src={noNotebooksImg} 
+  alt="Mercury with no notebooks" 
+  class="docs-image-100"
+/>
+
+## Create a notebook
+
+Let's create a first notebook with `TextInput` widget. The notebook will ask for user name and display welcome message.
+
+```python
+# first cell with imports
+from mercury import TextInput
+```
+
+```python
+# create interactive widget
+name = TextInput(label="What is yout name?")
+```
+
+```python
+# display widget value
+print(f"Hey {name.value}!")
+```
+
+## Live preview
+
+In **MLJAR Studio** or **JupyterLab** editor please click on confetti icon in the top toolbar to open a live app preview.
+
+<Image 
+  src={liveAppPreviewImg} 
+  alt="Mercury with no notebooks" 
+  class="docs-image-100"
+/>
+
+<Aside type="note" title="Cell re-execution in live app preview">
+Mercury automatically re-execute cells below updated widget. This feature is available only when serving notebooks with Mercury or when live preview is open during development.
+</Aside>
+
+## Start server
+
+Start a server with command:
+
+```bash
+mercury
+```
+
+You should see a card with notebook. The title in the card will be the same as notebook filename.
+
+<Image 
+  src={oneNotebookImg} 
+  alt="Mercury serving one notebook" 
+  class="docs-image-100"
+/>
+
+
+
+<Image 
+  src={simpleAppImg} 
+  alt="Mercury with no notebooks" 
+  class="docs-image-100"
+/>
