@@ -1,9 +1,67 @@
 ---
 title: Cloud Deployment
-description: How to deploy Python notebooks as Mercury web apps using Mercury cloud service
+description: How to deploy Python notebooks as Mercury web applications using the Mercury Cloud service
 ---
 
-import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
 
+Deploying Mercury apps in the cloud is the **simplest and fastest** way to share your notebooks as web applications.  
+The Mercury Cloud service takes care of servers, configuration, and infrastructure, so you can focus entirely on your notebooks and your users.
 
-cloud
+Below is a step-by-step guide that walks you through the entire process.
+
+--- 
+
+<Steps>
+
+1. **Create an account**
+
+   Start by creating an account at  
+   [platform.mljar.com](https://platform.mljar.com).
+
+   This account will be used to manage your Mercury applications, deployments, and secrets in one place.
+
+2. **Open the Pages section**
+
+   After logging in, navigate to the **Pages** section in the dashboard.
+
+   Pages are used to host Mercury applications and control how they are deployed and exposed to users.
+
+3. **Create a new site**
+
+   Click **Create new site** and choose a name for your application.  
+   This site will represent a single Mercury web app.
+
+4. **Upload your files**
+
+   Upload all files required by your application. This typically includes:
+
+   - Jupyter notebooks (`.ipynb`) with Mercury apps
+   - Data files such as `.csv` or `.xls`
+   - A `requirements.txt` file with additional Python dependencies
+   - A `config.toml` file with Mercury configuration (optional)
+
+   Once uploaded, Mercury Cloud will automatically prepare the environment for your app.
+
+5. **Define secrets (optional)**
+
+   In the **Pages** view, you can define **secrets** for your application.
+
+   Secrets are a safe place to store sensitive information such as:
+   - database connection strings,
+   - API keys,
+   - access tokens,
+   - or credentials required by external services.
+
+   These values are never exposed in your notebooks or source files. 
+   Notebooks access them as environment variables.
+
+</Steps>
+
+---
+
+That's it!  
+After completing these steps, your Mercury application will be built and deployed in the cloud, ready to be shared with others.
+
+If something is unclear or you need help, do not worry - we are happy to assist 🙂
+
