@@ -1,23 +1,54 @@
 ---
 title: Mercury Deployment
-description: How to deploy Python notebooks as Mercury web apps
+description: How to deploy Python notebooks as Mercury web applications
 ---
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
-import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
-Mercury web apps can be easily deployed. 
+Mercury allows you to turn Python notebooks into fully interactive web applications and deploy them with very little effort.  
+Depending on your needs, you can choose between **self-hosting** or using a **managed cloud service**.
+
+This section of the documentation explains the available deployment options and helps you decide which one best fits your use case.
+
+---
 
 <CardGrid>
   <LinkCard
     title="Docker"
     href="/deploy/dockerfile/"
-    description="Self hosting with Docker."
+    description="Run Mercury as a self-hosted web application using Docker containers. Ideal for local environments, on-premise servers, and custom infrastructure."
   />
   <LinkCard
     title="Cloud"
     href="/deploy/cloud/"
-    description="Host with MLJAR Cloud service."
+    description="Deploy Mercury notebooks using the managed MLJAR Cloud service. The easiest way to publish apps without managing servers or infrastructure."
   />
 </CardGrid>
+
+
+### Which option should you choose?
+
+- **Docker deployment** is recommended if you want full control over the environment, need to run Mercury on your own infrastructure, or prefer a reproducible setup for development and production.
+- **Cloud deployment** is the simplest option if you want to focus on your notebooks and users, without dealing with servers, Docker images, or configuration.
+
+Both approaches allow you to deploy the same Mercury notebooks — only the hosting method differs.
+
+
+### Need help with deployment?
+
+If you have questions, encounter issues, or something does not work as expected, please **create an issue** in the Mercury repository.  
+We actively monitor issues and are happy to help.
+
+If you need help with **more advanced setups** — for example:
+- deploying Mercury inside your company infrastructure,
+- running it behind authentication or a proxy,
+- integrating it with existing systems,
+- or preparing a production-ready environment,
+
+we also offer **paid support and consulting**.
+
+<Aside type="tip">
+We are friendly people, we know Mercury very well, and we genuinely enjoy helping users deploy it successfully.  
+If you need hands-on help, just reach out - we will take care of the technical part 🙂
+</Aside>
