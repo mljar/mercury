@@ -1,0 +1,220 @@
+---
+title: Slider
+description: How to use the Slider widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **Slider** widget allows users to select a **numeric value from a range** by dragging a slider handle.
+It is commonly used for thresholds, limits, percentages, and other numeric parameters in a Mercury App.
+
+
+## Import
+
+<Code code={`from mercury import Slider`} lang="python" />
+
+## Usage
+
+To create a Slider widget, you define the numeric range using `min` and `max`.
+You can optionally provide an initial `value`.
+
+If no `value` is provided, the slider **defaults to the minimum value**.
+
+### Basic Example
+
+**Code**
+
+```python
+threshold = Slider(
+    label="Threshold",
+    min=0,
+    max=10
+)
+````
+
+In this example, the initial value will be:
+
+```python
+0
+```
+
+
+### Default Value
+
+You can explicitly define the initial slider position using the `value` argument.
+
+**Code**
+
+```python
+threshold = Slider(
+    label="Threshold",
+    min=0,
+    max=10,
+    value=3
+)
+```
+
+If the provided value is outside the `[min, max]` range, it is **automatically clamped**.
+
+
+### Layout
+
+Use the `position` argument to control where the widget is displayed.
+The default is `position="sidebar"`, which renders the widget in the left sidebar.
+
+Other available values are:
+
+* `"inline"` — displays the widget directly in the notebook output,
+* `"bottom"` — displays the widget after all notebook cells.
+
+**Code**
+
+```python
+alpha = Slider(
+    label="Alpha",
+    min=0,
+    max=100,
+    position="inline"
+)
+```
+
+
+## Slider Props
+
+### label
+
+**type:** `string`
+Text displayed above the slider.
+The default is `"Select number"`.
+
+---
+
+### value
+
+**type:** `int | None`
+
+Initial slider value.
+
+* If `None` or omitted, the value defaults to `min`.
+* If the value is outside the `[min, max]` range, it is clamped automatically.
+
+The value is always an integer.
+
+---
+
+### min
+
+**type:** `int`
+
+Minimum allowed value.
+The default is `0`.
+
+---
+
+### max
+
+**type:** `int`
+
+Maximum allowed value.
+The default is `100`.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the slider is visible but cannot be interacted with.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+
+This is useful for internal state management.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different <code>key</code> is specified.
+
+The <code>key</code> value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Behavior Notes
+
+* The slider value is always an **integer**.
+* If no value is provided, the slider starts at `min`.
+* Values outside the `[min, max]` range are clamped automatically.
+* The current value is always available via `.value`.
+* The slider track length remains constant, regardless of how many digits the value has.
+
+---
+
+### Example
+
+```python
+steps = Slider(
+    label="Number of steps",
+    min=1,
+    max=20,
+    value=5
+)
+
+steps.value
+```
+
+**Output**
+
+```text
+5
+```
+
+After user interaction:
+
+```text
+12
+```
+
+---
+
+## Live Demo
+
+You can try the Slider widget directly in this interactive example:
+
+<MercuryDemo
+iframeSrc="https://demo.ismvp.org/mercury/slider-basic?no-navbar"
+notebookUrl="https://demo.ismvp.org/mercury/slider-basic"
+/>
+
+```
+
+
