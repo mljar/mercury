@@ -1,0 +1,182 @@
+---
+import { Code } from "astro/components";
+
+export interface Props {
+  cells: string[];
+  lang?: "python" | "js" | "ts" | "astro" | "css";
+  title?: string;
+}
+
+const {
+  cells,
+  lang = "python",
+  theme = "poimandres",
+  title = "notebook.ipynb",
+} = Astro.props as Props;
+---
+
+<section class="nbw" aria-label="Notebook window">
+  <header class="nbw__bar">
+    <div class="nbw__dots">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="nbw__title">{title}</div>
+  </header>
+
+  <div class="nbw__body">
+    <div class="nbw__codeCol">
+      {cells.map((cell, i) => (
+        <article class="nbw__cell">
+          <div class="nbw__prompt">[{i + 1}]:</div>
+          <div class="nbw__code">
+            <Code lang={lang} code={cell.trim()} />
+          </div>
+        </article>
+      ))}
+    </div>
+
+
+  </div>
+</section>
+
+<style>
+.nbw {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: #ffffff;
+  color: #0f172a;
+
+
+  /* ✨ Blue ambient glow */
+  box-shadow:
+    0 40px 90px rgba(56, 189, 248, 0.1),
+    0 0 0 1px rgba(148, 163, 184, 0.1);
+
+  overflow: hidden;
+
+}
+
+.nbw__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.9);
+
+  background: linear-gradient(
+    to right,
+    #eef5ff,
+    #f8fafc
+  );
+
+  font-size: 12px;
+}
+
+.nbw__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.nbw__dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #cbd5f5;
+}
+
+.nbw__dots span:nth-child(1) {
+  background: #ff5f57; /* red */
+}
+.nbw__dots span:nth-child(2) {
+  background: #febc2e; /* yellow */
+}
+.nbw__dots span:nth-child(3) {
+  background: #28c840; /* green */
+}
+
+.nbw__title {
+  font-size: 12px;
+  color: #1e293b;
+}
+
+/* Wider interior layout */
+.nbw__body {
+  padding: 18px 22px 22px;
+  display: grid;
+  grid-template-columns: 1fr; /* only code column now */
+  
+  background: #ffffff;
+}
+
+/* Code column layout */
+.nbw__codeCol {
+  display: grid;
+  gap: 14px;
+}
+
+/* 👇 Softer, smaller prompts */
+.nbw__cell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  align-items: start;
+}
+
+.nbw__prompt {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+
+  /* softer light green */
+  color: #4db6ac;
+
+  padding-top: 4px;
+  letter-spacing: -0.3px;
+}
+
+/* LIGHT MODE code cells */
+.nbw__code :global(pre) {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.48;
+
+  /* Light cell */
+  background: #f8fafc;                  /* light soft background */
+  color: #1e293b;                       /* dark readable text */
+
+  border-radius: 14px;
+  padding: 12px 14px;
+
+  /* soft inner glow */
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 4px 14px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(203, 213, 225, 0.5);
+  
+}
+.nbw__code {
+  text-align: left;
+  justify-self: start;
+}
+
+.nbw__cell {
+  width: 100%;
+}
+
+.nbw__code {
+  width: 100%;
+}
+
+.nbw__code :global(pre) {
+  width: 100%;
+  display: block;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .nbw {
+    transform: none;
+  }
+}
+</style>

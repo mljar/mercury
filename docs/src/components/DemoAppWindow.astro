@@ -1,0 +1,254 @@
+---
+export interface Props {
+  url?: string;
+}
+
+const { url = "localhost:8000/app" } = Astro.props as Props;
+---
+
+<section class="daw" aria-label="Mercury app demo">
+  <header class="daw__bar">
+    <div class="daw__dots">
+      <span></span><span></span><span></span>
+    </div>
+    <!-- URL pill moved next to dots on the left -->
+    <div class="daw__url" title={url}>{url}</div>
+    <div class="daw__spacer"></div>
+  </header>
+
+  <div class="daw__body">
+    <aside class="daw__sidebar">
+      <div class="daw__field">
+        <label for="demo-greet">Greetings</label>
+        <select id="demo-greet" class="daw__input daw__select">
+          <option>Hello</option>
+          <option>Cześć</option>
+          <option>Ciao</option>
+        </select>
+      </div>
+
+      <div class="daw__field">
+        <label for="demo-name">What is your name?</label>
+        <input
+          id="demo-name"
+          class="daw__input"
+          value="Aleksandra"
+          autocomplete="off"
+        />
+      </div>
+    </aside>
+
+    <main class="daw__main">
+      <h2 class="daw__greeting" id="demo-greeting">
+        Hello Aleksandra! 👋
+      </h2>
+      <p class="daw__text">
+        Easily share your discoveries with Mercury 🎉
+      </p>
+    </main>
+  </div>
+</section>
+
+<script is:inline>
+  (function () {
+    const greetEl = document.getElementById("demo-greet");
+    const nameEl = document.getElementById("demo-name");
+    const outEl = document.getElementById("demo-greeting");
+    if (!greetEl || !nameEl || !outEl) return;
+
+    function render() {
+      const greet = greetEl.value || "Hello";
+      const name = (nameEl.value || "").trim() || "World";
+      outEl.textContent = greet + " " + name + "! 👋";
+    }
+
+    greetEl.addEventListener("change", render);
+    nameEl.addEventListener("input", render);
+    nameEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") render();
+    });
+
+    render();
+  })();
+</script>
+
+<style>
+.daw {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: radial-gradient(circle at top center,
+      rgba(191, 219, 254, 0.45),
+      #ffffff 40%,
+      #f3f4f6 90%);
+  color: #0f172a;
+  box-shadow:
+    0 40px 90px rgba(56, 189, 248, 0.1),
+    0 0 0 1px rgba(148, 163, 184, 0.1);
+  overflow: hidden;
+}
+
+/* Top bar */
+.daw__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.9);
+  background: linear-gradient(
+    to right,
+    #eef5ff,
+    #f8fafc
+  );
+  font-size: 12px;
+}
+
+.daw__dots {
+  display: flex;
+  gap: 6px;
+}
+
+/* macOS traffic lights */
+.daw__dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.daw__dots span:nth-child(1) {
+  background: #ff5f57; /* red */
+}
+.daw__dots span:nth-child(2) {
+  background: #febc2e; /* yellow */
+}
+.daw__dots span:nth-child(3) {
+  background: #28c840; /* green */
+}
+
+.daw__spacer {
+  flex: 1;
+}
+
+.daw__url {
+  font-size: 11px;
+  padding: 4px 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+/* Layout */
+.daw__body {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 220px;
+  background: #ffffff;
+}
+
+.daw__sidebar {
+  padding: 26px 26px;
+  border-right: 1px solid rgba(203, 213, 225, 0.8);
+  background: #ffffff;
+  display: grid;
+  gap: 20px;
+}
+
+.daw__field {
+  display: grid;
+  gap: 0px;
+}
+
+/* Labels – above input, left-aligned */
+.daw__field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b6070;
+  display: block;
+  text-align: left;
+}
+
+/* Blueprint-like input / select */
+.daw__input {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ced9e0;
+  background-color: #ffffff;
+  color: #182026;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 7px 9px;
+  outline: none;
+  box-shadow:
+    inset 0 0 0 0 rgba(16, 22, 26, 0),
+    0 0 0 0 rgba(19, 124, 189, 0);
+  transition:
+    border-color 0.12s ease-out,
+    box-shadow 0.12s ease-out,
+    background-color 0.12s ease-out;
+}
+
+.daw__input::placeholder {
+  color: #a7b6c2;
+}
+
+.daw__input:hover {
+  border-color: #a7b6c2;
+}
+
+.daw__input:focus {
+  border-color: #137cbd;
+  box-shadow: 0 0 0 1px #137cbd;
+}
+
+/* Select arrow */
+.daw__select {
+  appearance: none;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #5c7080 50%),
+    linear-gradient(-45deg, transparent 50%, #5c7080 50%);
+  background-position:
+    calc(100% - 16px) 48%,
+    calc(100% - 10px) 48%;
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* Right column */
+.daw__main {
+  padding: 34px 32px;
+  background: #ffffff;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+
+.daw__greeting {
+  font-size: 26px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.daw__text {
+  font-size: 15px;
+  color: #475569;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .daw__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .daw__sidebar {
+    border-right: none;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.8);
+  }
+
+  .daw__main {
+    padding: 20px 18px 24px;
+  }
+}
+</style>

@@ -12,6 +12,10 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Mercury',
+      components: {
+        // Overrides components
+        Hero: './src/components/CustomHero.astro',
+      },
       customCss: ['./src/styles/custom.css'],
       plugins: [
         starlightLlmsTxt(),

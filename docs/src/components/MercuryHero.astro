@@ -1,0 +1,97 @@
+---
+import NotebookWindow from "./NotebookWindow.astro";
+import DemoAppWindow from "./DemoAppWindow.astro";
+
+const notebookCells = [
+  `from mercury import TextInput, Select, Markdown`,
+  `greet = Select(label="Greetings", 
+               choices=["Hello", "Cześć", "Ciao"])
+name = TextInput(label="What is your name?")`,
+  `Markdown(f"""
+## {greet.value} {name.value}! 👋
+Easily share your discoveries with Mercury 🎉
+""")`,
+];
+
+const url = "localhost:8888/app";
+---
+
+<section class="mh-hero" aria-label="Mercury notebook & app hero">
+  <div class="mh-hero__inner">
+    <div class="mh-hero__notebook">
+      <NotebookWindow cells={notebookCells} />
+    </div>
+
+    <div class="mh-hero__app">
+      <DemoAppWindow url={url} />
+    </div>
+  </div>
+</section>
+
+<style>
+
+.mh-hero {
+  position: relative;
+  padding-top: 3rem;
+}
+
+.mh-hero__inner {
+  position: relative;
+  max-width: 64rem;   /* a bit narrower than 80rem */
+  margin: 0 auto;
+  min-height: 23rem;
+}
+
+.mh-hero__notebook,
+.mh-hero__app {
+  position: absolute;
+  inset: 0;
+}
+
+/* back notebook window – move to the LEFT */
+.mh-hero__notebook {
+  transform: translate(-20%, -6%) scale(1.02);
+  z-index: 1;
+}
+
+/* front app window – move to the RIGHT */
+.mh-hero__app {
+  transform: translate(20%, 32%);
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .mh-hero {
+    padding-top: 1.75rem;
+    padding-bottom: 2rem;
+    padding-inline: 1rem;         /* some side breathing room */
+  }
+
+  .mh-hero__inner {
+    min-height: auto;
+    max-width: 24rem;             /* keep hero narrow on mobile */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;                 /* smaller gap between notebook & app */
+  }
+
+  .mh-hero__notebook,
+  .mh-hero__app {
+    position: static;             /* stack vertically */
+    inset: auto;
+    transform: none;              /* no overlap on mobile */
+    width: 100%;
+  }
+
+  /* ✂️ actually scale the windows down */
+  .mh-hero__notebook :global(.nbw),
+  .mh-hero__app :global(.daw) {
+    transform: scale(0.86);       /* try 0.8–0.9 if you want more/less */
+    transform-origin: top center;
+  }
+}
+
+
+</style>
