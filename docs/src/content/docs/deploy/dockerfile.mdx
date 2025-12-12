@@ -1,0 +1,135 @@
+---
+title: Docker Deployment
+description: How to deploy Python notebooks as Mercury web applications using Docker containers
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+This guide explains how to run **Mercury** as a web application using **Docker**.  
+Docker allows you to package Mercury together with Python and all dependencies, making deployment predictable and reproducible across different machines.
+
+## Create a Dockerfile
+
+Start by creating a file named `Dockerfile` in your project directory.
+
+The following Dockerfile uses a lightweight Python image, installs Mercury, and starts the Mercury server on port `8888`.
+
+<Code
+  code={`
+FROM python:3.12-slim
+
+# Install Mercury
+RUN pip install mercury==3.0.0a2
+
+# You can also install needed packages here, 
+# For example install pandas
+# RUN pip install pandas
+
+# Directory where notebooks will be mounted
+WORKDIR /workspace
+
+# Mercury default port
+EXPOSE 8888
+
+# Start Mercury server
+CMD ["mercury", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
+`}
+  lang="docker"
+  title="Dockerfile"
+/>
+
+<Aside type="note" title="Workspace directory">
+The <code>/workspace</code> directory is important.  
+Your local notebooks directory will be mounted there so Mercury can discover and serve your notebooks.
+</Aside>
+
+
+## Docker commands
+
+Below are the most common Docker commands you will need when working with the Mercury container.
+
+### Build the Docker image
+
+Build the Docker image from the `Dockerfile` and tag it as `mercury-server`:
+
+```bash
+docker build -t mercury-server .
+````
+
+This command only needs to be run again if you change the Dockerfile code.
+
+### Run the container (foreground mode)
+
+This mode is useful during development.
+The container runs in the foreground and is automatically removed when you stop it.
+
+```bash
+docker run --rm -it \
+  -p 8888:8888 \
+  -v /my/directory/with/notebooks:/workspace \
+  mercury-server
+```
+
+After starting, open your browser and navigate to:
+
+```
+http://localhost:8888
+```
+
+<Aside type="note" title="Mount notebooks directory">
+The <code>-v</code> option mounts your local notebooks directory `/my/directory/with/notebooks` into the container.  
+</Aside>
+
+### Run the container (background mode)
+
+For longer-running sessions or server-like usage, run Mercury in detached mode by adding `-d` flag:
+
+```bash
+docker run -d --name mercury-server \
+  -p 8888:8888 \
+  -v /my/directory/with/notebooks:/workspace \
+  mercury-server
+```
+
+The container will continue running in the background until you stop it explicitly.
+
+### View container logs
+
+To inspect Mercury logs or verify that the server started correctly:
+
+```bash
+docker logs -f mercury-server
+```
+
+Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to stop following the logs.
+
+### Open a shell inside the container (debugging)
+
+If you need to inspect the container environment or verify mounted files:
+
+```bash
+docker exec -it mercury-server /bin/sh
+```
+
+For example, you can list mounted notebooks:
+
+```bash
+ls -la /workspace
+```
+
+### Stop the container
+
+If Mercury is running in background mode, stop it with:
+
+```bash
+docker stop mercury-server
+```
+
+### Stop and remove the container
+
+To stop and remove the container in a single command:
+
+```bash
+docker rm -f mercury-server
+```

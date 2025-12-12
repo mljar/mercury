@@ -85,7 +85,7 @@ export default defineConfig({
                 { label: 'Input Widgets 2', autogenerate: { directory: 'docs/widgets/input' } },
                 { label: 'Output Widgets', autogenerate: { directory: 'docs/widgets/output' } },
               ]
-            ,
+  
           },
           {
             label: 'Examples',
@@ -108,7 +108,10 @@ export default defineConfig({
             link: 'deploy',
             icon: 'rocket',
             items: [
-              { label: 'Get started tut', slug: 'deploy' }
+              { label: 'Get started', slug: 'deploy' },
+              { label: 'Dockerfile', slug: 'deploy/dockerfile' },
+              { label: 'Cloud', slug: 'deploy/cloud' },
+              
             ],
           },
         ]),
