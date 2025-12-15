@@ -107,17 +107,14 @@ def NumberInput(
         warnings.warn("\nNumberInput: `value` is out of range. Clamping to [min, max].")
         value_f = max(min_f, min(value_f, max_f))
 
-    args = [label, value_f, min_f, max_f, step_f, position, disabled, hidden, key]
+    args = [label, value_f, min_f, max_f, step_f, position]
     kwargs = {
         "label": label,
         "value": value_f,
         "min": min_f,
         "max": max_f,
         "step": step_f,
-        "position": position,
-        "disabled": disabled,
-        "hidden": hidden,
-        "key": key,
+        "position": position
     }
 
     code_uid = WidgetsManager.get_code_uid("NumberInput", key=key, args=args, kwargs=kwargs)

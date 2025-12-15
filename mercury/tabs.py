@@ -118,7 +118,45 @@ def _ensure_global_tabs_styles():
 # ---------- Public API ----------
 def Tabs(labels=("Tab 1", "Tab 2"), active=0, key=""):
     """
-    Create a tabbed container with one ipywidgets.Output per tab.
+    Create a tabbed container with one output area per tab.
+
+    This helper renders a tab header and a content panel area.
+    Each tab is associated with an `ipywidgets.Output` object,
+    which can be written to using a `with` block.
+
+    Parameters
+    ----------
+    labels : tuple[str] or list[str], optional
+        Labels displayed in the tab header.
+        Each label creates one tab and one output panel.
+        Default is ("Tab 1", "Tab 2").
+
+    active : int, optional
+        Index (0-based) of the tab that is active initially.
+        If out of range, it is clamped to a valid index.
+        Default is 0.
+
+    key : str, optional
+        Unique identifier used to distinguish Tabs instances
+        with identical arguments. Required when Tabs are
+        created inside loops.
+
+    Returns
+    -------
+    tuple[ipywidgets.Output, ...]
+        A tuple of output widgets, one per tab.
+        Write content into a tab using:
+
+        >>> tabs = mr.Tabs(["A", "B"])
+        >>> with tabs[0]:
+        ...     print("Content for tab A")
+
+    Notes
+    -----
+    - Only one tab panel is visible at a time.
+    - Switching tabs does not clear their contents.
+    - Tabs are cached and reused between cell re-runs
+      unless a different `key` is provided.
     """
     _ensure_global_tabs_styles()
 

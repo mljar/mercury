@@ -1,0 +1,111 @@
+---
+
+title: Expander
+description: How to use the Expander helper in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **Expander** helper lets you hide and show a block of content under a clickable header.
+It is useful for optional settings, advanced parameters, explanations, or details that should not be visible by default.
+
+`mr.Expander()` returns an output area, so you can write content into it using a `with` block.
+
+## Usage
+
+Call `mr.Expander()` to create an expander section.
+The function returns an output widget you can write into.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+details = mr.Expander(label="Details")
+
+with details:
+    print("Hidden content")
+```
+
+
+### Expanded by Default
+
+Use `expanded=True` to open the expander on first render.
+
+**Code**
+
+```python
+import mercury as mr
+
+details = mr.Expander(
+    label="Advanced settings",
+    expanded=True
+)
+
+with details:
+    print("Shown immediately")
+```
+
+
+### Common Pattern: Advanced Options
+
+**Code**
+
+```python
+import mercury as mr
+
+# Basic controls
+name = mr.TextInput(label="Name")
+
+# Advanced section
+advanced = mr.Expander(label="Advanced")
+
+with advanced:
+    threshold = mr.NumberInput(label="Threshold", value=0.5, min=0.0, max=1.0, step=0.05)
+    refresh = mr.Checkbox(label="Auto-refresh")
+```
+
+
+## Expander Props
+
+### label
+
+**type:** `string`
+
+Text displayed in the expander header.
+The default is `"Details"`.
+
+---
+
+### expanded
+
+**type:** `bool`
+
+If `True`, the expander starts in the open state.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish expanders with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous expander instance unless a different `key` is specified.
+
+The `key` value is required when expanders are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* `mr.Expander()` returns an output area. Put content inside using `with`.
+* The expander uses a single unified border and smooth open/close animation.
+* Use expanders for optional or advanced settings to keep the UI clean.

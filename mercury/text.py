@@ -50,14 +50,11 @@ def TextInput(
         The created or retrieved TextInput widget instance.
     """
 
-    args = [label, value, position, disabled, hidden, key]
+    args = [label, value, position]
     kwargs = {
         "label": label,
         "value": value,
-        "position": position,
-        "disabled": disabled,
-        "hidden": hidden,
-        "key": key,
+        "position": position
     }
 
     code_uid = WidgetsManager.get_code_uid("TextInput", key=key, args=args, kwargs=kwargs)

@@ -109,16 +109,13 @@ def Slider(
         warnings.warn("\nSlider: `value` is out of range. Clamping to [min, max].")
         value_int = max(min_int, min(value_int, max_int))
 
-    args = [label, value_int, min_int, max_int, position, disabled, hidden, key]
+    args = [label, value_int, min_int, max_int, position]
     kwargs = {
         "label": label,
         "value": value_int,
         "min": min_int,
         "max": max_int,
-        "position": position,
-        "disabled": disabled,
-        "hidden": hidden,
-        "key": key,
+        "position": position
     }
 
     code_uid = WidgetsManager.get_code_uid("Slider", key=key, args=args, kwargs=kwargs)

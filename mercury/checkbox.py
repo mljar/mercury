@@ -35,15 +35,12 @@ def Checkbox(
     False
     """
 
-    args = [label, bool(value), appearance, position, disabled, hidden, key]
+    args = [label, bool(value), appearance, position]
     kwargs = {
         "label": label,
         "value": bool(value),
         "appearance": appearance,
-        "position": position,
-        "disabled": disabled,
-        "hidden": hidden,
-        "key": key,
+        "position": position
     }
 
     code_uid = WidgetsManager.get_code_uid("Checkbox", key=key, args=args, kwargs=kwargs)

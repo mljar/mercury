@@ -1,3 +1,6 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+ 
 import anywidget
 import traitlets
 import ipywidgets as widgets
@@ -17,7 +20,6 @@ def _ensure_global_expander_styles():
         overflow: hidden;
       }}
 
-      /* Streamlit-like expander transition */
       .mljar-expander-content {{
         width: 100%;
         position: relative;
@@ -80,10 +82,18 @@ def _ensure_global_expander_styles():
 
 def Expander(label="Details", expanded=False, key=""):
     """
-    Displays an expander with one unified border and smooth animation.
+    Create and display an Expander.
 
-    IMPORTANT: We DO NOT display() on the cached path to avoid duplicates.
-    Use a stable `key` to make re-runs reuse the same cached instance.
+    The function returns an `ipywidgets.Output` that you can write into:
+
+    >>> out = mr.Expander("Details")
+    >>> with out:
+    ...     print("Hello")
+
+    Notes
+    -----
+    - Uses caching via WidgetsManager (stable `key` recommended).
+    - Styling is injected once globally (theme-aware).
     """
     _ensure_global_expander_styles()
 

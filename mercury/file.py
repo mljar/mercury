@@ -95,15 +95,12 @@ def UploadFile(
     ...     print(f.name, len(f.value))
     """
 
-    args = [label, max_file_size, multiple, position, disabled, hidden, key]
+    args = [label, max_file_size, multiple, position]
     kwargs = {
         "label": label,
         "max_file_size": max_file_size,
         "multiple": multiple,
-        "position": position,
-        "disabled": disabled,
-        "hidden": hidden,
-        "key": key,
+        "position": position
     }
 
     code_uid = WidgetsManager.get_code_uid("UploadFile", key=key, args=args, kwargs=kwargs)

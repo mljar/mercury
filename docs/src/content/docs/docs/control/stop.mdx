@@ -1,0 +1,87 @@
+---
+title: Stop
+description: How to stop execution in a Mercury App with mr.Stop
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **Stop** helper lets you stop executing a notebook cell **silently** inside a Mercury App.
+It is useful for early exits like validation, missing inputs, or conditional flows (for example: stop until the user uploads a file).
+
+## Usage
+
+Call `mr.Stop()` to stop execution immediately.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+x = 0
+if x == 0:
+    mr.Stop()
+
+print("This line will not run")
+```
+
+
+### Typical Pattern: Stop until a widget has a value
+
+This is a common pattern in Mercury Apps: render a widget, and stop execution until the user provides input.
+
+**Code**
+
+```python
+import mercury as mr
+
+uploader = mr.UploadFile(label="Upload CSV")
+
+if uploader.value is None:
+    mr.Stop()
+
+print("File uploaded:", uploader.name)
+```
+
+
+### Validation Guard
+
+Use `mr.Stop()` to prevent running expensive code when inputs are invalid.
+
+**Code**
+
+```python
+import mercury as mr
+
+threshold = mr.NumberInput(label="Threshold", value=0.5, min=0.0, max=1.0, step=0.05)
+
+if threshold.value < 0.2:
+    # too small — stop here
+    mr.Stop()
+
+print("Running with threshold:", threshold.value)
+```
+
+
+## API
+
+### mr.Stop()
+
+Stops execution of the current notebook cell.
+
+* It raises an internal exception used only for flow control.
+* It does **not** show a traceback.
+* It does **not** display an error message.
+
+---
+
+## Notes
+
+* `mr.Stop()` is intended for **control flow**, not for error handling.
+* If you need to show a message to the user, display it **before** calling `mr.Stop()`.
+
+<Aside>
+`mr.Stop()` stops only the current execution flow. When the user changes a widget, Mercury may re-run the notebook, and execution can continue once your condition is satisfied.
+</Aside>

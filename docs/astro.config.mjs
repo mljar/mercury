@@ -82,7 +82,8 @@ export default defineConfig({
                 },
                 
                 { label: 'Input Widgets', autogenerate: { directory: 'docs/input' } },
-                { label: 'Input Widgets 2', autogenerate: { directory: 'docs/widgets/input' } },
+                { label: 'Layout', autogenerate: { directory: 'docs/layout' } },
+                { label: 'Control', autogenerate: { directory: 'docs/control' } },
                 { label: 'Output Widgets', autogenerate: { directory: 'docs/widgets/output' } },
               ]
   
