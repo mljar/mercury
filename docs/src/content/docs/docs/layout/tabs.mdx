@@ -5,11 +5,22 @@ description: How to use the Tabs helper in the interactive Mercury App
 
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
 The **Tabs** helper lets you organize content into multiple tabs, showing one panel at a time.
 It is useful for dashboards, comparisons, multi-step outputs, or grouping related results without cluttering the UI.
 
 `mr.Tabs()` returns a tuple of output areas — one per tab.
+
+## Live Demo
+
+You can check the `Tabs` widget directly in this interactive example:
+
+<MercuryDemo
+  iframeSrc="https://demo.ismvp.org/mercury/layout-widgets?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/layout-widgets.ipynb"
+/> 
+
 
 ## Usage
 

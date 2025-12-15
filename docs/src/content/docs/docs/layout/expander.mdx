@@ -6,11 +6,22 @@ description: How to use the Expander helper in the interactive Mercury App
 
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
 The **Expander** helper lets you hide and show a block of content under a clickable header.
 It is useful for optional settings, advanced parameters, explanations, or details that should not be visible by default.
 
 `mr.Expander()` returns an output area, so you can write content into it using a `with` block.
+
+## Live Demo
+
+You can check the `Expander` widget directly in this interactive example:
+
+<MercuryDemo
+  iframeSrc="https://demo.ismvp.org/mercury/layout-widgets?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/layout-widgets.ipynb"
+/> 
+
 
 ## Usage
 

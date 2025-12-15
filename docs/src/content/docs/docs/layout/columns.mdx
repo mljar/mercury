@@ -5,11 +5,22 @@ description: How to create responsive column layouts in a Mercury App
 
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
 The **Columns** helper lets you create a responsive row of output areas (columns) inside a Mercury App.
 It is useful for building dashboards, side-by-side comparisons, charts grids, or multi-panel layouts.
 
 Each column is returned as an `Output` widget, so you can write into it using a `with` block.
+
+## Live Demo
+
+You can check the `Columns` widget directly in this interactive example:
+
+<MercuryDemo
+  iframeSrc="https://demo.ismvp.org/mercury/layout-widgets?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/layout-widgets.ipynb"
+/> 
+
 
 ## Usage
 
