@@ -81,10 +81,12 @@ export default defineConfig({
                   slug: "docs/quickstart"
                 },
                 
-                { label: 'Input Widgets', autogenerate: { directory: 'docs/input' } },
+                { label: 'Chat', autogenerate: { directory: 'docs/chat' } },
+                { label: 'Input', autogenerate: { directory: 'docs/input' } },
+                { label: 'Output', autogenerate: { directory: 'docs/widgets/output' } },
                 { label: 'Layout', autogenerate: { directory: 'docs/layout' } },
                 { label: 'Control', autogenerate: { directory: 'docs/control' } },
-                { label: 'Output Widgets', autogenerate: { directory: 'docs/widgets/output' } },
+                
               ]
   
           },

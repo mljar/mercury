@@ -143,6 +143,44 @@ export default { render };
 
 
 class Chat:
+    """
+    Chat container that displays Message widgets and auto-scrolls
+    to the most recent message.
+
+    The Chat widget manages a vertical list of Message instances and ensures
+    that newly added messages are brought into view automatically.
+
+    Scrolling behavior is implemented via an internal `ScrollHelper`
+    anywidget that runs frontend JavaScript. The Chat itself does not
+    create its own scrollbar — scrolling happens in the surrounding
+    application or page container.
+
+    Usage
+    -----
+    >>> chat = mr.Chat()
+    >>> chat.add(mr.Message("Hello"))
+    >>> chat.add(mr.Message("How can I help you?"))
+
+    API
+    ---
+    - add(message): append a Message and scroll to it
+    - clear(): remove all messages and show the placeholder
+
+    Parameters
+    ----------
+    placeholder : str, optional
+        Text displayed when the chat contains no messages.
+    scroll_container_selector : str, optional
+        CSS selector used to locate the preferred scrollable container
+        (defaults to the Mercury main panel).
+
+    Notes
+    -----
+    - The Chat widget does not manage message layout details;
+      each message is responsible for its own rendering.
+    - Auto-scrolling is resilient to large outputs (plots, images)
+      and waits briefly for layout stabilization before scrolling.
+    """
     def __init__(
         self,
         placeholder: str = "💬 No messages yet. Start the conversation!",

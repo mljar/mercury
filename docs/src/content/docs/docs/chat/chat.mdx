@@ -1,0 +1,211 @@
+---
+title: Columns
+description: How to create responsive column layouts in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **Columns** helper lets you create a responsive row of output areas (columns) inside a Mercury App.
+It is useful for building dashboards, side-by-side comparisons, charts grids, or multi-panel layouts.
+
+Each column is returned as an `Output` widget, so you can write into it using a `with` block.
+
+## Live Demo
+
+You can check the `Columns` widget directly in this interactive example:
+
+<MercuryDemo
+  iframeSrc="https://demo.ismvp.org/mercury/layout-widgets?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/layout-widgets.ipynb"
+/> 
+
+
+## Usage
+
+Call `mr.Columns()` to create a row of columns.
+The function returns a **tuple of output widgets** — one for each column.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+col1, col2 = mr.Columns(2)
+
+with col1:
+    print("Left column")
+
+with col2:
+    print("Right column")
+```
+
+
+### Three Columns
+
+**Code**
+
+```python
+c1, c2, c3 = mr.Columns(3)
+
+with c1:
+    print("Column 1")
+
+with c2:
+    print("Column 2")
+
+with c3:
+    print("Column 3")
+```
+
+
+### Minimum Width and Responsiveness
+
+Use `min_width` to control how narrow a column can become.
+When there is not enough horizontal space, columns automatically wrap to the next row.
+
+**Code**
+
+```python
+c1, c2, c3 = mr.Columns(
+    n=3,
+    min_width="240px"
+)
+```
+
+
+### Gap Between Columns
+
+Control spacing between columns using the `gap` argument.
+
+**Code**
+
+```python
+c1, c2 = mr.Columns(
+    n=2,
+    gap="32px"
+)
+```
+
+
+### Borders
+
+You can control column borders explicitly or let the theme decide.
+
+**Examples**
+
+```python
+# Theme-based borders (default)
+mr.Columns(2)
+
+# Custom border
+mr.Columns(2, border="1px solid lightgray")
+
+# No borders
+mr.Columns(2, border="")
+```
+
+
+### Layout Position
+
+Use the `position` argument to control where the columns are displayed.
+The default is `position="inline"`.
+
+Available positions:
+
+* `"sidebar"` — display columns in the sidebar
+* `"inline"` — display columns in the main notebook output (default)
+* `"bottom"` — display columns after all notebook cells
+
+**Code**
+
+```python
+mr.Columns(
+    n=2,
+    position="bottom"
+)
+```
+
+
+## Columns Props
+
+### n
+
+**type:** `int`
+
+Number of columns.
+Must be at least 1.
+
+---
+
+### min_width
+
+**type:** `string`
+
+Minimum width of each column (CSS value).
+
+Examples:
+
+* `"120px"`
+* `"240px"`
+
+---
+
+### gap
+
+**type:** `string`
+
+Gap between columns (CSS value).
+
+Examples:
+
+* `"8px"`
+* `"16px"`
+* `"32px"`
+
+---
+
+### border
+
+**type:** `string | None`
+
+Controls column borders:
+
+* `None` — use theme defaults
+* `""` — disable borders
+* CSS string — custom border (e.g. `"1px solid red"`)
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the columns are rendered.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous Columns instance unless a different `key` is specified.
+
+The `key` value is required when Columns are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* Columns are responsive and automatically wrap when space is limited.
+* Each returned object is an `Output` widget.
+* Use `with column:` blocks to write content into columns.
+* Columns are ideal for charts, tables, metrics, or grouped controls.
