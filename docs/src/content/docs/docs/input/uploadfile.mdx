@@ -1,0 +1,206 @@
+---
+
+title: UploadFile
+description: How to upload files in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **UploadFile** widget lets users upload one or more files using **drag & drop** or a **file picker**.
+Uploaded files are immediately available in Python as byte data, making it easy to load datasets, images, or documents in your Mercury App.
+
+## Usage
+
+To create an UploadFile widget, provide a `label`.
+The uploaded content is available via `.value`, `.name`, or `.files`.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+uploader = mr.UploadFile(
+    label="Upload CSV"
+)
+```
+
+To access the uploaded file:
+
+```python
+uploader.name
+uploader.value
+```
+
+* `name` → file name
+* `value` → file content as `bytes`
+
+---
+
+### Multiple Files
+
+Enable uploading multiple files using `multiple=True`.
+
+**Code**
+
+```python
+uploader = mr.UploadFile(
+    label="Upload images",
+    multiple=True
+)
+```
+
+Iterate over uploaded files:
+
+```python
+for f in uploader:
+    print(f.name, len(f.value))
+```
+
+You can also access all files directly:
+
+```python
+uploader.files
+```
+
+---
+
+### File Size Limit
+
+Use `max_file_size` to limit the size of each uploaded file.
+
+Supported units:
+
+* `KB`
+* `MB`
+* `GB`
+
+**Code**
+
+```python
+uploader = mr.UploadFile(
+    label="Upload dataset",
+    max_file_size="10MB"
+)
+```
+
+If a file exceeds the limit, the user is notified and the file is not uploaded.
+
+---
+
+### Layout
+
+Use the `position` argument to control where the widget is displayed.
+The default is `position="sidebar"`.
+
+Available positions:
+
+* `"sidebar"` — displayed in the left sidebar (default)
+* `"inline"` — displayed in the main notebook output
+* `"bottom"` — displayed after all notebook cells
+
+**Code**
+
+```python
+mr.UploadFile(
+    label="Upload report",
+    position="inline"
+)
+```
+
+---
+
+## UploadFile Props
+
+### label
+
+**type:** `string`
+
+Text displayed above the upload area.
+The default is `"Upload file"`.
+
+---
+
+### max_file_size
+
+**type:** `string`
+
+Maximum allowed size per file.
+
+Examples:
+
+* `"500KB"`
+* `"10MB"`
+* `"1GB"`
+
+The default is `"100MB"`.
+
+---
+
+### multiple
+
+**type:** `bool`
+
+If `True`, allows uploading multiple files.
+The default is `False`.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the widget is visible but cannot be interacted with.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* Uploaded files are stored **in memory**, not saved to disk automatically.
+* Each uploaded file is represented as an `UploadedFile` object with:
+
+  * `.name` — file name
+  * `.value` — file content as `bytes`
+* For `multiple=False`, `.value` and `.name` refer to the **first file**.
+* Use `.files` or iteration to handle multiple uploads.
+

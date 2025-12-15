@@ -1,0 +1,221 @@
+---
+title: NumberInput
+description: How to use the NumberInput widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **NumberInput** widget displays a numeric input field that lets users type a number.
+It is useful for setting parameters like thresholds, limits, counts, or any value that should be a number.
+
+## Usage
+
+To create a NumberInput widget, provide a `label`.
+You can optionally set `value`, `min`, `max`, and `step`.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+n = mr.NumberInput(
+    label="Enter number",
+    min=0,
+    max=100,
+    step=1
+)
+```
+
+To get the current value:
+
+```python
+n.value
+```
+
+---
+
+### Default Value
+
+If `value` is not provided (or is `None`), the widget defaults to `min`.
+
+**Code**
+
+```python
+n = mr.NumberInput(
+    label="Rows",
+    min=10,
+    max=100
+)
+
+n.value
+```
+
+**Output**
+
+```text
+10
+```
+
+---
+
+### Range and Clamping
+
+The value is always kept within `[min, max]`.
+
+* If `min > max`, the values are swapped (and a warning is shown).
+* If `value` is outside the range, it is clamped to the nearest valid value.
+
+**Code**
+
+```python
+n = mr.NumberInput(
+    label="Probability",
+    value=2.0,
+    min=0.0,
+    max=1.0,
+    step=0.1
+)
+
+n.value
+```
+
+**Output**
+
+```text
+1.0
+```
+
+---
+
+### Layout
+
+Use the `position` argument to control where the widget is displayed.
+The default is `position="sidebar"`.
+
+Available positions:
+
+* `"sidebar"` — displayed in the left sidebar (default)
+* `"inline"` — displayed in the main notebook output
+* `"bottom"` — displayed after all notebook cells
+
+**Code**
+
+```python
+mr.NumberInput(
+    label="Threshold",
+    value=0.5,
+    min=0.0,
+    max=1.0,
+    step=0.05,
+    position="inline"
+)
+```
+
+---
+
+## NumberInput Props
+
+### label
+
+**type:** `string`
+
+Text displayed above the input.
+The default is `"Enter number"`.
+
+---
+
+### value
+
+**type:** `float | None`
+
+Initial numeric value.
+
+* If `None` or omitted, it defaults to `min`.
+* If outside `[min, max]`, it is clamped during initialization.
+
+At runtime, `.value` is always a number.
+
+---
+
+### min
+
+**type:** `float`
+
+Minimum allowed value.
+The default is `0`.
+
+---
+
+### max
+
+**type:** `float`
+
+Maximum allowed value.
+The default is `100`.
+
+---
+
+### step
+
+**type:** `float`
+
+Step used by the browser numeric input.
+The default is `1`.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the input is visible but cannot be changed.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* The widget value is always numeric and available via `.value`.
+* The value is clamped to the `[min, max]` range.
+* If you need integer-only input, set `step=1` and use integer `min/max`.
+

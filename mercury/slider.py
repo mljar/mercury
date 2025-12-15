@@ -8,7 +8,7 @@ import anywidget
 import traitlets
 from IPython.display import display
 
-from .manager import WidgetsManager, MERCURY_MIMETYPE
+from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
 
 Position = Literal["sidebar", "inline", "bottom"]
@@ -23,15 +23,65 @@ def Slider(
     disabled: bool = False,
     hidden: bool = False,
     key: str = "",
-    custom_css: str = "",
 ):
     """
     Create and display a Slider widget.
 
-    Notes on defaults and normalization:
+    This function instantiates a `SliderWidget` with the given label and range.
+    If a widget with the same configuration (identified by a unique code UID
+    generated from widget type, arguments, and keyword arguments) already exists
+    in the `WidgetsManager`, the existing instance is returned and displayed.
+
+    Notes on defaults and normalization
+    -----------------------------------
     - If `value` is None, it defaults to `min`.
     - If `min > max`, values are swapped (with a warning).
     - If `value` is outside [min, max], it is clamped (with a warning).
+
+    Parameters
+    ----------
+    label : str
+        Text displayed above the widget.
+        The default is `"Select number"`.
+    value : int | None
+        Initial value. If None, defaults to `min`.
+    min : int
+        Minimum slider value.
+        The default is 0.
+    max : int
+        Maximum slider value.
+        The default is 100.
+    position : {"sidebar", "inline", "bottom"}, optional
+        Controls where the widget is displayed:
+
+        - `"sidebar"` — place the widget in the left sidebar panel (default).
+        - `"inline"` — render the widget directly in the notebook flow.
+        - `"bottom"` — render the widget after all notebook cells.
+    disabled : bool, optional
+        If `True`, the widget is rendered but cannot be interacted with.
+    hidden : bool, optional
+        If `True`, the widget exists but is not visible in the UI.
+    key : str, optional
+        Unique identifier used to differentiate widgets with the same parameters.
+
+    Returns
+    -------
+    SliderWidget
+        The created or retrieved Slider widget instance.
+
+    Examples
+    --------
+    Basic usage:
+
+    >>> from mercury import Slider
+    >>> s = Slider(label="Rows", min=0, max=100, value=10)
+    >>> s.value
+    10
+
+    After user interaction in the UI:
+
+    >>> s.value
+    42
     """
 
     # Validate and normalize range
@@ -59,8 +109,7 @@ def Slider(
         warnings.warn("\nSlider: `value` is out of range. Clamping to [min, max].")
         value_int = max(min_int, min(value_int, max_int))
 
-    # Cache key must include all meaningful args (same approach as Select / MultiSelect)
-    args = [label, value_int, min_int, max_int, position, disabled, hidden, key, custom_css]
+    args = [label, value_int, min_int, max_int, position, disabled, hidden, key]
     kwargs = {
         "label": label,
         "value": value_int,
@@ -70,7 +119,6 @@ def Slider(
         "disabled": disabled,
         "hidden": hidden,
         "key": key,
-        "custom_css": custom_css,
     }
 
     code_uid = WidgetsManager.get_code_uid("Slider", key=key, args=args, kwargs=kwargs)
@@ -87,87 +135,88 @@ def Slider(
 
 class SliderWidget(anywidget.AnyWidget):
     _esm = """
-function render({ model, el }) {
-  const container = document.createElement("div");
-  container.classList.add("mljar-slider-container");
+    function render({ model, el }) {
+      const container = document.createElement("div");
+      container.classList.add("mljar-slider-container");
 
-  const topLabel = document.createElement("div");
-  topLabel.classList.add("mljar-slider-top-label");
-  topLabel.textContent = model.get("label") || "Select number";
+      const topLabel = document.createElement("div");
+      topLabel.classList.add("mljar-slider-top-label");
 
-  const sliderRow = document.createElement("div");
-  sliderRow.classList.add("mljar-slider-row");
+      const sliderRow = document.createElement("div");
+      sliderRow.classList.add("mljar-slider-row");
 
-  const slider = document.createElement("input");
-  slider.type = "range";
-  slider.classList.add("mljar-slider-input");
+      const slider = document.createElement("input");
+      slider.type = "range";
+      slider.classList.add("mljar-slider-input");
 
-  const valueLabel = document.createElement("span");
-  valueLabel.classList.add("mljar-slider-value-label");
+      const valueLabel = document.createElement("span");
+      valueLabel.classList.add("mljar-slider-value-label");
 
-  function syncFromModel() {
-    slider.min = model.get("min");
-    slider.max = model.get("max");
-    slider.value = model.get("value");
-    valueLabel.textContent = String(model.get("value"));
-    slider.disabled = !!model.get("disabled");
-    topLabel.textContent = model.get("label") || "Select number";
-  }
+      function syncFromModel() {
+        slider.min = model.get("min");
+        slider.max = model.get("max");
+        slider.value = model.get("value");
+        valueLabel.textContent = String(model.get("value"));
 
-  let debounceTimer = null;
-  slider.addEventListener("input", () => {
-    if (model.get("disabled")) return;
-    model.set("value", Number(slider.value));
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => model.save_changes(), 100);
-  });
+        slider.disabled = !!model.get("disabled");
+        topLabel.textContent = model.get("label") || "Select number";
 
-  // Keep UI stable and always in sync
-  model.on("change:value", syncFromModel);
-  model.on("change:min", syncFromModel);
-  model.on("change:max", syncFromModel);
-  model.on("change:disabled", syncFromModel);
-  model.on("change:label", syncFromModel);
-
-  sliderRow.appendChild(slider);
-  sliderRow.appendChild(valueLabel);
-
-  container.appendChild(topLabel);
-  container.appendChild(sliderRow);
-  el.appendChild(container);
-
-  syncFromModel();
-
-  // ---- read cell id (no DOM modifications) ----
-  const ID_ATTR = 'data-cell-id';
-  const hostWithId = el.closest(`[${ID_ATTR}]`);
-  const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
-
-  if (cellId) {
-    model.set('cell_id', cellId);
-    model.save_changes();
-    model.send({ type: 'cell_id_detected', value: cellId });
-  } else {
-    const mo = new MutationObserver(() => {
-      const host = el.closest(`[${ID_ATTR}]`);
-      const newId = host?.getAttribute(ID_ATTR);
-      if (newId) {
-        model.set('cell_id', newId);
-        model.save_changes();
-        model.send({ type: 'cell_id_detected', value: newId });
-        mo.disconnect();
+        // hidden (exists but not visible)
+        container.style.display = model.get("hidden") ? "none" : "flex";
       }
-    });
-    mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
-  }
-}
-export default { render };
+
+      let debounceTimer = null;
+      slider.addEventListener("input", () => {
+        if (model.get("disabled")) return;
+        model.set("value", Number(slider.value));
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          model.save_changes();
+        }, 100);
+      });
+
+      model.on("change:value", syncFromModel);
+      model.on("change:min", syncFromModel);
+      model.on("change:max", syncFromModel);
+      model.on("change:disabled", syncFromModel);
+      model.on("change:hidden", syncFromModel);
+      model.on("change:label", syncFromModel);
+
+      sliderRow.appendChild(slider);
+      sliderRow.appendChild(valueLabel);
+
+      container.appendChild(topLabel);
+      container.appendChild(sliderRow);
+      el.appendChild(container);
+
+      syncFromModel();
+
+      // ---- read cell id (no DOM modifications) ----
+      const ID_ATTR = "data-cell-id";
+      const hostWithId = el.closest(`[${ID_ATTR}]`);
+      const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
+
+      if (cellId) {
+        model.set("cell_id", cellId);
+        model.save_changes();
+        model.send({ type: "cell_id_detected", value: cellId });
+      } else {
+        const mo = new MutationObserver(() => {
+          const host = el.closest(`[${ID_ATTR}]`);
+          const newId = host?.getAttribute(ID_ATTR);
+          if (newId) {
+            model.set("cell_id", newId);
+            model.save_changes();
+            model.send({ type: "cell_id_detected", value: newId });
+            mo.disconnect();
+          }
+        });
+        mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
+      }
+    }
+    export default { render };
     """
 
-    # Key UI fixes:
-    # - Use CSS grid so the slider track width does NOT change when the number grows (e.g. 9 -> 10)
-    # - Give the value label a fixed width in `ch` units
-    # - Do NOT clip the row (overflow visible), so the value is always visible
     _css = f"""
     .mljar-slider-container {{
       display: flex;
@@ -192,11 +241,11 @@ export default { render };
 
     .mljar-slider-row {{
       display: grid;
-      grid-template-columns: 1fr 5ch; /* slider takes full width; label is fixed */
+      grid-template-columns: 1fr 5ch;
       column-gap: 16px;
       align-items: center;
       width: 100%;
-      overflow: visible; /* IMPORTANT: do not clip the number */
+      overflow: visible;
       box-sizing: border-box;
     }}
 
@@ -210,7 +259,7 @@ export default { render };
       border: none;
       height: 24px;
       padding: 0;
-      margin: 0; /* IMPORTANT: avoid layout surprises */
+      margin: 0;
       box-sizing: border-box;
     }}
 
@@ -240,7 +289,7 @@ export default { render };
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
-      margin-top: -5px; /* centers thumb on track */
+      margin-top: -5px;
     }}
     .mljar-slider-input::-moz-range-thumb {{
       width: 16px;
@@ -251,8 +300,8 @@ export default { render };
     }}
 
     .mljar-slider-value-label {{
-      width: 5ch;            /* fixed width keeps slider length stable */
-      text-align: right;     /* aligns nicely for 1/2/3/4-digit numbers */
+      width: 5ch;
+      text-align: right;
       font-weight: 700;
       font-size: 1.1em;
       color: {THEME.get('text_color', '#000')};
@@ -265,7 +314,6 @@ export default { render };
     min = traitlets.Int(0).tag(sync=True)
     max = traitlets.Int(100).tag(sync=True)
     label = traitlets.Unicode("Select number").tag(sync=True)
-    custom_css = traitlets.Unicode(default_value="", help="Extra CSS to append to default styles").tag(sync=True)
 
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)
@@ -294,10 +342,6 @@ export default { render };
             self.value = self.min
         if self.value > self.max:
             self.value = self.max
-
-        # Append custom css if provided
-        if isinstance(self.custom_css, str) and self.custom_css.strip():
-            self._css = f"{self._css}\n\n/* custom_css */\n{self.custom_css}\n"
 
     def _repr_mimebundle_(self, **kwargs):
         data = super()._repr_mimebundle_(**kwargs)

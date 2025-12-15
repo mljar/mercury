@@ -1,16 +1,22 @@
-__version__ = "3.0.0a9"
+__version__ = "3.0.0a10"
+
+# input widgets
+from .button import Button
+from .checkbox import Checkbox
+from .multiselect import MultiSelect
+from .number import NumberInput
+from .select import Select
+from .slider import Slider
+from .text import TextInput
+from .file import UploadFile
+
 
 from .expander import Expander
 from .columns import Columns
-from .button import Button
 from .md import Markdown
-from .select import Select
-from .multiselect import MultiSelect
-from .slider import Slider
 from .indicator import Indicator
 from .tabs import Tabs
 from .table import Table
-from .text import TextInput
 
 from .chat.chat import Chat
 from .chat.chatinput import ChatInput

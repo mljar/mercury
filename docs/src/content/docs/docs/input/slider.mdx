@@ -10,11 +10,6 @@ import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 The **Slider** widget allows users to select a **numeric value from a range** by dragging a slider handle.
 It is commonly used for thresholds, limits, percentages, and other numeric parameters in a Mercury App.
 
-
-## Import
-
-<Code code={`from mercury import Slider`} lang="python" />
-
 ## Usage
 
 To create a Slider widget, you define the numeric range using `min` and `max`.
@@ -27,7 +22,9 @@ If no `value` is provided, the slider **defaults to the minimum value**.
 **Code**
 
 ```python
-threshold = Slider(
+import mercury as mr
+
+threshold = mr.Slider(
     label="Threshold",
     min=0,
     max=10
@@ -37,7 +34,9 @@ threshold = Slider(
 In this example, the initial value will be:
 
 ```python
-0
+threshold.value
+
+>>> 0
 ```
 
 
@@ -178,43 +177,3 @@ The <code>key</code> value is required when widgets are created inside loops.
 * The slider track length remains constant, regardless of how many digits the value has.
 
 ---
-
-### Example
-
-```python
-steps = Slider(
-    label="Number of steps",
-    min=1,
-    max=20,
-    value=5
-)
-
-steps.value
-```
-
-**Output**
-
-```text
-5
-```
-
-After user interaction:
-
-```text
-12
-```
-
----
-
-## Live Demo
-
-You can try the Slider widget directly in this interactive example:
-
-<MercuryDemo
-iframeSrc="https://demo.ismvp.org/mercury/slider-basic?no-navbar"
-notebookUrl="https://demo.ismvp.org/mercury/slider-basic"
-/>
-
-```
-
-

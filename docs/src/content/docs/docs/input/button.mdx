@@ -1,0 +1,211 @@
+---
+
+title: Button
+description: How to use the Button widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **Button** widget displays a clickable button that allows users to **trigger actions** in a Mercury App.
+It is useful for running computations, refreshing results, submitting parameters, or controlling app logic.
+
+## Usage
+
+To create a Button widget, you only need to provide a label.
+When the user clicks the button, its state is updated and can be inspected from Python.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+btn = mr.Button(
+    label="Run"
+)
+```
+
+To check whether the button has been clicked:
+
+```python
+btn.value
+```
+
+After a click, the value becomes:
+
+```text
+True
+```
+
+You can also inspect how many times the button was clicked:
+
+```python
+btn.n_clicks
+```
+
+---
+
+### Variants and Sizes
+
+You can customize the button appearance using `variant` and `size` arguments.
+
+**Code**
+
+```python
+mr.Button(
+    label="Delete",
+    variant="danger",
+    size="lg"
+)
+```
+
+Available variants:
+
+* `"primary"` (default)
+* `"secondary"`
+* `"outline"`
+* `"danger"`
+
+Available sizes:
+
+* `"sm"`
+* `"md"` (default)
+* `"lg"`
+
+---
+
+### Layout
+
+Use the `position` argument to control where the button is displayed.
+The default is `position="sidebar"`.
+
+Available positions:
+
+* `"sidebar"` — displayed in the left sidebar (default)
+* `"inline"` — displayed in the main notebook output
+* `"bottom"` — displayed after all notebook cells
+
+**Code**
+
+```python
+mr.Button(
+    label="Run analysis",
+    position="inline"
+)
+```
+
+---
+
+## Button Props
+
+### label
+
+**type:** `string`
+
+Text displayed on the button.
+The default is `"Run"`.
+
+---
+
+### value
+
+**type:** `bool`
+
+Indicates whether the button has been clicked.
+
+* Initially `False`
+* Set to `True` after the first click
+
+The value stays `True` until you reset it manually in Python.
+
+---
+
+### n_clicks
+
+**type:** `int`
+
+Counts how many times the button has been clicked.
+Starts at `0`.
+
+---
+
+### last_clicked_at
+
+**type:** `string`
+
+ISO timestamp of the last click.
+Empty string before the first click.
+
+---
+
+### variant
+
+**type:** `"primary" | "secondary" | "outline" | "danger"`
+
+Controls the visual style of the button.
+The default is `"primary"`.
+
+---
+
+### size
+
+**type:** `"sm" | "md" | "lg"`
+
+Controls the button size.
+The default is `"md"`.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the button is visible but cannot be clicked.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* The button does not return a value automatically — instead, it updates its internal state.
+* Use `.value`, `.n_clicks`, or `.last_clicked_at` to react to user clicks.
+* A common pattern is to check `if btn.value:`. The `value` is set back to `False` after cells re-execution.

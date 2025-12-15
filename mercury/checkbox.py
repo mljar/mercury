@@ -1,26 +1,58 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
+from typing import Literal
+
 import anywidget
 import traitlets
 from IPython.display import display
 
-from .manager import WidgetsManager, MERCURY_MIMETYPE
+from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
 
+Position = Literal["sidebar", "inline", "bottom"]
+Appearance = Literal["toggle", "box"]
 
-def Checkbox(*args, key: str = "", **kwargs):
+
+def Checkbox(
+    label: str = "Enable",
+    value: bool = False,
+    appearance: Appearance = "toggle",
+    position: Position = "sidebar",
+    disabled: bool = False,
+    hidden: bool = False,
+    key: str = "",
+):
     """
-    Factory that caches and reuses a CheckboxWidget instance keyed by cell code.
+    Create and display a Checkbox widget.
 
     Examples
     --------
-    cb = Checkbox(label="Auto-refresh")               # toggle switch (default)
-    cb = Checkbox(label="I agree", appearance="box")  # classic square checkbox
+    >>> import mercury as mr
+    >>> cb = mr.Checkbox(label="Auto-refresh")               # toggle (default)
+    >>> cb2 = mr.Checkbox(label="I agree", appearance="box") # classic box
+    >>> cb.value
+    False
     """
+
+    args = [label, bool(value), appearance, position, disabled, hidden, key]
+    kwargs = {
+        "label": label,
+        "value": bool(value),
+        "appearance": appearance,
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
+        "key": key,
+    }
+
     code_uid = WidgetsManager.get_code_uid("Checkbox", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
         display(cached)
         return cached
-    instance = CheckboxWidget(*args, **kwargs)
+
+    instance = CheckboxWidget(**kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
@@ -32,23 +64,15 @@ class CheckboxWidget(anywidget.AnyWidget):
       const container = document.createElement("label");
       container.classList.add("mljar-checkbox-container");
 
-      const appearance = model.get("appearance") || "toggle";
-      container.classList.add(`is-${appearance}`);
-
       const input = document.createElement("input");
       input.type = "checkbox";
-      input.checked = !!model.get("value");
-      input.disabled = !!model.get("disabled");
       input.classList.add("mljar-checkbox-input");
-      input.setAttribute("aria-checked", String(input.checked));
-      input.setAttribute("role", appearance === "toggle" ? "switch" : "checkbox");
 
       const control = document.createElement("span");
       control.classList.add("mljar-checkbox-control");
 
       const text = document.createElement("span");
       text.classList.add("mljar-checkbox-label");
-      text.textContent = model.get("label") || "";
 
       container.appendChild(input);
       container.appendChild(control);
@@ -56,29 +80,35 @@ class CheckboxWidget(anywidget.AnyWidget):
       el.appendChild(container);
 
       function syncFromModel() {
+        // appearance
+        const a = model.get("appearance") || "toggle";
+        container.classList.remove("is-toggle","is-box");
+        container.classList.add(`is-${a}`);
+        input.setAttribute("role", a === "toggle" ? "switch" : "checkbox");
+
+        // value
         const v = !!model.get("value");
         if (input.checked !== v) {
           input.checked = v;
           input.setAttribute("aria-checked", String(v));
         }
         container.classList.toggle("is-checked", v);
-      }
-      function syncDisabled() {
+
+        // disabled
         const d = !!model.get("disabled");
         input.disabled = d;
         container.classList.toggle("is-disabled", d);
-      }
-      function syncAppearance() {
-        const a = model.get("appearance") || "toggle";
-        container.classList.remove("is-toggle","is-box");
-        container.classList.add(`is-${a}`);
-        input.setAttribute("role", a === "toggle" ? "switch" : "checkbox");
-      }
-      function syncLabel() {
+
+        // label
         text.textContent = model.get("label") || "";
+
+        // hidden (exists but not visible)
+        container.style.display = model.get("hidden") ? "none" : "inline-flex";
       }
 
       input.addEventListener("change", () => {
+        if (model.get("disabled")) return;
+
         const v = input.checked;
         if (model.get("value") !== v) {
           model.set("value", v);
@@ -90,26 +120,18 @@ class CheckboxWidget(anywidget.AnyWidget):
       });
 
       model.on("change:value", syncFromModel);
-      model.on("change:disabled", syncDisabled);
-      model.on("change:appearance", syncAppearance);
-      model.on("change:label", syncLabel);
+      model.on("change:disabled", syncFromModel);
+      model.on("change:appearance", syncFromModel);
+      model.on("change:label", syncFromModel);
+      model.on("change:hidden", syncFromModel);
 
       syncFromModel();
-      syncDisabled();
-      syncAppearance();
-      syncLabel();
 
-      const css = model.get("custom_css");
-      if (css && css.trim().length > 0) {
-        const styleTag = document.createElement("style");
-        styleTag.textContent = css;
-        el.appendChild(styleTag);
-      }
-
-      // ---- read cell id ----
+      // ---- read cell id (no DOM modifications) ----
       const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
       const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
+
       if (cellId) {
         model.set("cell_id", cellId);
         model.save_changes();
@@ -167,8 +189,8 @@ class CheckboxWidget(anywidget.AnyWidget):
     /* --- Toggle style (15% smaller) --- */
     .mljar-checkbox-container.is-toggle .mljar-checkbox-control {{
         position: relative;
-        width: 34px;  /* smaller */
-        height: 19px; /* smaller */
+        width: 34px;
+        height: 19px;
         border-radius: 999px;
         background: {THEME.get('panel_bg_hover', '#e5e7eb')};
         border: 1px solid {THEME.get('border_color', '#d0d0d0')};
@@ -183,7 +205,7 @@ class CheckboxWidget(anywidget.AnyWidget):
         position: absolute;
         top: 2px;
         left: 2px;
-        width: 15px;   /* smaller thumb */
+        width: 15px;
         height: 15px;
         border-radius: 50%;
         background: {THEME.get('widget_background_color', '#ffffff')};
@@ -191,7 +213,7 @@ class CheckboxWidget(anywidget.AnyWidget):
         transition: transform 150ms ease;
     }}
     .mljar-checkbox-container.is-toggle.is-checked .mljar-checkbox-control::after {{
-        transform: translateX(15px);  /* adjusted distance */
+        transform: translateX(15px);
     }}
 
     /* --- Classic box style --- */
@@ -228,11 +250,19 @@ class CheckboxWidget(anywidget.AnyWidget):
     value = traitlets.Bool(False).tag(sync=True)
     label = traitlets.Unicode("Enable").tag(sync=True)
     disabled = traitlets.Bool(False).tag(sync=True)
+    hidden = traitlets.Bool(False).tag(sync=True)
+
     appearance = traitlets.Enum(["toggle", "box"], default_value="toggle").tag(sync=True)
+
     n_toggles = traitlets.Int(0).tag(sync=True)
     last_changed_at = traitlets.Unicode("").tag(sync=True)
-    custom_css = traitlets.Unicode(default_value="", help="Extra CSS appended after default styles").tag(sync=True)
-    position = traitlets.Enum(["sidebar", "inline", "bottom"], default_value="sidebar").tag(sync=True)
+
+    position = traitlets.Enum(
+        values=["sidebar", "inline", "bottom"],
+        default_value="sidebar",
+        help="Widget placement: sidebar, inline, or bottom",
+    ).tag(sync=True)
+
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     def _repr_mimebundle_(self, **kwargs):
@@ -243,6 +273,7 @@ class CheckboxWidget(anywidget.AnyWidget):
                 "model_id": self.model_id,
                 "position": self.position,
             }
-            import json
             data[0][MERCURY_MIMETYPE] = mercury_mime
+            if "text/plain" in data[0]:
+                del data[0]["text/plain"]
         return data

@@ -1,0 +1,155 @@
+---
+title: TextInput
+description: How to use the TextInput widget in the interactive Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **TextInput** widget displays a single-line text input field.
+It is useful for entering names, labels, filters, search queries, or any short text values in your Mercury App.
+
+## Usage
+
+To create a TextInput widget, provide a `label`.
+The current text entered by the user is always available via `.value`.
+
+### Basic Example
+
+**Code**
+
+```python
+import mercury as mr
+
+text = mr.TextInput(
+    label="Enter your name"
+)
+```
+
+To get the current value:
+
+```python
+text.value
+```
+
+---
+
+### Default Value
+
+You can provide an initial value using the `value` argument.
+
+**Code**
+
+```python
+text = mr.TextInput(
+    label="City",
+    value="Warsaw"
+)
+
+text.value
+```
+
+**Output**
+
+```text
+Warsaw
+```
+
+---
+
+### Layout
+
+Use the `position` argument to control where the widget is displayed.
+The default is `position="sidebar"`.
+
+Available positions:
+
+* `"sidebar"` — displayed in the left sidebar (default)
+* `"inline"` — displayed in the main notebook output
+* `"bottom"` — displayed after all notebook cells
+
+**Code**
+
+```python
+mr.TextInput(
+    label="Search",
+    position="inline"
+)
+```
+
+---
+
+## TextInput Props
+
+### label
+
+**type:** `string`
+
+Text displayed above the input field.
+The default is `"Enter text"`.
+
+---
+
+### value
+
+**type:** `string`
+
+Initial text value.
+
+* If omitted, defaults to an empty string.
+* The value always reflects the current text entered by the user.
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered:
+
+* **sidebar** — in the sidebar (default)
+* **inline** — directly in the notebook cell output
+* **bottom** — after all notebook cells
+
+---
+
+### disabled
+
+**type:** `bool`
+
+If `True`, the input is visible but cannot be edited.
+The default is `False`.
+
+---
+
+### hidden
+
+**type:** `bool`
+
+If `True`, the widget exists in the UI state but is not rendered.
+The default is `False`.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is required when widgets are created inside loops.
+
+</Aside>
+
+---
+
+## Notes
+
+* The widget value is always available via `.value`.
+* Changes are debounced slightly to avoid excessive updates.
+* This widget is intended for **single-line text**. For longer text, consider a textarea-style widget.
+

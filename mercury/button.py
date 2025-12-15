@@ -1,23 +1,99 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
+from typing import Literal
+
 import anywidget
 import traitlets
 from IPython.display import display
 
-from .manager import WidgetsManager, MERCURY_MIMETYPE
+from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
 
+Position = Literal["sidebar", "inline", "bottom"]
+Variant = Literal["primary", "secondary", "outline", "danger"]
+Size = Literal["sm", "md", "lg"]
 
-def Button(*args, key: str = "", **kwargs):
+
+def Button(
+    label: str = "Run",
+    variant: Variant = "primary",
+    size: Size = "md",
+    position: Position = "sidebar",
+    disabled: bool = False,
+    hidden: bool = False,
+    key: str = "",
+):
     """
-    Factory that caches and reuses a ButtonWidget instance keyed by cell code.
-    Usage:
-        btn = Button(label="Run", variant="primary", size="md")
+    Create and display a Button widget.
+
+    This function instantiates a `ButtonWidget` with the given label and style.
+    If a widget with the same configuration (identified by a unique code UID
+    generated from widget type, arguments, and keyword arguments) already exists
+    in the `WidgetsManager`, the existing instance is returned and displayed.
+
+    Parameters
+    ----------
+    label : str
+        Text displayed on the button.
+        The default is `"Run"`.
+    variant : {"primary", "secondary", "outline", "danger"}, optional
+        Visual style variant of the button.
+        The default is `"primary"`.
+    size : {"sm", "md", "lg"}, optional
+        Size of the button.
+        The default is `"md"`.
+    position : {"sidebar", "inline", "bottom"}, optional
+        Controls where the widget is displayed:
+
+        - `"sidebar"` — place the widget in the left sidebar panel (default).
+        - `"inline"` — render the widget directly in the notebook flow.
+        - `"bottom"` — render the widget after all notebook cells.
+    disabled : bool, optional
+        If `True`, the widget is rendered but cannot be interacted with.
+    hidden : bool, optional
+        If `True`, the widget exists but is not visible in the UI.
+    key : str, optional
+        Unique identifier used to differentiate widgets with the same parameters.
+
+    Returns
+    -------
+    ButtonWidget
+        The created or retrieved Button widget instance.
+
+    Examples
+    --------
+    Basic usage:
+
+    >>> from mercury import Button
+    >>> btn = Button(label="Run", variant="primary")
+
+    After the user clicks the button:
+
+    >>> btn.value
+    True
+    >>> btn.n_clicks
+    1
     """
+
+    args = [label, variant, size, position, disabled, hidden, key]
+    kwargs = {
+        "label": label,
+        "variant": variant,
+        "size": size,
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
+        "key": key,
+    }
+
     code_uid = WidgetsManager.get_code_uid("Button", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
         display(cached)
         return cached
-    instance = ButtonWidget(*args, **kwargs)
+
+    instance = ButtonWidget(**kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
@@ -32,44 +108,51 @@ class ButtonWidget(anywidget.AnyWidget):
       const btn = document.createElement("button");
       btn.classList.add("mljar-button");
 
-      const variant = model.get("variant") || "primary";
-      const size = model.get("size") || "md";
-      btn.classList.add(`is-${variant}`, `is-${size}`);
-      btn.disabled = !!model.get("disabled");
-      btn.textContent = model.get("label") || "Run";
+      function syncFromModel() {
+        // label
+        btn.textContent = model.get("label") || "Run";
+
+        // variant
+        const v = model.get("variant") || "primary";
+        ["is-primary","is-secondary","is-outline","is-danger"].forEach(c => btn.classList.remove(c));
+        btn.classList.add(`is-${v}`);
+
+        // size
+        const s = model.get("size") || "md";
+        ["is-sm","is-md","is-lg"].forEach(c => btn.classList.remove(c));
+        btn.classList.add(`is-${s}`);
+
+        // disabled
+        btn.disabled = !!model.get("disabled");
+
+        // hidden (exists but not visible)
+        container.style.display = model.get("hidden") ? "none" : "inline-flex";
+      }
 
       btn.addEventListener("click", () => {
+        if (model.get("disabled")) return;
+
         const current = model.get("n_clicks") || 0;
         model.set("n_clicks", current + 1);
         model.set("last_clicked_at", new Date().toISOString());
-        model.set("value", true);  // ✅ set value=True on click
+        model.set("value", true);
         model.save_changes();
         model.send({ type: "clicked", n_clicks: current + 1 });
       });
 
       // Reactivity
-      model.on("change:label", () => { btn.textContent = model.get("label"); });
-      model.on("change:variant", () => {
-        ["is-primary","is-secondary","is-outline","is-danger"].forEach(c => btn.classList.remove(c));
-        btn.classList.add(`is-${model.get("variant")}`);
-      });
-      model.on("change:size", () => {
-        ["is-sm","is-md","is-lg"].forEach(c => btn.classList.remove(c));
-        btn.classList.add(`is-${model.get("size")}`);
-      });
-      model.on("change:disabled", () => { btn.disabled = !!model.get("disabled"); });
+      model.on("change:label", syncFromModel);
+      model.on("change:variant", syncFromModel);
+      model.on("change:size", syncFromModel);
+      model.on("change:disabled", syncFromModel);
+      model.on("change:hidden", syncFromModel);
 
       container.appendChild(btn);
       el.appendChild(container);
 
-      const css = model.get("custom_css");
-      if (css && css.trim().length > 0) {
-        const styleTag = document.createElement("style");
-        styleTag.textContent = css;
-        el.appendChild(styleTag);
-      }
+      syncFromModel();
 
-      // ---- read cell id ----
+      // ---- read cell id (no DOM modifications) ----
       const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
       const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
@@ -100,6 +183,9 @@ class ButtonWidget(anywidget.AnyWidget):
         display: inline-flex;
         width: auto;
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
+        margin-bottom: 8px;
+        padding-left: 4px;
+        padding-right: 4px;
     }}
 
     .mljar-button {{
@@ -107,7 +193,7 @@ class ButtonWidget(anywidget.AnyWidget):
         background: {THEME.get('widget_background_color', '#ffffff')};
         color: {THEME.get('text_color', '#222')};
         border-radius: {THEME.get('border_radius', '8px')};
-        padding: 4px 12px 4px 12px;  
+        padding: 4px 12px 4px 12px;
         margin-top: 5px;
         margin-bottom: 5px;
         cursor: pointer;
@@ -177,7 +263,7 @@ class ButtonWidget(anywidget.AnyWidget):
         border-radius: {THEME.get('border_radius_sm', '2px')};
     }}
     .mljar-button.is-md {{
-        padding: 4px 12px 4px 12px;  
+        padding: 4px 12px 4px 12px;
     }}
     .mljar-button.is-lg {{
         padding: 8px 16px 8px 16px;
@@ -186,20 +272,23 @@ class ButtonWidget(anywidget.AnyWidget):
     }}
     """
 
-    # --- Backend synced traits ---
-    label = traitlets.Unicode("Run").tag(sync=True)
+    label = traitlets.Unicode(default_value="Run").tag(sync=True)
     variant = traitlets.Enum(["primary", "secondary", "outline", "danger"], default_value="primary").tag(sync=True)
     size = traitlets.Enum(["sm", "md", "lg"], default_value="md").tag(sync=True)
-    disabled = traitlets.Bool(False).tag(sync=True)
 
-    # "value" traitlet (True after click)
-    value = traitlets.Bool(False).tag(sync=True)
+    disabled = traitlets.Bool(default_value=False).tag(sync=True)
+    hidden = traitlets.Bool(default_value=False).tag(sync=True)
 
-    n_clicks = traitlets.Int(0).tag(sync=True)
-    last_clicked_at = traitlets.Unicode("").tag(sync=True)
+    value = traitlets.Bool(default_value=False).tag(sync=True)
+    n_clicks = traitlets.Int(default_value=0).tag(sync=True)
+    last_clicked_at = traitlets.Unicode(default_value="").tag(sync=True)
 
-    custom_css = traitlets.Unicode(default_value="", help="Extra CSS appended after default styles").tag(sync=True)
-    position = traitlets.Enum(["sidebar", "inline", "bottom"], default_value="sidebar").tag(sync=True)
+    position = traitlets.Enum(
+        values=["sidebar", "inline", "bottom"],
+        default_value="sidebar",
+        help="Widget placement: sidebar, inline, or bottom",
+    ).tag(sync=True)
+
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     def _repr_mimebundle_(self, **kwargs):
@@ -211,4 +300,6 @@ class ButtonWidget(anywidget.AnyWidget):
                 "position": self.position,
             }
             data[0][MERCURY_MIMETYPE] = mercury_mime
+            if "text/plain" in data[0]:
+                del data[0]["text/plain"]
         return data

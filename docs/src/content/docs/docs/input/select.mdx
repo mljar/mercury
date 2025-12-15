@@ -10,10 +10,6 @@ import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 The **Select** widget displays a dropdown menu that lets users choose a single value from a list.
 It is ideal for filtering data, configuring options, or controlling the logic of your Mercury App.
 
-## Import
-
-<Code code={`from mercury import Select`} lang="python" />
-
 ## Usage
 
 To create a Select widget, you only need to provide a list of choices.
@@ -24,10 +20,18 @@ If no `value` is given, the first item from the list is selected automatically.
 **Code**
 
 ```python
-fruit = Select(
+import mercury as mr
+
+fruit = mr.Select(
     label="Choose fruit",
     choices=["Apple", "Banana", "Cherry"]
 )
+```
+
+To get the current selection:
+
+```python
+fruit.value
 ```
 
 ### Layout
@@ -122,24 +126,12 @@ The `key` value is needed if widgets are created in the loop.
 * If the provided `value` is not in `choices`, it is replaced with the first element and a warning is shown.
 * The current selection is always available via `.value`.
 
-**Example**
 
-```python
-fruit = Select(label="Fruit", choices=["Apple", "Banana"])
-fruit.value
-```
-
-**Output**
-
-```
-'Apple'
-```
-
-## Live Demo
+{/* ## Live Demo
 
 You can try the Select widget directly in this interactive example:
 
 <MercuryDemo
   iframeSrc="https://demo.ismvp.org/mercury/select-basic?no-navbar"
   notebookUrl="https://demo.ismvp.org/mercury/select-basic"
-/>
+/> */}

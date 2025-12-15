@@ -10,10 +10,6 @@ import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 The **MultiSelect** widget displays a dropdown menu that allows users to choose **multiple values** from a list.
 It is well suited for filtering data, selecting multiple categories, or controlling more complex logic in your Mercury App.
 
-## Import
-
-<Code code={`from mercury import MultiSelect`} lang="python" />
-
 ## Usage
 
 To create a MultiSelect widget, you must provide a non-empty list of `choices`.
@@ -24,7 +20,7 @@ If no `value` is provided (or if it is `None`), the widget selects the **first e
 
 ### Basic Example
 
-**Code**
+Create `MultiSelect` widget:
 
 ```python
 fruits = MultiSelect(
@@ -32,6 +28,12 @@ fruits = MultiSelect(
     choices=["Apple", "Banana", "Cherry"]
 )
 ````
+
+To get the current selection, use `value` attribute:
+
+```python
+fruits.value
+```
 
 In this case, the initial value will be:
 
@@ -46,7 +48,7 @@ You can specify one or more default selections using the `value` argument.
 **Code**
 
 ```python
-fruits = MultiSelect(
+fruits = mr.MultiSelect(
     label="Choose fruits",
     choices=["Apple", "Banana", "Cherry"],
     value=["Banana", "Cherry"]
@@ -175,47 +177,4 @@ The <code>key</code> value is required when widgets are created inside loops.
 * Invalid values are removed automatically.
 * The current selection is always available via `.value`.
 
----
-
-### Example
-
-```python
-fruits = MultiSelect(
-    label="Fruits",
-    choices=["Apple", "Banana", "Cherry"]
-)
-
-fruits.value
-```
-
-**Output**
-
-```text
-['Apple']
-```
-
-After clearing selections in the UI:
-
-```text
-[]
-```
-
-After selecting new values:
-
-```text
-['Banana', 'Cherry']
-```
-
----
-
-## Live Demo
-
-You can try the MultiSelect widget directly in this interactive example:
-
-<MercuryDemo
-iframeSrc="https://demo.ismvp.org/mercury/multiselect-basic?no-navbar"
-notebookUrl="https://demo.ismvp.org/mercury/multiselect-basic"
-/>
-
-```
 
