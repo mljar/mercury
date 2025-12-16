@@ -1,0 +1,165 @@
+---
+title: ChatInput
+description: How to use the ChatInput widget to collect user messages in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **ChatInput** widget provides a simple text input field with a send button, designed for
+chat-style Mercury Apps. It is typically used together with [`Chat`](./chat) and
+[`Message`](./message) to build conversational interfaces.
+
+By default, `ChatInput` is displayed **at the bottom of the main view**.
+
+---
+
+## Basic Usage
+
+Create a chat input and read the submitted message:
+
+```python
+import mercury as mr
+
+# ChatInput is displayed at the bottom of the main view by default
+prompt = mr.ChatInput()
+
+if prompt.value:
+    # do something with user prompt
+    print("User said:", prompt.value)
+```
+
+## How Submission Works ⭐
+
+`prompt.value` contains the **last submitted message**.
+
+A typical Mercury App flow looks like this:
+
+1. User types a message and clicks the send button (or presses Enter).
+2. `prompt.value` is set to the submitted text.
+3. Your notebook code runs and reads `prompt.value`.
+4. After the notebook finishes executing, Mercury resets `prompt.value` back to `""`
+   so the next run starts clean.
+
+<Aside>
+This reset behavior makes it easy to treat `prompt.value` as a “one-shot” input:
+it is available during the run, and cleared afterwards.
+</Aside>
+
+---
+
+## Example: Chat + ChatInput
+
+A minimal chat loop:
+
+```python
+import mercury as mr
+
+chat = mr.Chat()
+prompt = mr.ChatInput()
+
+if prompt.value:
+    # user message
+    chat.add(mr.Message(markdown=prompt.value, role="user", emoji="👤"))
+
+    # assistant response
+    chat.add(mr.Message(markdown="Got it ✅", role="assistant", emoji="🤖"))
+```
+
+## Layout
+
+Use the `position` argument to control where the widget is rendered:
+
+* `"sidebar"` — in the sidebar
+* `"inline"` — directly in the notebook output flow
+* `"bottom"` — at the bottom of the main view (**default**)
+
+```python
+prompt = mr.ChatInput(position="inline")
+```
+
+---
+
+## ChatInput Props
+
+### value
+
+**type:** `string`
+
+The last submitted message.
+
+* Updated only when the user submits
+* Reset to `""` after all cells are executed
+
+---
+
+### placeholder
+
+**type:** `string`
+
+Placeholder text shown inside the input.
+
+Default: `"Type a message..."`
+
+---
+
+### button_icon
+
+**type:** `string`
+
+Text (or emoji) displayed on the send button.
+
+Default: `"➤"`
+
+---
+
+### send_on_enter
+
+**type:** `bool`
+
+If `True`, pressing Enter submits the message.
+
+Default: `True`
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered.
+
+Default: `"bottom"`
+
+---
+
+### custom_css
+
+**type:** `string`
+
+Additional CSS appended to the widget’s default styles.
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is needed if widgets are created in a loop.
+
+</Aside>
+
+---
+
+## Notes
+
+* `ChatInput` is designed for short, single-line messages.
+* The widget clears the visible input field immediately after submission.
+* `value` is best treated as “consume once during the current run”.
+

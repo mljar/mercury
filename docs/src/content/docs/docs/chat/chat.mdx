@@ -1,211 +1,218 @@
 ---
-title: Columns
-description: How to create responsive column layouts in a Mercury App
+title: Chat
+description: How to build chat-style interfaces with the Chat container in a Mercury App
 ---
 
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
-The **Columns** helper lets you create a responsive row of output areas (columns) inside a Mercury App.
-It is useful for building dashboards, side-by-side comparisons, charts grids, or multi-panel layouts.
+The **Chat** widget is a container for displaying a sequence of `Message` widgets.
+It provides a simple API for building **chat-style interfaces** and ensures that
+new messages are **automatically scrolled into view**.
 
-Each column is returned as an `Output` widget, so you can write into it using a `with` block.
+`Chat` does not render messages itself — each message is responsible for its own
+content and layout. The role of `Chat` is to **manage message order, visibility,
+and scrolling behavior**.
 
 ## Live Demo
 
-You can check the `Columns` widget directly in this interactive example:
+You can try the `Chat` widget directly in this interactive example:
 
 <MercuryDemo
-  iframeSrc="https://demo.ismvp.org/mercury/layout-widgets?no-navbar"
-  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/layout-widgets.ipynb"
+  iframeSrc="https://demo.ismvp.org/mercury/chat?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/chat.ipynb"
 /> 
 
 
-## Usage
+## Basic Usage
 
-Call `mr.Columns()` to create a row of columns.
-The function returns a **tuple of output widgets** — one for each column.
-
-### Basic Example
-
-**Code**
+Create a chat container and add messages to it:
 
 ```python
 import mercury as mr
 
-col1, col2 = mr.Columns(2)
+chat = mr.Chat()
 
-with col1:
-    print("Left column")
-
-with col2:
-    print("Right column")
+chat.add(mr.Message(markdown="Hello 👋", role="assistant"))
+chat.add(mr.Message(markdown="Hi!", role="user"))
 ```
 
+Messages are displayed in the order they are added.
 
-### Three Columns
+## Chat + Message Together
 
-**Code**
+`Chat` is designed to work together with the `Message` widget.
 
-```python
-c1, c2, c3 = mr.Columns(3)
+Each `Message`:
 
-with c1:
-    print("Column 1")
+* renders its own content (Markdown, HTML, plots, tables, etc.)
+* controls avatar, emoji, and formatting
 
-with c2:
-    print("Column 2")
+`Chat`:
 
-with c3:
-    print("Column 3")
-```
+* stacks messages vertically
+* shows a placeholder when empty
+* scrolls automatically when new messages appear
 
+## Auto-Scrolling Behavior ⭐
 
-### Minimum Width and Responsiveness
+One of the key features of `Chat` is **automatic scrolling**.
 
-Use `min_width` to control how narrow a column can become.
-When there is not enough horizontal space, columns automatically wrap to the next row.
+Whenever a new message is added:
 
-**Code**
+* the chat scrolls to the **most recent message**
+* scrolling waits briefly to allow large outputs (plots, images) to finish rendering
 
-```python
-c1, c2, c3 = mr.Columns(
-    n=3,
-    min_width="240px"
-)
-```
+This makes `Chat` suitable for:
 
-
-### Gap Between Columns
-
-Control spacing between columns using the `gap` argument.
-
-**Code**
-
-```python
-c1, c2 = mr.Columns(
-    n=2,
-    gap="32px"
-)
-```
-
-
-### Borders
-
-You can control column borders explicitly or let the theme decide.
-
-**Examples**
-
-```python
-# Theme-based borders (default)
-mr.Columns(2)
-
-# Custom border
-mr.Columns(2, border="1px solid lightgray")
-
-# No borders
-mr.Columns(2, border="")
-```
-
-
-### Layout Position
-
-Use the `position` argument to control where the columns are displayed.
-The default is `position="inline"`.
-
-Available positions:
-
-* `"sidebar"` — display columns in the sidebar
-* `"inline"` — display columns in the main notebook output (default)
-* `"bottom"` — display columns after all notebook cells
-
-**Code**
-
-```python
-mr.Columns(
-    n=2,
-    position="bottom"
-)
-```
-
-
-## Columns Props
-
-### n
-
-**type:** `int`
-
-Number of columns.
-Must be at least 1.
-
----
-
-### min_width
-
-**type:** `string`
-
-Minimum width of each column (CSS value).
-
-Examples:
-
-* `"120px"`
-* `"240px"`
-
----
-
-### gap
-
-**type:** `string`
-
-Gap between columns (CSS value).
-
-Examples:
-
-* `"8px"`
-* `"16px"`
-* `"32px"`
-
----
-
-### border
-
-**type:** `string | None`
-
-Controls column borders:
-
-* `None` — use theme defaults
-* `""` — disable borders
-* CSS string — custom border (e.g. `"1px solid red"`)
-
----
-
-### position
-
-**type:** `"sidebar" | "inline" | "bottom"`
-
-Controls where the columns are rendered.
-
----
-
-### key
-
-**type:** `string`
-
-Unique identifier used to distinguish widgets with identical arguments.
+* conversational UIs
+* LLM chat apps
+* data exploration assistants
+* streaming outputs
 
 <Aside>
-If the same code cell is run again, Mercury reuses the previous Columns instance unless a different `key` is specified.
-
-The `key` value is required when Columns are created inside loops.
-
+`Chat` itself does not create a scrollbar.
+Scrolling happens in the surrounding Mercury application container.
 </Aside>
+
+## Displaying Rich Outputs in Chat
+
+Because `Message` is a generic output container, `Chat` can display **any output
+supported by Mercury**.
+
+### Chat with Charts
+
+```python
+import matplotlib.pyplot as plt
+import mercury as mr
+
+chat = mr.Chat()
+
+msg = mr.Message(markdown="Here is the chart:")
+chat.add(msg)
+
+with msg:
+    plt.plot([1, 2, 3], [2, 1, 4])
+    plt.title("Example plot")
+    plt.show()
+```
+
+The plot is rendered **inside the chat message**, and the chat scrolls automatically.
+
+### Chat with DataFrames
+
+```python
+import pandas as pd
+import mercury as mr
+
+chat = mr.Chat()
+
+df = pd.DataFrame({
+    "product": ["A", "B", "C"],
+    "sales": [120, 90, 150]
+})
+
+msg = mr.Message(markdown="Sales data:")
+chat.add(msg)
+
+with msg:
+    display(df)
+```
+
+This pattern is ideal for **conversational data analysis**.
+
+## Streaming Responses
+
+A common pattern is to add an empty message first, then update it incrementally:
+
+```python
+msg = mr.Message()
+chat.add(msg)
+
+msg.append_markdown("Thinking")
+msg.append_markdown("...")
+msg.append_markdown("\n\nAnswer ready!")
+```
+
+The chat scrolls as content grows, making it ideal for **LLM streaming responses**.
+
+## Chat Props
+
+### placeholder
+
+**type:** `string`
+
+Text displayed when the chat contains no messages.
+
+Default:
+
+```text
+💬 No messages yet. Start the conversation!
+```
+
+---
+
+### scroll_container_selector
+
+**type:** `string`
+
+CSS selector used to locate the preferred scrollable container.
+
+Default:
+
+```text
+#mercury-main-panel, .mercury-main-panel
+```
+
+This is usually the main content area of a Mercury App.
+
+<Aside>
+You usually do not need to change this value unless you are embedding Chat
+inside a custom layout.
+</Aside>
+
+---
+
+## Chat Methods
+
+### add()
+
+Add a `Message` to the chat and scroll to it.
+
+```python
+chat.add(mr.Message(markdown="New message"))
+```
+
+---
+
+### clear()
+
+Remove all messages and show the placeholder.
+
+```python
+chat.clear()
+```
+
+---
+
+## What Chat Does Not Do
+
+To avoid confusion, it is important to note that `Chat`:
+
+* does not format messages
+* does not limit message types
+* does not manage user input
+* does not impose a conversation structure
+
+It is a **lightweight container**, not a full chat application framework.
 
 ---
 
 ## Notes
 
-* Columns are responsive and automatically wrap when space is limited.
-* Each returned object is an `Output` widget.
-* Use `with column:` blocks to write content into columns.
-* Columns are ideal for charts, tables, metrics, or grouped controls.
+* `Chat` manages **ordering and scrolling only**
+* All rendering logic lives in the `Message` widget
+* Auto-scrolling is resilient to large outputs (plots, images)
+* Internally, scrolling is implemented using a small frontend helper widget
+

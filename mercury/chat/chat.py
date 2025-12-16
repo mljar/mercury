@@ -1,4 +1,6 @@
-import uuid
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
 import ipywidgets as widgets
 from IPython.display import display, clear_output
 

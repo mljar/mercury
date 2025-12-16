@@ -1,0 +1,307 @@
+---
+title: Message
+description: How to use the Message widget to display chat messages and rich outputs in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+The **Message** widget represents a single chat message with an avatar and rich content.
+It supports **Markdown**, **plain text**, **raw HTML**, and — importantly — **any object
+that can be displayed in Mercury**.
+
+This makes `Message` not only a chat bubble, but also a **general-purpose output container**
+for charts, plots, images, and tables.
+
+The widget is most commonly used inside the `Chat` container, but it can also be displayed
+on its own.
+
+## Live Demo
+
+You can try the `Message` widget directly in this interactive example:
+
+<MercuryDemo
+  iframeSrc="https://demo.ismvp.org/mercury/chat?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/chat.ipynb"
+/> 
+
+## Basic Usage
+
+A simple message rendered with Markdown:
+
+```python
+import mercury as mr
+
+msg = mr.Message(markdown="**Hello world!**")
+msg
+```
+
+## Using Message with Chat
+
+The most common use case is adding messages to a `Chat` container:
+
+```python
+chat = mr.Chat()
+
+chat.add(
+    mr.Message(
+        markdown="Hello! How can I help you?",
+        role="assistant",
+        emoji="🤖"
+    )
+)
+```
+
+Each `Message` is displayed with:
+
+* an avatar (emoji)
+* role-based styling
+* rich content rendering
+
+
+## Message as a Generic Output Container ⭐
+
+In addition to text, **`Message` can display any object that Mercury (IPython)
+knows how to render**, including:
+
+* matplotlib / seaborn plots
+* Plotly charts
+* pandas DataFrames
+* images
+* custom widgets
+
+This is achieved using the standard IPython `display()` mechanism.
+
+
+### Displaying Charts and Plots
+
+You can use a `Message` as an output context manager:
+
+```python
+import matplotlib.pyplot as plt
+import mercury as mr
+
+msg = mr.Message()
+chat.add(msg)
+
+with msg:
+    plt.plot([1, 2, 3], [1, 4, 2])
+    plt.title("Simple chart")
+    plt.show()
+```
+
+The plot is rendered **inside the message bubble**, just like text.
+
+
+### Displaying a pandas DataFrame
+
+```python
+import pandas as pd
+import mercury as mr
+
+df = pd.DataFrame({
+    "name": ["Alice", "Bob", "Charlie"],
+    "score": [82, 91, 77]
+})
+
+msg = mr.Message(markdown="Here are the results:")
+chat.add(msg)
+
+with msg:
+    display(df)
+```
+
+This is especially useful for:
+
+* interactive data exploration
+* explaining results step-by-step
+* building conversational data apps
+
+---
+
+<Aside>
+`Message` internally wraps an `ipywidgets.Output`, so anything that works with
+`display()` or `print()` can be rendered inside it.
+</Aside>
+
+
+## Rendering Modes
+
+A `Message` can render content in **exactly one text mode at a time**:
+
+* Markdown
+* Plain text
+* Raw HTML
+
+These modes control **text rendering only**.
+Rich outputs (plots, tables, images) are always displayed using `display()`.
+
+
+### Markdown
+
+```python
+msg = mr.Message()
+msg.set_content(markdown="### Title\nSome **bold** text")
+```
+
+
+### Plain Text
+
+```python
+msg = mr.Message()
+msg.set_content(text="This is plain text.")
+```
+
+
+### Raw HTML
+
+```python
+msg = mr.Message()
+msg.set_content(html="<b style='color:red'>Error</b>")
+```
+
+<Aside>
+Use raw HTML carefully. Invalid HTML may break layout or styling.
+</Aside>
+
+
+## Streaming / Incremental Updates
+
+The `Message` widget supports incremental updates, which is useful for
+LLM streaming responses.
+
+```python
+msg = mr.Message()
+chat.add(msg)
+
+msg.append_markdown("Thinking")
+msg.append_markdown("...")
+msg.append_markdown("\n\nDone!")
+```
+
+Each call appends content and re-renders the message.
+
+## Animated Text Helpers
+
+### Bouncing Text
+
+Render animated bouncing text (useful for loading indicators):
+
+```python
+msg = mr.Message()
+msg.set_bouncing_text("Thinking...")
+```
+
+
+### Gradient Text
+
+Render animated gradient text cycling through colors:
+
+```python
+msg = mr.Message()
+msg.set_gradient_text(
+    "Processing",
+    colors=["#666", "#999", "#bbb"],
+    speed=1.0
+)
+```
+
+
+## Message Props
+
+### markdown
+
+**type:** `string`
+
+Initial Markdown content rendered when the message is created.
+
+---
+
+### role
+
+**type:** `string`
+
+Used to determine avatar styling.
+Common values:
+
+* `"user"`
+* `"assistant"`
+
+---
+
+### emoji
+
+**type:** `string`
+
+Emoji displayed in the avatar.
+The default is `"👤"`.
+
+---
+
+## Message Methods
+
+### set_content()
+
+Replace message content entirely.
+
+```python
+msg.set_content(markdown="New content")
+```
+
+Exactly one argument must be provided:
+
+* `markdown`
+* `text`
+* `html`
+
+---
+
+### append_markdown()
+
+Append Markdown content and re-render.
+
+```python
+msg.append_markdown(" more text")
+```
+
+---
+
+### append_text()
+
+Append plain text (no formatting).
+
+```python
+msg.append_text(" raw text")
+```
+
+---
+
+### append_html()
+
+Append raw HTML.
+
+```python
+msg.append_html("<br><b>HTML</b>")
+```
+
+---
+
+### clear()
+
+Remove all content from the message.
+
+```python
+msg.clear()
+```
+
+---
+
+## Notes
+
+* `Message` is both a **chat message** and a **generic output container**.
+* Any object supported by `display()` can be rendered inside a message.
+* Text rendering mode affects only text content.
+* Auto-scrolling is handled by the parent `Chat` widget.
+* Messages share a common CSS class: `mljar-chat-msg`.
+

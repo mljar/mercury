@@ -404,3 +404,15 @@
 .jp-MarkdownOutput {
   padding-left: 0px !important;
 }
+
+jp-RenderedHTMLCommon h1 {
+  font-weight: 900;
+}
+
+jp-RenderedHTMLCommon h2 {
+  font-weight: 900;
+}
+
+jp-RenderedHTMLCommon h3 {
+  font-weight: 900;
+}
