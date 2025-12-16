@@ -83,7 +83,7 @@ export default defineConfig({
                 
                 { label: 'Chat', autogenerate: { directory: 'docs/chat' } },
                 { label: 'Input', autogenerate: { directory: 'docs/input' } },
-                { label: 'Output', autogenerate: { directory: 'docs/widgets/output' } },
+                { label: 'Output', autogenerate: { directory: 'docs/output' } },
                 { label: 'Layout', autogenerate: { directory: 'docs/layout' } },
                 { label: 'Control', autogenerate: { directory: 'docs/control' } },
                 

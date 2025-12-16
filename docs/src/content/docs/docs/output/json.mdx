@@ -1,0 +1,147 @@
+---
+title: JSON
+description: How to display and explore JSON data with the JSON widget in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **JSON** widget displays JSON data in an interactive, expandable tree view.
+It is useful for inspecting nested structures such as API responses, configuration files,
+model outputs, or logs.
+
+You can pass JSON content as:
+- a Python `dict` / `list` (it will be serialized automatically), or
+- a JSON `string` (it will be parsed in the frontend).
+
+## Basic Usage
+
+Display a Python dictionary:
+
+```python
+import mercury as mr
+
+mr.JSON(
+    json_data={"b": [1, 2, 3], "c": ["a", "b"]},
+    label="Payload",
+    level=2
+)
+```
+
+Display a JSON string:
+
+```python
+import mercury as mr
+
+mr.JSON(
+    json_data='{"name": "Alice", "age": 30}',
+    label="User",
+    level=1
+)
+```
+
+## Expand Level
+
+Use `level` to control how many levels are expanded initially.
+
+* `level=0` — fully collapsed
+* `level=1` — expand the top level (default)
+* `level=2` — expand two levels, etc.
+
+```python
+import mercury as mr
+
+mr.JSON(
+    json_data={"a": {"b": {"c": 123}}},
+    level=3
+)
+```
+
+<Aside>
+Very large JSON structures may become heavy to render if you expand too many levels.
+</Aside>
+
+
+## Layout
+
+Use `position` to control where the widget is displayed:
+
+* `"sidebar"` — in the sidebar
+* `"inline"` — directly in the notebook flow (**default**)
+* `"bottom"` — after all notebook cells
+
+```python
+import mercury as mr
+
+mr.JSON(
+    json_data={"status": "ok"},
+    position="sidebar"
+)
+```
+
+## JSON Props
+
+### json_data
+
+**type:** `dict | list | string | None`
+
+JSON content to display.
+
+* If `dict` or `list`, it is serialized to JSON automatically.
+* If `string`, it is parsed as JSON in the frontend.
+* If `None`, `{}` is displayed.
+
+---
+
+### label
+
+**type:** `string`
+
+Optional label displayed above the viewer.
+
+Default: `""`
+
+---
+
+### level
+
+**type:** `int`
+
+Initial expand level.
+
+Default: `1`
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered.
+
+Default: `"inline"`
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier to distinguish widgets with identical arguments.
+
+<Aside>
+If the same code cell is run again, Mercury reuses the previous widget instance unless a different `key` is specified.
+
+The `key` value is needed if widgets are created in a loop.
+
+</Aside>
+
+---
+
+## Notes
+
+* The JSON viewer expects valid JSON types:
+  objects (dict), arrays (list), strings, numbers, booleans, and `null`.
+* Python-only types like `set` are **not valid JSON** and should be converted first
+  (for example: `list(my_set)`).
+

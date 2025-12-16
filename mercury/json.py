@@ -1,20 +1,91 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
+import json
+from typing import Any, Literal, Optional, Union
+
 import anywidget
 import traitlets
-import json
-from .manager import WidgetsManager, MERCURY_MIMETYPE
+from IPython.display import display
+
+from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
 
+Position = Literal["sidebar", "inline", "bottom"]
+JSONData = Union[dict, list, str]
 
-def JSON(*args, key="", **kwargs):
+
+def JSON(
+    json_data: Optional[JSONData] = None,
+    label: str = "",
+    level: int = 1,
+    position: Position = "inline",
+    key: str = "",
+):
+    """
+    Create and display a JSON viewer widget.
+
+    This function instantiates a `JSONViewer` to render JSON data in an
+    expandable, pretty-printed tree view (powered by an embedded `renderjson`
+    implementation). If a widget with the same configuration (identified by a
+    unique code UID generated from widget type, arguments, and keyword arguments)
+    already exists in the `WidgetsManager`, the existing instance is reused and
+    displayed instead of creating a new one.
+
+    Parameters
+    ----------
+    json_data : dict | list | str | None, optional
+        JSON content to display.
+
+        - If `dict` or `list`, it will be serialized to JSON.
+        - If `str`, it should contain JSON text (it will be parsed in the frontend).
+        - If `None`, an empty object `{}` is displayed.
+    label : str, optional
+        Optional label displayed above the JSON viewer.
+        The default is `""` (no label).
+    level : int, optional
+        Initial expand level for the tree. Higher values expand more levels.
+        The default is `1`.
+    position : {"sidebar", "inline", "bottom"}, optional
+        Controls where the widget is displayed:
+
+        - `"sidebar"` — place the widget in the left sidebar panel.
+        - `"inline"` — render the widget directly in the notebook flow (default).
+        - `"bottom"` — render the widget after all notebook cells.
+    key : str, optional
+        Unique identifier used to differentiate widgets with the same parameters.
+
+    Examples
+    --------
+    Display a Python dictionary:
+
+    >>> import mercury as mr
+    >>> mr.JSON(
+    ...     json_data={"b": [1, 2, 3], "c": ["a", "b"]},
+    ...     label="Payload",
+    ...     level=2
+    ... )
+
+    Display JSON from a string:
+
+    >>> mr.JSON(json_data='{"name": "Alice", "age": 30}', level=1)
+    """
+    args = [json_data, label, level, position]
+    kwargs = {
+        "label": label,
+        "level": level,
+        "position": position,
+    }
+
     code_uid = WidgetsManager.get_code_uid("JSON", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
-        display(cached)        
-        return cached
-    instance = JSONViewer(*args, **kwargs)
+        display(cached)
+        return
+
+    instance = JSONViewer(json_data=json_data, **kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
-    return instance
 
 
 class JSONViewer(anywidget.AnyWidget):
@@ -40,7 +111,6 @@ class JSONViewer(anywidget.AnyWidget):
 
       el.appendChild(container);
 
-      // draw
       function draw() {
         holder.innerHTML = "";
         const lvl = model.get("level") ?? 1;
@@ -58,7 +128,6 @@ class JSONViewer(anywidget.AnyWidget):
 
       draw();
 
-      // sync
       model.on("change:data", draw);
       model.on("change:level", draw);
       model.on("change:label", () => {
@@ -69,14 +138,6 @@ class JSONViewer(anywidget.AnyWidget):
           container.removeChild(labelEl);
         }
       });
-
-      // custom css
-      const css = model.get("custom_css");
-      if (css && css.trim().length > 0) {
-        const styleTag = document.createElement("style");
-        styleTag.textContent = css;
-        el.appendChild(styleTag);
-      }
     }
     export default { render };
     """
@@ -110,26 +171,23 @@ class JSONViewer(anywidget.AnyWidget):
     .renderjson .disclosure {{ color: #666; font-size: 120%; text-decoration: none; }}
     """
 
-    # traits
     data = traitlets.Unicode(default_value="{}").tag(sync=True)
     label = traitlets.Unicode(default_value="").tag(sync=True)
     level = traitlets.Int(default_value=1).tag(sync=True)
-    custom_css = traitlets.Unicode(default_value="", help="Extra CSS").tag(sync=True)
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
         default_value="inline",
-        help="Widget placement"
+        help="Widget placement",
     ).tag(sync=True)
 
-    def __init__(self, json_data=None, **kwargs):
+    def __init__(self, json_data: Optional[JSONData] = None, **kwargs):
         super().__init__(**kwargs)
         if json_data is None:
             self.data = "{}"
+        elif isinstance(json_data, (dict, list)):
+            self.data = json.dumps(json_data)
         else:
-            if isinstance(json_data, (dict, list)):
-                self.data = json.dumps(json_data)
-            else:
-                self.data = str(json_data)
+            self.data = str(json_data)
 
     def _repr_mimebundle_(self, **kwargs):
         data = super()._repr_mimebundle_(**kwargs)
@@ -137,7 +195,7 @@ class JSONViewer(anywidget.AnyWidget):
             mercury_mime = {
                 "widget": type(self).__qualname__,
                 "model_id": self.model_id,
-                "position": self.position
+                "position": self.position,
             }
             data[0][MERCURY_MIMETYPE] = mercury_mime
             if "text/plain" in data[0]:

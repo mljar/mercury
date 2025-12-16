@@ -1,0 +1,186 @@
+---
+title: Indicator
+description: How to display KPI-style metric cards with the Indicator component in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **Indicator** component renders a compact KPI-style card for displaying a metric value,
+an optional label, and an optional delta (change) badge.
+
+It is useful for dashboards and summaries such as:
+- number of users
+- revenue / costs
+- accuracy / AUC / latency
+- conversion rate changes
+- experiment comparisons
+
+Indicators can be displayed:
+- as a **single card**, or
+- as a **responsive row of cards** (by passing a list of `Indicator` objects).
+
+## Basic Usage
+
+### Single Indicator
+
+```python
+import mercury as mr
+
+mr.Indicator(
+    value="123",
+    label="Users",
+    delta=5.4
+)
+```
+
+* `value` is displayed as the main metric
+* `label` is shown above the value
+* `delta` shows an up/down badge (green/red) if numeric
+
+## Delta (Change Badge)
+
+`delta` can be numeric or text:
+
+* numeric `delta > 0` → green badge with ↑
+* numeric `delta < 0` → red badge with ↓
+* non-numeric delta → displayed as-is (no arrow logic)
+
+```python
+mr.Indicator(value="98%", label="Accuracy", delta=-1.2)
+```
+
+```python
+mr.Indicator(value="OK", label="Status", delta="stable")
+```
+
+<Aside>
+The delta badge formats numeric values as a percentage (`abs(delta)%`).  
+If you want custom formatting, pass `delta` as a string (for example: `"−1.2 pp"`).
+</Aside>
+
+
+## Multiple Indicators in One Row 
+
+To render a row of indicators, pass a list of `Indicator` objects as the `value`
+of another `Indicator`:
+
+```python
+import mercury as mr
+
+mr.Indicator([
+    mr.Indicator(value="123", label="Users", delta=5.4),
+    mr.Indicator(value="98%", label="Accuracy", delta=-1.2),
+    mr.Indicator(value="1.3s", label="Latency"),
+])
+```
+
+The row is responsive:
+
+* on wide screens it displays as a row of cards
+* on small screens it switches to a single-column layout
+
+## Styling
+
+You can customize colors per indicator:
+
+```python
+import mercury as mr
+
+mr.Indicator(
+    value="$12,340",
+    label="Revenue",
+    delta=3.1,
+    background_color="#fff",
+    border_color="#ebebeb",
+    value_color="#222",
+    label_color="#555",
+)
+```
+
+---
+
+## Indicator Params
+
+### value (required)
+
+**type:** `any`
+
+Main value displayed in the card.
+
+Special case:
+
+* if `value` is a list of `Indicator` instances, they are rendered together as a row.
+
+---
+
+### label
+
+**type:** `string`
+
+Optional label shown above the value.
+
+Default: `""`
+
+---
+
+### delta
+
+**type:** `float | string | None`
+
+Optional change badge.
+
+* numeric → shows arrow and color logic
+* string → shown as provided
+* `None` → no badge
+
+Default: `None`
+
+---
+
+### background_color
+
+**type:** `string`
+
+Card background color.
+
+Default: `"#fff"`
+
+---
+
+### border_color
+
+**type:** `string`
+
+Card border color.
+
+Default: `"#ebebeb"`
+
+---
+
+### value_color
+
+**type:** `string`
+
+Text color of the main value.
+
+Default: `"#222"`
+
+---
+
+### label_color
+
+**type:** `string`
+
+Text color of the label.
+
+Default: `"#555"`
+
+---
+
+## Notes
+
+* `Indicator` renders HTML using the `_repr_html_` protocol.
+* Multiple indicators can be grouped into a responsive row.
+* Numeric deltas are interpreted as percentages (`abs(delta)%`).
+

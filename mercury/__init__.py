@@ -10,14 +10,20 @@ from .slider import Slider
 from .text import TextInput
 from .file import UploadFile
 
-
-from .expander import Expander
+# layout widgets
 from .columns import Columns
+from .expander import Expander
+from .tabs import Tabs
+
+# output widgets
+from .json import JSON
 from .md import Markdown
 from .indicator import Indicator
-from .tabs import Tabs
 from .table import Table
+from .image import ImageCard
+from .download import Download
 
+# chat widgets
 from .chat.chat import Chat
 from .chat.chatinput import ChatInput
 from .chat.message import Message 

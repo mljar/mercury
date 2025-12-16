@@ -1,0 +1,209 @@
+---
+title: ImageCard
+description: How to display images from URLs or local files with the ImageCard helper in a Mercury App
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **ImageCard** helper displays an image (from a URL or a local file) inside a styled card,
+with an optional caption below it.
+
+<Aside>
+`ImageCard` displays the widget immediately and does not return a value.
+Use it like other display helpers in Mercury: call it in a cell and it will render in the UI.
+</Aside>
+
+
+## Basic Usage
+
+### Example: Image from URL
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
+    caption="A cat loaded from a public URL"
+)
+```
+
+### Example: Image from Local File
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/plot.png",
+    caption="Saved plot from the experiment"
+)
+```
+
+<Aside>
+For local files, `ImageCard` reads the image and embeds it as a `data:` URI, so it can be displayed reliably in the Mercury UI.
+</Aside>
+
+
+## Caption
+
+Use `caption` to show a centered italic description below the image:
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/result.png",
+    caption="Training result after 50 epochs"
+)
+```
+
+If `caption=""` (default), no caption element is rendered.
+
+
+
+## Sizing
+
+### Card Width
+
+Use `width` to control the outer card width (CSS value):
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/result.png",
+    width="420px"
+)
+```
+
+Default: `"100%"`
+
+
+
+### Fixed Image Height
+
+Use `height` to create a fixed image area (useful when you want multiple cards aligned).
+When `height` is provided, the image uses `object-fit: contain`.
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/result.png",
+    height="240px",
+    caption="Fixed-height preview"
+)
+```
+
+Default: `None` (natural image height)
+
+
+## Styling Options
+
+### Rounded Corners
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/result.png",
+    rounded=False
+)
+```
+
+Default: `True`
+
+
+### Border
+
+```python
+import mercury as mr
+
+mr.ImageCard(
+    src="assets/result.png",
+    show_border=False
+)
+```
+
+Default: `True`
+
+
+## ImageCard Props
+
+### src (required)
+
+**type:** `string`
+
+Image source. Can be:
+
+* an `http://` or `https://` URL, or
+* a local filesystem path (e.g. `assets/plot.png`)
+
+---
+
+### caption
+
+**type:** `string`
+
+Optional caption text shown below the image (centered and italic).
+
+Default: `""`
+
+---
+
+### width
+
+**type:** `string`
+
+CSS width for the outer card (e.g. `"100%"`, `"400px"`).
+
+Default: `"100%"`
+
+---
+
+### height
+
+**type:** `string | None`
+
+Fixed CSS height for the image area (e.g. `"240px"`).
+If `None`, the image uses its natural height.
+
+Default: `None`
+
+---
+
+### rounded
+
+**type:** `bool`
+
+If `True`, apply theme border radius to the image area.
+
+Default: `True`
+
+---
+
+### show_border
+
+**type:** `bool`
+
+If `True`, show a border around the card.
+
+Default: `True`
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier to reuse the same widget instance.
+
+---
+
+## Notes
+
+* `ImageCard` **renders immediately** (it is a display helper) and does not return a value.
+* Local files are embedded as `data:` URIs (base64), which makes them easy to render in the UI.
+* If `src` is neither a valid URL nor an existing file path, it is used as-is (so invalid paths will likely show a broken image).
+* Styling is aligned with the Mercury theme (`THEME`) and is injected globally once per notebook session.
+

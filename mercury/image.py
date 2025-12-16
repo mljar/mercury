@@ -103,10 +103,6 @@ def ImageCard(src: str, caption: str = "",
     key : str
         Stable cache key to reuse the same widget instance.
 
-    Returns
-    -------
-    ipywidgets.VBox
-        The image card widget (already displayed).
     """
     _ensure_global_image_styles()
 
@@ -118,7 +114,7 @@ def ImageCard(src: str, caption: str = "",
     if cached:
         card = cached
         display(card)
-        return card
+        return
 
     img_src = _img_src(src)
     style_parts = ["width:100%;", "height:auto;"]
@@ -148,4 +144,4 @@ def ImageCard(src: str, caption: str = "",
 
     display(card)
     WidgetsManager.add_widget(code_uid, card)
-    return card
+
