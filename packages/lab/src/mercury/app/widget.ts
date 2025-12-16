@@ -167,18 +167,18 @@ function getPageConfig(): IPageConfigLike {
  * Fetch theme overrides.
  * The `url` parameter is accepted for future flexibility.
  */
-async function fetchTheme(_url: string) {
-  try {
-    const response = await fetch('http://localhost:8888/mercury/api/theme');
-    if (!response.ok) {
-      throw new Error(`Theme API error: ${response.status}`);
-    }
-    return await response.json();
-  } catch (err) {
-    console.warn('Failed to fetch theme overrides', err);
-    return {};
-  }
-}
+// async function fetchTheme(_url: string) {
+//   try {
+//     const response = await fetch('http://localhost:8888/mercury/api/theme');
+//     if (!response.ok) {
+//       throw new Error(`Theme API error: ${response.status}`);
+//     }
+//     return await response.json();
+//   } catch (err) {
+//     console.warn('Failed to fetch theme overrides', err);
+//     return {};
+//   }
+// }
 
 /**
  * Main application widget that lays out notebook cells into
@@ -257,7 +257,7 @@ export class AppWidget extends Panel {
     super();
 
     const pageConfig = getPageConfig();
-    void fetchTheme(pageConfig.baseUrl || '');
+    // void fetchTheme(pageConfig.baseUrl || '');
 
     this._model = model;
 
@@ -1060,19 +1060,17 @@ export class AppWidget extends Panel {
     }
   }
 
+  // --- autorerun gate + coalesce ---
+  private _acceptWidgetInput = true;
+  private _rerunInProgress = false;
+  private _pendingRerunFromIndex: number | null = null;
+  private _rerunTimer: number | null = null;
+
   private onWidgetUpdate = (_model: AppModel, update: IWidgetUpdate) => {
-    // respect autorerun
-    if (!this._autoRerun) {
-      return;
-    }
+    if (!this._autoRerun || this.isDisposed) return;
+    if (!update.cellModelId) return;
 
-    if (this.isDisposed) {
-      return;
-    }
-    if (!update.cellModelId) {
-      return;
-    }
-
+    // find index of the updated cell
     const cells = this._model.cells;
     let updatedIndex = -1;
     for (let i = 0; i < cells.length; i++) {
@@ -1081,28 +1079,86 @@ export class AppWidget extends Panel {
         break;
       }
     }
-    if (updatedIndex === -1) {
+    if (updatedIndex === -1) return;
+
+    const fromIndex = updatedIndex + 1;
+
+    // If we are busy, just remember earliest affected index
+    if (!this._acceptWidgetInput || this._rerunInProgress) {
+      this._pendingRerunFromIndex =
+        this._pendingRerunFromIndex === null
+          ? fromIndex
+          : Math.min(this._pendingRerunFromIndex, fromIndex);
       return;
     }
 
-    // Execute all code cells _below_ the updated cell
-    for (let i = updatedIndex + 1; i < cells.length; i++) {
-      const cellModel = cells.get(i);
-      if (cellModel.type === 'code') {
-        const cellWidget = this._cellItems.find(w => w.cellId === cellModel.id);
-        if (cellWidget && cellWidget.child instanceof CodeCell) {
-          codeCellExecute(
-            cellWidget.child as CodeCell,
-            this._model.context.sessionContext,
-            {
-              deletedCells: this._model.context.model?.deletedCells ?? []
-            }
-          );
-        }
+    // Debounce bursts of updates (checkbox rapid clicks, slider drags, etc.)
+    this._pendingRerunFromIndex =
+      this._pendingRerunFromIndex === null
+        ? fromIndex
+        : Math.min(this._pendingRerunFromIndex, fromIndex);
+
+    if (this._rerunTimer !== null) {
+      window.clearTimeout(this._rerunTimer);
+    }
+    this._rerunTimer = window.setTimeout(() => {
+      this._rerunTimer = null;
+      const start = this._pendingRerunFromIndex;
+      this._pendingRerunFromIndex = null;
+      if (start !== null) {
+        void this._runCellsFromIndex(start);
+      }
+    }, 80);
+  };
+  private async _runCellsFromIndex(fromIndex: number): Promise<void> {
+    // If a run is already happening, coalesce and exit
+    if (this._rerunInProgress) {
+      this._pendingRerunFromIndex =
+        this._pendingRerunFromIndex === null
+          ? fromIndex
+          : Math.min(this._pendingRerunFromIndex, fromIndex);
+      return;
+    }
+
+    this._rerunInProgress = true;
+    this._acceptWidgetInput = false;
+
+    try {
+      const cells = this._model.cells;
+
+      for (let i = fromIndex; i < cells.length; i++) {
+        const cellModel = cells.get(i);
+        if (cellModel.type !== 'code') continue;
+
+        const item = this._cellItems.find(w => w.cellId === cellModel.id);
+        if (!item || !(item.child instanceof CodeCell)) continue;
+
+        // IMPORTANT: sequential await prevents kernel flooding
+        await codeCellExecute(
+          item.child as CodeCell,
+          this._model.context.sessionContext,
+          { deletedCells: this._model.context.model?.deletedCells ?? [] }
+        );
+      }
+
+      // Do this once per chain, not per cell
+      await executeWidgetsManagerClearValues(
+        this._model.context.sessionContext
+      );
+    } catch (e) {
+      console.error('[Mercury][autoRerun] chain failed:', e);
+    } finally {
+      this._acceptWidgetInput = true;
+      this._rerunInProgress = false;
+
+      // If something changed while we were running, run again once (coalesced)
+      if (this._pendingRerunFromIndex !== null) {
+        const nextFrom = this._pendingRerunFromIndex;
+        this._pendingRerunFromIndex = null;
+        void this._runCellsFromIndex(nextFrom);
       }
     }
-    executeWidgetsManagerClearValues(this._model.context.sessionContext);
-  };
+  }
 
   // ────────────────────────────────────────────────────────────────────────────
   // Insert / dispose helpers
@@ -1175,8 +1231,8 @@ export class AppWidget extends Panel {
           }
         );
       }
-      executeWidgetsManagerClearValues(this._model.context.sessionContext);
     }
+    executeWidgetsManagerClearValues(this._model.context.sessionContext);
   }
 
   private async checkWidgetModels(): Promise<void> {

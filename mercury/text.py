@@ -92,7 +92,7 @@ class TextInputWidget(anywidget.AnyWidget):
         if (model.get("disabled")) return;
         model.set("value", input.value);
         if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => model.save_changes(), 100);
+        debounceTimer = setTimeout(() => model.save_changes(), 200);
       });
 
       function syncFromModel() {
@@ -113,6 +113,7 @@ class TextInputWidget(anywidget.AnyWidget):
 
       syncFromModel();
 
+      /*
       // ---- read cell id (no DOM modifications) ----
       const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
@@ -135,6 +136,7 @@ class TextInputWidget(anywidget.AnyWidget):
         });
         mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
       }
+      */
     }
     export default { render };
     """

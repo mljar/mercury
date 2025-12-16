@@ -90,8 +90,8 @@
   justify-content: center;
 
   opacity: 0.8;
-  width: 25px;
-  height: 25px;
+  width: 23px;
+  height: 23px;
 
   border: none;
   cursor: pointer;
@@ -103,7 +103,7 @@
 
 .mercury-sidebar-collapse {
   right: -2px;
-  top: 5px;
+  top: 0px;
 }
 
 .mercury-sidebar-expand {
@@ -405,14 +405,14 @@
   padding-left: 0px !important;
 }
 
-jp-RenderedHTMLCommon h1 {
-  font-weight: 900;
+.jp-MarkdownOutput h1 {
+  font-weight: 900 !important;
 }
 
-jp-RenderedHTMLCommon h2 {
-  font-weight: 900;
+.jp-MarkdownOutput h2 {
+  font-weight: 900 !important;
 }
 
-jp-RenderedHTMLCommon h3 {
-  font-weight: 900;
+.jp-MarkdownOutput h3 {
+  font-weight: 900 !important;
 }

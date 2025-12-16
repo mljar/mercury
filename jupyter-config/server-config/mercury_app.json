@@ -2,6 +2,8 @@
   "ServerApp": {
     "jpserver_extensions": {
       "mercury_app": true
-    }
+    },
+    "websocket_ping_interval": 30000,
+    "websocket_ping_timeout": 30000
   }
 }

@@ -134,7 +134,7 @@ class ButtonWidget(anywidget.AnyWidget):
         model.set("last_clicked_at", new Date().toISOString());
         model.set("value", true);
         model.save_changes();
-        model.send({ type: "clicked", n_clicks: current + 1 });
+        // model.send({ type: "clicked", n_clicks: current + 1 });
       });
 
       // Reactivity
@@ -150,6 +150,7 @@ class ButtonWidget(anywidget.AnyWidget):
       syncFromModel();
 
       // ---- read cell id (no DOM modifications) ----
+      /*
       const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
       const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
@@ -170,7 +171,7 @@ class ButtonWidget(anywidget.AnyWidget):
           }
         });
         mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
-      }
+      }*/
     }
     export default { render };
     """

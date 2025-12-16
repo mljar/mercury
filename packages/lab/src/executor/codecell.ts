@@ -86,7 +86,24 @@ export async function codeCellExecute(
     }
     // Save this execution's future so we can compare in the catch below.
     future = cell.outputArea.future;
-    const msg = (await msgPromise)!;
+    //const msg = (await msgPromise)!;
+
+    let msg: KernelMessage.IExecuteReplyMsg | undefined;
+
+    try {
+      msg = await msgPromise;
+    } catch (e: any) {
+      if (String(e?.message || e).includes('Canceled future')) {
+        // normalne anulowanie (re-run, dispose, widget update)
+        return;
+      }
+      throw e;
+    }
+
+    if (!msg) {
+      return;
+    }
+
     model.executionCount = msg.content.execution_count;
     if (recordTiming) {
       const timingInfo = Object.assign(

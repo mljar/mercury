@@ -283,7 +283,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
       });
 
       // ---- read cell id (no DOM modifications) ----
-      const ID_ATTR = 'data-cell-id';
+      /*const ID_ATTR = 'data-cell-id';
       const hostWithId = el.closest(`[${ID_ATTR}]`);
       const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
 
@@ -305,6 +305,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
         });
         mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
       }
+      */
     }
     export default { render };
     """

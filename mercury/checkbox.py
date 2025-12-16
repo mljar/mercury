@@ -45,6 +45,7 @@ def CheckBox(
 
     code_uid = WidgetsManager.get_code_uid("Checkbox", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
+    
     if cached:
         display(cached)
         return cached
@@ -112,7 +113,7 @@ class CheckboxWidget(anywidget.AnyWidget):
           model.set("last_changed_at", new Date().toISOString());
           model.set("n_toggles", (model.get("n_toggles") || 0) + 1);
           model.save_changes();
-          model.send({ type: "changed", value: v });
+          // model.send({ type: "changed", value: v });
         }
       });
 
@@ -125,6 +126,7 @@ class CheckboxWidget(anywidget.AnyWidget):
       syncFromModel();
 
       // ---- read cell id (no DOM modifications) ----
+      /*
       const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
       const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
@@ -137,6 +139,7 @@ class CheckboxWidget(anywidget.AnyWidget):
         const mo = new MutationObserver(() => {
           const host = el.closest(`[${ID_ATTR}]`);
           const newId = host?.getAttribute(ID_ATTR);
+          
           if (newId) {
             model.set("cell_id", newId);
             model.save_changes();
@@ -146,6 +149,7 @@ class CheckboxWidget(anywidget.AnyWidget):
         });
         mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
       }
+      */
     }
     export default { render };
     """
@@ -160,6 +164,7 @@ class CheckboxWidget(anywidget.AnyWidget):
         -webkit-tap-highlight-color: transparent;
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
         color: {THEME.get('text_color', '#222')};
+        padding-left: 5px;
     }}
     .mljar-checkbox-container.is-disabled {{
         opacity: 0.6;

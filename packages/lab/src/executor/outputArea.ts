@@ -50,8 +50,12 @@ export async function outputAreaExecute(
         if (this._future === value) {
           return;
         }
-        if (this._future) {
-          this._future.dispose();
+        // if (this._future) {
+        //   void this._future.done.finally(() => this._future?.dispose());
+        // }
+        const oldFuture = this._future;
+        if (oldFuture) {
+          void oldFuture.done.finally(() => oldFuture.dispose());
         }
         this._future = value;
 
