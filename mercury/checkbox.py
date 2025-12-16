@@ -14,7 +14,7 @@ Position = Literal["sidebar", "inline", "bottom"]
 Appearance = Literal["toggle", "box"]
 
 
-def Checkbox(
+def CheckBox(
     label: str = "Enable",
     value: bool = False,
     appearance: Appearance = "toggle",

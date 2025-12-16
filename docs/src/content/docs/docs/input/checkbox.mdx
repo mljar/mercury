@@ -1,19 +1,19 @@
 ---
 
-title: Checkbox
-description: How to use the Checkbox widget in the interactive Mercury App
+title: CheckBox
+description: How to use the CheckBox widget in the interactive Mercury App
 ---
 
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
-The **Checkbox** widget displays a boolean control that lets users toggle a value between **True** and **False**.
+The **CheckBox** widget displays a boolean control that lets users toggle a value between **True** and **False**.
 It is useful for enabling/disabling features, turning options on/off, or controlling conditional logic in your Mercury App.
 
 ## Live Demo
 
-You can try the `Checkbox` widget directly in this interactive example:
+You can try the `CheckBox` widget directly in this interactive example:
 
 <MercuryDemo
   iframeSrc="https://demo.ismvp.org/mercury/input-widgets?no-navbar"
@@ -23,7 +23,7 @@ You can try the `Checkbox` widget directly in this interactive example:
 
 ## Usage
 
-To create a Checkbox widget, provide a `label`.
+To create a CheckBox widget, provide a `label`.
 The current state is always available via `.value`.
 
 ### Basic Example
@@ -33,7 +33,7 @@ The current state is always available via `.value`.
 ```python
 import mercury as mr
 
-cb = mr.Checkbox(
+cb = mr.CheckBox(
     label="Auto-refresh"
 )
 ```
@@ -48,7 +48,7 @@ cb.value
 
 ### Appearance
 
-The Checkbox supports two visual styles controlled by the `appearance` argument:
+The CheckBox supports two visual styles controlled by the `appearance` argument:
 
 * `"toggle"` — switch-style control (default)
 * `"box"` — classic square checkbox
@@ -58,12 +58,12 @@ The Checkbox supports two visual styles controlled by the `appearance` argument:
 ```python
 import mercury as mr
 
-cb_toggle = mr.Checkbox(
+cb_toggle = mr.CheckBox(
     label="Auto-refresh",
     appearance="toggle"
 )
 
-cb_box = mr.Checkbox(
+cb_box = mr.CheckBox(
     label="I agree",
     appearance="box"
 )
@@ -92,7 +92,7 @@ Available positions:
 **Code**
 
 ```python
-cb = mr.Checkbox(
+cb = mr.CheckBox(
     label="Enable option",
     position="inline"
 )
@@ -100,7 +100,7 @@ cb = mr.Checkbox(
 
 ---
 
-## Checkbox Props
+## CheckBox Props
 
 ### label
 

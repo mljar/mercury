@@ -1,0 +1,170 @@
+---
+title: PDF
+description: How to display PDF documents in a Mercury App with the PDF widget
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+The **PDF** widget displays a PDF document inside a Mercury App using an embedded iframe.
+It is useful for showing reports, invoices, slides, and generated documents directly in your app.
+
+The widget reads a local PDF file and embeds it as a `data:` URL, so the document can be
+rendered reliably in the Mercury UI.
+
+
+## Basic Usage
+
+### Display a Local PDF
+
+```python
+import mercury as mr
+
+mr.PDF(
+    file_path="report.pdf",
+    label="Monthly report",
+    height="900"
+)
+```
+
+## Layout
+
+Use `position` to control where the PDF viewer is displayed:
+
+* `"inline"` — in the notebook flow (**default**)
+* `"sidebar"` — in the sidebar
+* `"bottom"` — after all notebook cells
+
+```python
+import mercury as mr
+
+mr.PDF(
+    file_path="slides.pdf",
+    position="bottom",
+    label="Slides"
+)
+```
+
+<Aside>
+The PDF viewer is usually too wide for the sidebar. If you use `position="sidebar"`,
+consider reducing the width or using a smaller height.
+</Aside>
+
+## Sizing
+
+### Width
+
+```python
+import mercury as mr
+
+mr.PDF(
+    file_path="report.pdf",
+    width="100%"
+)
+```
+
+Default: `"100%"`
+
+### Height
+
+```python
+import mercury as mr
+
+mr.PDF(
+    file_path="report.pdf",
+    height="600"
+)
+```
+
+Default: `"800"`
+
+## Example: Generate PDF and Display It
+
+A common workflow is to generate a PDF first (for example with ReportLab),
+save it to disk, then display it with `mr.PDF()`.
+
+```python
+import mercury as mr
+from reportlab.pdfgen import canvas
+
+pdf_path = "hello.pdf"
+
+c = canvas.Canvas(pdf_path)
+c.drawString(72, 720, "Hello from Mercury ✅")
+c.save()
+
+mr.PDF(
+    file_path=pdf_path,
+    label="Generated PDF"
+)
+```
+
+## PDF Props
+
+### file_path
+
+**type:** `string | None`
+
+Path to a local PDF file.
+
+If `None`, the widget is created without a document (empty iframe).
+
+Default: `None`
+
+---
+
+### label
+
+**type:** `string`
+
+Optional label displayed above the viewer.
+
+Default: `""`
+
+---
+
+### width
+
+**type:** `string`
+
+CSS width of the iframe (for example `"100%"`, `"800px"`).
+
+Default: `"100%"`
+
+---
+
+### height
+
+**type:** `string`
+
+Height of the iframe. Usually a pixel value like `"800"` or `"900"`.
+
+Default: `"800"`
+
+---
+
+### position
+
+**type:** `"sidebar" | "inline" | "bottom"`
+
+Controls where the widget is rendered.
+
+Default: `"inline"`
+
+---
+
+### key
+
+**type:** `string`
+
+Unique identifier used to distinguish widgets with identical arguments.
+
+---
+
+## Notes
+
+* The PDF is embedded using an iframe with a `data:application/pdf;base64,...` URL.
+* Very large PDFs may increase memory usage because they are encoded into base64.
+* The widget is best used for local PDF files. If you want to show remote PDFs,
+  download them locally first.
+

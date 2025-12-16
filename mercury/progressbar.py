@@ -6,7 +6,7 @@ from .manager import WidgetsManager, MERCURY_MIMETYPE
 from .theme import THEME
 
 
-# ---------- Global CSS (injected once) ----------
+# ---------- Global CSS ----------
 def _ensure_global_progress_styles():
     css = f"""
     <style>
@@ -156,34 +156,91 @@ class ProgressHandle:
 
 
 # ---------- Public factory ----------
-def Progressbar(label: str = "", value: float = 0, min: float = 0, max: float = 100,
-                show_percent: bool = True, indeterminate: bool = False,
-                key: str = "", position: str = "inline") -> ProgressHandle:
+def ProgressBar(
+    label: str = "",
+    value: float = 0,
+    min: float = 0,
+    max: float = 100,
+    show_percent: bool = True,
+    indeterminate: bool = False,
+    key: str = "",
+    position: str = "inline",
+) -> ProgressHandle:
     """
-    Create a theme-aware progress bar.
+    Create and display a theme-aware progress bar.
+
+    This function renders a progress bar widget that can operate in either
+    determinate mode (percentage-based) or indeterminate mode (animated).
+    A `ProgressHandle` is returned to allow dynamic updates to the progress
+    after rendering.
+
+    The widget integrates with Mercury layout management and supports
+    placement in the main view, sidebar, or bottom area.
 
     Parameters
     ----------
-    label : str
-        Optional text shown above the bar (left-aligned).
-    value : float
+    label : str, optional
+        Optional text shown above the progress bar.
+        Default is `""`.
+    value : float, optional
         Initial value for determinate mode.
-    min, max : float
-        Range for determinate mode.
-    show_percent : bool
-        Show percentage text aligned to the right of the label row.
-    indeterminate : bool
-        Start in indeterminate (animated) mode.
-    key : str
-        Stable cache key for reuse.
-    position : {"sidebar","inline","bottom"}
-        Placement hint for Mercury/JupyterLab integration. Defaults to "inline".
+        The value is clamped to the `[min, max]` range.
+        Default is `0`.
+    min : float, optional
+        Minimum value for determinate mode.
+        Default is `0`.
+    max : float, optional
+        Maximum value for determinate mode.
+        Default is `100`.
+    show_percent : bool, optional
+        If `True`, display the percentage value aligned to the right
+        of the label row.
+        Default is `True`.
+    indeterminate : bool, optional
+        If `True`, the progress bar starts in indeterminate (animated) mode.
+        In this mode, the percentage text is hidden.
+        Default is `False`.
+    key : str, optional
+        Stable cache key used to reuse the same widget instance
+        across multiple executions.
+    position : {"sidebar", "inline", "bottom"}, optional
+        Placement hint for Mercury/JupyterLab integration.
+        Default is `"inline"`.
 
     Returns
     -------
     ProgressHandle
-        Controller with .set(value), .set_label(text), .set_indeterminate(on), .show(), .hide().
+        A controller object used to update and control the progress bar.
+
+    Examples
+    --------
+    Basic determinate progress:
+
+    >>> import mercury as mr
+    >>> p = mr.ProgressBar(label="Training", value=0)
+    >>> p.set(30)
+    >>> p.set(75)
+    >>> p.set(100)
+
+    Indeterminate progress:
+
+    >>> p = mr.ProgressBar(label="Loading", indeterminate=True)
+    >>> # do some work...
+    >>> p.set_indeterminate(False)
+    >>> p.set(100)
+
+    Dynamic label update:
+
+    >>> p = mr.ProgressBar(label="Step 1/3")
+    >>> p.set_label("Step 2/3")
+
+    Notes
+    -----
+    - Indeterminate mode is useful when progress cannot be measured.
+    - Determinate mode automatically disables indeterminate animation.
+    - The progress bar is rendered immediately when the function is called.
     """
+
     _ensure_global_progress_styles()
 
     code_uid = WidgetsManager.get_code_uid("Progress", key=key or label or "progress",
