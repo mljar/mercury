@@ -11,6 +11,7 @@ const BundleAnalyzerPlugin =
 
 const Build = require('@jupyterlab/builder').Build;
 const baseConfig = require('@jupyterlab/builder/lib/webpack.config.base');
+const { mergeWithCustomize, customizeObject } = require('webpack-merge');
 
 const data = require('./package.json');
 
@@ -147,7 +148,7 @@ function createShared(packageData) {
       )} Please add them to packages.json#resolutions section.`
     );
   }
-
+  console.log(shared);
   return shared;
 }
 
@@ -161,19 +162,28 @@ fs.writeFileSync(entryPoint, bootstrap);
 // }
 
 module.exports = [
-  merge(baseConfig, {
-    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mergeWithCustomize({
+    customizeObject: customizeObject({
+      optimization: 'replace',   // ✅ replace whole optimization object
+      output: 'merge',           // keep normal
+    }),
+  })(baseConfig, {
+    mode: 'production',
     entry: ['./publicpath.js', './' + path.relative(__dirname, entryPoint)],
     output: {
       path: path.resolve(__dirname, '..', 'mercury_app/static/'),
-      library: {
-        type: 'var',
-        name: ['_JUPYTERLAB', 'CORE_OUTPUT']
-      },
       filename: 'bundle.js',
-      sourceMapFilename: '[name].js.map'
+      chunkFilename: 'chunk.[contenthash].js',
+      library: { type: 'var', name: ['_JUPYTERLAB', 'CORE_OUTPUT'] },
     },
-    devtool: 'source-map',
+    optimization: {
+      splitChunks: false,
+      runtimeChunk: false,
+      minimize: true,
+      moduleIds: 'deterministic',
+      chunkIds: 'deterministic'
+    },
+    devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
     plugins: [
       new ModuleFederationPlugin({
         library: {
