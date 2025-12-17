@@ -8,8 +8,7 @@ from jupyterlab.commands import (get_app_dir, get_user_settings_dir,
                                  get_workspaces_dir)
 from jupyterlab_server import LabServerApp
 from traitlets import Bool, Integer
-# ⬇️ NEW: import CaselessStrEnum for a nice --log-level string flag
-from traitlets import CaselessStrEnum
+from tornado.routing import Rule, PathMatches
 
 from ._version import __version__
 from .custom_contents_handler import MercuryContentsHandler
@@ -19,8 +18,6 @@ from .idle_timeout import (TimeoutActivityTransform, TimeoutManager,
 from .notebooks import NotebooksAPIHandler
 from .root import RootIndexHandler
 from .theme_handler import ThemeHandler
-
-from traitlets.config import Config
 
 from .mercury_hybrid_cm import HybridContentsManager
 from .block_handler import BlockedHandler, BLOCKED_PATTERNS
@@ -112,26 +109,19 @@ class MercuryApp(LabServerApp):
             self.handlers.append((r"/api/contents/(.*\.ipynb)$", MercuryContentsHandler))
         super().initialize_handlers()
 
-        # 2) A potem MY przykrywamy to regułami o najwyższym priorytecie
-        from tornado.routing import Rule, PathMatches
-        sa = getattr(self, "serverapp", None)
-        if not sa:
-            return
-
-        app = sa.web_app
-        base_url = (sa.base_url or "").rstrip("/")  # zwykle "" lub "/something"
-
-        # ważne: wzorce muszą uwzględniać base_url
-        block_rules = []
-        for pat in BLOCKED_PATTERNS:
-            full_pat = (base_url + pat) if base_url else pat
-            block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
-
-        # priorytet: na początek listy reguł
-        app.default_router.rules = block_rules + app.default_router.rules
-
-
-        self._dump_handlers()
+        # blocking not needed resources
+        if sys.argv[0].endswith("mercury_app/__main__.py") or \
+           sys.argv[0].endswith("mercury"):
+            sa = getattr(self, "serverapp", None)
+            if not sa:
+                return
+            app = sa.web_app
+            base_url = (sa.base_url or "").rstrip("/")
+            block_rules = []
+            for pat in BLOCKED_PATTERNS:
+                full_pat = (base_url + pat) if base_url else pat
+                block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
+            app.default_router.rules = block_rules + app.default_router.rules
 
     def initialize_templates(self):
         super().initialize_templates()

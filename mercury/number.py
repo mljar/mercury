@@ -188,7 +188,7 @@ class NumberInputWidget(anywidget.AnyWidget):
 
         model.set("value", v);
         if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => model.save_changes(), 100);
+        debounceTimer = setTimeout(() => model.save_changes(), 200);
       });
 
       model.on("change:value", syncFromModel);

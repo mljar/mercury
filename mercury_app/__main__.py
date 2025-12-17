@@ -151,6 +151,46 @@ def _parse_and_inject(argv):
             new_argv.append(f"--MercuryApp.timeout={timeout_int}")
 
     # ----------------------------
+    # XSRF HANDLING
+    # Disable XSRF only when server is public:
+    # - no token (empty)
+    # - no password
+    # ----------------------------
+
+    def _get_arg_value(prefix: str):
+        for a in new_argv:
+            if a.startswith(prefix):
+                return a.split("=", 1)[1]
+        return None
+
+    # Detect "no token" after your injection
+    # You inject: --IdentityProvider.token=''  OR --IdentityProvider.token='<token>'
+    idp_token_val = _get_arg_value("--IdentityProvider.token=")
+    srv_token_val = _get_arg_value("--ServerApp.token=")
+
+    # Normalize: treat '' or "" as empty
+    def _is_empty_token(v):
+        if v is None:
+            return True
+        v = v.strip()
+        return v in ("''", '""', "''\n", '""\n', "")  # be defensive
+
+    token_is_empty = _is_empty_token(idp_token_val) and _is_empty_token(srv_token_val)
+
+    # Detect if password is set (either hashed_password or ServerApp.password)
+    password_is_set = any(
+        a.startswith("--IdentityProvider.hashed_password=") or a.startswith("--ServerApp.password=")
+        for a in new_argv
+    )
+
+    disable_xsrf_already_set = any(
+        a.startswith("--ServerApp.disable_check_xsrf=") for a in new_argv
+    )
+
+    if token_is_empty and not password_is_set and not disable_xsrf_already_set:
+        new_argv.append("--ServerApp.disable_check_xsrf=True")
+
+    # ----------------------------
     # OTHER DEFAULTS
     # ----------------------------
     new_argv.append("--ContentsManager.allow_hidden=True")
