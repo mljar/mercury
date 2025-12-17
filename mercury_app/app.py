@@ -23,6 +23,7 @@ from .theme_handler import ThemeHandler
 from traitlets.config import Config
 
 from .mercury_hybrid_cm import HybridContentsManager
+from .block_handler import BlockedHandler, BLOCKED_PATTERNS
 
 class SuppressKernelDoesNotExist(logging.Filter):
     def filter(self, record):
@@ -72,7 +73,35 @@ class MercuryApp(LabServerApp):
         "keep-session": "MercuryApp.keepSession"
     }
 
+    def _dump_router(self, router, prefix=""):
+        for i, rule in enumerate(getattr(router, "rules", [])):
+            matcher = rule.matcher
+            target = rule.target
+
+            pat = getattr(matcher, "regex", None)
+            pat = pat.pattern if pat else repr(matcher)
+
+            name = getattr(target, "__name__", None)
+            if name:
+                self.log.warning("%s%03d | %s -> %s", prefix, i, pat, name)
+            else:
+                self.log.warning("%s%03d | %s -> %r", prefix, i, pat, target)
+
+            # recurse into nested routers
+            if hasattr(target, "rules"):
+                self._dump_router(target, prefix=prefix + "  ")
+
+    def _dump_handlers(self):
+        sa = getattr(self, "serverapp", None)
+        if not sa:
+            return
+        self.log.warning("=== FULL ROUTES DUMP ===")
+        self._dump_router(sa.web_app.default_router)
+        self.log.warning("=== END FULL ROUTES DUMP ===")
+
+
     def initialize_handlers(self):
+        
         from jupyter_server.base.handlers import path_regex
         self.handlers.append((r"/", RootIndexHandler))
         self.handlers.append(("/mercury/api/notebooks", NotebooksAPIHandler))
@@ -82,6 +111,27 @@ class MercuryApp(LabServerApp):
            sys.argv[0].endswith("mercury"):
             self.handlers.append((r"/api/contents/(.*\.ipynb)$", MercuryContentsHandler))
         super().initialize_handlers()
+
+        # 2) A potem MY przykrywamy to regułami o najwyższym priorytecie
+        from tornado.routing import Rule, PathMatches
+        sa = getattr(self, "serverapp", None)
+        if not sa:
+            return
+
+        app = sa.web_app
+        base_url = (sa.base_url or "").rstrip("/")  # zwykle "" lub "/something"
+
+        # ważne: wzorce muszą uwzględniać base_url
+        block_rules = []
+        for pat in BLOCKED_PATTERNS:
+            full_pat = (base_url + pat) if base_url else pat
+            block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
+
+        # priorytet: na początek listy reguł
+        app.default_router.rules = block_rules + app.default_router.rules
+
+
+        self._dump_handlers()
 
     def initialize_templates(self):
         super().initialize_templates()

@@ -1070,6 +1070,7 @@ export class AppWidget extends Panel {
     if (!this._autoRerun || this.isDisposed) return;
     if (!update.cellModelId) return;
 
+    console.log('onWidgetUpdate');
     // find index of the updated cell
     const cells = this._model.cells;
     let updatedIndex = -1;
@@ -1082,6 +1083,8 @@ export class AppWidget extends Panel {
     if (updatedIndex === -1) return;
 
     const fromIndex = updatedIndex + 1;
+
+    console.log('fromIndex', fromIndex);
 
     // If we are busy, just remember earliest affected index
     if (!this._acceptWidgetInput || this._rerunInProgress) {
@@ -1111,6 +1114,7 @@ export class AppWidget extends Panel {
     }, 80);
   };
   private async _runCellsFromIndex(fromIndex: number): Promise<void> {
+    console.log('runCellsFrom', fromIndex);
     // If a run is already happening, coalesce and exit
     if (this._rerunInProgress) {
       this._pendingRerunFromIndex =
