@@ -298,12 +298,13 @@
 
 /* App title */
 .mercury-left-panel .mercury-sidebar-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 18px;
   padding: 10px 0px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-left: 5px;
 }
 /* --- Left footer container line */
 /* .mercury-left-footer {} */

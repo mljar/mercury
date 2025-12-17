@@ -1067,10 +1067,12 @@ export class AppWidget extends Panel {
   private _rerunTimer: number | null = null;
 
   private onWidgetUpdate = (_model: AppModel, update: IWidgetUpdate) => {
-    if (!this._autoRerun || this.isDisposed) return;
-    if (!update.cellModelId) return;
-
-    console.log('onWidgetUpdate');
+    if (!this._autoRerun || this.isDisposed) {
+      return;
+    }
+    if (!update.cellModelId) {
+      return;
+    }
     // find index of the updated cell
     const cells = this._model.cells;
     let updatedIndex = -1;
@@ -1080,11 +1082,11 @@ export class AppWidget extends Panel {
         break;
       }
     }
-    if (updatedIndex === -1) return;
+    if (updatedIndex === -1) {
+      return;
+    }
 
     const fromIndex = updatedIndex + 1;
-
-    console.log('fromIndex', fromIndex);
 
     // If we are busy, just remember earliest affected index
     if (!this._acceptWidgetInput || this._rerunInProgress) {
@@ -1111,10 +1113,9 @@ export class AppWidget extends Panel {
       if (start !== null) {
         void this._runCellsFromIndex(start);
       }
-    }, 80);
+    }, 10);
   };
   private async _runCellsFromIndex(fromIndex: number): Promise<void> {
-    console.log('runCellsFrom', fromIndex);
     // If a run is already happening, coalesce and exit
     if (this._rerunInProgress) {
       this._pendingRerunFromIndex =
@@ -1130,21 +1131,35 @@ export class AppWidget extends Panel {
     try {
       const cells = this._model.cells;
 
-      for (let i = fromIndex; i < cells.length; i++) {
-        const cellModel = cells.get(i);
-        if (cellModel.type !== 'code') continue;
-
-        const item = this._cellItems.find(w => w.cellId === cellModel.id);
-        if (!item || !(item.child instanceof CodeCell)) continue;
-
-        // IMPORTANT: sequential await prevents kernel flooding
-        await codeCellExecute(
-          item.child as CodeCell,
-          this._model.context.sessionContext,
-          { deletedCells: this._model.context.model?.deletedCells ?? [] }
-        );
+      const itemByCellId = new Map<string, { child: unknown }>();
+      for (const w of this._cellItems) {
+        itemByCellId.set(w.cellId, w);
       }
 
+      for (let i = fromIndex; i < cells.length; i++) {
+        // stop early if a newer update arrived
+        if (this._pendingRerunFromIndex !== null) {
+          break;
+        }
+
+        const cellModel = cells.get(i);
+        if (cellModel.type !== 'code') {
+          continue;
+        }
+
+        const item = itemByCellId.get(cellModel.id);
+        const child = item?.child;
+        if (!(child instanceof CodeCell)) {
+          continue;
+        }
+
+        // await every 5th cell
+        if ((i - fromIndex) % 5 === 0) {
+          await codeCellExecute(child, this._model.context.sessionContext);
+        } else {
+          codeCellExecute(child, this._model.context.sessionContext);
+        }
+      }
       // Do this once per chain, not per cell
       await executeWidgetsManagerClearValues(
         this._model.context.sessionContext
@@ -1154,7 +1169,6 @@ export class AppWidget extends Panel {
     } finally {
       this._acceptWidgetInput = true;
       this._rerunInProgress = false;
-
       // If something changed while we were running, run again once (coalesced)
       if (this._pendingRerunFromIndex !== null) {
         const nextFrom = this._pendingRerunFromIndex;
