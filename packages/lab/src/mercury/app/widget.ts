@@ -341,6 +341,7 @@ export class AppWidget extends Panel {
     //  pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
 
     this._model.context.sessionContext.statusChanged.connect((_, status) => {
+      console.log('STATUS-------------->', status);
       if (status === 'busy') this._busy?.begin();
       else if (status === 'idle') this._busy?.finish();
     });
@@ -1153,8 +1154,9 @@ export class AppWidget extends Panel {
           continue;
         }
 
+        // await codeCellExecute(child, this._model.context.sessionContext);
         // await every 5th cell
-        if ((i - fromIndex) % 5 === 0) {
+        if ((i - fromIndex) % 2 === 0) {
           await codeCellExecute(child, this._model.context.sessionContext);
         } else {
           codeCellExecute(child, this._model.context.sessionContext);

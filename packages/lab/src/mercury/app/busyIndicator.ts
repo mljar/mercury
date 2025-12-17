@@ -1,16 +1,8 @@
-// busyIndicator.ts
-// Minimal, friendly top-right busy indicator for App View.
-//
-// - Hidden when idle
-// - After > showDelayMs (default 1000ms): shows a light-gray pill
-//   with a single pulsing green dot + "Stop" button
-// - Button emits 'mbi:interrupt' event (host should interrupt the kernel)
-// - Soft, calm animation and subtle gray background
-
 interface BusyIndicatorOptions {
-  container: HTMLElement;                 // e.g. this._rightTop.node
-  position?: 'top-right' | 'top-left';    // default: 'top-right'
-  showDelayMs?: number;                   // default: 1000
+  container: HTMLElement;
+  position?: 'top-right' | 'top-left';
+  showDelayMs?: number;   // default 1000
+  hideDelayMs?: number;   // default 500  ✅ grace between cells
 }
 
 export class BusyIndicator {
@@ -18,41 +10,39 @@ export class BusyIndicator {
   private root: HTMLDivElement;
   private dot: HTMLSpanElement;
   private btn: HTMLButtonElement;
+
   private visible = false;
-  private armedTimer: number | null = null;
+  private showTimer: number | null = null;
+  private hideTimer: number | null = null;
+
   private showDelayMs: number;
+  private hideDelayMs: number;
 
   constructor(opts: BusyIndicatorOptions) {
     if (!opts?.container) throw new Error('BusyIndicator: container required');
     BusyIndicator.ensureStyles();
 
     this.showDelayMs = opts.showDelayMs ?? 1000;
+    this.hideDelayMs = opts.hideDelayMs ?? 500;
 
-    // Ensure container can anchor absolute child
     const cs = window.getComputedStyle(opts.container);
     if (cs.position === 'static') opts.container.style.position = 'relative';
 
-    // Root pill
     this.root = document.createElement('div');
     this.root.className = 'mbi-root';
     this.root.style.position = 'absolute';
     this.root.style.top = '8px';
-    if ((opts.position ?? 'top-right') === 'top-right') {
-      this.root.style.right = '8px';
-    } else {
-      this.root.style.left = '8px';
-    }
+    if ((opts.position ?? 'top-right') === 'top-right') this.root.style.right = '8px';
+    else this.root.style.left = '8px';
 
     this.root.setAttribute('role', 'status');
     this.root.setAttribute('aria-live', 'polite');
 
-    // Green pulsing dot
     this.dot = document.createElement('span');
     this.dot.className = 'mbi-dot';
     this.dot.title = 'Computing…';
     this.root.appendChild(this.dot);
 
-    // Stop button (borderless by default; subtle outline on hover)
     this.btn = document.createElement('button');
     this.btn.className = 'mbi-stop-btn';
     this.btn.type = 'button';
@@ -63,42 +53,61 @@ export class BusyIndicator {
     });
     this.root.appendChild(this.btn);
 
-    // Start hidden
     this.root.style.display = 'none';
     opts.container.appendChild(this.root);
   }
 
-  /** Arm a delayed show */
+  /** Called on kernel status === 'busy' */
   begin() {
-    if (this.visible || this.armedTimer !== null) return;
-    this.armedTimer = window.setTimeout(() => {
-      this.armedTimer = null;
+    // If we were about to hide (idle gap), don't.
+    if (this.hideTimer !== null) {
+      window.clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
+
+    // Already visible OR already waiting to show → nothing to do.
+    if (this.visible || this.showTimer !== null) return;
+
+    // Arm delayed show (do NOT show immediately).
+    this.showTimer = window.setTimeout(() => {
+      this.showTimer = null;
+      console.log('visible');
       this.visible = true;
       this.root.style.display = 'inline-flex';
     }, this.showDelayMs) as unknown as number;
   }
 
-  /** Hide immediately / cancel delayed show */
+  /** Called on kernel status === 'idle' */
   finish() {
-    if (this.armedTimer !== null) {
-      window.clearTimeout(this.armedTimer);
-      this.armedTimer = null;
+    // If we haven't shown yet, cancel the pending show.
+    if (this.showTimer !== null) {
+      window.clearTimeout(this.showTimer);
+      this.showTimer = null;
     }
-    if (this.visible) {
+
+    // If it's not visible, nothing to hide.
+    if (!this.visible) return;
+
+    // Debounced hide: keep visible during short idle gaps between cells.
+    if (this.hideTimer !== null) return;
+    this.hideTimer = window.setTimeout(() => {
+      this.hideTimer = null;
       this.visible = false;
+      console.log('hide');
       this.root.style.display = 'none';
-    }
+    }, this.hideDelayMs) as unknown as number;
   }
 
   error() {
+    // same behavior as idle
     this.finish();
   }
 
   dispose() {
-    if (this.armedTimer !== null) {
-      window.clearTimeout(this.armedTimer);
-      this.armedTimer = null;
-    }
+    if (this.showTimer !== null) window.clearTimeout(this.showTimer);
+    if (this.hideTimer !== null) window.clearTimeout(this.hideTimer);
+    this.showTimer = null;
+    this.hideTimer = null;
     this.root.remove();
   }
 
@@ -106,7 +115,6 @@ export class BusyIndicator {
     return this.root;
   }
 
-  // Inject CSS once
   private static ensureStyles() {
     if (BusyIndicator.stylesInserted) return;
     BusyIndicator.stylesInserted = true;
