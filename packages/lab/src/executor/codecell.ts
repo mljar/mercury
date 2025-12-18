@@ -7,7 +7,13 @@ import { JSONObject } from '@lumino/coreutils';
 import { outputAreaExecute } from './outputArea';
 
 export async function codeCellExecute(
-cell: CodeCell, sessionContext: ISessionContext, metadata?: JSONObject, p0?: { deletedCells: string[]; }): Promise<KernelMessage.IExecuteReplyMsg | void> {
+  cell: CodeCell,
+  sessionContext: ISessionContext,
+  metadata?: JSONObject,
+  p0?: { deletedCells: string[] }
+): Promise<KernelMessage.IExecuteReplyMsg | void> {
+  console.log('codeCellExecute');
+
   const model = cell.model;
   const code = model.sharedModel.getSource();
 

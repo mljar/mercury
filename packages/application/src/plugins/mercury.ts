@@ -121,6 +121,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               if (mimetype) {
                 cellItem.child.model.mimeType = mimetype;
               }
+              console.log('Application executor.runCell');
               await executor.runCell({
                 cell: cellItem.child,
                 notebook,

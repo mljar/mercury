@@ -115,6 +115,11 @@ def _ensure_global_tabs_styles():
     display(widgets.HTML(css))
 
 
+class TabOutput(widgets.Output):
+    """Tab widget with a convenient .clear() alias."""
+    def clear(self, wait: bool = True):
+        self.clear_output(wait=wait)
+
 # ---------- Public API ----------
 def Tabs(labels=("Tab 1", "Tab 2"), active=0, key=""):
     """
@@ -171,7 +176,7 @@ def Tabs(labels=("Tab 1", "Tab 2"), active=0, key=""):
     header = _TabsHeaderWidget(labels=list(labels), active=int(active))
 
     # Create an Output per tab, wrapped in a panel Box
-    outs = tuple(widgets.Output() for _ in labels)
+    outs = tuple(TabOutput() for _ in labels)
     panels = []
     for i, out in enumerate(outs):
         out.layout.width = "100%"
@@ -218,7 +223,10 @@ class _TabsHeaderWidget(anywidget.AnyWidget):
     ).tag(sync=True)
 
     _esm = """
+
+    console.log(' TTTTTTTTTTTTTAAAAAAAAAAAAAAABBBBBBBBBBSSSSSSSSS header');
     function render({ model, el }) {
+      console.log('RENDER MODEL', el);
       const tablist = document.createElement("div");
       tablist.classList.add("mljar-tablist");
       tablist.setAttribute("role", "tablist");
@@ -237,9 +245,11 @@ class _TabsHeaderWidget(anywidget.AnyWidget):
         btn.addEventListener("click", () => {
           model.set("active", index);
           model.save_changes();
+          console.log('tabs save_changes');
         });
 
         btn.addEventListener("keydown", (e) => {
+          console.log('tabs KEYDOWN');
           const len = buttons.length;
           let i = model.get("active") || 0;
           if (e.key === "ArrowRight") {

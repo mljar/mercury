@@ -10,6 +10,7 @@ export async function outputAreaExecute(
   sessionContext: ISessionContext,
   metadata?: JSONObject
 ): Promise<KernelMessage.IExecuteReplyMsg | undefined> {
+  console.log('outputAreaExecute', code);
   // Override the default for `stop_on_error`.
   let stopOnError = true;
   if (
@@ -109,6 +110,7 @@ export async function outputAreaExecute(
                 msg.content.execution_state === 'idle' &&
                 this.executeCounter === 0)
             ) {
+              console.log('clear output right here right now ...');
               this.model.clear();
               // Make sure there were no input widgets.
               if (this.widgets.length) {

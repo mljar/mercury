@@ -25,15 +25,14 @@ export class BusyIndicator {
     this.showDelayMs = opts.showDelayMs ?? 1000;
     this.hideDelayMs = opts.hideDelayMs ?? 500;
 
-    const cs = window.getComputedStyle(opts.container);
-    if (cs.position === 'static') opts.container.style.position = 'relative';
+    //const cs = window.getComputedStyle(opts.container);
+    //if (cs.position === 'static') opts.container.style.position = 'relative';
 
     this.root = document.createElement('div');
     this.root.className = 'mbi-root';
     this.root.style.position = 'absolute';
     this.root.style.top = '8px';
-    if ((opts.position ?? 'top-right') === 'top-right') this.root.style.right = '8px';
-    else this.root.style.left = '8px';
+    this.root.style.right = '8px';
 
     this.root.setAttribute('role', 'status');
     this.root.setAttribute('aria-live', 'polite');
@@ -132,7 +131,7 @@ export class BusyIndicator {
 
 /* Light gray pill */
 .mbi-root {
-  z-index: 5;
+  z-index: 1500;
   align-items: center;
   gap: 6px;
   padding: 6px 12px;

@@ -22,11 +22,11 @@ import {
   codeCellExecute,
   executeWidgetsManagerClearValues
 } from '../../executor/codecell';
-import {
-  getWidgetManager,
-  resolveIpyModel,
-  getWidgetModelIdsFromCell
-} from './ipyWidgetsHelpers';
+// import {
+//   getWidgetManager,
+//   resolveIpyModel,
+//   getWidgetModelIdsFromCell
+// } from './ipyWidgetsHelpers';
 
 import {
   hideErrorOutputsOnChange,
@@ -339,17 +339,21 @@ export class AppWidget extends Panel {
     // style for bottom panel
     //this._rightBottom.node.style.backgroundColor =
     //  pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
-
     this._model.context.sessionContext.statusChanged.connect((_, status) => {
-      console.log('STATUS-------------->', status);
-      if (status === 'busy') this._busy?.begin();
-      else if (status === 'idle') this._busy?.finish();
+      console.log('STATUS-------------->', status, Date.now().toLocaleString());
+      if (status === 'busy') {
+        this._busy?.begin();
+      } else if (status === 'idle') {
+        this._busy?.finish();
+      }
     });
     // Wire the button to interrupt the kernel
     this._busy.element.addEventListener('mbi:interrupt', () => {
       try {
         void this._model.context.sessionContext.session?.kernel?.interrupt();
-      } catch { }
+      } catch {
+        /* empty */
+      }
     });
   }
 
@@ -1068,6 +1072,7 @@ export class AppWidget extends Panel {
   private _rerunTimer: number | null = null;
 
   private onWidgetUpdate = (_model: AppModel, update: IWidgetUpdate) => {
+    console.log('^^^^^^^^^ onWidgetUpdate ^^^^^^^^^^^^^^^');
     if (!this._autoRerun || this.isDisposed) {
       return;
     }
@@ -1088,6 +1093,8 @@ export class AppWidget extends Panel {
     }
 
     const fromIndex = updatedIndex + 1;
+
+    console.log('^^^^^^^^^ onWidgetUpdate:', fromIndex);
 
     // If we are busy, just remember earliest affected index
     if (!this._acceptWidgetInput || this._rerunInProgress) {
@@ -1116,6 +1123,7 @@ export class AppWidget extends Panel {
       }
     }, 10);
   };
+
   private async _runCellsFromIndex(fromIndex: number): Promise<void> {
     // If a run is already happening, coalesce and exit
     if (this._rerunInProgress) {
@@ -1138,10 +1146,11 @@ export class AppWidget extends Panel {
       }
 
       for (let i = fromIndex; i < cells.length; i++) {
+        console.log('cell##>', i);
         // stop early if a newer update arrived
-        if (this._pendingRerunFromIndex !== null) {
-          break;
-        }
+        //if (this._pendingRerunFromIndex !== null) {
+        //  break;
+        //}
 
         const cellModel = cells.get(i);
         if (cellModel.type !== 'code') {
@@ -1154,14 +1163,15 @@ export class AppWidget extends Panel {
           continue;
         }
 
-        // await codeCellExecute(child, this._model.context.sessionContext);
+        await codeCellExecute(child, this._model.context.sessionContext);
         // await every 5th cell
-        if ((i - fromIndex) % 2 === 0) {
-          await codeCellExecute(child, this._model.context.sessionContext);
-        } else {
-          codeCellExecute(child, this._model.context.sessionContext);
-        }
+        // if ((i - fromIndex) % 2 === 0) {
+        //   await codeCellExecute(child, this._model.context.sessionContext);
+        // } else {
+        //   codeCellExecute(child, this._model.context.sessionContext);
+        // }
       }
+
       // Do this once per chain, not per cell
       await executeWidgetsManagerClearValues(
         this._model.context.sessionContext
@@ -1233,7 +1243,8 @@ export class AppWidget extends Panel {
   // ipywidgets utilities
   // ────────────────────────────────────────────────────────────────────────────
 
-  private reexecuteAllCodeCells(): void {
+  private async reexecuteAllCodeCells(): Promise<void> {
+    console.log('rexecute all code cells!!!!!');
     const cells = this._model.cells;
     for (let i = 0; i < cells.length; i++) {
       const m = cells.get(i);
@@ -1243,7 +1254,7 @@ export class AppWidget extends Panel {
 
       const item = this._cellItems.find(w => w.cellId === m.id);
       if (item && item.child instanceof CodeCell) {
-        codeCellExecute(
+        await codeCellExecute(
           item.child as CodeCell,
           this._model.context.sessionContext,
           {
@@ -1252,10 +1263,11 @@ export class AppWidget extends Panel {
         );
       }
     }
-    executeWidgetsManagerClearValues(this._model.context.sessionContext);
+    await executeWidgetsManagerClearValues(this._model.context.sessionContext);
   }
 
   private async checkWidgetModels(): Promise<void> {
+    /*
     if (this.isDisposed) {
       return;
     }
@@ -1305,6 +1317,7 @@ export class AppWidget extends Panel {
     if (noLiveModels || emptyOutputs) {
       this.reexecuteAllCodeCells();
     }
+      */
   }
 
   // ────────────────────────────────────────────────────────────────────────────
