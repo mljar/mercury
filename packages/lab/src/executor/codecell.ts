@@ -12,8 +12,6 @@ export async function codeCellExecute(
   metadata?: JSONObject,
   p0?: { deletedCells: string[] }
 ): Promise<KernelMessage.IExecuteReplyMsg | void> {
-  console.log('codeCellExecute');
-
   const model = cell.model;
   const code = model.sharedModel.getSource();
 

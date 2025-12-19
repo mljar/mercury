@@ -577,8 +577,6 @@ export class AppModel {
       this._ipywidgetToCellId.set(commId, updateCellId);
     } else {
       if (!skipEmit) {
-        console.log('emit', commId, this._ipywidgetToCellId.get(commId));
-        console.log('msg', msg);
         this._widgetUpdated.emit({
           widgetModelId: commId,
           cellModelId: this._ipywidgetToCellId.get(commId)

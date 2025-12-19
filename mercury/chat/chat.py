@@ -260,3 +260,13 @@ class Chat:
         """
         self.messages.clear()
         self._render()
+
+    def remove_last(self):
+        """
+        Remove the last Message widget from the chat.
+        """
+        if not self.messages:
+            return
+
+        self.messages.pop()
+        self._render()

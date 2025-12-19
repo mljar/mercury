@@ -340,12 +340,11 @@ export class AppWidget extends Panel {
     //this._rightBottom.node.style.backgroundColor =
     //  pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
     this._model.context.sessionContext.statusChanged.connect((_, status) => {
-      console.log('STATUS-------------->', status, Date.now().toLocaleString());
-      if (status === 'busy') {
-        this._busy?.begin();
-      } else if (status === 'idle') {
-        this._busy?.finish();
-      }
+      // if (status === 'busy') {
+      //   this._busy?.begin();
+      // } else if (status === 'idle') {
+      //   this._busy?.finish();
+      // }
     });
     // Wire the button to interrupt the kernel
     this._busy.element.addEventListener('mbi:interrupt', () => {
@@ -1072,7 +1071,6 @@ export class AppWidget extends Panel {
   private _rerunTimer: number | null = null;
 
   private onWidgetUpdate = (_model: AppModel, update: IWidgetUpdate) => {
-    console.log('^^^^^^^^^ onWidgetUpdate ^^^^^^^^^^^^^^^');
     if (!this._autoRerun || this.isDisposed) {
       return;
     }
@@ -1093,8 +1091,6 @@ export class AppWidget extends Panel {
     }
 
     const fromIndex = updatedIndex + 1;
-
-    console.log('^^^^^^^^^ onWidgetUpdate:', fromIndex);
 
     // If we are busy, just remember earliest affected index
     if (!this._acceptWidgetInput || this._rerunInProgress) {
@@ -1137,6 +1133,7 @@ export class AppWidget extends Panel {
     this._rerunInProgress = true;
     this._acceptWidgetInput = false;
 
+    this._busy?.begin();
     try {
       const cells = this._model.cells;
 
@@ -1144,9 +1141,7 @@ export class AppWidget extends Panel {
       for (const w of this._cellItems) {
         itemByCellId.set(w.cellId, w);
       }
-
       for (let i = fromIndex; i < cells.length; i++) {
-        console.log('cell##>', i);
         // stop early if a newer update arrived
         //if (this._pendingRerunFromIndex !== null) {
         //  break;
@@ -1179,6 +1174,7 @@ export class AppWidget extends Panel {
     } catch (e) {
       console.error('[Mercury][autoRerun] chain failed:', e);
     } finally {
+      this._busy?.finish();
       this._acceptWidgetInput = true;
       this._rerunInProgress = false;
       // If something changed while we were running, run again once (coalesced)
@@ -1244,7 +1240,6 @@ export class AppWidget extends Panel {
   // ────────────────────────────────────────────────────────────────────────────
 
   private async reexecuteAllCodeCells(): Promise<void> {
-    console.log('rexecute all code cells!!!!!');
     const cells = this._model.cells;
     for (let i = 0; i < cells.length; i++) {
       const m = cells.get(i);

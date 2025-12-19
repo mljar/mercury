@@ -2,16 +2,19 @@ interface BusyIndicatorOptions {
   container: HTMLElement;
   position?: 'top-right' | 'top-left';
   showDelayMs?: number;   // default 1000
-  hideDelayMs?: number;   // default 500  ✅ grace between cells
+  hideDelayMs?: number;   // default 500
 }
 
 export class BusyIndicator {
   private static stylesInserted = false;
+
   private root: HTMLDivElement;
   private dot: HTMLSpanElement;
   private btn: HTMLButtonElement;
 
+  private busyCount = 0;
   private visible = false;
+
   private showTimer: number | null = null;
   private hideTimer: number | null = null;
 
@@ -24,9 +27,6 @@ export class BusyIndicator {
 
     this.showDelayMs = opts.showDelayMs ?? 1000;
     this.hideDelayMs = opts.hideDelayMs ?? 500;
-
-    //const cs = window.getComputedStyle(opts.container);
-    //if (cs.position === 'static') opts.container.style.position = 'relative';
 
     this.root = document.createElement('div');
     this.root.className = 'mbi-root';
@@ -56,50 +56,82 @@ export class BusyIndicator {
     opts.container.appendChild(this.root);
   }
 
-  /** Called on kernel status === 'busy' */
+  /** One unit of work started */
   begin() {
-    // If we were about to hide (idle gap), don't.
+    this.busyCount++;
+
+    console.log('begin', this.busyCount);
+
+    // If we were about to hide, cancel that (work resumed).
     if (this.hideTimer !== null) {
       window.clearTimeout(this.hideTimer);
       this.hideTimer = null;
     }
 
-    // Already visible OR already waiting to show → nothing to do.
-    if (this.visible || this.showTimer !== null) return;
+    // If already visible, no need to (re)show.
+    if (this.visible) return;
 
-    // Arm delayed show (do NOT show immediately).
+    // If show already armed, keep it armed.
+    if (this.showTimer !== null) return;
+
+    // Arm delayed show.
     this.showTimer = window.setTimeout(() => {
       this.showTimer = null;
-      console.log('visible');
-      this.visible = true;
-      this.root.style.display = 'inline-flex';
+
+      // Only show if still busy.
+      if (this.busyCount > 0 && !this.visible) {
+        this.visible = true;
+        this.root.style.display = 'inline-flex';
+      }
     }, this.showDelayMs) as unknown as number;
   }
 
-  /** Called on kernel status === 'idle' */
+  /** One unit of work finished */
   finish() {
-    // If we haven't shown yet, cancel the pending show.
+    // Decrement but never go below 0 (defensive).
+    this.busyCount = Math.max(0, this.busyCount - 1);
+
+    console.log('finish', this.busyCount);
+
+    // Still busy? Then do nothing.
+    if (this.busyCount > 0) return;
+
+    // No longer busy => cancel pending show (if it hasn't shown yet).
     if (this.showTimer !== null) {
       window.clearTimeout(this.showTimer);
       this.showTimer = null;
     }
 
-    // If it's not visible, nothing to hide.
+    // If not visible, nothing to hide.
     if (!this.visible) return;
 
-    // Debounced hide: keep visible during short idle gaps between cells.
+    // Debounced hide: hide only if we remain at 0 long enough.
     if (this.hideTimer !== null) return;
     this.hideTimer = window.setTimeout(() => {
       this.hideTimer = null;
-      this.visible = false;
-      console.log('hide');
-      this.root.style.display = 'none';
+
+      // Only hide if still not busy.
+      if (this.busyCount === 0 && this.visible) {
+        this.visible = false;
+        this.root.style.display = 'none';
+      }
     }, this.hideDelayMs) as unknown as number;
   }
 
   error() {
-    // same behavior as idle
+    // Treat error as "finished one unit"
     this.finish();
+  }
+
+  /** Optional helper if you want a hard reset */
+  reset() {
+    this.busyCount = 0;
+    if (this.showTimer !== null) window.clearTimeout(this.showTimer);
+    if (this.hideTimer !== null) window.clearTimeout(this.hideTimer);
+    this.showTimer = null;
+    this.hideTimer = null;
+    this.visible = false;
+    this.root.style.display = 'none';
   }
 
   dispose() {
@@ -128,8 +160,6 @@ export class BusyIndicator {
   --mbi-pill-border: color-mix(in srgb, var(--jp-border-color2, #e6e8eb) 80%, transparent);
   --mbi-text: var(--jp-ui-font-color1, #24292f);
 }
-
-/* Light gray pill */
 .mbi-root {
   z-index: 1500;
   align-items: center;
@@ -142,8 +172,6 @@ export class BusyIndicator {
   color: var(--mbi-text);
   display: inline-flex;
 }
-
-/* Calm pulsing dot (run-all green gradient) */
 .mbi-dot {
   width: 12px;
   height: 12px;
@@ -159,8 +187,6 @@ export class BusyIndicator {
   0%, 100% { transform: scale(1); opacity: .7; }
   50% { transform: scale(1.15); opacity: 1; }
 }
-
-/* Friendly Stop button */
 .mbi-stop-btn {
   background: transparent;
   color: var(--mbi-text);

@@ -11,9 +11,10 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { ITranslator } from '@jupyterlab/translation';
 import { PromiseDelegate } from '@lumino/coreutils';
 import { type AppWidget, type MercuryWidget } from '@mljar/mercury-extension';
-import { IMercuryCellExecutor } from '@mljar/mercury-tokens';
+//import { INotebookCellExecutor } from '@mljar/mercury-tokens';
 
 import { MercuryNavbar } from './navbar';
+import { INotebookCellExecutor } from '@jupyterlab/notebook';
 
 /**
  * Open the notebook with Mercury.
@@ -21,12 +22,14 @@ import { MercuryNavbar } from './navbar';
 export const plugin: JupyterFrontEndPlugin<void> = {
   id: 'mercury-application:opener',
   autoStart: true,
-  requires: [IDocumentManager, IMercuryCellExecutor],
+  requires: [IDocumentManager, INotebookCellExecutor],
+  //requires: [IDocumentManager, IMercuryCellExecutor],
   optional: [IEditorServices, ISessionContextDialogs, ITranslator],
   activate: (
     app: JupyterFrontEnd,
     documentManager: IDocumentManager,
-    executor: IMercuryCellExecutor,
+    //executor: IMercuryCellExecutor,
+    executor: INotebookCellExecutor,
     editorServices: IEditorServices | null,
     sessionContextDialogs: ISessionContextDialogs | null,
     translator: ITranslator | null
@@ -121,7 +124,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               if (mimetype) {
                 cellItem.child.model.mimeType = mimetype;
               }
-              console.log('Application executor.runCell');
+              console.log('Application executor.runCell CHANKE');
               await executor.runCell({
                 cell: cellItem.child,
                 notebook,
