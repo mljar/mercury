@@ -3,25 +3,57 @@ import traitlets
 import math
 from numbers import Real, Integral
 from typing import Any, List, Dict
-import datetime 
+import datetime
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 
 
-def Table(data, *args, page_size=50, search=False, select_rows=False, width="100%", key: str = "", **kwargs):
-    kwargs.setdefault("page_size", page_size)
-    kwargs.setdefault("search", search)
-    kwargs.setdefault("select_rows", select_rows)
-    kwargs.setdefault("width", width)
-    code_uid = WidgetsManager.get_code_uid("Table", key=key, args=(data, *args), kwargs=kwargs)
+def Table(
+    data,
+    page_size: int = 50,
+    search: bool = False,
+    select_rows: bool = False,
+    width: str = "100%",
+    position: str = "inline",
+    show_index_col: bool = False,
+    key: str = "",
+):
+    # validation
+    try:
+        page_size_int = int(page_size)
+    except Exception:
+        raise Exception("Table: `page_size` must be integer")
+
+    if not isinstance(width, str) or not width.endswith(("px", "%")):
+      raise ValueError("Table: `width` must be a string ending with 'px' or '%', e.g. '400px' or '80%'")
+
+    args = [
+        data,
+        page_size_int,
+        search,
+        select_rows,
+        width,
+        show_index_col,
+        position,
+    ]
+    kwargs = {
+        "data": data,
+        "page_size": page_size_int,
+        "search": search,
+        "select_rows": select_rows,
+        "width": width,
+        "show_index_col": show_index_col,
+        "position": position,
+    }
+    code_uid = WidgetsManager.get_code_uid("Table", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
         display(cached)
         return cached
-    instance = TableWidget(data, *args, **kwargs)
+
+    instance = TableWidget(**kwargs)
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
-
 
 
 # new data trait declaration
@@ -84,7 +116,9 @@ class DataFrameTrait(traitlets.TraitType):
         # Fallback: return as-is (JSON will handle strings etc.)
         return val
 
-    def _from_list_of_dicts(self, records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _from_list_of_dicts(
+        self, records: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Normalize list[dict] input."""
         if not records:
             return []
@@ -109,7 +143,9 @@ class DataFrameTrait(traitlets.TraitType):
         if all(isinstance(v, (list, tuple)) for v in vals):
             lengths = {len(v) for v in vals}
             if len(lengths) != 1:
-                raise traitlets.TraitError("All column lists in dict must have the same length.")
+                raise traitlets.TraitError(
+                    "All column lists in dict must have the same length."
+                )
             n = next(iter(lengths))
             keys = list(value.keys())
             out: List[Dict[str, Any]] = []
@@ -120,10 +156,7 @@ class DataFrameTrait(traitlets.TraitType):
 
         # Case 2: row-wise dict: {id1: {col: val}, id2: {...}}
         if all(isinstance(v, dict) for v in vals):
-            return [
-                {k: self.to_json_safe(v) for k, v in row.items()}
-                for row in vals
-            ]
+            return [{k: self.to_json_safe(v) for k, v in row.items()} for row in vals]
 
         # Case 3: treat as a single row
         return [{k: self.to_json_safe(v) for k, v in value.items()}]
@@ -142,7 +175,9 @@ class DataFrameTrait(traitlets.TraitType):
                 d = to_dict()
                 if isinstance(d, dict):
                     return self._from_dict(d)
-        raise traitlets.TraitError("Object with .to_dict is not a supported DataFrame-like value.")
+        raise traitlets.TraitError(
+            "Object with .to_dict is not a supported DataFrame-like value."
+        )
 
     def _from_polars_like(self, value: Any) -> List[Dict[str, Any]]:
         """Handle polars-like objects via .to_dicts()."""
@@ -151,7 +186,9 @@ class DataFrameTrait(traitlets.TraitType):
             records = to_dicts()
             if isinstance(records, list):
                 return self._from_list_of_dicts(records)
-        raise traitlets.TraitError("Object with .to_dicts is not a supported Polars-like DataFrame.")
+        raise traitlets.TraitError(
+            "Object with .to_dicts is not a supported Polars-like DataFrame."
+        )
 
     def validate(self, obj, value):
         """Main entry point: normalize many possible input types to list[dict]."""
@@ -167,11 +204,11 @@ class DataFrameTrait(traitlets.TraitType):
         if isinstance(value, dict):
             return self._from_dict(value)
 
-        # polars DataFrame 
+        # polars DataFrame
         if hasattr(value, "to_dicts"):
             return self._from_polars_like(value)
 
-        # pandas DataFrame 
+        # pandas DataFrame
         if hasattr(value, "to_dict"):
             return self._from_pandas_like(value)
 
@@ -182,6 +219,7 @@ class DataFrameTrait(traitlets.TraitType):
             f"The '{self.name}' trait expected DataFrame-like, list[dict], or dict, not {value!r}"
         )
 
+
 class TableWidget(anywidget.AnyWidget):
     _esm = """
 function render({ model, el }) {
@@ -191,9 +229,16 @@ function render({ model, el }) {
   let data = model.get('data') || [];
   let page = model.get('table_page');
   const pageSize = model.get('page_size');
+  const showIndexCol = model.get('show_index_col');
+  const indexLabel = showIndexCol
+    ? model.get('_oryginal_index_column_name') || 'Index'
+    : '';
 
   let isLoading = false;
   let searchTimeout = null;
+  let fixedTableHeight = null;
+  let lastKnownColumns = null;
+  const MERCURY_INDEX_NAME = 'mercury_table_row_index';
 
   const container = c('div', { className: 'table-container' });
   el.appendChild(container);
@@ -228,119 +273,165 @@ function render({ model, el }) {
   };
 
   const isRowSelected = row => {
-    const selected = model.get('selected_rows') || [];
+    const selected = model.get('_id_selected_rows') || [];
     return selected.some(r => rowsEqual(r, row));
   };
 
+  function removeIndex(data) {
+    if (!Array.isArray(data)) return [];
+
+    return data.map(row =>
+      row && typeof row === 'object'
+        ? (({ [MERCURY_INDEX_NAME]: _, ...rest }) => rest)(row)
+        : row
+    );
+  }
+
+  function renameIndex(data) {
+    if (!Array.isArray(data)) return [];
+
+    return data.map(row =>
+      row && typeof row === 'object'
+        ? (({ [MERCURY_INDEX_NAME]: idx, ...rest }) => ({
+            [indexLabel]: idx,
+            ...rest
+          }))(row)
+        : row
+    );
+  }
+
   function toggleRowSelection(row, checked, tr) {
-    const current = model.get('selected_rows') || [];
+    const current = model.get('_id_selected_rows') || [];
+    const id = row[MERCURY_INDEX_NAME];
     let next;
 
     if (checked) {
-      const exists = current.some(r => rowsEqual(r, row));
-      next = exists ? current : current.concat([row]);
+      next = current.concat([row]);
       tr.classList.add('row-selected');
     } else {
-      next = current.filter(r => !rowsEqual(r, row));
+      next = current.filter(r => r[MERCURY_INDEX_NAME] !== id);
       tr.classList.remove('row-selected');
     }
 
-    model.set('selected_rows', next);
+    model.set('_id_selected_rows', next);
+    model.set(
+      'selected_rows',
+      showIndexCol ? renameIndex(next) : removeIndex(next)
+    );
     model.save_changes();
   }
 
   function renderTable() {
     container.innerHTML = '';
 
+    const hasData = data.length > 0;
+    const hiddenCols = showIndexCol ? new Set() : new Set([MERCURY_INDEX_NAME]);
+    const selectionEnabled = rowsSelectionEnabled();
+
+    let cols = [];
+
+    if (hasData) {
+      cols = Object.keys(data[0]).filter(c => !hiddenCols.has(c));
+      lastKnownColumns = [...cols];
+    } else if (lastKnownColumns) {
+      cols = lastKnownColumns;
+    }
+    
+    const wrap = c('div', { className: 'table-wrapper' });
     const table = c('table', { className: 'tbl' });
     const w = model.get('width');
-    if (w) table.style.width = w;
+    if (w) {
+      wrap.style.width = w;
+      controls.style.width = w;
+      }
 
-    if (!data.length) {
-      // show no data found message
-      const wrapEmpty = c('div', {
-        className: 'table-wrapper no-data-wrapper'
-      });
-      const emptyCell = c('div', {
-        className: 'no-data-cell',
-        textContent: 'No data found'
-      });
+        
+    if (cols.length > 0) {
+      const thead = table.appendChild(c('thead'));
+      const trh = thead.appendChild(c('tr'));
 
-      wrapEmpty.appendChild(emptyCell);
-      container.appendChild(wrapEmpty);
-      return;
-    }
-
-    const cols = Object.keys(data[0]);
-    const thead = table.appendChild(c('thead'));
-    const trh = thead.appendChild(c('tr'));
-
-    const selectionEnabled = rowsSelectionEnabled();
-    if (selectionEnabled) {
-      table.classList.add('has-row-selection');
-    }
-
-    // extra header cell above checkboxes
-    if (selectionEnabled) {
-      const thSelect = c('th', { textContent: '' });
-      trh.appendChild(thSelect);
-    }
-
-    // column headers
-    cols.forEach(col => {
-      const th = c('th', { textContent: col });
+      if (selectionEnabled) {
+        table.classList.add('has-row-selection');
+        trh.appendChild(c('th', { textContent: '' }));
+      }
 
       const sCol = model.get('table_sort_column');
       const sDir = model.get('table_sort_direction');
 
-      if (sCol === col && sDir === 1) th.textContent += ' ▲';
-      if (sCol === col && sDir === 2) th.textContent += ' ▼';
+      cols.forEach(col => {
+        const isIndexCol = col === MERCURY_INDEX_NAME;
+        const label = isIndexCol ? indexLabel : col;
+        const th = c('th', { textContent: label });
 
-      th.onclick = () => {
-        let dir = 1;
-        if (sCol === col) dir = (sDir + 1) % 3;
+        if (sCol === col && sDir === 1) th.textContent += ' ▲';
+        if (sCol === col && sDir === 2) th.textContent += ' ▼';
 
-        model.set('table_sort_column', col);
-        model.set('table_sort_direction', dir);
-        model.set('table_page', 1);
-        model.save_changes();
-      };
+        th.onclick = () => {
+          let dir = 1;
+          if (sCol === col) dir = (sDir + 1) % 3;
 
-      trh.appendChild(th);
-    });
+          model.set('table_sort_column', col);
+          model.set('table_sort_direction', dir);
+          model.set('table_page', 1);
+          model.save_changes();
+        };
+
+        trh.appendChild(th);
+      });
+    }
 
     const tbody = table.appendChild(c('tbody'));
 
-    data.forEach(row => {
-      const tr = tbody.appendChild(c('tr'));
+    if (hasData) {
+      data.forEach(row => {
+        const tr = tbody.appendChild(c('tr'));
 
-      const selected = selectionEnabled && isRowSelected(row);
-      if (selected) {
-        tr.classList.add('row-selected');
-      }
+        const selected = selectionEnabled && isRowSelected(row);
+        if (selected) tr.classList.add('row-selected');
 
-      if (selectionEnabled) {
-        const tdSelect = c('td');
-        const checkbox = c('input', { type: 'checkbox' });
+        if (selectionEnabled) {
+          const tdSelect = c('td');
+          const checkbox = c('input', { type: 'checkbox' });
+          checkbox.checked = selected;
+          checkbox.onchange = () =>
+            toggleRowSelection(row, checkbox.checked, tr);
+          tdSelect.appendChild(checkbox);
+          tr.appendChild(tdSelect);
+        }
 
-        checkbox.checked = selected;
-
-        checkbox.onchange = () => {
-          toggleRowSelection(row, checkbox.checked, tr);
-        };
-
-        tdSelect.appendChild(checkbox);
-        tr.appendChild(tdSelect);
-      }
-
-      cols.forEach(col => {
-        tr.appendChild(c('td', { textContent: row[col] }));
+        cols.forEach(col => {
+          tr.appendChild(c('td', { textContent: row[col] }));
+        });
       });
-    });
+    }
 
-    const wrap = c('div', { className: 'table-wrapper' });
     wrap.appendChild(table);
     container.appendChild(wrap);
+
+    if (!hasData) {
+      const overlay = c('div', {
+        className: 'no-data-overlay',
+        textContent: 'No data found'
+      });
+      const thead = table.querySelector('thead');
+      if (thead) {
+        const h = thead.getBoundingClientRect().height;
+        overlay.style.top = `${h}px`;
+      }
+      wrap.appendChild(overlay);
+    }
+
+    if (fixedTableHeight === null) {
+      requestAnimationFrame(() => {
+        const h = wrap.getBoundingClientRect().height;
+        if (h > 0) {
+          fixedTableHeight = h;
+          wrap.style.height = `${fixedTableHeight}px`;
+        }
+      });
+    } else {
+      wrap.style.height = `${fixedTableHeight}px`;
+    }
   }
 
   function renderPager() {
@@ -480,8 +571,6 @@ function render({ model, el }) {
   model.on('change:table_page', rerender);
   model.on('change:_filtered_length', rerender);
   model.on('change:search_version', rerender);
-  model.on('change:selected_rows', rerender);
-
   rerender();
 
   // read cell id (used to sync widget with notebook cell)
@@ -519,7 +608,7 @@ export default { render };
 .table-controls {
   display: flex;
   justify-content: space-between;
-  padding: 5px 15px;
+  padding: 10px 0px 0px 0px;
   align-items: center;
   gap: 16px;
   font-family: sans-serif;
@@ -551,11 +640,9 @@ export default { render };
 }
 
 .table-wrapper {
-  height: 480px;
-
+  max-height: 480px;
   overflow-y: auto;
   overflow-x: auto;
-  width: 100%;
   display: block;
   box-sizing: border-box;
 }
@@ -564,7 +651,7 @@ export default { render };
   border-collapse: collapse;
   table-layout: fixed;
   font-family: sans-serif;
-  min-width: max-content;
+  width: 100%;
 }
 
 .tbl th,
@@ -611,6 +698,7 @@ export default { render };
 
 .table-container {
   position: relative;
+  min-height: 40px;
 }
 
 .table-container.loading .table-wrapper {
@@ -661,11 +749,20 @@ export default { render };
   min-height: 120px;
 }
 
-.no-data-cell {
+.no-data-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: sans-serif;
   font-size: 20px;
   font-weight: bold;
   color: #666;
+  background: white;
+  pointer-events: none;
 }
 """
 
@@ -684,6 +781,7 @@ export default { render };
     _full_data: list[dict] | None = None
     _filtered_data: list[dict] | None = None
     _sorted_data: list[dict] | None = None
+    _mercury_index_column_name = "mercury_table_row_index"
 
     # traits synced to JS
     data = DataFrameTrait().tag(sync=True)
@@ -691,6 +789,12 @@ export default { render };
     search = traitlets.Bool(False).tag(sync=True)
     select_rows = traitlets.Bool(False).tag(sync=True)
     width = traitlets.Unicode("100%").tag(sync=True)
+    show_index_col = traitlets.Bool(False).tag(sync=True)
+    position = traitlets.Enum(
+        values=["sidebar", "inline", "bottom"],
+        default_value="inline",
+        help="Widget placement: sidebar, inline, or bottom",
+    ).tag(sync=True)
 
     table_search_query = traitlets.Unicode("").tag(sync=True)
     table_page = traitlets.Int(1).tag(sync=True)
@@ -698,18 +802,15 @@ export default { render };
     table_sort_direction = traitlets.Int(0).tag(sync=True)  # 0 none, 1 asc, 2 desc
     _filtered_length = traitlets.Int(0).tag(sync=True)
     search_version = traitlets.Int(0).tag(sync=True)
+    _id_selected_rows = DataFrameTrait().tag(sync=True)
     selected_rows = DataFrameTrait().tag(sync=True)
-    position = traitlets.Enum(
-        values=["sidebar", "inline", "bottom"],
-        default_value="inline",
-        help="Widget placement: sidebar, inline, or bottom",
-    ).tag(sync=True)
+    _oryginal_index_column_name = traitlets.Unicode("").tag(sync=True)
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     # -------- event router --------
 
     def _react(self, change):
-        if (self._full_df is None and not self._full_data):
+        if self._full_df is None and not self._full_data:
             self.data = []
             self._filtered_length = 0
             return
@@ -734,13 +835,13 @@ export default { render };
     # -------- dispatcher: frame vs list --------
 
     def _handle_refresh(self, steps=("filter", "sort", "paginate")):
-      if "filter" in steps:
-        self._apply_filter()
-      if "sort" in steps:
-        self._apply_sort()
-      if "paginate" in steps:
-        self._paginate()
-    
+        if "filter" in steps:
+            self._apply_filter()
+        if "sort" in steps:
+            self._apply_sort()
+        if "paginate" in steps:
+            self._paginate()
+
     def _apply_filter(self):
         if self._use_frame_backend:
             self._apply_filter_frame()
@@ -770,7 +871,9 @@ export default { render };
         else:
             out = []
             for row in records:
-                for v in row.values():
+                for k, v in row.items():
+                    if not self.show_index_col and k == self._mercury_index_column_name:
+                        continue
                     if q in str(v).lower():
                         out.append(row)
                         break
@@ -789,7 +892,7 @@ export default { render };
             self._sorted_data = records
             return
 
-        reverse = (direction == 2)
+        reverse = direction == 2
 
         def sort_key(row: dict):
             v = row.get(col)
@@ -840,35 +943,51 @@ export default { render };
         q = (self.table_search_query or "").strip()
         if not q:
             self._filtered_df = df
-            self._filtered_length = getattr(df, "shape", (0,))[0] if self._frame_lib == "pandas" else df.height
+            self._filtered_length = (
+                getattr(df, "shape", (0,))[0]
+                if self._frame_lib == "pandas"
+                else df.height
+            )
             return
 
         if self._frame_lib == "pandas":
             import pandas as pd
-            bool_df = (
-                df.astype(str)
-                  .apply(lambda col: col.str.contains(q, case=False, na=False))
+
+            # search_df = df.drop(columns=[self._mercury_index_column_name], errors="ignore")
+            search_df = (
+                df
+                if self.show_index_col
+                else df.drop(columns=[self._mercury_index_column_name], errors="ignore")
+            )
+            bool_df = search_df.astype(str).apply(
+                lambda col: col.str.contains(q, case=False, na=False)
             )
             mask = bool_df.any(axis=1)
             self._filtered_df = df[mask]
             self._filtered_length = int(mask.sum())
         elif self._frame_lib == "polars":
             import polars as pl
+
             q_lower = q.lower()
-            tmp = df.select(
-                pl.all().cast(pl.Utf8).str.to_lowercase()
+            # search_df = df.drop(self._mercury_index_column_name, strict=False)
+            search_df = (
+                df
+                if self.show_index_col
+                else df.drop(self._mercury_index_column_name, strict=False)
             )
+            tmp = search_df.select(pl.all().cast(pl.Utf8).str.to_lowercase())
             mask = tmp.select(
-                pl.any_horizontal(
-                    pl.all().str.contains(q_lower, literal=True)
-                )
+                pl.any_horizontal(pl.all().str.contains(q_lower, literal=True))
             ).to_series()
             self._filtered_df = df.filter(mask)
             self._filtered_length = self._filtered_df.height
         else:
             # fallback: convert to list backend
             trait = DataFrameTrait()
-            self._full_data = trait.validate(self, df)
+            rows = trait.validate(self, df)
+            for i, row in enumerate(rows):
+                rows[i] = {self._mercury_index_column_name: i, **row}
+            self._full_data = rows
             self._use_frame_backend = False
             self._apply_filter_list()
 
@@ -887,7 +1006,7 @@ export default { render };
             self._sorted_df = df
             return
 
-        ascending = (direction == 1)
+        ascending = direction == 1
 
         if self._frame_lib == "pandas":
             self._sorted_df = df.sort_values(col, ascending=ascending)
@@ -921,7 +1040,7 @@ export default { render };
         start = (page - 1) * size
 
         if self._frame_lib == "pandas":
-            page_df = df.iloc[start:start + size]
+            page_df = df.iloc[start : start + size]
         else:  # polars
             page_df = df.slice(start, size)
 
@@ -939,10 +1058,26 @@ export default { render };
             frame_used = False
             try:
                 import pandas as pd
+
                 if isinstance(data, pd.DataFrame):
+                    if isinstance(data.index, pd.MultiIndex):
+                        raise traitlets.TraitError(
+                            "Table widget does not support pandas MultiIndex rows. "
+                        )
+
+                    if isinstance(data.columns, pd.MultiIndex):
+                        raise traitlets.TraitError(
+                            "Table widget does not support pandas MultiIndex columns."
+                        )
+
                     self._use_frame_backend = True
                     self._frame_lib = "pandas"
-                    self._full_df = data.copy()
+                    df = data.copy()
+                    self._oryginal_index_column_name = df.index.name or ""
+                    df = df.reset_index(
+                        names=self._mercury_index_column_name
+                    )  # add index col
+                    self._full_df = df
                     frame_used = True
             except ImportError:
                 pass
@@ -951,10 +1086,13 @@ export default { render };
             if not frame_used:
                 try:
                     import polars as pl
+
                     if isinstance(data, pl.DataFrame):
                         self._use_frame_backend = True
                         self._frame_lib = "polars"
-                        self._full_df = data.clone()
+                        df = data.clone()
+                        df = df.with_row_index(name=self._mercury_index_column_name)
+                        self._full_df = df
                         frame_used = True
                 except ImportError:
                     pass
@@ -965,7 +1103,11 @@ export default { render };
             else:
                 # generic path: list[dict] backend
                 trait = DataFrameTrait()
-                self._full_data = trait.validate(self, data)
+                rows = trait.validate(self, data)
+                for i, row in enumerate(rows):
+                    rows[i] = {self._mercury_index_column_name: i, **row}
+
+                self._full_data = rows
                 self._handle_refresh(("filter", "sort", "paginate"))
         else:
             self._full_data = []
@@ -973,11 +1115,16 @@ export default { render };
             self._sorted_data = []
             self.data = []
 
-        self.observe(self._react, names=[
-            "table_page", "page_size",
-            "table_search_query",
-            "table_sort_column", "table_sort_direction",
-        ])
+        self.observe(
+            self._react,
+            names=[
+                "table_page",
+                "page_size",
+                "table_search_query",
+                "table_sort_column",
+                "table_sort_direction",
+            ],
+        )
 
     def _repr_mimebundle_(self, **kwargs):
         data = super()._repr_mimebundle_(**kwargs)
