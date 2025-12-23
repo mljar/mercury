@@ -1,5 +1,6 @@
 import anywidget
 import traitlets
+from IPython.display import display
 import math
 from numbers import Real, Integral
 from typing import Any, List, Dict
@@ -240,12 +241,12 @@ function render({ model, el }) {
   let lastKnownColumns = null;
   const MERCURY_INDEX_NAME = 'mercury_table_row_index';
 
-  const container = c('div', { className: 'table-container' });
+  const container = c('div', { className: 'mljar-mercury-table-widget-table-container' });
   el.appendChild(container);
 
-  const controls = c('div', { className: 'table-controls' });
-  const controlsLeft = c('div', { className: 'controls-left' });
-  const controlsRight = c('div', { className: 'controls-right' });
+  const controls = c('div', { className: 'mljar-mercury-table-widget-table-controls' });
+  const controlsLeft = c('div', { className: 'mljar-mercury-table-widget-controls-left' });
+  const controlsRight = c('div', { className: 'mljar-mercury-table-widget-controls-right' });
   controls.appendChild(controlsLeft);
   controls.appendChild(controlsRight);
   el.appendChild(controls);
@@ -307,10 +308,10 @@ function render({ model, el }) {
 
     if (checked) {
       next = current.concat([row]);
-      tr.classList.add('row-selected');
+      tr.classList.add('mljar-mercury-table-widget-row-selected');
     } else {
       next = current.filter(r => r[MERCURY_INDEX_NAME] !== id);
-      tr.classList.remove('row-selected');
+      tr.classList.remove('mljar-mercury-table-widget-row-selected');
     }
 
     model.set('_id_selected_rows', next);
@@ -337,8 +338,8 @@ function render({ model, el }) {
       cols = lastKnownColumns;
     }
     
-    const wrap = c('div', { className: 'table-wrapper' });
-    const table = c('table', { className: 'tbl' });
+    const wrap = c('div', { className: 'mljar-mercury-table-widget-table-wrapper' });
+    const table = c('table', { className: 'mljar-mercury-table-widget-tbl' });
     const w = model.get('width');
     if (w) {
       wrap.style.width = w;
@@ -387,7 +388,7 @@ function render({ model, el }) {
         const tr = tbody.appendChild(c('tr'));
 
         const selected = selectionEnabled && isRowSelected(row);
-        if (selected) tr.classList.add('row-selected');
+        if (selected) tr.classList.add('mljar-mercury-table-widget-row-selected');
 
         if (selectionEnabled) {
           const tdSelect = c('td');
@@ -410,7 +411,7 @@ function render({ model, el }) {
 
     if (!hasData) {
       const overlay = c('div', {
-        className: 'no-data-overlay',
+        className: 'mljar-mercury-table-widget-no-data-overlay',
         textContent: 'No data found'
       });
       const thead = table.querySelector('thead');
@@ -456,7 +457,7 @@ function render({ model, el }) {
       const prev = c('button', {
         textContent: 'Previous',
         disabled: page <= 1,
-        className: 'pager-btn'
+        className: 'mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn'
       });
       prev.onclick = () => {
         model.set('table_page', page - 1);
@@ -468,7 +469,7 @@ function render({ model, el }) {
         min: 1,
         max: total,
         value: String(page),
-        className: 'page-input'
+        className: 'mljar-mercury-table-widget-page-input'
       });
 
       const goToPageFromInput = () => {
@@ -496,13 +497,13 @@ function render({ model, el }) {
 
       const ofLabel = c('span', {
         textContent: ` / ${total}`,
-        className: 'page-of'
+        className: 'mljar-mercury-table-widget-page-of'
       });
 
       const next = c('button', {
         textContent: 'Next',
         disabled: page >= total,
-        className: 'pager-btn'
+        className: 'mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn'
       });
       next.onclick = () => {
         model.set('table_page', page + 1);
@@ -521,7 +522,7 @@ function render({ model, el }) {
         searchBox = c('input', {
           type: 'text',
           placeholder: 'Search...',
-          className: 'search-box'
+          className: 'mljar-mercury-table-widget-search-box'
         });
 
         searchBox.oninput = () => {
@@ -605,7 +606,7 @@ export default { render };
 """
 
     _css = """
-.table-controls {
+.mljar-mercury-table-widget-table-controls {
   display: flex;
   justify-content: space-between;
   padding: 10px 0px 0px 0px;
@@ -615,14 +616,14 @@ export default { render };
   font-size: 13px;
 }
 
-.controls-left,
-.controls-right {
+.mljar-mercury-table-widget-controls-left,
+.mljar-mercury-table-widget-controls-right {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.pager-btn {
+.mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn {
   padding: 4px 10px;
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -630,16 +631,16 @@ export default { render };
   cursor: pointer;
 }
 
-.pager-btn:disabled {
+.mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-.page-of {
+.mljar-mercury-table-widget-page-of {
   margin: 0 4px;
 }
 
-.table-wrapper {
+.mljar-mercury-table-widget-table-wrapper {
   max-height: 480px;
   overflow-y: auto;
   overflow-x: auto;
@@ -647,15 +648,15 @@ export default { render };
   box-sizing: border-box;
 }
 
-.tbl {
+.mljar-mercury-table-widget-tbl {
   border-collapse: collapse;
   table-layout: fixed;
   font-family: sans-serif;
   width: 100%;
 }
 
-.tbl th,
-.tbl td {
+.mljar-mercury-table-widget-tbl th,
+.mljar-mercury-table-widget-tbl td {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: left;
@@ -665,48 +666,48 @@ export default { render };
   min-width: 160px;
 }
 
-.tbl th {
+.mljar-mercury-table-widget-tbl th {
   background: #f2f2f2;
   cursor: pointer;
   text-align: center;
 }
 
-.pager {
+.mljar-mercury-table-widget-pager {
   margin-top: 8px;
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.page-input {
+.mljar-mercury-table-widget-page-input {
   width: 56px;
   text-align: center;
   padding: 4px 6px;
   -moz-appearance: textfield;
 }
-.page-input::-webkit-outer-spin-button,
-.page-input::-webkit-inner-spin-button {
+.mljar-mercury-table-widget-page-input::-webkit-outer-spin-button,
+.mljar-mercury-table-widget-page-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.search-box {
+.mljar-mercury-table-widget-search-box {
   padding: 6px 8px;
   width: 200px;
   font-size: 13px;
 }
 
-.table-container {
+.mljar-mercury-table-widget-table-container {
   position: relative;
   min-height: 40px;
 }
 
-.table-container.loading .table-wrapper {
+.mljar-mercury-table-widget-table-container.loading .mljar-mercury-table-widget-table-wrapper {
   filter: blur(2px);
   pointer-events: none;
 }
 
-.table-container.loading::after {
+.mljar-mercury-table-widget-table-container.loading::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -730,26 +731,26 @@ export default { render };
   }
 }
 
-.row-selected {
+.mljar-mercury-table-widget-row-selected {
   background-color: #e0f2fe;
 }
 
-.tbl.has-row-selection td:first-child,
-.tbl.has-row-selection th:first-child {
+.mljar-mercury-table-widget-tbl.has-row-selection td:first-child,
+.mljar-mercury-table-widget-tbl.has-row-selection th:first-child {
   width: 32px;
   min-width: 32px;
   max-width: 32px;
   text-align: center;
 }
 
-.table-wrapper.no-data-wrapper {
+.mljar-mercury-table-widget-table-wrapper.no-data-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 120px;
 }
 
-.no-data-overlay {
+.mljar-mercury-table-widget-no-data-overlay {
   position: absolute;
   left: 0;
   right: 0;
