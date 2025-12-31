@@ -1,4 +1,4 @@
-__version__ = "3.0.0a12"
+__version__ = "3.0.0b1"
 
 # input widgets
 from .button import Button

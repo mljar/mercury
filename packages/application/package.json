@@ -1,6 +1,6 @@
 {
   "name": "mercury-application",
-  "version": "3.0.0-alpha.12",
+  "version": "3.0.0-beta.1",
   "description": "Mercury Jupyter application.",
   "private": true,
   "keywords": [

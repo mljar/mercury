@@ -1,6 +1,6 @@
 {
     "name": "@mljar/mercury-meta",
-    "version": "3.0.0-alpha.12",
+    "version": "3.0.0-beta.1",
     "description": "Mercury Framework",
     "keywords": [
         "jupyter",
