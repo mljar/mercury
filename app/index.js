@@ -6,7 +6,7 @@ import './style';
 import './extraStyle';
 
 // ✅ STATIC: mercury application
-import mercuryPlugins from 'mercury-application';
+import mercuryPlugins, { MercuryApp } from 'mercury-application';
 
 // ✅ STATIC: mime extensions
 import jsMime from '@jupyterlab/javascript-extension';
@@ -221,7 +221,6 @@ async function main() {
     .filter(({ status }) => status === 'rejected')
     .forEach(({ reason }) => console.error(reason));
 
-  const MercuryApp = mercuryPlugins.MercuryApp || (await import('mercury-application')).MercuryApp;
   const app = new MercuryApp({ mimeExtensions });
 
   app.registerPluginModules(mods);
