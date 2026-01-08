@@ -16,7 +16,7 @@ import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import { MercuryWidget } from './widget';
 
 import { MercuryPanel } from './panel';
-import { LabIcon } from '@jupyterlab/ui-components';
+// import { LabIcon } from '@jupyterlab/ui-components';
 
 export class MercuryWidgetFactory extends ABCWidgetFactory<
   MercuryWidget,
@@ -129,7 +129,7 @@ export namespace MercuryWidgetFactory {
     notebookConfig?: StaticNotebook.INotebookConfig;
     notebookPanel: NotebookPanel | null;
 
-    icon?: LabIcon;
+    iconClass?: string;
     iconLabel?: string;
   }
 }

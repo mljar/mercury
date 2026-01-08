@@ -27,6 +27,12 @@
         "type": "git",
         "url": "https://github.com/mljar/mercury.git"
     },
+    "resolutions": {
+        "@microsoft/fast-colors": "5.3.1",
+        "@microsoft/fast-element": "1.12.0",
+        "@microsoft/fast-foundation": "2.49.4",
+        "@microsoft/fast-web-utilities": "5.4.1"
+    },
     "scripts": {
         "build": "jlpm run clean && jlpm workspaces foreach -Atp run build && jlpm run check:artifacts",
         "build:prod": "jlpm run clean:all && jlpm workspaces foreach -At run build:prod && jlpm run check:artifacts",

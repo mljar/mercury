@@ -30,8 +30,10 @@ fs.ensureDirSync(buildDir);
 // Copy extra files
 const index = path.resolve(__dirname, 'index.js');
 const cssImports = path.resolve(__dirname, 'style.js');
+const fastColorsPatch = path.resolve(__dirname, 'fast-colors-sort-patch.js');
 fs.copySync(index, path.resolve(buildDir, 'index.js'));
 fs.copySync(cssImports, path.resolve(buildDir, 'extraStyle.js'));
+fs.copySync(fastColorsPatch, path.resolve(buildDir, 'fast-colors-sort-patch.js'));
 
 const extras = Build.ensureAssets({
   packageNames: names,
@@ -154,7 +156,7 @@ function createShared(packageData) {
 
 // Make a bootstrap entrypoint
 const entryPoint = path.join(buildDir, 'bootstrap.js');
-const bootstrap = 'import("./index.js");';
+const bootstrap = 'import("./fast-colors-sort-patch.js");\nimport("./index.js");';
 fs.writeFileSync(entryPoint, bootstrap);
 
 // if (process.argv.includes('--analyze')) {

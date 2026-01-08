@@ -70,7 +70,6 @@
         "@jupyterlab/rendermime": "^4.0.0",
         "@jupyterlab/services": "^7.0.0",
         "@jupyterlab/translation": "^4.0.0",
-        "@jupyterlab/ui-components": "^4.0.0",
         "@lumino/algorithm": "^2.0.0",
         "@lumino/commands": "^2.0.0",
         "@lumino/coreutils": "^2.0.0",
@@ -124,6 +123,30 @@
                 "singleton": true
             },
             "@jupyter-widgets/jupyterlab-manager": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@jupyter/react-components": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@jupyter/web-components": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@microsoft/fast-colors": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@microsoft/fast-element": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@microsoft/fast-foundation": {
+                "bundled": false,
+                "singleton": true
+            },
+            "@microsoft/fast-web-utilities": {
                 "bundled": false,
                 "singleton": true
             }

@@ -10,8 +10,6 @@ import { IDisposable } from '@lumino/disposable';
 
 import { Widget } from '@lumino/widgets';
 
-import { partyIcon } from '../../icons';
-
 /**
  * A WidgetExtension for Notebook's toolbar to open a `Mercury` widget.
  */
@@ -32,7 +30,7 @@ export class OpenMercuryButton
   createNew(panel: NotebookPanel): IDisposable {
     const button = new ToolbarButton({
       tooltip: 'Open with Mercury',
-      icon: partyIcon,
+      iconClass: 'mrc-Icon',
       onClick: () => {
         this._commands
           .execute('docmanager:open', {

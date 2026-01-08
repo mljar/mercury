@@ -1,5 +1,12 @@
 /* Make the Mercury toolbar a proper flex container that can shrink */
 /* Toolbar as flex container */
+.mrc-Icon {
+  background-image: url('./icons/party.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+
 .mercury-Toolbar {
   display: flex;
   align-items: center;

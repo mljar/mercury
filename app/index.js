@@ -2,6 +2,9 @@
 
 import { PageConfig, URLExt } from '@jupyterlab/coreutils';
 
+// Patch FAST color scale sort to avoid recursion issues in some builds.
+import './fast-colors-sort-patch';
+
 import './style';
 import './extraStyle';
 
@@ -102,16 +105,16 @@ async function main() {
 
     // @jupyterlab plugins (filtered)
     filterPlugins(normalizePlugins(applicationExt), [
-      '@jupyterlab/application-extension:commands',
-      '@jupyterlab/application-extension:context-menu'
+      //'@jupyterlab/application-extension:commands',
+      //'@jupyterlab/application-extension:context-menu'
     ]),
 
     filterPlugins(normalizePlugins(apputilsExt), [
-      '@jupyterlab/apputils-extension:palette',
-      '@jupyter/apputils-extension:sanitizer',
+      // '@jupyterlab/apputils-extension:palette',
+      //'@jupyter/apputils-extension:sanitizer',
       '@jupyterlab/apputils-extension:sanitizer',
       '@jupyterlab/apputils-extension:settings',
-      '@jupyterlab/apputils-extension:sessionDialogs',
+      //'@jupyterlab/apputils-extension:sessionDialogs',
       '@jupyterlab/apputils-extension:toolbar-registry'
     ]),
 
@@ -157,13 +160,26 @@ async function main() {
   // ---- Federated extensions still supported (Module Federation kept) ----
   const extensionRaw = PageConfig.getOption('federated_extensions');
   const extension_data = extensionRaw ? JSON.parse(extensionRaw) : [];
+  const urlParams = new URLSearchParams(window.location.search);
+  const keepFederated = urlParams.has('keep-federated');
+  const keepFederatedSet = keepFederated
+    ? new Set(
+        (urlParams.get('keep-federated') || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+      )
+    : null;
+  const filteredExtensions = keepFederatedSet
+    ? extension_data.filter(ext => keepFederatedSet.has(ext.name))
+    : extension_data;
 
   const federatedExtensionPromises = [];
   const federatedMimeExtensionPromises = [];
   const federatedStylePromises = [];
 
   const extensions = await Promise.allSettled(
-    extension_data.map(async data => {
+    filteredExtensions.map(async data => {
       await loadComponent(
         `${URLExt.join(
           PageConfig.getOption('fullLabextensionsUrl'),
@@ -221,10 +237,11 @@ async function main() {
     .filter(({ status }) => status === 'rejected')
     .forEach(({ reason }) => console.error(reason));
 
+  console.log('app');
   const app = new MercuryApp({ mimeExtensions });
 
   app.registerPluginModules(mods);
   await app.start();
 }
 
-window.addEventListener('load', main);
+window.addEventListener('load', main); 
