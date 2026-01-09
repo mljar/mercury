@@ -1,21 +1,24 @@
-# handlers.py 
-import uuid
-from pathlib import Path
-from typing import Optional, List, Dict
-from datetime import datetime, timezone, timedelta
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
 
+import uuid
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Dict, List, Optional
+
+import toml
 from jupyter_server.base.handlers import JupyterHandler
-from jupyter_server.extension.handler import (ExtensionHandlerJinjaMixin,
-                                              ExtensionHandlerMixin)
+from jupyter_server.extension.handler import (
+    ExtensionHandlerJinjaMixin,
+    ExtensionHandlerMixin,
+)
 from jupyter_server.utils import ensure_async
 from jupyter_server.utils import url_path_join as ujoin
-from jupyterlab_server.config import (LabConfig, get_page_config,
-                                      recursive_update)
+from jupyterlab_server.config import LabConfig, get_page_config, recursive_update
 from jupyterlab_server.handlers import _camelCase, is_url
 from tornado import web
 
 from ._version import __version__
-import toml
 
 version = __version__
 

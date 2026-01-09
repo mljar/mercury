@@ -94,6 +94,10 @@
                 "bundled": false,
                 "singleton": true
             },
+            "@jupyter/ydoc": {
+                "bundled": false,
+                "singleton": true
+            },
             "@microsoft/fast-colors": {
                 "bundled": false,
                 "singleton": true
@@ -107,6 +111,10 @@
                 "singleton": true
             },
             "@microsoft/fast-web-utilities": {
+                "bundled": false,
+                "singleton": true
+            },
+            "yjs": {
                 "bundled": false,
                 "singleton": true
             }

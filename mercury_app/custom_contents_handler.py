@@ -1,3 +1,6 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
 import datetime
 
 from jupyter_server.services.contents.handlers import ContentsHandler

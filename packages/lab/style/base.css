@@ -166,7 +166,7 @@
 
 .mercury-right-top-panel.mercury-right-limited > .lm-Widget,
 .mercury-right-bottom-panel.mercury-right-limited > .lm-Widget {
-  max-width: 1024px;
+  max-width: 976px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -218,8 +218,8 @@
 }
 
 .mercury-panel-with-margin {
-  /* max-width: 1280px; */
-  max-width: 1024px;
+  /* max-width: 1024px; */
+  max-width: 976px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 24px;

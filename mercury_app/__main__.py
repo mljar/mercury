@@ -1,7 +1,10 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
+import argparse
+import logging
 import os
 import sys
-import logging
-import argparse
 
 from ._version import __version__
 
@@ -88,10 +91,7 @@ def _parse_and_inject(argv):
             try:
                 from jupyter_server.auth import passwd as _passwd
             except ImportError:
-                try:
-                    from notebook.auth import passwd as _passwd
-                except ImportError:
-                    _passwd = None
+                _passwd = None
 
             if _passwd is None:
                 logging.warning(
@@ -248,7 +248,6 @@ def _parse_and_inject(argv):
     return new_argv
 
 def main(argv=None):
-    """Console script entrypoint."""
     if argv is None:
         argv = sys.argv
     print(logo)

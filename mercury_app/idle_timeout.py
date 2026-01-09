@@ -1,3 +1,6 @@
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
 import logging
 import time
 from threading import Event, Thread
@@ -62,8 +65,7 @@ class TimeoutActivityTransform(tornado.web.OutputTransform):
 
 def patch_kernel_websocket_handler():
     try:
-        from jupyter_server.services.kernels.websocket import \
-            KernelWebsocketHandler
+        from jupyter_server.services.kernels.websocket import KernelWebsocketHandler
         orig_on_message = KernelWebsocketHandler.on_message
         def on_message_with_touch(self, message):
             if hasattr(self.application, "_timeout_manager"):

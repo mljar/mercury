@@ -34,11 +34,22 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     sessionContextDialogs: ISessionContextDialogs | null,
     translator: ITranslator | null
   ) => {
+    console.info('[Mercury] mercury-application:opener activate');
     const { mimeTypeService } = editorServices ?? {};
     Promise.all([app.started, app.restored])
       .then(async () => {
         try {
+          if (app.serviceManager?.ready) {
+            console.info('[Mercury] Waiting for service manager ready');
+            await app.serviceManager.ready;
+          }
+          const docManagerReady = (documentManager as any)?.ready;
+          if (docManagerReady?.then) {
+            console.info('[Mercury] Waiting for document manager ready');
+            await docManagerReady;
+          }
           const notebookPath = PageConfig.getOption('notebookPath');
+          console.info('[Mercury] Opening notebook', notebookPath);
           const mercuryPanel = documentManager.open(
             notebookPath,
             'Mercury'
@@ -89,6 +100,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
           // ---------- Execute notebook cells once kernel is ready ----------
           mercuryPanel.context.ready.then(async () => {
             try {
+              console.info('[Mercury] Notebook context ready');
               let session = mercuryPanel.context.sessionContext.session;
               if (!session) {
                 const [, changes] = await signalToPromise(

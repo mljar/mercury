@@ -4,20 +4,22 @@ import { PageConfig, URLExt } from '@jupyterlab/coreutils';
 
 // Patch FAST color scale sort to avoid recursion issues in some builds.
 import './fast-colors-sort-patch';
+// Patch @jupyter/ydoc to avoid premature access before Yjs types attach.
+import './ydoc-attach-patch';
 
 import './style';
 import './extraStyle';
 
-// ✅ STATIC: mercury application
+// mercury application
 import mercuryPlugins, { MercuryApp } from 'mercury-application';
 
-// ✅ STATIC: mime extensions
+// mime extensions
 import jsMime from '@jupyterlab/javascript-extension';
 import jsonMime from '@jupyterlab/json-extension';
 import pdfMime from '@jupyterlab/pdf-extension';
 import vegaMime from '@jupyterlab/vega5-extension';
 
-// ✅ STATIC: core extensions (import plugin arrays)
+// core extensions (import plugin arrays)
 import applicationExt from '@jupyterlab/application-extension';
 import apputilsExt from '@jupyterlab/apputils-extension';
 import codemirrorExt from '@jupyterlab/codemirror-extension';
@@ -90,7 +92,7 @@ async function main() {
     }
   }
 
-  // ✅ STATIC: mime extensions list (no Promise.all)
+  // mime extensions list (no Promise.all)
   const mimeExtensions = [
     ...normalizePlugins(jsMime),
     ...normalizePlugins(jsonMime),
@@ -98,7 +100,7 @@ async function main() {
     ...normalizePlugins(vegaMime)
   ];
 
-  // ✅ STATIC: base mods (no dynamic import())
+  // base mods (no dynamic import())
   const baseMods = [
     // mercury plugins
     mercuryPlugins,
@@ -150,6 +152,10 @@ async function main() {
     ])
   ];
 
+  // ---- Federated extensions still supported (Module Federation kept) ----
+  const extensionRaw = PageConfig.getOption('federated_extensions');
+  const extension_data = extensionRaw ? JSON.parse(extensionRaw) : [];
+
   // Add the base frontend extensions
   baseMods.forEach(p => {
     for (let plugin of activePlugins(p)) {
@@ -157,29 +163,12 @@ async function main() {
     }
   });
 
-  // ---- Federated extensions still supported (Module Federation kept) ----
-  const extensionRaw = PageConfig.getOption('federated_extensions');
-  const extension_data = extensionRaw ? JSON.parse(extensionRaw) : [];
-  const urlParams = new URLSearchParams(window.location.search);
-  const keepFederated = urlParams.has('keep-federated');
-  const keepFederatedSet = keepFederated
-    ? new Set(
-        (urlParams.get('keep-federated') || '')
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean)
-      )
-    : null;
-  const filteredExtensions = keepFederatedSet
-    ? extension_data.filter(ext => keepFederatedSet.has(ext.name))
-    : extension_data;
-
   const federatedExtensionPromises = [];
   const federatedMimeExtensionPromises = [];
   const federatedStylePromises = [];
 
   const extensions = await Promise.allSettled(
-    filteredExtensions.map(async data => {
+    extension_data.map(async data => {
       await loadComponent(
         `${URLExt.join(
           PageConfig.getOption('fullLabextensionsUrl'),
@@ -237,9 +226,7 @@ async function main() {
     .filter(({ status }) => status === 'rejected')
     .forEach(({ reason }) => console.error(reason));
 
-  console.log('app');
   const app = new MercuryApp({ mimeExtensions });
-
   app.registerPluginModules(mods);
   await app.start();
 }

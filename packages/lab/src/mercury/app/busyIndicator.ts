@@ -60,8 +60,6 @@ export class BusyIndicator {
   begin() {
     this.busyCount++;
 
-    console.log('begin', this.busyCount);
-
     // If we were about to hide, cancel that (work resumed).
     if (this.hideTimer !== null) {
       window.clearTimeout(this.hideTimer);
@@ -90,8 +88,6 @@ export class BusyIndicator {
   finish() {
     // Decrement but never go below 0 (defensive).
     this.busyCount = Math.max(0, this.busyCount - 1);
-
-    console.log('finish', this.busyCount);
 
     // Still busy? Then do nothing.
     if (this.busyCount > 0) return;

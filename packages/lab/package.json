@@ -126,11 +126,19 @@
                 "bundled": false,
                 "singleton": true
             },
+            "@jupyter/ydoc": {
+                "bundled": false,
+                "singleton": true
+            },
             "@jupyter/react-components": {
                 "bundled": false,
                 "singleton": true
             },
             "@jupyter/web-components": {
+                "bundled": false,
+                "singleton": true
+            },
+            "yjs": {
                 "bundled": false,
                 "singleton": true
             },

@@ -1,9 +1,10 @@
-from tornado.web import RequestHandler, HTTPError
+# Copyright MLJAR Sp. z o.o.
+# Licensed under the Apache License, Version 2.0 (Apache-2.0)
+
+from tornado.web import HTTPError, RequestHandler
 
 BLOCKED_PATTERNS = [
     # JupyterLab UI + API
-    #r"/lab(?:/.*)?",
-    #r"/lab(?!/(?:extensions/|api/settings(?:/|$)))(?:/.*)?",
     r"/lab(?!/(?:extensions/|api/settings(?:/|$)|api/translations(?:/|$)))(?:/.*)?"
     r"/api/terminals(?:/.*)?",
     r"/api/shutdown(?:/.*)?",
