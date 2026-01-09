@@ -14,7 +14,17 @@ def convert_datetimes(obj):
     elif isinstance(obj, list):
         return [convert_datetimes(i) for i in obj]
     elif isinstance(obj, datetime.datetime):
-        return obj.isoformat() + "Z"
+        dt = obj
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        try:
+            dt = dt.astimezone(datetime.timezone.utc)
+        except Exception:
+            pass
+        iso = dt.isoformat()
+        if iso.endswith("+00:00"):
+            iso = iso[:-6] + "Z"
+        return iso
     else:
         return obj
 
