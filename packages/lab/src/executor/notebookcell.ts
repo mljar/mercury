@@ -78,7 +78,6 @@ export class NotebookCellExecutor implements INotebookCellExecutor {
 
           let ran = false;
           try {
-            console.log('NotebookCellExecutor calls codeCellExecute');
             const reply = await codeCellExecute(
               cell as CodeCell,
               sessionContext,

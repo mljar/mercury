@@ -224,9 +224,8 @@ class _TabsHeaderWidget(anywidget.AnyWidget):
 
     _esm = """
 
-    console.log(' TTTTTTTTTTTTTAAAAAAAAAAAAAAABBBBBBBBBBSSSSSSSSS header');
     function render({ model, el }) {
-      console.log('RENDER MODEL', el);
+
       const tablist = document.createElement("div");
       tablist.classList.add("mljar-tablist");
       tablist.setAttribute("role", "tablist");
@@ -245,11 +244,9 @@ class _TabsHeaderWidget(anywidget.AnyWidget):
         btn.addEventListener("click", () => {
           model.set("active", index);
           model.save_changes();
-          console.log('tabs save_changes');
         });
 
         btn.addEventListener("keydown", (e) => {
-          console.log('tabs KEYDOWN');
           const len = buttons.length;
           let i = model.get("active") || 0;
           if (e.key === "ArrowRight") {

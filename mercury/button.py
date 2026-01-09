@@ -128,13 +128,11 @@ class ButtonWidget(anywidget.AnyWidget):
 
       btn.addEventListener("click", () => {
         if (model.get("disabled")) return;
-        console.log('button click');
         const current = model.get("n_clicks") || 0;
         model.set("n_clicks", current + 1);
         model.set("last_clicked_at", new Date().toISOString());
         model.set("value", true);
         model.save_changes();
-        console.log('button save_changes');
         // model.send({ type: "clicked", n_clicks: current + 1 });
       });
 

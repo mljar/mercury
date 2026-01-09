@@ -152,7 +152,6 @@ function createShared(packageData) {
       )} Please add them to packages.json#resolutions section.`
     );
   }
-  console.log(shared);
   return shared;
 }
 

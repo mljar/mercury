@@ -40,14 +40,12 @@ export const commands: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [INotebookTracker],
   activate: (app: JupyterFrontEnd, notebookTracker: INotebookTracker) => {
-    console.log('execute below');
     const commandID = '@mljar/mercury-execute-below';
     app.commands.addCommand(commandID, {
       label: 'Execute cells below',
       execute: () => {
         const nb = notebookTracker.currentWidget;
         if (nb) {
-          console.log('Run all below');
           runAllBelow(nb.content, nb.context.sessionContext);
         }
       }
