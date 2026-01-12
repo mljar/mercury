@@ -3,6 +3,10 @@ import { OutputArea } from '@jupyterlab/outputarea';
 import { Kernel, KernelMessage } from '@jupyterlab/services';
 import { JSONObject } from '@lumino/coreutils';
 
+const FUTURE_DESCRIPTOR = Object.getOwnPropertyDescriptor(
+  OutputArea.prototype,
+  'future'
+);
 const NO_FLICKER_PATCHED = Symbol('no-flicker-patched');
 const NO_FLICKER_RUN_TOKEN = Symbol('no-flicker-run-token');
 
@@ -115,6 +119,12 @@ export async function outputAreaExecute(
     Object.defineProperty(output, 'future', {
       configurable: true, // ✅ improvement #1
       enumerable: true,
+      get() {
+        if (FUTURE_DESCRIPTOR?.get) {
+          return FUTURE_DESCRIPTOR.get.call(this);
+        }
+        return (this as any)._future;
+      },
       set(
         value: Kernel.IShellFuture<
           KernelMessage.IExecuteRequestMsg,
