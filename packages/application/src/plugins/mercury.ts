@@ -102,6 +102,49 @@ export const plugin: JupyterFrontEndPlugin<void> = {
           mercuryPanel.context.ready.then(async () => {
             try {
               console.info('[Mercury] Context ready, preparing execution');
+              const waitForKernelReady = async (kc: typeof kernelConnection) => {
+                if (!kc) {
+                  return;
+                }
+                if (
+                  kc.connectionStatus === 'connected' &&
+                  kc.status === 'idle'
+                ) {
+                  return;
+                }
+                await new Promise<void>(resolve => {
+                  const maybeResolve = () => {
+                    if (
+                      kc.connectionStatus === 'connected' &&
+                      kc.status === 'idle'
+                    ) {
+                      kc.connectionStatusChanged.disconnect(maybeResolve);
+                      kc.statusChanged.disconnect(maybeResolve);
+                      resolve();
+                    }
+                  };
+                  kc.connectionStatusChanged.connect(maybeResolve);
+                  kc.statusChanged.connect(maybeResolve);
+                  maybeResolve();
+                });
+              };
+              const waitForCellWidgets = async (
+                appWidget: AppWidget,
+                totalCells: number,
+                timeoutMs = 10000,
+                intervalMs = 200
+              ) => {
+                if (totalCells <= 0) {
+                  return;
+                }
+                const startedAt = Date.now();
+                while (
+                  appWidget.cellWidgets.length === 0 &&
+                  Date.now() - startedAt < timeoutMs
+                ) {
+                  await new Promise(resolve => setTimeout(resolve, intervalMs));
+                }
+              };
               let session = mercuryPanel.context.sessionContext.session;
               if (!session) {
                 const [, changes] = await signalToPromise(
@@ -118,87 +161,91 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                 status: kernelConnection?.status,
                 connectionStatus: kernelConnection?.connectionStatus
               });
+              await waitForKernelReady(kernelConnection);
+              console.info('[Mercury] Kernel ready', {
+                status: kernelConnection?.status,
+                connectionStatus: kernelConnection?.connectionStatus
+              });
 
               const executeAll = async () => {
                 try {
-                  console.info('[Mercury] executeAll invoked', {
-                    status: kernelConnection?.status,
-                    connectionStatus: kernelConnection?.connectionStatus
+                  console.info('[Mercury] Executing cells');
+
+                  const scheduledForExecution = new Set<string>();
+                  const notebook = mercuryPanel.context.model;
+                  const appWidget = mercuryPanel.content.widgets[0] as AppWidget;
+                  const totalCells = notebook.cells.length;
+                  console.info('[Mercury] Cell widgets status', {
+                    totalCells,
+                    widgetCells: appWidget.cellWidgets.length
                   });
-                  if (
-                    kernelConnection?.connectionStatus === 'connected' &&
-                    kernelConnection?.status === 'idle'
-                  ) {
-                    kernelConnection.connectionStatusChanged.disconnect(executeAll);
-                    kernelConnection.statusChanged.disconnect(executeAll);
-                    console.info('[Mercury] Kernel idle/connected, executing cells');
+                  const info = notebook.getMetadata('language_info');
+                  const mimetype = info
+                    ? mimeTypeService?.getMimeTypeByLanguage(info)
+                    : undefined;
+                  console.info('[Mercury] Notebook metadata', {
+                    languageInfo: info,
+                    mimeType: mimetype
+                  });
 
-                    const scheduledForExecution = new Set<string>();
-                    const notebook = mercuryPanel.context.model;
-                    const info = notebook.getMetadata('language_info');
-                    const mimetype = info
-                      ? mimeTypeService?.getMimeTypeByLanguage(info)
-                      : undefined;
-                    console.info('[Mercury] Notebook metadata', {
-                      languageInfo: info,
-                      mimeType: mimetype
+                  const onCellExecutionScheduled = (args: { cell: Cell }) => {
+                    scheduledForExecution.add(args.cell.model.id);
+                    console.info('[Mercury] Cell scheduled', {
+                      id: args.cell.model.id
                     });
+                  };
 
-                    const onCellExecutionScheduled = (args: { cell: Cell }) => {
-                      scheduledForExecution.add(args.cell.model.id);
-                      console.info('[Mercury] Cell scheduled', {
-                        id: args.cell.model.id
-                      });
-                    };
+                  const onCellExecuted = (args: { cell: Cell }) => {
+                    scheduledForExecution.delete(args.cell.model.id);
+                    console.info('[Mercury] Cell executed', {
+                      id: args.cell.model.id
+                    });
+                  };
 
-                    const onCellExecuted = (args: { cell: Cell }) => {
-                      scheduledForExecution.delete(args.cell.model.id);
-                      console.info('[Mercury] Cell executed', {
-                        id: args.cell.model.id
-                      });
-                    };
-
-                    for (const cellItem of (
-                      mercuryPanel.content.widgets[0] as AppWidget
-                    ).cellWidgets) {
-                      if (mimetype) {
-                        cellItem.child.model.mimeType = mimetype;
-                      }
-                      console.info('[Mercury] Running cell', {
-                        id: cellItem.child.model.id,
-                        type: cellItem.child.model.type
-                      });
-                      await executor.runCell({
-                        cell: cellItem.child,
-                        notebook,
-                        notebookConfig: mercuryPanel.content.notebookConfig,
-                        onCellExecuted: onCellExecuted,
-                        onCellExecutionScheduled: onCellExecutionScheduled,
-                        sessionContext: mercuryPanel.context.sessionContext,
-                        sessionDialogs: sessionContextDialogs ?? undefined,
-                        translator: translator ?? undefined
-                      });
-                    }
-
-                    const waitForExecution = new PromiseDelegate<void>();
-                    const pollExecution = setInterval(() => {
-                      if (scheduledForExecution.size === 0) {
-                        clearInterval(pollExecution);
-                        waitForExecution.resolve();
-                      }
-                    }, 500);
-
-                    await waitForExecution.promise;
-                    console.info('[Mercury] All cells executed');
+                  if (appWidget.cellWidgets.length === 0 && totalCells > 0) {
+                    console.info('[Mercury] Waiting for cell widgets to init');
+                    await waitForCellWidgets(appWidget, totalCells);
+                    console.info('[Mercury] Cell widgets ready', {
+                      widgetCells: appWidget.cellWidgets.length
+                    });
                   }
+
+                  for (const cellItem of appWidget.cellWidgets) {
+                    if (mimetype) {
+                      cellItem.child.model.mimeType = mimetype;
+                    }
+                    console.info('[Mercury] Running cell', {
+                      id: cellItem.child.model.id,
+                      type: cellItem.child.model.type
+                    });
+                    await executor.runCell({
+                      cell: cellItem.child,
+                      notebook,
+                      notebookConfig: mercuryPanel.content.notebookConfig,
+                      onCellExecuted: onCellExecuted,
+                      onCellExecutionScheduled: onCellExecutionScheduled,
+                      sessionContext: mercuryPanel.context.sessionContext,
+                      sessionDialogs: sessionContextDialogs ?? undefined,
+                      translator: translator ?? undefined
+                    });
+                  }
+
+                  const waitForExecution = new PromiseDelegate<void>();
+                  const pollExecution = setInterval(() => {
+                    if (scheduledForExecution.size === 0) {
+                      clearInterval(pollExecution);
+                      waitForExecution.resolve();
+                    }
+                  }, 500);
+
+                  await waitForExecution.promise;
+                  console.info('[Mercury] All cells executed');
                 } catch (err) {
                   console.error('[Mercury] Failed while executing cells:', err);
                 }
               };
 
-              kernelConnection?.connectionStatusChanged.connect(executeAll);
-              kernelConnection?.statusChanged.connect(executeAll);
-              executeAll();
+              await executeAll();
             } catch (err) {
               console.error('[Mercury] Failed to prepare kernel execution:', err);
             }

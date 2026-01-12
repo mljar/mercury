@@ -315,10 +315,11 @@ class MultiSelectWidget(anywidget.AnyWidget):
     .mljar-ms-container {{
       display: flex;
       flex-direction: column;
-      width: 100%;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
       margin-bottom: 8px;
+      padding-left: 4px;
+      padding-right: 4px;
     }}
 
     .mljar-ms-label {{
