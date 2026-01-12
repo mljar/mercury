@@ -1,5 +1,7 @@
 __version__ = "3.0.0b2"
 
+from IPython.display import display
+
 # input widgets
 from .button import Button
 from .checkbox import CheckBox
