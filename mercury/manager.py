@@ -47,7 +47,6 @@ class WidgetsManager:
 
     @staticmethod
     def get_code_uid(widget_type="widget", key="", index=None, args=[], kwargs={}):
-
         cfg_hash = _config_hash(args, kwargs)
         
         uid = f"{widget_type}.{cfg_hash}"

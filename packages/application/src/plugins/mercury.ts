@@ -40,7 +40,6 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     Promise.all([app.started, app.restored])
       .then(async () => {
         try {
-          console.info('[Mercury] App started/restored');
           if (app.serviceManager?.ready) {
             await app.serviceManager.ready;
           }
@@ -49,7 +48,6 @@ export const plugin: JupyterFrontEndPlugin<void> = {
             await docManagerReady;
           }
           const notebookPath = PageConfig.getOption('notebookPath');
-          console.info('[Mercury] Opening notebook', { notebookPath });
           const mercuryPanel = documentManager.open(
             notebookPath,
             'Mercury'
@@ -58,7 +56,6 @@ export const plugin: JupyterFrontEndPlugin<void> = {
           // Hide default toolbar and mount panel early
           mercuryPanel.toolbar.hide();
           app.shell.add(mercuryPanel, 'mercury');
-          console.info('[Mercury] Panel mounted');
 
           // ------- Navbar: create and mount (separate file) -------
           const baseUrl = PageConfig.getBaseUrl() || '/';
@@ -101,7 +98,6 @@ export const plugin: JupyterFrontEndPlugin<void> = {
           // ---------- Execute notebook cells once kernel is ready ----------
           mercuryPanel.context.ready.then(async () => {
             try {
-              console.info('[Mercury] Context ready, preparing execution');
               const waitForKernelReady = async (kc: typeof kernelConnection) => {
                 if (!kc) {
                   return;
@@ -157,15 +153,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                 const [, changes] = await signalToPromise(session.kernelChanged);
                 kernelConnection = changes.newValue!;
               }
-              console.info('[Mercury] Kernel resolved', {
-                status: kernelConnection?.status,
-                connectionStatus: kernelConnection?.connectionStatus
-              });
               await waitForKernelReady(kernelConnection);
-              console.info('[Mercury] Kernel ready', {
-                status: kernelConnection?.status,
-                connectionStatus: kernelConnection?.connectionStatus
-              });
 
               const executeAll = async () => {
                 try {
@@ -175,49 +163,27 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                   const notebook = mercuryPanel.context.model;
                   const appWidget = mercuryPanel.content.widgets[0] as AppWidget;
                   const totalCells = notebook.cells.length;
-                  console.info('[Mercury] Cell widgets status', {
-                    totalCells,
-                    widgetCells: appWidget.cellWidgets.length
-                  });
                   const info = notebook.getMetadata('language_info');
                   const mimetype = info
                     ? mimeTypeService?.getMimeTypeByLanguage(info)
                     : undefined;
-                  console.info('[Mercury] Notebook metadata', {
-                    languageInfo: info,
-                    mimeType: mimetype
-                  });
 
                   const onCellExecutionScheduled = (args: { cell: Cell }) => {
                     scheduledForExecution.add(args.cell.model.id);
-                    console.info('[Mercury] Cell scheduled', {
-                      id: args.cell.model.id
-                    });
                   };
 
                   const onCellExecuted = (args: { cell: Cell }) => {
                     scheduledForExecution.delete(args.cell.model.id);
-                    console.info('[Mercury] Cell executed', {
-                      id: args.cell.model.id
-                    });
                   };
 
                   if (appWidget.cellWidgets.length === 0 && totalCells > 0) {
-                    console.info('[Mercury] Waiting for cell widgets to init');
                     await waitForCellWidgets(appWidget, totalCells);
-                    console.info('[Mercury] Cell widgets ready', {
-                      widgetCells: appWidget.cellWidgets.length
-                    });
                   }
 
                   for (const cellItem of appWidget.cellWidgets) {
                     if (mimetype) {
                       cellItem.child.model.mimeType = mimetype;
                     }
-                    console.info('[Mercury] Running cell', {
-                      id: cellItem.child.model.id,
-                      type: cellItem.child.model.type
-                    });
                     await executor.runCell({
                       cell: cellItem.child,
                       notebook,
