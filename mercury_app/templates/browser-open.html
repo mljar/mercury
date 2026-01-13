@@ -55,8 +55,16 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .box-emoji {
-      font-size: 48px;
-      margin-bottom: 1rem;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><path d='M22 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M34 30c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M46 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
+      background-repeat: no-repeat, no-repeat;
+      background-position: center 1.1rem, center 0.7rem;
+      background-size: 56px 56px, 44px 44px;
+      animation: mercury-steam-float 2s ease-in-out infinite;
     }
     .box-title {
       font-size: 1.4rem;
@@ -67,6 +75,17 @@
       color: #334155;
       font-size: 15px;
       margin-bottom: 1rem;
+    }
+
+    @keyframes mercury-steam-float {
+      0%, 100% {
+        background-position: center 1.1rem, center 0.7rem;
+        background-size: 56px 56px, 44px 44px;
+      }
+      50% {
+        background-position: center 1.1rem, center 0.7rem;
+        background-size: 56px 56px, 46px 48px;
+      }
     }
   </style>
 </head>
@@ -81,7 +100,7 @@
 
   <main>
     <div class="box">
-      <div class="box-emoji">☕</div>
+      <div class="box-emoji" aria-hidden="true"></div>
 
       <div class="box-title">Starting your app ...</div> 
 
