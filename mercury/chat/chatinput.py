@@ -91,8 +91,6 @@ class ChatInputWidget(anywidget.AnyWidget):
         If `True`, pressing Enter submits the message.
     position : {"sidebar", "inline", "bottom"}
         Controls where the widget is rendered in the Mercury App.
-    custom_css : str
-        Additional CSS appended to the default widget styles.
     cell_id : str or None
         Identifier of the notebook cell hosting the widget.
 
@@ -134,17 +132,30 @@ class ChatInputWidget(anywidget.AnyWidget):
       container.appendChild(btn);
       el.appendChild(container);
 
+      let lastModelValue = model.get("value") ?? "";
+
       model.on("change:value", () => {
         const newVal = model.get("value") ?? "";
-        if (input.value !== newVal) input.value = newVal;
-      });
 
+        // Only update the visible input if the user hasn't typed since
+        // the last time we applied a model value.
+        const userHasTyped = input.value !== lastModelValue;
+        if (!userHasTyped) {
+            input.value = newVal;
+        }
+
+        lastModelValue = newVal;
+      });
+      
       const sendMessage = () => {
         const msg = (input.value || "").trim();
         if (!msg) return;
 
         model.set("submitted", msg);
         model.set("value", msg);
+        // After submission we clear the input, but the model value becomes msg.
+        // Track it so subsequent model changes don't clobber a new draft.
+        lastModelValue = msg;
         input.value = "";
         model.save_changes();
       };
@@ -159,39 +170,6 @@ class ChatInputWidget(anywidget.AnyWidget):
           sendMessage();
         }
       });
-
-      const css = model.get("custom_css");
-      if (css && css.trim().length > 0) {
-        const styleTag = document.createElement("style");
-        styleTag.textContent = css;
-        el.appendChild(styleTag);
-      }
-
-      const ID_ATTR = 'data-cell-id';
-      const hostWithId = el.closest(`[${ID_ATTR}]`);
-      const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
-
-      if (cellId) {
-        model.set('cell_id', cellId);
-        model.save_changes();
-        model.send({ type: 'cell_id_detected', value: cellId });
-      } else {
-        const mo = new MutationObserver(() => {
-          const host = el.closest(`[${ID_ATTR}]`);
-          const newId = host?.getAttribute(ID_ATTR);
-          if (newId) {
-            model.set('cell_id', newId);
-            model.save_changes();
-            model.send({ type: 'cell_id_detected', value: newId });
-            mo.disconnect();
-          }
-        });
-        mo.observe(document.body, {
-          attributes: true,
-          subtree: true,
-          attributeFilter: [ID_ATTR],
-        });
-      }
     }
     export default { render };
     """
@@ -251,10 +229,6 @@ class ChatInputWidget(anywidget.AnyWidget):
     placeholder = traitlets.Unicode("Type a message...").tag(sync=True)
     button_icon = traitlets.Unicode("➤").tag(sync=True)
     send_on_enter = traitlets.Bool(True).tag(sync=True)
-
-    custom_css = traitlets.Unicode(
-        default_value="", help="Extra CSS to append to default styles"
-    ).tag(sync=True)
 
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
