@@ -208,6 +208,11 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                   console.info('[Mercury] All cells executed');
                 } catch (err) {
                   console.error('[Mercury] Failed while executing cells:', err);
+                } finally {
+                  const hideLoader = (window as any).hideMercuryLoader;
+                  if (typeof hideLoader === 'function') {
+                    hideLoader();
+                  }
                 }
               };
 

@@ -61,7 +61,7 @@
       right: 0;
       bottom: 0;
       z-index: 2147483647;
-      background: rgba(249,250,251,0.96);
+      background: rgba(249,250,251,0.85);
       /* Prevent scroll behind on mobile */
       -webkit-overflow-scrolling: touch;
       touch-action: none;
@@ -69,8 +69,7 @@
 
     /* Coffee box centered BELOW the header */
     html::after {
-      content: "☕\A Initializing the web application…";
-      white-space: pre;
+      content: "Initializing the web application…";
       position: fixed;
       top: calc(var(--header-height) + var(--safe-top) + 50%);
       left: 50%;
@@ -80,12 +79,20 @@
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 1rem;
-      padding: 2rem 2.5rem;
+      padding: 5.1rem 2.25rem 2rem;
       text-align: center;
       font-size: 18px;
       font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      color: #334155;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      color: #475569;
+
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><path d='M26 14c4 4 4 8 0 12' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M36 12c4 4 4 8 0 12' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M46 14c4 4 4 8 0 12' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
+      background-repeat: no-repeat, no-repeat;
+      background-position: center 1.9rem, center 1.0rem;
+      background-size: 56px 56px, 48px 48px;
+      animation: mercury-steam-float 1.8s ease-in-out infinite;
 
       /* Mobile-friendly sizing */
       width: min(92vw, 28rem);
@@ -97,11 +104,18 @@
     /* Small screens: tighten spacing and font size */
     @media (max-width: 480px) {
       html::after {
-        padding: 1.25rem 1.25rem;
+        padding: 4.6rem 1.25rem 1.5rem;
         font-size: 16px;
         border-radius: .75rem;
         width: min(94vw, 24rem);
+        background-position: center 1.7rem, center 0.85rem;
+        background-size: 48px 48px, 40px 40px;
       }
+    }
+
+    @keyframes mercury-steam-float {
+      0%, 100% { background-position: center 1.9rem, center 1.0rem; }
+      50% { background-position: center 1.9rem, center 0.75rem; }
     }
 
     /* Hide overlay when ready */
@@ -180,45 +194,7 @@
       }
     })();
   
-    // Smart loader: observe DOM and hide when JupyterLab shell appears
-    (function () {
-      function appRootFound() {
-        // Heuristics: typical JupyterLab / Mercury root containers
-        return document.querySelector('.jp-LabShell') ||
-               document.querySelector('#jp-main-dock-panel') ||
-               document.querySelector('.jp-NotebookPanel') ||
-               document.querySelector('[data-mercury-app-ready]');
-      }
-  
-      // In case it's already there (very fast load)
-      if (appRootFound()) {
-        window.hideMercuryLoader();
-        return;
-      }
-  
-      // Otherwise, watch for DOM changes
-      const observer = new MutationObserver(() => {
-        if (appRootFound()) {
-          observer.disconnect();
-          window.hideMercuryLoader();
-        }
-      });
-  
-      // Start observing body once it exists
-      function startObserving() {
-        if (!document.body) {
-          // If body not yet there, retry on next frame (no hard timeout)
-          requestAnimationFrame(startObserving);
-          return;
-        }
-        observer.observe(document.body, { childList: true, subtree: true });
-      }
-  
-      startObserving();
-  
-      // Clean up on navigation
-      window.addEventListener('beforeunload', () => observer.disconnect());
-    })();
+    // Loader is hidden explicitly by the app once cells finish executing.
   </script>
   
   <!-- Body may be replaced by the app; overlay stays visible and responsive. -->
