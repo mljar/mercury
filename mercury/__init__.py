@@ -1,4 +1,4 @@
-__version__ = "3.0.0b6"
+__version__ = "3.0.0rc1"
 
 from IPython.display import display
 
