@@ -1,0 +1,134 @@
+---
+title: Chat message with a Matplotlib chart
+description: In this example, you will learn how to include charts in your chat web apps. We will use Python notebook and Mercury framework to create chat web app. The chat bot can respond with charts from Matplotlib. 
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+import { Image } from 'astro:assets';
+
+import chatImg from "../../../../assets/examples/chat-with-matplotlib-charts.png"
+
+Mercury chat [`Message`](/docs/chat/message/) can display **charts, tables, and rich outputs**, not only text.
+In this example, the assistant responds with a **Matplotlib chart** based on sales data.
+
+
+<Aside>
+This bot respons to every message with the same chart.
+</Aside>
+
+
+## App preview
+
+<Image 
+  src={chatImg} 
+  alt="Echo Chat Web App created in Python" 
+  class="docs-image-100"
+/>
+
+You can try the live web app:
+
+<MercuryDemo
+  iframeSrc="https://docs.ismvp.org/mercury/chat-matplotlib-charts?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/chat-matplotlib-charts.ipynb"
+/> 
+
+
+## 1. Import Mercury
+
+In the first notebook cell, import Mercury:
+
+```python
+import mercury as mr
+```
+
+We will use `mr` alias to create all widgets.
+
+## 2. Example data
+
+In the second cell, let's prepare a simple sales dataset.
+
+```python
+import pandas as pd
+
+sales_df = pd.DataFrame({
+    "date": ["2023-01-01", "2023-01-08", "2023-01-15", "2023-01-22"],
+    "region": ["North", "South", "East", "West"],
+    "product": ["A", "B", "A", "C"],
+    "units_sold": [10, 15, 7, 12],
+    "unit_price": [20, 25, 19, 22],
+})
+
+sales_df["total_sales"] = sales_df["units_sold"] * sales_df["unit_price"]
+```
+
+## 3. Create chat and input
+
+Now create the [`Chat`](/docs/chat/chat/) area, it will display all messages.
+
+```python
+chat = mr.Chat()
+```
+
+In the next cell, please create the [`ChatInput`](/docs/chat/chatinput/) to accept user prompts:
+
+```
+prompt = mr.ChatInput()
+```
+
+<Aside>
+Please note that `mr.Chat()` and `mr.ChatInput()` can't be in the same cell, because otherwise both will be placed at the bottom of application. The Mercury framework place all widgets from the same cell in the same position. The default `position` for `ChatInput` is `bottom`. 
+</Aside>
+
+## 4. Respond with a chart
+
+When the user sends a message:
+
+1. We add the user message to the chat
+2. We create an assistant message
+3. Inside the message, we draw a Matplotlib chart
+4. The chart is displayed **inside the chat bubble**
+
+```python
+import matplotlib.pyplot as plt
+
+if prompt.value:
+    # user message
+    user_msg = mr.Message(prompt.value, role="user")
+    chat.add(user_msg)
+
+    # assistant message
+    response_msg = mr.Message(
+        "**Matplotlib** plot based on sales data",
+        role="assistant",
+        emoji="🤖",
+    )
+
+    with response_msg:
+        # create figure
+        fig, ax = plt.subplots(figsize=(6, 3))
+        ax.plot(sales_df["date"], sales_df["total_sales"], marker="o")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Total Sales")
+        ax.set_title("Total Sales Over Time")
+
+        fig.tight_layout()
+
+        # important: close the figure
+        plt.close(fig)
+
+        # display figure inside the chat message
+        display(fig)
+
+    chat.add(response_msg)
+```
+
+
+## Why this works
+
+* `Message` can display text, markdown, HTML, charts and tables.
+* Everything inside `with response_msg:` is rendered in the response message.
+* `display(fig)` shows the Matplotlib figure
+* `plt.close(fig)` prevents extra empty space and duplicated plots

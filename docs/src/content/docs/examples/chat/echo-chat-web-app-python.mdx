@@ -1,0 +1,113 @@
+---
+title: Basic echo chat web app in Python
+description: Create a basic echo chat web application in Python with the Mercury framework. The chat will accept a user prompt and respond with the same message. You will learn how to use the Chat, ChatInput, and Message widgets from Mercury. This is a good start for building more advanced chat apps.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+
+import { Image } from 'astro:assets';
+
+import chatImg from "../../../../assets/examples/basic-echo-chat.png"
+
+
+Have you ever heard an echo in the mountains, a cave, or a tunnel?
+An echo is a simple response: it repeats your voice back to you.
+
+In this tutorial, we will build a simple **Echo Chat Bot**.
+It will respond with the same text that the user typed.
+
+You will learn how to use these Mercury widgets:
+
+* `Chat` (`/docs/chat/chat/`)
+* `ChatInput` (`/docs/chat/chatinput/`)
+* `Message` (`/docs/chat/message/`)
+
+Below is the screenshot of echo bot developed in Python notebook. In the left there is notebook code, in the right there is live app preview:
+<Image 
+  src={chatImg} 
+  alt="Echo Chat Web App created in Python" 
+  
+/>
+
+The live web app:
+<MercuryDemo
+  iframeSrc="https://docs.ismvp.org/mercury/echo-chat?no-navbar"
+  notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/echo-chat.ipynb"
+/> 
+
+
+## 1. Import Mercury
+
+In the first notebook cell, import Mercury:
+
+```python
+import mercury as mr
+```
+
+We will use `mr` alias to create all widgets.
+
+## 2. Create the chat area
+
+In the next cell, create a place where all messages will be displayed:
+
+```python 
+chat = mr.Chat()
+```
+
+Yes, it is that simple :)
+
+## 3. Add an input for the user prompt
+
+Now we need `ChatInput` to let the user type a message:
+
+```python
+prompt = mr.ChatInput()
+```
+
+When user enters the text and send it, this automatically re-execute cells below. 
+
+## 4. Echo the message back
+
+In the next cell, we will:
+
+1. Create a message from the user input
+2. Add it to the chat
+3. Create the assistant response (`Echo: ...`)
+4. Add it to the chat
+
+```python 
+if prompt.value:
+    # user message
+    user_msg = mr.Message(prompt.value, role="user")
+    chat.add(user_msg)
+
+    # assistant message (echo)
+    response_msg = mr.Message(
+        f"Echo: {prompt.value}",
+        role="assistant",
+        emoji="🤖",
+    )
+    chat.add(response_msg)
+```
+
+## How it works
+
+* `prompt.value` contains the latest user input.
+* `mr.Message(..., role="user")` creates a message from the user.
+* `mr.Message(..., role="assistant")` creates a message from the bot.
+* `chat.add(...)` appends messages to the chat view.
+
+## Next steps
+
+This echo bot is a great starting point. Next you can:
+
+* Replace the echo response with an LLM call (OpenAI, Ollama, OpenRouter, Anthropic, Mistral, Bielik, etc.).
+* Add system prompts and tools for an agent-like chat.
+* Build interactive responses with charts and tables.
+
+
+
+
+

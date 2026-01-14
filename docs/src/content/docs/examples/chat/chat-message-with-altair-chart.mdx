@@ -1,0 +1,154 @@
+---
+title: Chat message with an Altair chart
+description: Learn how to display interactive Altair charts inside chat messages. In this example, we use a Python notebook and the Mercury framework to build a chat bot that responds with Altair visualizations.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
+import { Image } from 'astro:assets';
+
+import chatImg from "../../../../assets/examples/chat-with-altair-charts.png"
+
+
+Mercury chat [`Message`](/docs/chat/message/) can display **interactive charts**, tables, and rich outputs.
+In this example, the assistant responds with an **Altair chart** based on sales data.
+
+<Aside>
+This bot respons to every message with the same chart.
+</Aside>
+
+## App preview
+
+<Image
+src={chatImg}
+alt="Chat web app with Altair charts created in Python"
+class="docs-image-100"
+/>
+
+Try the live web app:
+
+<MercuryDemo
+iframeSrc="https://docs.ismvp.org/mercury/chat-altair-charts?no-navbar"
+notebookUrl="https://github.com/mljar/mercury/blob/v3/docs/notebooks/chat-altair-charts.ipynb"
+/>
+
+
+## 1. Import Mercury and Altair
+
+In the first notebook cell, import required libraries:
+
+```python
+import mercury as mr
+import pandas as pd
+import altair as alt
+```
+
+We use following aliases:
+
+* `mr` for Mercury widgets
+* `pandas` for data
+* `altair` for interactive charts
+
+
+## 2. Example data
+
+Prepare a simple sales dataset:
+
+```python
+sales_df = pd.DataFrame({
+    "date": ["2023-01-01", "2023-01-08", "2023-01-15", "2023-01-22"],
+    "region": ["North", "South", "East", "West"],
+    "product": ["A", "B", "A", "C"],
+    "units_sold": [10, 15, 7, 12],
+    "unit_price": [20, 25, 19, 22],
+})
+
+sales_df["total_sales"] = sales_df["units_sold"] * sales_df["unit_price"]
+```
+
+
+## 3. Create chat and input
+
+Create the [`Chat`](/docs/chat/chat/) widget:
+
+```python
+chat = mr.Chat()
+```
+
+In the next cell, create the [`ChatInput`](/docs/chat/chatinput/) widget:
+
+```python
+prompt = mr.ChatInput()
+```
+
+<Aside>
+`Chat` and `ChatInput` should be created in separate cells.  
+Mercury places widgets from the same cell in the same position, and `ChatInput` is placed at the bottom by default.
+</Aside>
+
+## 4. Respond with an Altair chart
+
+When the user sends a message:
+
+1. The cell below `ChatInput` is re-executed
+2. The user message is added to the chat
+3. The assistant creates an Altair chart
+4. The chart is displayed **inside the chat message**
+
+```python
+if prompt.value:
+    # user message
+    user_msg = mr.Message(prompt.value, role="user")
+    chat.add(user_msg)
+
+    # assistant message
+    response_msg = mr.Message(
+        "**Altair** plot based on sales data",
+        role="assistant",
+        emoji="🤖",
+    )
+
+    with response_msg:
+        # prepare data
+        df = sales_df.copy()
+        df["date"] = pd.to_datetime(df["date"])
+
+        # create Altair chart
+        chart = (
+            alt.Chart(df)
+            .mark_line(point=True)
+            .encode(
+                x=alt.X("date:T", title="Date"),
+                y=alt.Y("total_sales:Q", title="Total Sales"),
+                tooltip=["date:T", "total_sales:Q"],
+            )
+            .properties(
+                width=400,
+                height=250,
+                title="Total Sales Over Time",
+            )
+        )
+        # display chart in the message
+        display(chart)
+
+    chat.add(response_msg)
+```
+
+
+## Why this works
+
+### ChatInput triggers re-execution
+
+* `ChatInput` automatically re-runs the cell below it
+* `prompt.value` contains the latest user message
+* Your code reacts and appends new messages to the chat
+
+No callbacks. No JavaScript. No async code.
+
+## Why Altair works so well in chat
+
+* Altair outputs are **HTML-based**
+* `display(chart)` renders directly in the message
+* Charts are interactive (hover tooltips)
+* No need to close figures or manage state

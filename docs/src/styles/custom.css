@@ -1,7 +1,7 @@
 .docs-image{
     display: block;
     margin: 1rem auto;
-    border-radius: 12px;
+    border-radius: 6px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.25);
     max-width: 90%
 }
@@ -9,7 +9,7 @@
 .docs-image-100{
   display: block;
   margin: 1rem auto;
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.25);
   max-width: 100%
 }

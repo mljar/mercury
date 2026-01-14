@@ -125,7 +125,7 @@ class ChatInputWidget(anywidget.AnyWidget):
       const btn = document.createElement("button");
       btn.type = "button";
       btn.classList.add("mljar-chatinput-button");
-      btn.textContent = model.get("button_icon") || "➤";
+      btn.textContent = model.get("button_icon") || " ➤ ";
       btn.setAttribute("aria-label", "Send message");
 
       container.appendChild(input);
@@ -186,8 +186,8 @@ class ChatInputWidget(anywidget.AnyWidget):
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
         font-size: {THEME.get('font_size', '14px')};
         color: {THEME.get('text_color', '#222')};
-        padding-top: 5px;
-        padding-bottom: 5px;
+        padding-top: 8px;
+        padding-bottom: 8px;
     }}
 
     .mljar-chatinput-input {{
@@ -200,6 +200,8 @@ class ChatInputWidget(anywidget.AnyWidget):
         background: {THEME.get('widget_background_color', '#fff')};
         color: {THEME.get('text_color', '#222')};
         box-sizing: border-box;
+        padding: 10px;
+        font-size: 0.9rem;
     }}
 
     .mljar-chatinput-input:focus {{
@@ -210,13 +212,15 @@ class ChatInputWidget(anywidget.AnyWidget):
     .mljar-chatinput-button {{
         flex: 0 0 auto;
         border: none;
-        border-radius: {THEME.get('border_radius', '6px')};
-        padding: 6px 12px;
+        border-radius: {THEME.get('border_radius', '6px')} !important;
         min-height: 1.6em;
         cursor: pointer;
         background: {THEME.get('primary_color', '#007bff')};
         color: {THEME.get('button_text_color', '#fff')};
         font-weight: bold;
+        padding: 11px;
+        padding-left: 18px;
+        padding-right: 18px;
     }}
 
     .mljar-chatinput-button:hover {{

@@ -95,7 +95,8 @@ export default defineConfig({
             link: 'examples',
             icon: 'pencil',
             items: [
-              { label: 'Examples', slug: 'examples' }
+              { label: 'Examples', slug: 'examples' },
+              { label: 'Chat', autogenerate: { directory: 'examples/chat' } },
             ],
           },
           {
