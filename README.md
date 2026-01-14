@@ -108,23 +108,68 @@ CMD ["mercury", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
 
 We also offer **managed cloud** service for 1-click app deployment. Please check our website [platform.mljar.com](https://platform.mljar.com).
 
-## Keep Session
-
-## Configuration and customization
 
 ## Authentication
 
+You can restrict access to your web apps by setting password when starting server:
 
+```
+mercury --pass=your-secret-here
+```
+
+Before opening the notebook user needs to provide the password:
+
+![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/mercury-login.png)
+
+If you want to have user-based authentication in your Mercury. It is paid option. Please reach us for more details contact - at - mljar.com
+
+## Configuration and customization
+
+We want you to customize your web apps so they look and feel exactly the way you like.
+
+To do this, create a file called `config.toml` in the same directory as your notebooks.
+
+```toml
+[main]
+title = "Mercury"
+footer = "MLJAR - next generation of AI tools"
+favicon_emoji = "🎉"
+
+[welcome]
+header = ""
+message = ""
+```
+
+### What you can customize
+
+* **`title`** – the title of your web app
+* **`footer`** – text shown at the bottom of the page
+* **`favicon_emoji`** – emoji shown as the browser tab icon
+* **`welcome.header`** – optional welcome header
+* **`welcome.message`** – optional welcome message for users
+
+Feel free to change these values and make the app your own.
+
+We are actively working on adding **more customization options**.
+If something is missing or you would like to customize more things, please let us know - your feedback really matters to us 🚀
 
 ## Arguments
 
---log-level
+Would you like to see more logs from `mercury`, please use `--log-level=INFO` or `--log-level=DEBUG`. The default log level is `CRITICAL`.
 
---keepSession
+We have option to share the same session between multiple users. What does it mean? You can deploy app, and when you click on it, others will see this. The enable session sharing please use `--keep-session`. Amazing, isn't it?
 
+Would you like to limit your server resources with usage timeout? Please set `--timeout=600`, the timeout value is in seconds. Be generous.
 
-## Notebook view in home page
+## Previous versions
 
+If you are looking for previous version codebase, the stable v2 codebase is available on the `v2.4.3` tag.
 
+## License
 
-The stable v2 codebase is available on the `v2.4.3` tag.
+Mercury is licensed under Apache-2.0. See LICENSE for details.
+
+---
+
+Stay safe! ❤️
+
