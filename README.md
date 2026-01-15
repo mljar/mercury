@@ -62,7 +62,7 @@ Yes, you can preview the app during development. Please click 🎉 in the top no
 
 You can serve your notebook as standalone web app:
 
-<img src="https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png" alt="Mercury echo bot screenshot" style="border:1px solid #ccc; padding:4px; border-radius:6px;" />
+![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png)
 
 ## Installation
 
