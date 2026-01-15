@@ -51,7 +51,7 @@ if prompt.value:
 
 ### Live App Preview
 
-Yes, you can preview the app during development.
+Yes, you can preview the app during development. Please click 🎉 in the top notebook toolbar to open preview.
 
 ![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/basic-echo-chat.png)
 
@@ -111,6 +111,19 @@ CMD ["mercury", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
 
 We also offer **managed cloud** service for 1-click app deployment. Please check our website [platform.mljar.com](https://platform.mljar.com).
 
+## Run at click (disable auto re-run)
+
+Maybe you don't want to re-execute cells after widget update and would like to run all cells from top to the bottom on the button click. You can disable auto re-rerun by unchecking it in app preview in the top toolbar. Your web app will have added **Run** button in the sidebar that will trigger cells re-execution.
+
+![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/disable-auto-re-run.png)
+
+## Notebook appearance in home page
+
+In the app preview toolbar you can also set: 
+- notebook title and description, they are displayed in the home page, 
+- emoji and colors of icon in the home page,
+- you can display notebook code - useful for teachers :+1:,
+- go app full width.
 
 ## Authentication
 
