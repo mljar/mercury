@@ -1,15 +1,20 @@
-```
+
      _ __ ___   ___ _ __ ___ _   _ _ __ _   _
     | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
     | | | | | |  __/ | | (__| |_| | |  | |_| |
     |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
                                          __/ |
                                         |___/ 
-```
+
 
 # Mercury 
 
 Mercury is a framework that helps you build interactive web applications directly from Python notebooks. You can build with Mercury data rich applications, like: chats, AI agents, dashboards and reports.
+
+- Documentation at [RunMercury.com/docs](https://runmercury.com/docs/).
+- Examples at [RunMercury.com/examples](https://runmercury.com/examples/).
+- Deployment at [RunMercury.com/deploy](https://runmercury.com/deploy/).
+
 
 ## Why?
 
@@ -53,13 +58,13 @@ if prompt.value:
 
 Yes, you can preview the app during development. Please click 🎉 in the top notebook toolbar to open preview.
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/basic-echo-chat.png)
+![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat.png)
 
 ### Production App
 
 You can serve your notebook as standalone web app:
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/basic-echo-chat-web-app.png)
+![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png)
 
 ## Installation
 
@@ -180,6 +185,8 @@ Would you like to limit your server resources with usage timeout? Please set `--
 ## Previous versions
 
 If you are looking for previous version codebase, the stable v2 codebase is available on the `v2.4.3` tag.
+
+Previous documentation webpage is available at [old.runmercury.com](https://old.runmercury.com).
 
 ## License
 
