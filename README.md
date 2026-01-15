@@ -18,6 +18,14 @@ Mercury is a framework that helps you build interactive web applications directl
 
 Mercury is the easiest way to built and deploy data rich apps with Python. There are no callbacks in the framework. **Widget interactions fire cells re-execution** (reactive notebooks). You don't need to worry about UI because there is **predefined layout**, so it will look beautiful.
 
+What is included:
+- collection of **widgets**, so you can build interactive web apps,
+- **standalone server**, to serve notebooks as web apps,
+- **JupyterLab extension**, to have live app preview during development.
+
+The Mercury live app preview extension is available only for JupyterLab and MLJAR Studio. It will not work in Google Colab and VS Code - sorry guys!
+
+
 ## Example - Echo chat bot
 
 Example bot app that will respond with echo:
@@ -81,13 +89,6 @@ It will detect all notebooks in the current directory and serve them as web apps
 Example view of notebooks home page:
 ![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/notebooks-home.png)
 
-
-What is included:
-- collection of **widgets**, so you can build interactive web apps,
-- **standalone server**, to serve notebooks as web apps,
-- **JupyterLab extension**, to have live app preview during development.
-
-The Mercury live app preview extension is available only for JupyterLab and MLJAR Studio. It will not work in Google Colab and VS Code - sorry guys!
 
 ## Deployment
 
