@@ -1,11 +1,9 @@
-
      _ __ ___   ___ _ __ ___ _   _ _ __ _   _
     | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
     | | | | | |  __/ | | (__| |_| | |  | |_| |
     |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
                                          __/ |
                                         |___/ 
-
 
 # Mercury 
 
@@ -64,7 +62,7 @@ Yes, you can preview the app during development. Please click 🎉 in the top no
 
 You can serve your notebook as standalone web app:
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png)
+<img src="https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png" alt="Mercury echo bot screenshot" style="border:1px solid #ccc; padding:4px; border-radius:6px;" />
 
 ## Installation
 
