@@ -138,17 +138,8 @@ if prompt.value:
 
 ## Why this works
 
-### ChatInput triggers re-execution
-
 * `ChatInput` automatically re-runs the cell below it
 * `prompt.value` contains the latest user message
 * Your code reacts and appends new messages to the chat
 
 No callbacks. No JavaScript. No async code.
-
-## Why Altair works so well in chat
-
-* Altair outputs are **HTML-based**
-* `display(chart)` renders directly in the message
-* Charts are interactive (hover tooltips)
-* No need to close figures or manage state

@@ -104,7 +104,8 @@ export default defineConfig({
             link: 'tutorials',
             icon: 'star',
             items: [
-              { label: 'Get started tut', slug: 'tutorials' }
+              { label: 'Get started', slug: 'tutorials' },
+              { label: 'Dashboard', autogenerate: { directory: 'tutorials/dashboard' } },
             ],
           },
           {
