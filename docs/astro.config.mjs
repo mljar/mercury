@@ -106,6 +106,7 @@ export default defineConfig({
             items: [
               { label: 'Get started', slug: 'tutorials' },
               { label: 'Dashboard', autogenerate: { directory: 'tutorials/dashboard' } },
+              { label: 'Report', autogenerate: { directory: 'tutorials/report' } },
             ],
           },
           {
