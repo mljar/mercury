@@ -95,8 +95,9 @@ def Select(
         value = choices[0]
         warnings.warn("\nYour value is not included in choices. Automatically set value to first element from choices.")
 
-    args = [label, choices, position]
+    args = [value, label, choices, position]
     kwargs = {
+        "value": value,
         "label": label,
         "choices": choices,
         "position": position

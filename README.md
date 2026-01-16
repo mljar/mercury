@@ -97,7 +97,7 @@ Here is minimal Dockerfile to serve Mercury:
 FROM python:3.12-slim
 
 # Install Mercury
-RUN pip install mercury==3.0.0a2
+RUN pip install mercury
 
 # You can also install needed packages here,
 # For example install pandas
