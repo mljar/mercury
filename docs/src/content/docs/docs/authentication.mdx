@@ -1,0 +1,25 @@
+---
+title: Authentication
+description: Restrict access to Mercury apps with a password
+---
+
+import { Image } from 'astro:assets';
+
+import mercuryLoginImg from "../../../assets/examples/mercury-login.png";
+
+
+You can restrict access to your web apps by setting password when starting server:
+
+```bash
+mercury --pass=your-secret-here
+```
+
+Before opening the notebook user needs to provide the password:
+
+<Image
+  src={mercuryLoginImg}
+  alt="Mercury password prompt"
+  class="docs-image-100"
+/>
+
+If you want to have user-based authentication in your Mercury. It is paid option. Please reach us for more details contact - at - mljar.com

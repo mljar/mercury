@@ -1,0 +1,20 @@
+---
+title: Arguments
+description: Common Mercury server arguments
+---
+
+## Log level
+
+Would you like to see more logs from `mercury`?  
+Please use `--log-level=INFO` or `--log-level=DEBUG`. The default log level is `CRITICAL`.
+
+## Session sharing
+
+We have option to share the same session between multiple users.  
+What does it mean? You can deploy app, and when you click on it, others will see this.  
+To enable session sharing please use `--keep-session`. 
+
+## Timeout
+
+Would you like to limit your server resources with usage timeout?  
+Please set `--timeout=600`. The timeout value is in seconds.

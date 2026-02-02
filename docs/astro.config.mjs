@@ -80,6 +80,18 @@ export default defineConfig({
                   label: "Quick Start",
                   slug: "docs/quickstart"
                 },
+                {
+                  label: "Customization",
+                  slug: "docs/customization"
+                },
+                {
+                  label: "Arguments",
+                  slug: "docs/arguments"
+                },
+                {
+                  label: "Authentication",
+                  slug: "docs/authentication"
+                },
                 
                 { label: 'Chat', autogenerate: { directory: 'docs/chat' } },
                 { label: 'Input', autogenerate: { directory: 'docs/input' } },
