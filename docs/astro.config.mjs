@@ -108,6 +108,7 @@ export default defineConfig({
             icon: 'pencil',
             items: [
               { label: 'Examples', slug: 'examples' },
+              { label: 'Ollama', autogenerate: { directory: 'examples/ollama' } },
               { label: 'Chat', autogenerate: { directory: 'examples/chat' } },
             ],
           },

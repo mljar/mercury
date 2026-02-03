@@ -1,0 +1,281 @@
+---
+title: Streaming LLM Chatbot
+description: Learn how to stream tokens from a local Ollama model into a Mercury Chat widget, so your chatbot replies in real time.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+
+import modelImg from "../../../../assets/examples/ollama/ollama-run-locally-gpt-oss.webp"
+import chatEmptyImg from "../../../../assets/examples/ollama/empty-chat-streaming.webp"
+import chatStreamingImg from "../../../../assets/examples/ollama/chat-streaming.webp"
+import chatPromptCodeImg from "../../../../assets/examples/ollama/chat-streaming-prompt-code.webp"
+import notebooksImg from "../../../../assets/examples/ollama/notebooks-view.webp"
+
+
+In this tutorial we will build a simple chatbot web app that **streams the response token-by-token** (as the model generates it).
+This gives a nice __the assistant is typing__ feeling.
+
+We will use only open-source tools:
+
+- **Ollama** to run the model locally
+- **GPT-OSS 20B** as the model (you can switch to any Ollama model)
+- **Python** programming language
+- **Mercury** to turn the notebook into a web app
+
+The full notebook code is vailable in our [Github repository](https://github.com/mljar/mercury/blob/main/docs/notebooks/ollama-streaming.ipynb).
+
+<Image
+  src={chatEmptyImg}
+  alt="Empty chat web app in Mercury, ready for a prompt"
+  class="docs-image-100"
+/>
+
+
+## 1. Install and run Ollama
+
+Install Ollama using the official quickstart:
+https://docs.ollama.com/quickstart
+
+In this example I’m using **GPT-OSS 20B**.
+
+To download and start the model, run:
+
+```bash
+ollama run gpt-oss:20b
+```
+
+Donwload will take few minutes, depending on your internet connection. You are ready to use the model in the terminal:
+
+<Image
+src={modelImg}
+alt="Running GPT-OSS model locally with Ollama"
+class="docs-image-100"
+/>
+
+## 2. Install Python packages
+
+We need two packages:
+
+* `ollama` (Python client)
+* `mercury` (widgets + app runtime)
+
+Install them:
+
+```bash
+pip install ollama mercury
+```
+
+Now import them in the first cell:
+
+```python
+import ollama
+import mercury as mr
+```
+
+<Aside>
+We use `mr` as alias for `mercury` package, so we can easily access any widget from the framework.
+</Aside>
+
+## 3. Create storage for the conversation
+
+We will keep the whole conversation in a list called `messages`.
+Ollama expects messages in the same format as many chat APIs: a list of dicts with `role` and `content`.
+
+```python
+# list with all user and assistant messages
+messages = []
+```
+
+> Why do we need this list?
+
+Because each new response should include the conversation history, so the model has context.
+
+
+## 4. Add UI widgets: Chat + ChatInput
+
+### Chat widget (message display)
+
+We use the [`Chat`](/docs/chat/chat/) widget to display the conversation.
+The `placeholder` is shown before the first message appears.
+
+```python
+# place to display messages
+chat = mr.Chat(placeholder="💬 Start conversation")
+```
+
+### ChatInput widget (prompt box)
+
+We also need an input at the bottom of the app.
+We use [`ChatInput`](/docs/chat/chatinput/).
+
+```python
+# user input
+prompt = mr.ChatInput()
+```
+
+<Aside>
+`Chat` and `ChatInput` are **not in the same cell** on purpose.
+
+Mercury places all widgets created in the same code cell in the same position in the layout.
+This is convenient most of the time, but here we want:
+
+* the chat content in the main area
+* the input at the bottom
+
+</Aside>
+
+<Image
+src={chatStreamingImg}
+alt="Chat web app streaming the assistant response token-by-token"
+class="docs-image-100"
+/>
+
+## 5. Stream the response from Ollama into the UI
+
+Now the fun part 😊
+
+Mercury automatically re-executes notebook cells when a widget changes.
+So when the user submits text in `ChatInput`, `prompt.value` becomes non-empty and the next cell runs.
+
+Here is the full streaming cell:
+
+```python
+if prompt.value:
+    # create user message
+    usr_msg = mr.Message(markdown=prompt.value, role="user")
+    # display user message in the chat
+    chat.add(usr_msg)
+    # save in messages list (history for Ollama)
+    messages += [{'role': 'user', 'content': prompt.value}]
+
+    # call local LLM with streaming enabled
+    stream = ollama.chat(
+      model='gpt-oss:20b',
+      messages=messages,
+      stream=True,
+    )
+
+    # create assistant message (empty at the beginning)
+    ai_msg = mr.Message(role="assistant", emoji="🤖")
+    # display assistant message in the chat
+    chat.add(ai_msg)
+
+    # stream the response token-by-token
+    content = ""
+    for chunk in stream:
+        ai_msg.append_markdown(chunk.message.content)
+        content += chunk.message.content
+
+    # save assistant response in history
+    messages += [{'role': 'assistant', 'content': content}]
+```
+
+Notebook and app preview:
+<Image
+src={chatPromptCodeImg}
+alt="Streaming prompt code: appending tokens to the assistant message in Mercury"
+class="docs-image-100"
+/>
+
+
+### Step-by-step explanation (what happens here?)
+
+Let’s go through the code slowly.
+
+#### 1) Check if the user submitted a prompt
+
+```python
+if prompt.value:
+```
+
+`prompt.value` contains the text from `ChatInput`.
+If it is empty, we do nothing.
+
+#### 2) Add the user message to the UI + history
+
+```python
+usr_msg = mr.Message(markdown=prompt.value, role="user")
+chat.add(usr_msg)
+messages += [{'role': 'user', 'content': prompt.value}]
+```
+
+We do three things:
+
+* create [`Message`](/docs/chat/message/) object, with `markdown` and `role`
+* show the message in the `Chat` widget (`chat.add(...)`)
+* store it in `messages` so the model sees the full conversation next time
+
+#### 3) Call Ollama with `stream=True`
+
+```python
+stream = ollama.chat(
+  model='gpt-oss:20b',
+  messages=messages,
+  stream=True,
+)
+```
+
+This is the key: `stream=True` makes Ollama return an iterator.
+Instead of one big response, we receive many small chunks.
+
+#### 4) Create an empty assistant message in the chat
+
+```python
+ai_msg = mr.Message(role="assistant", emoji="🤖")
+chat.add(ai_msg)
+```
+
+We add the assistant message *before* we have any text.
+Now we have a “container” that we can update as tokens arrive.
+
+#### 5) Append tokens as they come
+
+```python
+for chunk in stream:
+    ai_msg.append_markdown(chunk.message.content)
+    content += chunk.message.content
+```
+
+For each chunk:
+
+* `append_markdown(...)` updates the UI immediately
+* we also keep `content` as a normal string, so we can store the final answer
+
+#### 6) Save the assistant response in history
+
+```python
+messages += [{'role': 'assistant', 'content': content}]
+```
+
+This step is important for multi-turn chat.
+Without it, the next prompt would not include the assistant’s last reply.
+
+## 6. Run as web application
+
+
+Please start `mercury` server application by running the following command:
+
+```bash
+mercury
+```
+
+The application will detect all notebook files in the current directory (files with `*.ipynb` extension) and serve them as web apps. The code won't be displayed. After opening the `mercury` website you will get view of all notebooks, please just click on the app to open it.
+
+<Image
+  src={notebooksImg}
+  alt="Notebooks view in Mercury"
+  class="docs-image-100"
+/>
+
+
+## Notes and tips
+
+* You can switch the model name to any Ollama model you have installed.
+* For better answers, keep the `messages` list (conversation history).
+  If you remove it, the chatbot becomes “single-turn” (no memory).
+* If you want to clear the conversation, you can add a button that resets `messages` and the chat.
+
+Have fun building! 🤖🎉
+
