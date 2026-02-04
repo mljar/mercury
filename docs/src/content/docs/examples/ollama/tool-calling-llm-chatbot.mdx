@@ -1,0 +1,333 @@
+---
+title: Chatbot with Tool Calling
+description: A practical guide to implementing LLM tool calling using Ollama, GPT models, and Python. Stream reasoning, execute functions, and turn your notebook into a web application.
+---
+
+import { Image } from 'astro:assets';
+import { Aside } from '@astrojs/starlight/components';
+
+import modelImg from "../../../../assets/examples/ollama/ollama-run-locally-gpt-oss.webp"
+import webAppImg from "../../../../assets/examples/ollama/chat-tool-calling-web-app.webp"
+
+In this example, we build a chatbot that can do more than just generate text — it can use tools. Normally, a language model can only answer based on what it already knows. It cannot check the weather, look up fresh data, or run your code. Tool calling changes that. It allows the model to decide that it needs outside information, ask your program to run a function, receive the result, and then use that result to produce a better, more accurate answer. This makes the chatbot feel less like a text generator and more like a real assistant that can interact with the world around it. In this tutorial, you will learn how to build this step by step using Ollama, Python, and Mercury, while also streaming the model’s thinking and final response in real time.
+
+📓 Full notebook code is [in our GitHub repository](https://github.com/mljar/mercury/blob/main/docs/notebooks/ollama-tool-calling.ipynb).
+
+<Image
+src={webAppImg}
+alt="Tool calling chat web application"
+class="docs-image-100"
+/>
+
+## What You Will Learn
+
+In this guide you will learn how to:
+
+* Stream AI responses word by word
+* Stream the **model’s thinking** separately
+* Let the model use tools
+* Build a simple chat interface
+* Turn everything into a web app
+
+
+## 1. Install and Run Ollama
+
+Install Ollama using the official guide: [docs.ollama.com/quickstart](https://docs.ollama.com/quickstart)
+
+We use **GPT-OSS 20B**.
+
+Download and start the model:
+
+```bash
+ollama run gpt-oss:20b
+```
+
+After download, the model runs locally on your machine.
+
+<Image
+src={modelImg}
+alt="Running GPT-OSS model locally with Ollama"
+class="docs-image-100"
+/>
+
+## 2. Install Python Packages
+
+We need two packages:
+
+* `ollama` — to talk to the model
+* `mercury` — to build the chat app
+
+```bash
+pip install ollama mercury
+```
+
+Import them:
+
+```python
+import ollama
+import mercury as mr
+```
+
+
+## 3. Create a Tool the Model Can Use
+
+We define a simple function. The model can call this like a tool.
+
+```python
+def get_temperature(city: str) -> str:
+    """Get the current temperature for a city"""
+    temperatures = {
+        'New York': '22°C',
+        'London': '15°C'
+    }
+    return temperatures.get(city, 'Unknown')
+```
+
+This function:
+
+* Takes a city name
+* Returns a temperature as string
+
+<Aside>
+This is simple function just to show you how tool calling working with LLMs.
+
+In real life such function will connect with database, REST API or something more sophisticated.
+</Aside>
+
+## 4. Build the Chat Interface
+
+```python
+messages = []
+```
+```python
+chat = mr.Chat(placeholder="💬 Start conversation")
+```
+
+```python
+prompt = mr.ChatInput()
+```
+
+* `messages` stores the full conversation
+* `chat` shows messages on screen
+* `prompt` is where the user types
+
+
+## 5. Stream Thinking and Answer from the Model
+
+This is the main logic.
+
+```python
+if prompt.value:
+    usr_msg = mr.Message(markdown=prompt.value, role="user")
+    chat.add(usr_msg)
+
+    messages += [{'role': 'user', 'content': prompt.value}]
+
+    stream = ollama.chat(
+        model='gpt-oss:20b',
+        messages=messages,
+        tools=[get_temperature],
+        stream=True,
+    )
+
+    ai_msg = mr.Message(role="assistant", emoji="🤖")
+    chat.add(ai_msg)
+
+    thinking, content = "", ""
+    tool_calls = []
+
+    for chunk in stream:
+        if chunk.message.thinking:
+            if thinking == "":
+                ai_msg.append_markdown("**Thinking:** ")
+            thinking += chunk.message.thinking
+            ai_msg.append_markdown(chunk.message.thinking)
+
+        elif chunk.message.content:
+            if content == "":
+                ai_msg.append_markdown("\n\n**Answer:** ")
+            content += chunk.message.content
+            ai_msg.append_markdown(chunk.message.content)
+
+        elif chunk.message.tool_calls:
+            tool_calls.extend(chunk.message.tool_calls)
+
+    messages += [{
+        'role': 'assistant',
+        'thinking': thinking,
+        'content': content,
+        'tool_calls': tool_calls
+    }]
+```
+
+What happens here?
+
+1. User message is added
+2. We call the model with streaming
+3. We listen to chunks from the model
+4. We separate:
+
+   * thinking
+   * final answer
+   * tool calls
+
+---
+
+## 6. 🔍 How the Last Code Piece Works (Tool Execution)
+
+Now we handle tools the model asked to use.
+
+```python
+for tool in tool_calls:
+    if tool.function.name == "get_temperature":
+        tool_msg = mr.Message(role="tool", emoji="⛅")
+        chat.add(tool_msg)
+
+        result = get_temperature(**tool.function.arguments)
+        tool_msg.append_markdown("Temperature is " + result)
+
+        messages += [{
+            "role": "tool",
+            "tool_name": "get_temperature",
+            "content": result
+        }]
+```
+
+Let’s break this down step by step:
+
+### 1️⃣ Loop through tool calls
+
+```python
+for tool in tool_calls:
+```
+
+During streaming, the model may say:
+
+> "I want to call a tool."
+
+Those requests are stored in `tool_calls`.
+Now we go through each one.
+
+---
+
+### 2️⃣ Check which tool the model wants
+
+```python
+if tool.function.name == "get_temperature":
+```
+
+The model tells us the name of the function.
+We check if it matches our function.
+
+---
+
+### 3️⃣ Show tool message in the chat
+
+```python
+tool_msg = mr.Message(role="tool", emoji="⛅")
+chat.add(tool_msg)
+```
+
+We create a message from the **tool**, so the user sees that a tool is being used.
+
+---
+
+### 4️⃣ Run the function in Python
+
+```python
+result = get_temperature(**tool.function.arguments)
+```
+
+Very important part.
+
+* `tool.function.arguments` contains data like:
+
+  ```json
+  {"city": "London"}
+  ```
+* `**` means: unpack arguments
+  So this becomes:
+
+```python
+get_temperature(city="London")
+```
+
+Now Python runs the function and returns `"15°C"`.
+
+---
+
+### 5️⃣ Show tool result
+
+```python
+tool_msg.append_markdown("Temperature is " + result)
+```
+
+The user now sees:
+
+> Temperature is 15°C
+
+---
+
+### 6️⃣ Add tool result to conversation history
+
+```python
+messages += [{
+    "role": "tool",
+    "tool_name": "get_temperature",
+    "content": result
+}]
+```
+
+This is very important.
+
+We tell the model:
+
+👉 “The tool ran.”
+👉 “Here is the result.”
+
+Now the model can continue and use this information in its final answer.
+
+---
+
+## Why This Pattern Is Powerful
+
+Normal chatbot:
+
+```
+User → Model → Answer
+```
+
+This system:
+
+```
+User → Model Thinking → Tool Call → Tool Result → Final Answer
+```
+
+This is the base for:
+
+* AI agents
+* Smart assistants
+* Tool-using AI systems
+* Transparent AI apps
+
+---
+
+## Turn It Into a Web App
+
+Run:
+
+```bash
+mercury
+```
+
+## Summary
+
+You built a chatbot that:
+
+* Streams the model’s thinking
+* Streams the final answer
+* Uses tools
+* Runs locally
+* Becomes a web app
+
+This is the foundation of modern AI agents 🚀
