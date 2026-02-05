@@ -4,12 +4,15 @@ description: A practical guide to implementing LLM tool calling using Ollama, GP
 ---
 
 import { Image } from 'astro:assets';
+import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
 import modelImg from "../../../../assets/examples/ollama/ollama-run-locally-gpt-oss.webp"
 import webAppImg from "../../../../assets/examples/ollama/chat-tool-calling-web-app.webp"
+import previewImg from "../../../../assets/examples/ollama/chat-tool-calling.webp"
 
-In this example, we build a chatbot that can do more than just generate text — it can use tools. Normally, a language model can only answer based on what it already knows. It cannot check the weather, look up fresh data, or run your code. Tool calling changes that. It allows the model to decide that it needs outside information, ask your program to run a function, receive the result, and then use that result to produce a better, more accurate answer. This makes the chatbot feel less like a text generator and more like a real assistant that can interact with the world around it. In this tutorial, you will learn how to build this step by step using Ollama, Python, and Mercury, while also streaming the model’s thinking and final response in real time.
+
+In this example, we build a chatbot that can do more than just generate text — it can **use tools**. Normally, a language model can only answer based on what it already knows. It cannot check the weather, look up fresh data, or run your code. __Tool calling changes that__. It allows the model to decide that it needs outside information, ask your program to run a function, receive the result, and then use that result to produce a better, more accurate answer. This makes the chatbot feel less like a text generator and more like a real assistant that can interact with the world around it. In this tutorial, you will learn how to build this step by step using Ollama, Python, and Mercury, while also streaming the model’s thinking and final response in real time.
 
 📓 Full notebook code is [in our GitHub repository](https://github.com/mljar/mercury/blob/main/docs/notebooks/ollama-tool-calling.ipynb).
 
@@ -42,7 +45,7 @@ Download and start the model:
 ollama run gpt-oss:20b
 ```
 
-After download, the model runs locally on your machine.
+After download, the model runs locally on your machine and you can use it in terminal. But let's move further!
 
 <Image
 src={modelImg}
@@ -57,21 +60,24 @@ We need two packages:
 * `ollama` — to talk to the model
 * `mercury` — to build the chat app
 
+Both packages are open source and easy to install:
+
 ```bash
 pip install ollama mercury
 ```
 
-Import them:
+Import them in the first code cell:
 
 ```python
 import ollama
 import mercury as mr
 ```
 
+We are ready to code more :)
 
 ## 3. Create a Tool the Model Can Use
 
-We define a simple function. The model can call this like a tool.
+We define a simple Python function. The model can call this like a **tool**. 
 
 ```python
 def get_temperature(city: str) -> str:
@@ -96,25 +102,35 @@ In real life such function will connect with database, REST API or something mor
 
 ## 4. Build the Chat Interface
 
+We will store our conversation in the list `messages`. It is used to provide context to local LLM model, without it model will not remember about dialog.
+
 ```python
 messages = []
 ```
+
+Let's clreate a [`Chat`](/docs/chat/chat/) widget for displaying messages in the next code cell:
 ```python
 chat = mr.Chat(placeholder="💬 Start conversation")
 ```
 
+User will provide prompts with [`ChatInput`](/docs/chat/chatinput/) widget. 
 ```python
 prompt = mr.ChatInput()
 ```
 
-* `messages` stores the full conversation
+Chat interface components:
 * `chat` shows messages on screen
 * `prompt` is where the user types
 
+<Aside>
+It is important to put widgets `chat` and `prompt` in the separate code cells. Mercury is placing widgets on cell basis in the app. It means you can't mix widgets from different position in one cell.
+
+It is not a bug. It is a feature.
+</Aside>
 
 ## 5. Stream Thinking and Answer from the Model
 
-This is the main logic.
+This is the main logic. It is called after every new `prompt` from user. This code cell is re-executed for every new input.
 
 ```python
 if prompt.value:
@@ -162,7 +178,7 @@ if prompt.value:
 
 What happens here?
 
-1. User message is added
+1. User message is created and displayed in the `chat`
 2. We call the model with streaming
 3. We listen to chunks from the model
 4. We separate:
@@ -171,11 +187,16 @@ What happens here?
    * final answer
    * tool calls
 
----
+The screenshot of notebook and app preview:
+<Image
+src={previewImg}
+alt="Tool calling chat web application preview in Jupyter"
+class="docs-image-100"
+/>
 
 ## 6. 🔍 How the Last Code Piece Works (Tool Execution)
 
-Now we handle tools the model asked to use.
+Let's look closer how we handle tools the model asked to use.
 
 ```python
 for tool in tool_calls:
@@ -208,8 +229,6 @@ During streaming, the model may say:
 Those requests are stored in `tool_calls`.
 Now we go through each one.
 
----
-
 ### 2️⃣ Check which tool the model wants
 
 ```python
@@ -218,8 +237,6 @@ if tool.function.name == "get_temperature":
 
 The model tells us the name of the function.
 We check if it matches our function.
-
----
 
 ### 3️⃣ Show tool message in the chat
 
@@ -230,7 +247,6 @@ chat.add(tool_msg)
 
 We create a message from the **tool**, so the user sees that a tool is being used.
 
----
 
 ### 4️⃣ Run the function in Python
 
@@ -245,16 +261,15 @@ Very important part.
   ```json
   {"city": "London"}
   ```
-* `**` means: unpack arguments
+
+* `**tool.function.arguments` means: unpack arguments
   So this becomes:
 
-```python
-get_temperature(city="London")
-```
+  ```python
+  get_temperature(city="London")
+  ```
 
 Now Python runs the function and returns `"15°C"`.
-
----
 
 ### 5️⃣ Show tool result
 
@@ -266,7 +281,6 @@ The user now sees:
 
 > Temperature is 15°C
 
----
 
 ### 6️⃣ Add tool result to conversation history
 
@@ -287,8 +301,6 @@ We tell the model:
 
 Now the model can continue and use this information in its final answer.
 
----
-
 ## Why This Pattern Is Powerful
 
 Normal chatbot:
@@ -308,26 +320,24 @@ This is the base for:
 * AI agents
 * Smart assistants
 * Tool-using AI systems
-* Transparent AI apps
 
----
 
 ## Turn It Into a Web App
 
-Run:
+Running the notebook as web app is simple as starting a Mercury Server with command:
 
 ```bash
 mercury
 ```
 
+Mercury will detect all `*.ipynb` files and serve them as web applications.
+
 ## Summary
 
-You built a chatbot that:
+Great job — you have just built a chatbot that behaves more like a real assistant than a simple text generator. Instead of only guessing answers from what the model already knows, your chatbot can decide to use a tool, run a Python function, and use the result to give a better and more accurate response. At the same time, users can watch how the model thinks and see the final answer appear step by step, which makes the whole system more transparent and easier to understand.
 
-* Streams the model’s thinking
-* Streams the final answer
-* Uses tools
-* Runs locally
-* Becomes a web app
+You also learned how to connect a local model running with **Ollama** to a Python application, how to pass conversation history, how tool calls are detected and executed, and how to show everything in an interactive interface using **Mercury**. By turning the notebook into a web app, you transformed a small code example into something people can actually use.
 
-This is the foundation of modern AI agents 🚀
+This pattern — model thinking, tool calling, tool result, and final answer — is the core idea behind modern AI assistants and agents. Once you understand this flow, you can connect models to databases, APIs, or your own business logic, and build systems that do real work, not just chat.
+
+
