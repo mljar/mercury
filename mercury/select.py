@@ -119,78 +119,215 @@ def Select(
 class SelectWidget(anywidget.AnyWidget):
     _esm = """
     function render({ model, el }) {
-      let container = document.createElement("div");
+      const normalize = value => String(value ?? "").toLowerCase().trim();
+      const getChoices = () =>
+        Array.isArray(model.get("choices")) ? [...model.get("choices")] : [];
+      const isDisabled = () => !!model.get("disabled");
+      const isHidden = () => !!model.get("hidden");
+
+      const container = document.createElement("div");
       container.classList.add("mljar-select-container");
 
       if (model.get("label")) {
-        let topLabel = document.createElement("div");
+        const topLabel = document.createElement("div");
         topLabel.classList.add("mljar-select-label");
         topLabel.innerHTML = model.get("label");
         container.appendChild(topLabel);
       }
 
-      let select = document.createElement("select");
-      select.classList.add("mljar-select-widget-input");
+      const control = document.createElement("div");
+      control.classList.add("mljar-select-control");
 
-      if (model.get("disabled")) {
-        select.disabled = true;
-      }
+      const input = document.createElement("input");
+      input.type = "text";
+      input.classList.add("mljar-select-widget-input");
+      input.autocomplete = "off";
+      input.spellcheck = false;
 
-      const choices = model.get("choices") || [];
-      const currentValue = model.get("value");
+      const caret = document.createElement("div");
+      caret.classList.add("mljar-select-caret");
+      caret.innerHTML = "&#9662;";
 
-      choices.forEach(choice => {
-        let option = document.createElement("option");
-        option.value = choice;
-        option.innerHTML = choice;
-        if (choice === currentValue) {
-          option.selected = true;
-        }
-        select.appendChild(option);
-      });
+      control.appendChild(input);
+      control.appendChild(caret);
 
-      let debounceTimer = null;
-      select.addEventListener("change", () => {
-        const val = select.value;
-        model.set("value", val);
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            model.save_changes();
-        }, 100);
-      });
+      const dropdown = document.createElement("div");
+      dropdown.classList.add("mljar-select-dropdown");
 
-      model.on("change:value", () => {
-        select.value = model.get("value");
-      });
+      const list = document.createElement("div");
+      list.classList.add("mljar-select-list");
 
-      container.appendChild(select);
+      const emptyState = document.createElement("div");
+      emptyState.classList.add("mljar-select-empty");
+      emptyState.textContent = "No matches";
+
+      dropdown.appendChild(list);
+      dropdown.appendChild(emptyState);
+
+      container.appendChild(control);
+      container.appendChild(dropdown);
       el.appendChild(container);
 
-      // ---- read cell id (no DOM modifications) ----
-      /*
-      const ID_ATTR = 'data-cell-id';
-      const hostWithId = el.closest(`[${ID_ATTR}]`);
-      const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
+      let isOpen = false;
+      let filteredChoices = [];
+      let lastCommittedValue = "";
+      let isEditing = false;
 
-      if (cellId) {
-        model.set('cell_id', cellId);
-        model.save_changes();
-        model.send({ type: 'cell_id_detected', value: cellId });
-      } else {
-        // handle case where the attribute appears slightly later
-        const mo = new MutationObserver(() => {
-          const host = el.closest(`[${ID_ATTR}]`);
-          const newId = host?.getAttribute(ID_ATTR);
-          if (newId) {
-            model.set('cell_id', newId);
-            model.save_changes();
-            model.send({ type: 'cell_id_detected', value: newId });
-            mo.disconnect();
+      const setOpen = next => {
+        if (isDisabled()) {
+          isOpen = false;
+        } else {
+          isOpen = !!next;
+        }
+        container.classList.toggle("is-open", isOpen);
+        dropdown.style.display = isOpen ? "block" : "none";
+      };
+
+      const updateDisabledState = () => {
+        const disabled = isDisabled();
+        input.disabled = disabled;
+        control.classList.toggle("is-disabled", disabled);
+      };
+
+      const updateHiddenState = () => {
+        container.style.display = isHidden() ? "none" : "";
+      };
+
+      const syncInputWithValue = () => {
+        const value = model.get("value") || "";
+        lastCommittedValue = value;
+        if (!isEditing) {
+          input.value = value;
+        }
+      };
+
+      const filterChoices = query => {
+        const normalizedQuery = normalize(query);
+        const allChoices = getChoices();
+        if (!normalizedQuery) {
+          return allChoices;
+        }
+        return allChoices.filter(choice =>
+          normalize(choice).includes(normalizedQuery)
+        );
+      };
+
+      const renderList = () => {
+        list.innerHTML = "";
+        filteredChoices.forEach(choice => {
+          const option = document.createElement("button");
+          option.type = "button";
+          option.classList.add("mljar-select-option");
+          if (choice === model.get("value")) {
+            option.classList.add("is-selected");
           }
+          option.textContent = choice;
+          option.addEventListener("mousedown", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            model.set("value", choice);
+            model.save_changes();
+            isEditing = false;
+            syncInputWithValue();
+            renderList();
+            setOpen(false);
+          });
+          list.appendChild(option);
         });
-        mo.observe(document.body, { attributes: true, subtree: true, attributeFilter: [ID_ATTR] });
-      }
-      */
+
+        const hasMatches = filteredChoices.length > 0;
+        list.style.display = hasMatches ? "block" : "none";
+        emptyState.style.display = hasMatches ? "none" : "block";
+      };
+
+      const refreshList = () => {
+        filteredChoices = filterChoices(input.value);
+        renderList();
+      };
+
+      const openWithCurrentQuery = () => {
+        isEditing = true;
+        input.value = "";
+        refreshList();
+        setOpen(true);
+      };
+
+      control.addEventListener("click", event => {
+        event.stopPropagation();
+        if (isDisabled()) {
+          return;
+        }
+        openWithCurrentQuery();
+        input.focus();
+      });
+
+      input.addEventListener("input", () => {
+        if (isDisabled()) {
+          return;
+        }
+        refreshList();
+        setOpen(true);
+      });
+
+      input.addEventListener("focus", () => {
+        if (isDisabled()) {
+          return;
+        }
+        openWithCurrentQuery();
+      });
+
+      input.addEventListener("blur", () => {
+        isEditing = false;
+        input.value = lastCommittedValue;
+      });
+
+      const handleDocumentClick = event => {
+        if (!container.contains(event.target)) {
+          isEditing = false;
+          setOpen(false);
+          input.value = lastCommittedValue;
+        }
+      };
+
+      document.addEventListener("click", handleDocumentClick);
+
+      model.on("change:value", () => {
+        syncInputWithValue();
+        refreshList();
+      });
+
+      model.on("change:choices", () => {
+        const choices = getChoices();
+        if (!choices.includes(model.get("value")) && choices.length > 0) {
+          model.set("value", choices[0]);
+          model.save_changes();
+          return;
+        }
+        syncInputWithValue();
+        refreshList();
+      });
+
+      model.on("change:disabled", () => {
+        updateDisabledState();
+        if (isDisabled()) {
+          isEditing = false;
+          setOpen(false);
+        }
+      });
+
+      model.on("change:hidden", () => {
+        updateHiddenState();
+      });
+
+      updateDisabledState();
+      updateHiddenState();
+      syncInputWithValue();
+      refreshList();
+      setOpen(false);
+
+      return () => {
+        document.removeEventListener("click", handleDocumentClick);
+      };
     }
     export default { render };
     """
@@ -213,23 +350,99 @@ class SelectWidget(anywidget.AnyWidget):
       font-weight: 600;
     }}
 
+    .mljar-select-control {{
+      position: relative;
+      display: flex;
+      align-items: center;
+    }}
+
     .mljar-select-widget-input {{
       width: 100%;
-      padding: 6px;
+      padding: 8px 36px 8px 10px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
-      
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
       appearance: none !important;
       background-color: #ffffff !important;
-      color: {THEME.get('text_color', '#222')} !important; 
+      color: {THEME.get('text_color', '#222')} !important;
+    }}
+
+    .mljar-select-widget-input:focus {{
+      outline: none;
+      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      box-shadow: 0 0 0 3px rgba(76, 124, 240, 0.16);
+    }}
+
+    .mljar-select-caret {{
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: {THEME.get('text_color', '#222')};
+      pointer-events: none;
+      font-size: 11px;
+      opacity: 0.7;
+    }}
+
+    .mljar-select-container.is-open .mljar-select-caret {{
+      opacity: 1;
+    }}
+
+    .mljar-select-dropdown {{
+      display: none;
+      margin-top: 6px;
+      border: 1px solid {THEME.get('border_color', '#ccc')};
+      border-radius: {THEME.get('border_radius', '6px')};
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      overflow: hidden;
+    }}
+
+    .mljar-select-list {{
+      max-height: 260px;
+      overflow-y: auto;
+    }}
+
+    .mljar-select-option {{
+      display: block;
+      width: 100%;
+      padding: 9px 10px;
+      border: 0;
+      background: transparent;
+      color: {THEME.get('text_color', '#222')};
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+    }}
+
+    .mljar-select-option:hover {{
+      background: #f5f7fb;
+    }}
+
+    .mljar-select-option.is-selected {{
+      background: #eef3ff;
+      color: #1f4fd1;
+      font-weight: 600;
+    }}
+
+    .mljar-select-empty {{
+      display: none;
+      padding: 10px;
+      color: #777;
+      font-size: 0.95em;
     }}
 
     .mljar-select-widget-input:disabled {{
       background: #f5f5f5;
       color: #888;
       cursor: not-allowed;
+    }}
+
+    .mljar-select-control.is-disabled .mljar-select-caret {{
+      opacity: 0.45;
     }}
     """
 
