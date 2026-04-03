@@ -2,10 +2,22 @@ import pytest
 from traitlets import TraitError
 
 import mercury.multiselect as m
-from mercury.multiselect import MultiSelectWidget
+from mercury.multiselect import MultiSelect, MultiSelectWidget
+from mercury.manager import WidgetsManager
 
 
 # --- value & choices behaviour ----------------------------------------------------
+
+
+def test_multiselect_respects_explicit_initial_value_on_subsequent_calls(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    MultiSelect(label="Choose fruits", choices=["Apple", "Banana", "Cherry"])
+    widget = MultiSelect(label="Choose fruits", choices=["Apple", "Banana", "Cherry"], value=["Banana"])
+
+    assert widget.value == ["Banana"]
+
 
 
 def test_multiselectwidget_default_value_with_non_empty_choices():

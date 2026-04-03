@@ -105,7 +105,7 @@ def MultiSelect(
         if len(value) == 0:
             value = [choices[0]]
 
-    args = [label, choices, placeholder, position]
+    args = [value, label, choices, placeholder, position]
     kwargs = {
         "value": value,
         "label": label, 
