@@ -105,7 +105,7 @@ def MultiSelect(
         if len(value) == 0:
             value = [choices[0]]
 
-    args = [label, choices, placeholder, position]
+    args = [value, label, choices, placeholder, position]
     kwargs = {
         "value": value,
         "label": label, 
@@ -162,7 +162,6 @@ class MultiSelectWidget(anywidget.AnyWidget):
 
       const caret = document.createElement("div");
       caret.classList.add("mljar-ms-caret");
-      caret.innerHTML = "&#9662;";
 
       control.appendChild(selectedWrap);
       control.appendChild(input);
@@ -185,6 +184,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
       let isOpen = false;
       let isEditing = false;
       let filteredChoices = [];
+      let blurTimeout = null;
 
       const setOpen = next => {
         if (isDisabled()) {
@@ -194,6 +194,13 @@ class MultiSelectWidget(anywidget.AnyWidget):
         }
         container.classList.toggle("is-open", isOpen);
         dropdown.style.display = isOpen ? "block" : "none";
+      };
+
+      const syncEditingState = () => {
+        const hasSelection = getSelected().length > 0;
+        container.classList.toggle("is-editing", isEditing);
+        container.classList.toggle("has-selection", hasSelection);
+        control.classList.toggle("has-selection", hasSelection);
       };
 
       const updateDisabledState = () => {
@@ -242,6 +249,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
           chip.appendChild(removeBtn);
           selectedWrap.appendChild(chip);
         });
+        syncEditingState();
       };
 
       const filterChoices = query => {
@@ -308,8 +316,13 @@ class MultiSelectWidget(anywidget.AnyWidget):
       };
 
       const openWithCurrentQuery = () => {
+        if (blurTimeout !== null) {
+          window.clearTimeout(blurTimeout);
+          blurTimeout = null;
+        }
         isEditing = true;
         input.value = "";
+        syncEditingState();
         refreshList();
         setOpen(true);
       };
@@ -317,6 +330,9 @@ class MultiSelectWidget(anywidget.AnyWidget):
       control.addEventListener("click", event => {
         event.stopPropagation();
         if (isDisabled()) {
+          return;
+        }
+        if (event.target === input) {
           return;
         }
         openWithCurrentQuery();
@@ -339,15 +355,27 @@ class MultiSelectWidget(anywidget.AnyWidget):
       });
 
       input.addEventListener("blur", () => {
-        isEditing = false;
-        input.value = "";
+        if (blurTimeout !== null) {
+          window.clearTimeout(blurTimeout);
+        }
+        blurTimeout = window.setTimeout(() => {
+          isEditing = false;
+          input.value = "";
+          syncEditingState();
+          blurTimeout = null;
+        }, 120);
       });
 
       const handleDocumentClick = event => {
         if (!container.contains(event.target)) {
+          if (blurTimeout !== null) {
+            window.clearTimeout(blurTimeout);
+            blurTimeout = null;
+          }
           isEditing = false;
           setOpen(false);
           input.value = "";
+          syncEditingState();
         }
       };
 
@@ -366,6 +394,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
         if (isDisabled()) {
           isEditing = false;
           setOpen(false);
+          syncEditingState();
         }
       });
       model.on("change:hidden", () => {
@@ -377,8 +406,12 @@ class MultiSelectWidget(anywidget.AnyWidget):
       renderSummary();
       refreshList();
       setOpen(false);
+      syncEditingState();
 
       return () => {
+        if (blurTimeout !== null) {
+          window.clearTimeout(blurTimeout);
+        }
         document.removeEventListener("click", handleDocumentClick);
       };
     }
@@ -430,6 +463,12 @@ class MultiSelectWidget(anywidget.AnyWidget):
       flex-wrap: wrap;
       gap: 6px;
       align-items: center;
+      flex: 0 1 auto;
+      min-width: 0;
+    }}
+
+    .mljar-ms-control.has-selection .mljar-ms-selected {{
+      flex: 1 0 calc(100% - 24px);
     }}
 
     .mljar-ms-chip {{
@@ -470,9 +509,9 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-input {{
-      flex: 0 1 96px;
+      flex: 1 1 96px;
       min-width: 56px;
-      max-width: 140px;
+      max-width: none;
       padding: 4px 0;
       border: 0;
       background: #fff;
@@ -480,6 +519,35 @@ class MultiSelectWidget(anywidget.AnyWidget):
       appearance: none !important;
       background-color: #ffffff !important;
       color: {THEME.get('text_color', '#222')} !important;
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        flex-basis 0.18s ease,
+        width 0.18s ease,
+        max-width 0.18s ease,
+        padding 0.18s ease,
+        opacity 0.18s ease,
+        transform 0.18s ease;
+    }}
+
+    .mljar-ms-control.has-selection .mljar-ms-input {{
+      flex: 1 0 100%;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      padding-right: 18px;
+    }}
+
+    .mljar-ms-container.has-selection:not(.is-editing) .mljar-ms-input {{
+      flex: 0 0 0;
+      min-width: 0;
+      max-width: 0;
+      width: 0;
+      padding: 0;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      overflow: hidden;
     }}
 
     .mljar-ms-input:focus {{
@@ -490,15 +558,19 @@ class MultiSelectWidget(anywidget.AnyWidget):
       position: absolute;
       right: 12px;
       top: 50%;
-      transform: translateY(-50%);
-      color: {THEME.get('text_color', '#222')};
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid {THEME.get('text_color', '#222')};
+      border-bottom: 1.5px solid {THEME.get('text_color', '#222')};
+      transform: translateY(-65%) rotate(45deg);
       pointer-events: none;
-      font-size: 11px;
-      opacity: 0.7;
+      opacity: 0.5;
+      transition: transform 0.18s ease, opacity 0.18s ease;
     }}
 
     .mljar-ms-container.is-open .mljar-ms-caret {{
       opacity: 1;
+      transform: translateY(-35%) rotate(225deg);
     }}
 
     .mljar-ms-dropdown {{
