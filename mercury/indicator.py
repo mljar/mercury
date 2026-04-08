@@ -132,37 +132,53 @@ class Indicator:
     def styles(self):
         return """
         <style scoped>
+        .mljar-indicator-container {
+            width: 100%;
+            container-type: inline-size;
+        }
         .mljar-indicator-row {
             width: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;                
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 12px;
-            justify-content: flex-start;
-            align-items: stretch;
             box-sizing: border-box;
-            padding: 5px;
         }
-        @media (max-width: 800px) {
+        @container (min-width: 560px) {
             .mljar-indicator-row {
-                flex-direction: column;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-            .mljar-indicator-card {
-                flex: 1 1 100%;
-                max-width: 100% !important;
-                min-width: 0;
+        }
+        @container (min-width: 900px) {
+            .mljar-indicator-row {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        @container (min-width: 1200px) {
+            .mljar-indicator-row {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
             }
         }
         .mljar-indicator-card {
-            flex: 0 1 180px;                 
             background: var(--bg, #fff);
             border: 1px solid var(--border, #ebebeb);
             border-radius: 10px;
             padding: 20px 18px 14px 18px;    
             text-align: center;
-            min-width: 150px;               
-            max-width: 210px !important;
+            width: 100%;
+            min-width: 0;
+            max-width: none !important;
+            box-sizing: border-box;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .mljar-indicator-card-single {
+            max-width: none !important;
+        }
+        @container (min-width: 480px) {
+            .mljar-indicator-card-single {
+                max-width: 400px !important;
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
         .mljar-indicator-title {
             font-size: 1.25em !important;
@@ -201,7 +217,7 @@ class Indicator:
         </style>
         """
 
-    def _card_html(self):
+    def _card_html(self, single=False):
         delta_html = ""
         if self.delta is not None:
             try:
@@ -215,9 +231,10 @@ class Indicator:
 
         label_html = f"<div class='mljar-indicator-title'>{self.label}</div>" if self.label else ""
         value_html = f"<div class='mljar-indicator-value'>{self.value}</div>"
+        card_cls = "mljar-indicator-card mljar-indicator-card-single" if single else "mljar-indicator-card"
 
         return f"""
-<div class="mljar-indicator-card"
+<div class="{card_cls}"
      style="--bg:{self.background_color};--border:{self.border_color};--value:{self.value_color};--label:{self.label_color};--green:{self.GREEN};--bg-green:{self.BG_GREEN};--red:{self.RED};--bg-red:{self.BG_RED}">
     {label_html}
     {value_html}
@@ -232,7 +249,7 @@ class Indicator:
             for v in self.value:
                 if isinstance(v, Indicator):
                     cards += v._card_html()
-            return f"{self.styles()}<div class='mljar-indicator-row'>{cards}</div>"
+            return f"{self.styles()}<div class='mljar-indicator-container'><div class='mljar-indicator-row'>{cards}</div></div>"
 
         # Single indicator
-        return f"{self.styles()}{self._card_html()}"
+        return f"{self.styles()}<div class='mljar-indicator-container'>{self._card_html(single=True)}</div>"
