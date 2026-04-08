@@ -3,6 +3,8 @@ from traitlets import TraitError
 
 import mercury.multiselect as m
 from mercury.multiselect import MultiSelectWidget
+from mercury.multiselect import MultiSelect
+from mercury.manager import WidgetsManager
 
 
 # --- value & choices behaviour ----------------------------------------------------
@@ -36,6 +38,20 @@ def test_multiselectwidget_empty_choices_keeps_empty_value():
     # No choices -> value should stay empty list
     w = MultiSelectWidget(choices=[], value=["something"])
     assert w.value == []
+
+
+def test_multiselect_respects_explicit_initial_value_on_subsequent_calls(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    MultiSelect(label="Choose colors", choices=["Red", "Green", "Blue"])
+    widget = MultiSelect(
+        label="Choose colors",
+        choices=["Red", "Green", "Blue"],
+        value=["Green"],
+    )
+
+    assert widget.value == ["Green"]
 
 
 # --- Trait defaults & validation ---------------------------------------------------
