@@ -10,6 +10,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_integer_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -19,6 +20,7 @@ def Slider(
     value: int | None = None,
     min: int = 0,
     max: int = 100,
+    url_key: str = "",
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -51,6 +53,9 @@ def Slider(
     max : int
         Maximum slider value.
         The default is 100.
+    url_key : str, optional
+        URL query parameter name used to override the initial value.
+        Missing, empty, or invalid values fall back to ``value``.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed:
 
@@ -109,12 +114,20 @@ def Slider(
         warnings.warn("\nSlider: `value` is out of range. Clamping to [min, max].")
         value_int = max(min_int, min(value_int, max_int))
 
-    args = [label, value_int, min_int, max_int, position]
+    value_int = resolve_integer_value(
+        value=value_int,
+        url_key=url_key,
+        min_value=min_int,
+        max_value=max_int,
+    )
+
+    args = [label, value_int, min_int, max_int, url_key, position]
     kwargs = {
         "label": label,
         "value": value_int,
         "min": min_int,
         "max": max_int,
+        "url_key": url_key,
         "position": position
     }
 
@@ -311,6 +324,7 @@ class SliderWidget(anywidget.AnyWidget):
     min = traitlets.Int(0).tag(sync=True)
     max = traitlets.Int(100).tag(sync=True)
     label = traitlets.Unicode("Select number").tag(sync=True)
+    url_key = traitlets.Unicode("").tag(sync=True)
 
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)

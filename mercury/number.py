@@ -10,6 +10,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_number_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -20,6 +21,7 @@ def NumberInput(
     min: float = 0.0,
     max: float = 100.0,
     step: float = 1.0,
+    url_key: str = "",
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -56,6 +58,9 @@ def NumberInput(
     step : float
         Step used by the browser number input.
         The default is 1.
+    url_key : str, optional
+        URL query parameter name used to override the initial value.
+        Missing, empty, or invalid values fall back to ``value``.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed.
     disabled : bool, optional
@@ -107,13 +112,22 @@ def NumberInput(
         warnings.warn("\nNumberInput: `value` is out of range. Clamping to [min, max].")
         value_f = max(min_f, min(value_f, max_f))
 
-    args = [label, value_f, min_f, max_f, step_f, position]
+    value_f = resolve_number_value(
+        value=value_f,
+        url_key=url_key,
+        min_value=min_f,
+        max_value=max_f,
+        step=step_f,
+    )
+
+    args = [label, value_f, min_f, max_f, step_f, url_key, position]
     kwargs = {
         "label": label,
         "value": value_f,
         "min": min_f,
         "max": max_f,
         "step": step_f,
+        "url_key": url_key,
         "position": position
     }
 
@@ -272,6 +286,7 @@ class NumberInputWidget(anywidget.AnyWidget):
     max = traitlets.Float(100.0).tag(sync=True)
     step = traitlets.Float(1.0).tag(sync=True)
     label = traitlets.Unicode("Enter number").tag(sync=True)
+    url_key = traitlets.Unicode("").tag(sync=True)
 
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)

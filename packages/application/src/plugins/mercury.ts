@@ -98,6 +98,9 @@ export const plugin: JupyterFrontEndPlugin<void> = {
           // ---------- Execute notebook cells once kernel is ready ----------
           mercuryPanel.context.ready.then(async () => {
             try {
+              const runtimeUrlParams = Object.fromEntries(
+                Array.from(urlParams.keys()).map(key => [key, urlParams.getAll(key)])
+              );
               const waitForKernelReady = async (kc: typeof kernelConnection) => {
                 if (!kc) {
                   return;
@@ -154,6 +157,28 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                 kernelConnection = changes.newValue!;
               }
               await waitForKernelReady(kernelConnection);
+
+              if (kernelConnection) {
+                const syncUrlParamsCode = `
+from mercury.url_params import set_runtime_url_params
+set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
+`.trim();
+                const future = kernelConnection.requestExecute({
+                  code: syncUrlParamsCode,
+                  silent: true,
+                  store_history: false,
+                  stop_on_error: false,
+                  allow_stdin: false
+                });
+                try {
+                  await future.done;
+                } catch (err) {
+                  console.warn(
+                    '[Mercury] Failed to sync URL params to Python runtime:',
+                    err
+                  );
+                }
+              }
 
               const executeAll = async () => {
                 try {
