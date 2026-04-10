@@ -112,6 +112,23 @@ Initial text value.
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* If the URL contains a non-empty value for this key, it takes precedence over `value`.
+* Missing, empty, or whitespace-only URL values fall back to `value`.
+
+Example:
+
+```text
+?username=jan
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -161,5 +178,6 @@ The `key` value is required when widgets are created inside loops.
 
 * The widget value is always available via `.value`.
 * Changes are debounced slightly to avoid excessive updates.
+* `url_key` can be used to initialize the widget from URL query parameters.
+* Empty or whitespace-only URL values are ignored.
 * This widget is intended for **single-line text**. For longer text, consider a textarea-style widget.
-

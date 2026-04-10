@@ -132,6 +132,24 @@ The default is an empty string.
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* Use repeated query parameters to provide multiple values.
+* Missing, empty, or invalid URL values fall back to `value`.
+* Matching against `choices` is case-insensitive and preserves the original values from `choices`.
+
+Example:
+
+```text
+?fruit=apple&fruit=banana
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -185,6 +203,7 @@ The <code>key</code> value is required when widgets are created inside loops.
 * During initialization, at least one value is selected by default.
 * During user interaction, the value may become an **empty list** (for example when the user clears all selections).
 * Invalid values are removed automatically.
+* `url_key` can be used to initialize the widget from repeated URL query parameters.
+* URL values are filtered against `choices`, matched case-insensitively, and deduplicated after matching.
 * The current selection is always available via `.value`.
-
 

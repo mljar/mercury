@@ -88,6 +88,24 @@ If empty, the widget raises an exception.
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* If the URL contains a valid value for this key, it takes precedence over `value`.
+* Missing, empty, or invalid URL values fall back to `value`.
+* Matching against `choices` is case-insensitive and preserves the original value from `choices`.
+
+Example:
+
+```text
+?fruit=banana
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -134,6 +152,7 @@ The `key` value is needed if widgets are created in the loop.
 
 * When no `value` is provided, the widget selects the **first choice**.
 * If the provided `value` is not in `choices`, it is replaced with the first element and a warning is shown.
+* `url_key` can be used to initialize the widget from URL query parameters.
+* URL values are matched against `choices` case-insensitively and use the canonical value from `choices`.
 * The current selection is always available via `.value`.
-
 

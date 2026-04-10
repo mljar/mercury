@@ -135,6 +135,24 @@ Controls how the checkbox is rendered:
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* If the URL contains a valid boolean value for this key, it takes precedence over `value`.
+* Missing, empty, or invalid URL values fall back to `value`.
+* Accepted values are `true` and `false`, matched case-insensitively.
+
+Example:
+
+```text
+?enabled=true
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -183,4 +201,6 @@ The `key` value is required when widgets are created inside loops.
 ## Notes
 
 * The widget value is always a **boolean**.
+* `url_key` can be used to initialize the widget from URL query parameters.
+* URL parameters accept only `true` and `false` values, matched case-insensitively.
 * Use `.value` in Python to access the current state.
