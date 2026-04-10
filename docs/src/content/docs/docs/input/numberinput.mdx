@@ -178,6 +178,24 @@ The default is `1`.
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* If the URL contains a valid numeric value for this key, it takes precedence over `value`.
+* Missing, empty, or invalid URL values fall back to `value`.
+* URL values are clamped to `[min, max]` and snapped to the nearest `step`.
+
+Example:
+
+```text
+?threshold=1.25
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -227,5 +245,6 @@ The `key` value is required when widgets are created inside loops.
 
 * The widget value is always numeric and available via `.value`.
 * The value is clamped to the `[min, max]` range.
+* `url_key` can be used to initialize the widget from URL query parameters.
+* URL values are parsed as numbers, clamped to `[min, max]`, and snapped to the nearest `step`.
 * If you need integer-only input, set `step=1` and use integer `min/max`.
-

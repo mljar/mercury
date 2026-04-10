@@ -131,6 +131,24 @@ The default is `100`.
 
 ---
 
+### url_key
+
+**type:** `string`
+
+Name of the URL query parameter used to override the initial value.
+
+* If the URL contains a valid integer value for this key, it takes precedence over `value`.
+* Missing, empty, or invalid URL values fall back to `value`.
+* URL values outside the allowed range are clamped to `[min, max]`.
+
+Example:
+
+```text
+?threshold=7
+```
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -183,6 +201,8 @@ The <code>key</code> value is required when widgets are created inside loops.
 * The slider value is always an **integer**.
 * If no value is provided, the slider starts at `min`.
 * Values outside the `[min, max]` range are clamped automatically.
+* `url_key` can be used to initialize the widget from URL query parameters.
+* URL values must be integers and are clamped to `[min, max]`.
 * The current value is always available via `.value`.
 * The slider track length remains constant, regardless of how many digits the value has.
 

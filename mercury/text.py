@@ -9,6 +9,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_text_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -16,6 +17,7 @@ Position = Literal["sidebar", "inline", "bottom"]
 def TextInput(
     label: str = "Enter text",
     value: str = "",
+    url_key: str = "",
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -35,6 +37,9 @@ def TextInput(
     value : str
         Initial value.
         The default is `""`.
+    url_key : str, optional
+        URL query parameter name used to override the initial value.
+        If the parameter is missing or invalid, the widget falls back to ``value``.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed.
     disabled : bool, optional
@@ -49,11 +54,13 @@ def TextInput(
     TextInputWidget
         The created or retrieved TextInput widget instance.
     """
+    value = resolve_text_value(value=value, url_key=url_key)
 
-    args = [label, value, position]
+    args = [label, value, url_key, position]
     kwargs = {
         "label": label,
         "value": value,
+        "url_key": url_key,
         "position": position
     }
 
@@ -193,6 +200,7 @@ class TextInputWidget(anywidget.AnyWidget):
 
     value = traitlets.Unicode("").tag(sync=True)
     label = traitlets.Unicode("Enter text").tag(sync=True)
+    url_key = traitlets.Unicode("").tag(sync=True)
 
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)

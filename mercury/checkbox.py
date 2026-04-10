@@ -9,6 +9,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_boolean_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 Appearance = Literal["toggle", "box"]
@@ -17,6 +18,7 @@ Appearance = Literal["toggle", "box"]
 def CheckBox(
     label: str = "Enable",
     value: bool = False,
+    url_key: str = "",
     appearance: Appearance = "toggle",
     position: Position = "sidebar",
     disabled: bool = False,
@@ -34,11 +36,13 @@ def CheckBox(
     >>> cb.value
     False
     """
+    value = resolve_boolean_value(value=bool(value), url_key=url_key)
 
-    args = [label, bool(value), appearance, position]
+    args = [label, bool(value), url_key, appearance, position]
     kwargs = {
         "label": label,
         "value": bool(value),
+        "url_key": url_key,
         "appearance": appearance,
         "position": position
     }
@@ -251,6 +255,7 @@ class CheckboxWidget(anywidget.AnyWidget):
 
     value = traitlets.Bool(False).tag(sync=True)
     label = traitlets.Unicode("Enable").tag(sync=True)
+    url_key = traitlets.Unicode("").tag(sync=True)
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)
 

@@ -10,6 +10,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_multiselect_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -18,6 +19,7 @@ def MultiSelect(
     label: str = "Select",
     value: List[str] | None = None,
     choices: List[str] = [],
+    url_key: str = "",
     placeholder: str = "",
     position: Position = "sidebar",
     disabled: bool = False,
@@ -43,6 +45,9 @@ def MultiSelect(
         from `choices` is selected by default.
     choices : list[str]
         Options available for selection. Must be non-empty.
+    url_key : str, optional
+        URL query parameter name used to override the initial value.
+        Repeated params are supported. Empty or invalid values fall back to ``value``.
     placeholder : str
         Text shown when no values are selected.
     position : {"sidebar", "inline", "bottom"}, optional
@@ -86,6 +91,10 @@ def MultiSelect(
     """
     if len(choices) == 0:
         raise Exception("Please provide choices list. God bless you <3")
+    if len(set(choices)) != len(choices):
+        raise Exception("MultiSelect: `choices` must not contain duplicate values.")
+
+    value = resolve_multiselect_value(value=value, url_key=url_key, choices=choices)
 
     # Normalize incoming value
     if value is None:
@@ -105,11 +114,12 @@ def MultiSelect(
         if len(value) == 0:
             value = [choices[0]]
 
-    args = [value, label, choices, placeholder, position]
+    args = [value, label, choices, url_key, placeholder, position]
     kwargs = {
         "value": value,
         "label": label, 
         "choices": choices,
+        "url_key": url_key,
         "placeholder": placeholder,
         "position": position
     }
@@ -651,6 +661,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
     value = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
     choices = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
     label = traitlets.Unicode(default_value="Select").tag(sync=True)
+    url_key = traitlets.Unicode(default_value="").tag(sync=True)
     placeholder = traitlets.Unicode(default_value="").tag(sync=True)
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)

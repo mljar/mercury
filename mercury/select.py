@@ -10,6 +10,7 @@ from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
 from .theme import THEME
+from .url_params import resolve_select_value
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -17,6 +18,7 @@ def Select(
     label: str = "Select",
     value: str = "",
     choices: List[str] = [],
+    url_key: str = "",
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -43,6 +45,9 @@ def Select(
     choices : list[str]
         Options available for selection.
         The default is `[]`.
+    url_key : str, optional
+        URL query parameter name used to override the initial value.
+        Missing, empty, or invalid values fall back to ``value``.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed:
 
@@ -90,16 +95,19 @@ def Select(
 
     if value == "":
         value = choices[0]
-    
+
+    value = resolve_select_value(value=value, url_key=url_key, choices=choices)
+
     if value not in choices:
         value = choices[0]
         warnings.warn("\nYour value is not included in choices. Automatically set value to first element from choices.")
 
-    args = [value, label, choices, position]
+    args = [value, label, choices, url_key, position]
     kwargs = {
         "value": value,
         "label": label,
         "choices": choices,
+        "url_key": url_key,
         "position": position
     }
 
@@ -449,6 +457,7 @@ class SelectWidget(anywidget.AnyWidget):
     value = traitlets.Unicode(default_value="").tag(sync=True)
     choices = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
     label = traitlets.Unicode(default_value="Select").tag(sync=True)
+    url_key = traitlets.Unicode(default_value="").tag(sync=True)
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
     hidden = traitlets.Bool(default_value=False).tag(sync=True)
     position = traitlets.Enum(
