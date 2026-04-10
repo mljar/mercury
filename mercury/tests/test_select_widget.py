@@ -4,7 +4,10 @@ import pytest
 from traitlets import TraitError
 
 import mercury.select as m
+from mercury.select import Select
 from mercury.select import SelectWidget
+from mercury.manager import WidgetsManager
+from mercury.url_params import clear_runtime_url_params, set_runtime_url_params
 
 
 # --- SelectWidget value behaviour -------------------------------------------------
@@ -32,6 +35,85 @@ def test_selectwidget_value_in_choices_is_preserved():
 def test_selectwidget_empty_choices_keeps_default_value():
     w = SelectWidget(choices=[], value="")
     assert w.value == ""
+
+
+def test_select_uses_url_param_value_when_valid(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"color": ["green"]})
+
+    widget = Select(
+        label="Choose color",
+        choices=["red", "green", "blue"],
+        value="red",
+        url_key="color",
+    )
+
+    assert widget.value == "green"
+
+
+def test_select_falls_back_to_value_when_url_param_missing(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+
+    widget = Select(
+        label="Choose color",
+        choices=["red", "green", "blue"],
+        value="red",
+        url_key="color",
+    )
+
+    assert widget.value == "red"
+
+
+def test_select_falls_back_to_value_when_url_param_empty(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"color": [""]})
+
+    widget = Select(
+        label="Choose color",
+        choices=["red", "green", "blue"],
+        value="red",
+        url_key="color",
+    )
+
+    assert widget.value == "red"
+
+
+def test_select_falls_back_to_value_when_url_param_not_in_choices(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"color": ["orange"]})
+
+    widget = Select(
+        label="Choose color",
+        choices=["red", "green", "blue"],
+        value="red",
+        url_key="color",
+    )
+
+    assert widget.value == "red"
+
+
+def test_select_matches_url_param_case_insensitively(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"color": ["green"]})
+
+    widget = Select(
+        label="Choose color",
+        choices=["Red", "Green", "Blue"],
+        value="Red",
+        url_key="color",
+    )
+
+    assert widget.value == "Green"
 
 
 # --- Trait defaults & validation ---------------------------------------------------

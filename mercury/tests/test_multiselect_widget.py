@@ -5,6 +5,7 @@ import mercury.multiselect as m
 from mercury.multiselect import MultiSelectWidget
 from mercury.multiselect import MultiSelect
 from mercury.manager import WidgetsManager
+from mercury.url_params import clear_runtime_url_params, set_runtime_url_params
 
 
 # --- value & choices behaviour ----------------------------------------------------
@@ -52,6 +53,85 @@ def test_multiselect_respects_explicit_initial_value_on_subsequent_calls(monkeyp
     )
 
     assert widget.value == ["Green"]
+
+
+def test_multiselect_uses_repeated_url_params_when_valid(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"fruits": ["apple", "banana"]})
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["apple", "banana", "cherry"],
+        value=["cherry"],
+        url_key="fruits",
+    )
+
+    assert widget.value == ["apple", "banana"]
+
+
+def test_multiselect_falls_back_to_value_when_url_param_missing(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["apple", "banana", "cherry"],
+        value=["cherry"],
+        url_key="fruits",
+    )
+
+    assert widget.value == ["cherry"]
+
+
+def test_multiselect_filters_invalid_and_empty_url_values(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"fruits": ["", "banana", "orange"]})
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["apple", "banana", "cherry"],
+        value=["cherry"],
+        url_key="fruits",
+    )
+
+    assert widget.value == ["banana"]
+
+
+def test_multiselect_matches_url_params_case_insensitively(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"fruits": ["apple", "BANANA"]})
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["Apple", "Banana", "Cherry"],
+        value=["Cherry"],
+        url_key="fruits",
+    )
+
+    assert widget.value == ["Apple", "Banana"]
+
+
+def test_multiselect_deduplicates_url_values_after_case_insensitive_match(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"fruits": ["apple", "Apple", "APPLE"]})
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["Apple", "Banana", "Cherry"],
+        value=["Cherry"],
+        url_key="fruits",
+    )
+
+    assert widget.value == ["Apple"]
 
 
 # --- Trait defaults & validation ---------------------------------------------------

@@ -112,7 +112,10 @@ def Slider(
 
     if value_int < min_int or value_int > max_int:
         warnings.warn("\nSlider: `value` is out of range. Clamping to [min, max].")
-        value_int = max(min_int, min(value_int, max_int))
+        if value_int < min_int:
+            value_int = min_int
+        if value_int > max_int:
+            value_int = max_int
 
     value_int = resolve_integer_value(
         value=value_int,
