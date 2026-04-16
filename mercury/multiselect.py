@@ -170,11 +170,24 @@ class MultiSelectWidget(anywidget.AnyWidget):
       input.spellcheck = false;
       input.placeholder = model.get("placeholder") || "";
 
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.classList.add("mljar-ms-clear");
+      clearBtn.setAttribute("aria-label", "Clear selected values");
+      clearBtn.setAttribute("title", "Clear selected values");
+      clearBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M18 6l-12 12"></path>
+          <path d="M6 6l12 12"></path>
+        </svg>
+      `;
+
       const caret = document.createElement("div");
       caret.classList.add("mljar-ms-caret");
 
       control.appendChild(selectedWrap);
-      control.appendChild(input);
+      control.appendChild(clearBtn);
       control.appendChild(caret);
 
       const dropdown = document.createElement("div");
@@ -211,11 +224,13 @@ class MultiSelectWidget(anywidget.AnyWidget):
         container.classList.toggle("is-editing", isEditing);
         container.classList.toggle("has-selection", hasSelection);
         control.classList.toggle("has-selection", hasSelection);
+        clearBtn.classList.toggle("is-visible", hasSelection && !isDisabled());
       };
 
       const updateDisabledState = () => {
         const disabled = isDisabled();
         input.disabled = disabled;
+        clearBtn.disabled = disabled;
         control.classList.toggle("is-disabled", disabled);
       };
 
@@ -229,6 +244,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
         if (selected.length === 0) {
           selectedWrap.classList.add("is-empty");
           input.placeholder = model.get("placeholder") || "";
+          selectedWrap.appendChild(input);
           return;
         }
         selectedWrap.classList.remove("is-empty");
@@ -259,16 +275,19 @@ class MultiSelectWidget(anywidget.AnyWidget):
           chip.appendChild(removeBtn);
           selectedWrap.appendChild(chip);
         });
+        selectedWrap.appendChild(input);
         syncEditingState();
       };
 
       const filterChoices = query => {
         const normalizedQuery = normalize(query);
         const allChoices = getChoices();
+        const selected = new Set(getSelected());
+        const availableChoices = allChoices.filter(choice => !selected.has(choice));
         if (!normalizedQuery) {
-          return allChoices;
+          return availableChoices;
         }
-        return allChoices.filter(choice =>
+        return availableChoices.filter(choice =>
           normalize(choice).includes(normalizedQuery)
         );
       };
@@ -342,11 +361,29 @@ class MultiSelectWidget(anywidget.AnyWidget):
         if (isDisabled()) {
           return;
         }
-        if (event.target === input) {
+        if (event.target === input || clearBtn.contains(event.target)) {
           return;
         }
         openWithCurrentQuery();
         input.focus();
+      });
+
+      clearBtn.addEventListener("mousedown", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (isDisabled()) {
+          return;
+        }
+        if (blurTimeout !== null) {
+          window.clearTimeout(blurTimeout);
+          blurTimeout = null;
+        }
+        isEditing = false;
+        model.set("value", []);
+        model.save_changes();
+        input.value = "";
+        setOpen(false);
+        syncEditingState();
       });
 
       input.addEventListener("input", () => {
@@ -450,17 +487,15 @@ class MultiSelectWidget(anywidget.AnyWidget):
       position: relative;
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
       width: 100%;
-      min-height: 42px;
-      padding: 6px 36px 6px 8px;
+      min-height: 40px;
+      padding: 4px 60px 4px 8px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      cursor: text;
+      cursor: default;
     }}
 
     .mljar-ms-control:focus-within {{
@@ -469,16 +504,22 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-selected {{
-      display: inline-flex;
+      display: flex;
       flex-wrap: wrap;
       gap: 6px;
       align-items: center;
-      flex: 0 1 auto;
+      flex: 1 1 auto;
       min-width: 0;
+      min-height: 30px;
+      width: 100%;
     }}
 
     .mljar-ms-control.has-selection .mljar-ms-selected {{
-      flex: 1 0 calc(100% - 24px);
+      max-width: 100%;
+    }}
+
+    .mljar-ms-container.has-selection:not(.is-editing) .mljar-ms-selected {{
+      flex: 1 1 auto;
     }}
 
     .mljar-ms-chip {{
@@ -486,10 +527,12 @@ class MultiSelectWidget(anywidget.AnyWidget):
       align-items: center;
       gap: 6px;
       max-width: 100%;
-      padding: 4px 8px;
+      min-height: 28px;
+      padding: 3px 8px;
       border-radius: 999px;
       background: #eef3ff;
       color: #1f4fd1;
+      box-sizing: border-box;
     }}
 
     .mljar-ms-chip-label {{
@@ -519,16 +562,18 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-input {{
-      flex: 1 1 96px;
-      min-width: 56px;
+      flex: 1 1 48px;
+      min-width: 32px;
       max-width: none;
-      padding: 4px 0;
+      padding: 3px 0;
       border: 0;
       background: #fff;
       box-sizing: border-box;
       appearance: none !important;
       background-color: #ffffff !important;
       color: {THEME.get('text_color', '#222')} !important;
+      line-height: 1.4;
+      cursor: default;
       opacity: 1;
       transform: translateY(0);
       transition:
@@ -541,11 +586,11 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-control.has-selection .mljar-ms-input {{
-      flex: 1 0 100%;
-      width: 100%;
-      min-width: 0;
+      flex: 1 1 48px;
+      width: auto;
+      min-width: 32px;
       max-width: 100%;
-      padding-right: 18px;
+      padding-right: 0;
     }}
 
     .mljar-ms-container.has-selection:not(.is-editing) .mljar-ms-input {{
@@ -562,6 +607,53 @@ class MultiSelectWidget(anywidget.AnyWidget):
 
     .mljar-ms-input:focus {{
       outline: none;
+      cursor: text;
+    }}
+
+    .mljar-ms-clear {{
+      position: absolute;
+      right: 30px;
+      top: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: {THEME.get('text_color', '#222')};
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(-50%) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }}
+
+    .mljar-ms-clear svg {{
+      display: block;
+    }}
+
+    .mljar-ms-clear.is-visible {{
+      opacity: 0.5;
+      transform: translateY(-50%) scale(1);
+      pointer-events: auto;
+    }}
+
+    .mljar-ms-clear:hover:enabled {{
+      opacity: 1;
+    }}
+
+    .mljar-ms-clear:focus-visible {{
+      outline: none;
+      opacity: 1;
+    }}
+
+    .mljar-ms-clear:disabled {{
+      cursor: not-allowed;
+      opacity: 0;
+      pointer-events: none;
     }}
 
     .mljar-ms-caret {{
@@ -651,6 +743,11 @@ class MultiSelectWidget(anywidget.AnyWidget):
     .mljar-ms-control.is-disabled {{
       background: #f5f5f5;
       cursor: not-allowed;
+    }}
+
+    .mljar-ms-control.is-disabled .mljar-ms-clear {{
+      opacity: 0;
+      pointer-events: none;
     }}
 
     .mljar-ms-control.is-disabled .mljar-ms-caret {{
