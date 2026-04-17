@@ -154,7 +154,6 @@ class SelectWidget(anywidget.AnyWidget):
 
       const caret = document.createElement("div");
       caret.classList.add("mljar-select-caret");
-      caret.innerHTML = "&#9662;";
 
       control.appendChild(input);
       control.appendChild(caret);
@@ -362,41 +361,50 @@ class SelectWidget(anywidget.AnyWidget):
       position: relative;
       display: flex;
       align-items: center;
+      cursor: default;
     }}
 
     .mljar-select-widget-input {{
       width: 100%;
-      padding: 8px 36px 8px 10px;
+      min-height: 40px;
+      padding: 9px 36px 9px 10px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
+      line-height: 1.4;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
       appearance: none !important;
       background-color: #ffffff !important;
       color: {THEME.get('text_color', '#222')} !important;
+      cursor: default;
     }}
 
     .mljar-select-widget-input:focus {{
       outline: none;
       border-color: {THEME.get('accent_color', '#4c7cf0')};
       box-shadow: 0 0 0 3px rgba(76, 124, 240, 0.16);
+      cursor: text;
     }}
 
     .mljar-select-caret {{
       position: absolute;
       right: 12px;
       top: 50%;
-      transform: translateY(-50%);
-      color: {THEME.get('text_color', '#222')};
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid {THEME.get('text_color', '#222')};
+      border-bottom: 1.5px solid {THEME.get('text_color', '#222')};
+      transform: translateY(-65%) rotate(45deg);
       pointer-events: none;
-      font-size: 11px;
-      opacity: 0.7;
+      opacity: 0.5;
+      transition: transform 0.18s ease, opacity 0.18s ease;
     }}
 
     .mljar-select-container.is-open .mljar-select-caret {{
       opacity: 1;
+      transform: translateY(-35%) rotate(225deg);
     }}
 
     .mljar-select-dropdown {{
