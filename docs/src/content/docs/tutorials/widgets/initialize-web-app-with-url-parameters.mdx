@@ -1,0 +1,399 @@
+---
+title: How to Use url_key in Mercury Widgets
+description: Learn how to use url_key in Mercury widgets, including supported widgets, validation rules, examples, and shared url_key behavior.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import { Card } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+
+import textInputImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/textinput-example.webp"
+import numberInputImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/numberinput-example.webp"
+import sliderImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/slider-example.webp"
+import selectImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/select-example.webp"
+import multiSelectImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/multiselect-example.webp"
+import checkBoxImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/checkbox-example.webp"
+import multipleWidgetsImg from "../../../../assets/tutorials/widgets/how-to-use-url-key-in-mercury-widgets/multiple-widgets-with-same-url-key.webp"
+
+
+The `url_key` argument lets you initialize widget values directly from URL query parameters.
+
+This is useful when you want to:
+
+* prefill widgets from a shared link,
+* create bookmarkable app states,
+* link dashboards with predefined filters,
+* pass parameters from another app into a Mercury notebook.
+
+## What `url_key` does
+
+When a widget supports `url_key`, Mercury reads the corresponding query parameter from the page URL during initialization and uses it to override the widget's default `value`.
+
+In practice, this means that code like this:
+
+```python
+import mercury as mr
+
+country = mr.Select(
+    label="Country",
+    choices=["Poland", "Germany", "France"],
+    value="Poland",
+    url_key="country"
+)
+```
+
+can be initialized from a URL such as:
+
+```text
+http://localhost:8888/mercury/example_notebook?country=Germany
+```
+
+In that case, the widget starts with `"Germany"` instead of `"Poland"`.
+
+<Aside>
+`url_key` affects the initial widget value during app startup. It does not continuously sync the widget with later URL changes.
+</Aside>
+
+## Widgets that support `url_key`
+
+The following Mercury widgets support `url_key`:
+
+* `TextInput`
+* `NumberInput`
+* `Slider`
+* `Select`
+* `MultiSelect`
+* `CheckBox`
+
+## Validation rules by widget
+
+Each widget validates URL values differently before accepting them.
+
+  <Card title="TextInput">
+    <ul>
+      <li>reads the first value for the given <code>url_key</code></li>
+      <li>accepts non-empty text values</li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+  <Card title="NumberInput">
+    <ul>
+      <li>reads the first value for the given <code>url_key</code></li>
+      <li>accepts numeric values</li>
+      <li>clamps values to the valid range and nearest step</li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+  <Card title="Slider">
+    <ul>
+      <li>reads the first value for the given <code>url_key</code></li>
+      <li>accepts numeric values</li>
+      <li>clamps values to the valid range</li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+  <Card title="Select">
+    <ul>
+      <li>reads the first value for the given <code>url_key</code></li>
+      <li>accepts non-empty values that match one of <code>choices</code></li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+  <Card title="MultiSelect">
+    <ul>
+      <li>reads all values for the given <code>url_key</code></li>
+      <li>accepts non-empty values that match one of <code>choices</code></li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+  <Card title="CheckBox">
+    <ul>
+      <li>reads the first value for the given <code>url_key</code></li>
+      <li>accepts only <code>true</code> or <code>false</code></li>
+      <li>uses the widget <code>value</code> if the URL value is invalid</li>
+    </ul>
+  </Card>
+
+## Examples
+
+### TextInput
+
+**Code**
+
+```python
+import mercury as mr
+
+username = mr.TextInput(
+    label="User name",
+    value="guest",
+    url_key="username"
+)
+
+username.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?username=jan
+```
+
+**Result**
+
+<Image 
+  src={textInputImg} 
+  alt="TextInput url_key example" 
+  class="docs-image-100"
+/>
+
+---
+
+### NumberInput
+
+**Code**
+
+```python
+import mercury as mr
+
+rows = mr.NumberInput(
+    label="Rows",
+    value=10,
+    min=0,
+    max=100,
+    step=5,
+    url_key="rows"
+)
+
+rows.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?rows=18
+```
+
+**Result**
+
+<Image 
+  src={numberInputImg} 
+  alt="NumberInput initialized from url_key" 
+  class="docs-image-100"
+/>
+
+The value is **20** because with `step=5`, 20 is the closest valid value to 18.
+
+---
+
+### Slider
+
+**Code**
+
+```python
+import mercury as mr
+
+age = mr.Slider(
+    label="Age",
+    value=25,
+    min=0,
+    max=100,
+    url_key="age"
+)
+
+age.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?age=42
+```
+
+**Result**
+
+<Image 
+  src={sliderImg} 
+  alt="Slider initialized from url_key" 
+  class="docs-image-100"
+/>
+
+---
+
+### Select
+
+**Code**
+
+```python
+import mercury as mr
+
+country = mr.Select(
+    label="Country",
+    choices=["Poland", "Germany", "France"],
+    value="Poland",
+    url_key="country"
+)
+
+country.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?country=Germany
+```
+
+**Result**
+
+<Image 
+  src={selectImg} 
+  alt="Select initialized from url_key" 
+  class="docs-image-100"
+/>
+
+---
+
+### MultiSelect
+
+**Code**
+
+```python
+import mercury as mr
+
+fruits = mr.MultiSelect(
+    label="Fruits",
+    choices=["Apple", "Banana", "Orange", "Kiwi"],
+    value=["Apple"],
+    url_key="fruit"
+)
+
+fruits.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?fruit=Banana&fruit=Orange
+```
+
+**Result**
+
+The widget starts with:
+
+<Image 
+  src={multiSelectImg} 
+  alt="MultiSelect initialized from url_key" 
+  class="docs-image-100"
+/>
+
+---
+
+### CheckBox
+
+**Code**
+
+```python
+import mercury as mr
+
+show_details = mr.CheckBox(
+    label="Show details",
+    value=False,
+    url_key="details"
+)
+
+show_details.value
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?details=true
+```
+
+**Result**
+
+<Image 
+  src={checkBoxImg} 
+  alt="CheckBox initialized from url_key" 
+  class="docs-image-100"
+/>
+
+ <Aside type="tip">
+  **Use descriptive keys** that explain what the value represents.
+
+  * Good examples: `country`, `rows`, `show_details`, `fruit`
+  * Avoid generic names like `x`, `v`, or `param1`.
+  </Aside>
+
+## What happens if multiple widgets use the same `url_key`?
+
+Multiple widgets can use the same `url_key`, but each widget interprets the URL value using its own validation rules.
+
+That means the same URL parameter may be accepted by some widgets and ignored by others.
+
+### Example
+
+**Code**
+
+```python
+import mercury as mr
+
+text_username = mr.TextInput(
+    label="Text username",
+    value="guest",
+    url_key="user"
+)
+
+select_username = mr.Select(
+    label="Select username",
+    choices=["guest", "admin", "editor"],
+    value="guest",
+    url_key="user"
+)
+
+number_username = mr.NumberInput(
+    label="Numeric user id",
+    value=1,
+    min=1,
+    max=100,
+    url_key="user"
+)
+```
+
+**Example URL**
+
+```text
+http://localhost:8888/mercury/example_notebook?user=admin
+```
+
+**Result**
+
+<Image 
+  src={multipleWidgetsImg} 
+  alt="Multiple widgets using the same url_key" 
+  class="docs-image-100"
+/>
+
+**What happens**
+
+* `TextInput` becomes `"admin"`
+* `Select` becomes `"admin"` because it is present in `choices`
+* `NumberInput` ignores `"admin"` (nonnumeric value) and keeps its fallback `value`
+
+
+<Aside>
+Sharing the same `url_key` between multiple widgets is supported, but it is usually clearer to use separate keys unless you intentionally want several widgets to derive state from the same URL parameter.
+</Aside>
+
+## Summary
+
+`url_key` makes it possible to initialize Mercury widgets from URL query
+parameters, enabling shareable links, bookmarkable state, and URL-driven
+defaults.
+
+Choose a clear `url_key`, provide a sensible fallback `value`, and test the
+exact URL formats your app should support.
