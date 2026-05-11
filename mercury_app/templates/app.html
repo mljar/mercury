@@ -20,31 +20,6 @@
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* Header */
-    .hdr {
-      position: sticky; top: 0; z-index: 50;
-      background: #0b0b0c;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .hdr-inner {
-      margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: .6rem .75rem;
-    }
-    .brand {
-      font-weight: 750; letter-spacing: -.01em;
-      color: #f3f4f6; font-size: clamp(14px, 2vw, 20px);
-    }
-    .btn {
-      display: inline-flex; align-items: center; gap: .5rem;
-      border: 1px solid #e5e7eb;
-      background: #fff; color: #374151;
-      padding: .45rem .75rem; font-size: 13px; border-radius: .5rem;
-      transition: box-shadow .15s ease, transform .15s ease;
-    }
-    .btn:hover { text-decoration: none; box-shadow: 0 1px 8px rgba(0,0,0,.06); }
-    .caret { transition: transform .15s ease; }
-
     /* ===== Persistent loader overlay (below header), mobile-friendly ===== */
     :root {
       /* default fallback; JS will set the real header height */
@@ -171,7 +146,7 @@
           document.documentElement.style.setProperty('--header-height', '0px');
           return;
         }
-        var hdr = document.querySelector('.hdr');
+        var hdr = document.querySelector('.mrc-hdr, .hdr');
         if (!hdr) return;
         var h = hdr.offsetHeight || 52;
         document.documentElement.style.setProperty('--header-height', h + 'px');
@@ -189,28 +164,12 @@
 
   </script>
 
-  <header class="hdr" role="banner" id="mercuryInitHeader">
-    <div class="hdr-inner">
-      <a class="brand" href="{{ base_url or '/' }}">{{page_config['title'] or 'Mercury'}}</a>
-      <div style="position:relative">
-        <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
-          Notebooks
-          <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
   <script>
-    // Remove navbar if requested
     (function () {
       const params = new URLSearchParams(window.location.search);
       if (params.has('no-navbar')) {
         document.documentElement.classList.add('no-navbar');
         document.documentElement.style.setProperty('--header-height', '0px');
-        const header = document.getElementById('mercuryInitHeader');
-        if (header) header.remove();
       }
     })();
   

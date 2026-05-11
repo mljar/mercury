@@ -43,6 +43,7 @@ export class MercuryNavbar {
     this.injectStyles();
     this.buildHeader();
     this.opts.attachTo!.insertBefore(this.header!, this.opts.attachTo!.firstChild);
+    document.body.classList.add('mercury-has-header');
 
     // Notify consumer about height so they can add padding to content below
     const height = this.header!.getBoundingClientRect().height || 52;
@@ -54,6 +55,7 @@ export class MercuryNavbar {
 
   destroy(): void {
     this.unbindGlobalHandlers();
+    document.body.classList.remove('mercury-has-header');
     this.header?.remove();
     this.styleEl?.remove();
   }
@@ -78,9 +80,13 @@ export class MercuryNavbar {
           display: flex; align-items: center; justify-content: space-between;
           padding: .6rem .75rem;
         }
+        .mrc-brand-wrap {
+          display: flex; align-items: center; gap: .6rem;
+          min-width: 0;
+        }
         .mrc-brand {
           font-weight: 750; letter-spacing: -.01em;
-          color: #f3f4f6; font-size: clamp(14px, 2vw, 20px);
+          color: #f3f4f6; font-size: clamp(16px, 2vw, 20px);
           text-decoration: none;
           font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         }
@@ -135,11 +141,15 @@ export class MercuryNavbar {
     const inner = document.createElement('div');
     inner.className = 'mrc-hdr-inner';
 
+    const brandWrap = document.createElement('div');
+    brandWrap.className = 'mrc-brand-wrap';
+
     // Brand
     const brand = document.createElement('a');
     brand.className = 'mrc-brand';
     brand.href = this.opts.baseUrl || '/';
     brand.textContent = this.opts.title || 'Mercury';
+    brandWrap.appendChild(brand);
 
     // Right side
     const rightWrap = document.createElement('div');
@@ -178,7 +188,7 @@ export class MercuryNavbar {
     rightWrap.appendChild(btn);
     rightWrap.appendChild(menu);
 
-    inner.appendChild(brand);
+    inner.appendChild(brandWrap);
     inner.appendChild(rightWrap);
     header.appendChild(inner);
 

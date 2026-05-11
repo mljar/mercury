@@ -79,70 +79,199 @@
 }
 
 .mercury-main-panel {
-  display: inline-flex;
+  --mercury-sidebar-outer-width: 330px;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mercury-sidebar-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  background: rgb(15 23 42 / 22%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.mercury-sidebar-backdrop.mercury-sidebar-backdrop-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* .mercury-main-panel.mercury-desktop-sidebar-collapsed {
+  padding-top: calc(var(--header-height, 52px) + 56px) !important;
+} */
+
+.mercury-split-panel {
   width: 100%;
   height: 100%;
 }
 
 .mercury-sidebar-toggle {
-  
-  position: fixed;
-  z-index: 1000;
-
-  background: #0d6efd;
-  color: #fff;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  opacity: 0.8;
-  width: 23px;
-  height: 23px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
 
-  border: none;
+  border: 0;
+  border-radius: 10px;
+
+  background: transparent;
+  color: rgb(17 24 39 / 88%);
+
+  box-shadow: none !important;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+
   cursor: pointer;
-  font-size: 1.4em;
 
-  transition: left 0.2s, opacity 0.2s;
-  border-radius: 10px 0px 0px 10px !important;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
 }
 
-.mercury-sidebar-collapse {
-  right: -2px;
-  top: 0px;
+.mercury-sidebar-toggle:hover {
+  background: rgb(209 213 219 / 55%);
+  box-shadow: none !important;
 }
 
-.mercury-sidebar-expand {
-  left: -4px;
-  background: #0d6efd;
-  color: #fff;
-  border-radius: 0px 10px 10px 0px !important;
-  opacity: 0.8;
+.mercury-sidebar-toggle:focus,
+.mercury-sidebar-toggle:focus-visible,
+.mercury-sidebar-toggle:active {
+  outline: none;
+  box-shadow: none !important;
+}
+
+.mercury-sidebar-toggle svg {
+  width: 22px;
+  height: 22px;
+
+  stroke-width: 1.5;
+  stroke: currentColor;
+  fill: none;
+
+  pointer-events: none;
+}
+
+.mercury-left-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  /* height: 0; */
+  min-height: 0;
+  padding: 0 5px 0 0;
+  box-sizing: border-box;
+  overflow: visible;
+  pointer-events: none;
+  background: transparent;
+}
+
+.mercury-left-topbar .mercury-sidebar-collapse {
+  position: static;
+  pointer-events: auto;
+  transform: translate(6px, 12px);
+}
+
+.mercury-sidebar-collapse-floating {
+  display: none;
+}
+
+.mercury-right-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: none;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  min-height: 30px;
+  padding: 5px 0px 5px 0px;
+  background: inherit;
+  box-sizing: border-box;
+}
+
+.mercury-right-topbar.mercury-right-topbar-visible {
+  display: flex;
+}
+
+.mercury-right-topbar .mercury-sidebar-expand {
+  position: static;
+  margin-left: 0;
 }
 
 .mercury-left-panel {
+  position: relative;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  height: 100%;
+  z-index: 1000;
+
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 5px;
   padding-bottom: 5px;
-  overflow: hidden auto;
-  box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%);
+
+  overflow: visible;
+  box-shadow: 2px 0 12px rgb(0 0 0 / 18%);
   min-width: 250px;
+  opacity: 0;
+  transform: translateX(calc(-100% - 16px));
+  pointer-events: none;
+  transition:
+    box-shadow 0.22s ease,
+    transform 0.22s ease,
+    opacity 0.22s ease;
+  will-change: transform, opacity;
 }
 
-/* Hide collapse button by default */
-.mercury-left-panel .mercury-sidebar-collapse {
-  display: none;
+.mercury-left-header,
+.mercury-left-footer {
+  flex: 0 0 auto;
 }
 
-/* Show collapse button only when hovering over sidebar */
-.mercury-left-panel:hover .mercury-sidebar-collapse {
-  display: block;
+.mercury-left-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+.mercury-left-panel.mercury-left-panel-visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.mercury-left-panel.mercury-left-panel-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  box-shadow: none;
+  overflow: hidden;
 }
 
 .mercury-right-top-panel {
-  padding-top: 5px;
+  background-color: white;
+  padding-top: 0px;
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 5px;
@@ -160,8 +289,8 @@
 .mercury-right-top-panel.mercury-right-limited,
 .mercury-right-bottom-panel.mercury-right-limited {
   box-sizing: border-box;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding-left: 5px !important; 
+  padding-right: 5px !important;
 }
 
 .mercury-right-top-panel.mercury-right-limited > .lm-Widget,
@@ -169,6 +298,13 @@
   max-width: 976px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.mercury-right-top-panel.mercury-right-limited > .mercury-right-topbar {
+  max-width: none;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Hide output prompt in sidebar */
@@ -196,6 +332,56 @@
 .mercury-right-bottom-panel,
 .mercury-right-top-panel {
   overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .mercury-main-panel {
+    --mercury-sidebar-outer-width: calc(min(85vw, 320px) + 10px);
+  }
+
+  .mercury-sidebar-backdrop {
+    display: block;
+  }
+
+  /* .mercury-main-panel.mercury-desktop-sidebar-collapsed {
+    padding-top: var(--header-height, 52px) !important;
+  } */
+
+  .mercury-left-topbar .mercury-sidebar-collapse {
+    display: inline-flex !important;
+  }
+
+  .mercury-right-topbar .mercury-sidebar-expand {
+    display: inline-flex !important;
+  }
+
+  .mercury-main-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mercury-left-panel {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: min(85vw, 320px) !important;
+    min-width: 0 !important;
+    max-width: 85vw;
+    height: 100% !important;
+    z-index: 1000;
+    box-shadow: 2px 0 12px rgb(0 0 0 / 18%);
+  }
+
+  .mercury-right-split-panel {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mercury-sidebar-backdrop {
+    display: none !important;
+  }
 }
 
 .widget-text {
@@ -356,7 +542,6 @@
   outline-offset: 2px;
 }
 
-
 /*********** mercury error toast ****************/
 .mercury-toast-container {
   position: fixed;
@@ -366,7 +551,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  pointer-events: none;  
+  pointer-events: none;
 }
 
 .mercury-toast {
@@ -375,7 +560,7 @@
   max-width: 420px;
   padding: 8px 12px 10px;
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   background: #222;
   color: #fff;
   font-size: 13px;
