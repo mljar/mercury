@@ -8,6 +8,7 @@ import traitlets
 from IPython.display import display
 
 from .manager import MERCURY_MIMETYPE, WidgetsManager
+from .render_context import apply_widget_render_metadata, with_widget_render_metadata
 from .theme import THEME
 
 Position = Literal["sidebar", "inline", "bottom"]
@@ -51,6 +52,60 @@ def _normalize_max_file_size(value: str) -> str:
     return f"{size}{unit}"
 
 
+def _normalize_accept(value: str | list[str] | tuple[str, ...]) -> str:
+    if value in ("", None):
+        return ""
+
+    if isinstance(value, str):
+        candidates = value.split(",")
+    elif isinstance(value, (list, tuple)):
+        candidates = list(value)
+    else:
+        raise ValueError(
+            "UploadFile: `accept` must be a string like '.csv' or a list of strings."
+        )
+
+    normalized: list[str] = []
+    for candidate in candidates:
+        if not isinstance(candidate, str):
+            raise ValueError(
+                "UploadFile: `accept` must contain only strings."
+            )
+        token = candidate.strip()
+        if not token:
+            raise ValueError(
+                "UploadFile: `accept` must not contain empty entries."
+            )
+        normalized.append(token.lower())
+
+    return ",".join(normalized)
+
+
+def _accept_tokens(accept: str) -> list[str]:
+    if not accept:
+        return []
+    return [token.strip().lower() for token in accept.split(",") if token.strip()]
+
+
+def _matches_accept_token(filename: str, file_type: str, token: str) -> bool:
+    lower_name = filename.lower()
+    lower_type = file_type.lower()
+
+    if token.startswith("."):
+        return lower_name.endswith(token)
+    if token.endswith("/*"):
+        prefix = token[:-1]
+        return lower_type.startswith(prefix)
+    return lower_type == token
+
+
+def _is_allowed_file(filename: str, accept: str, file_type: str = "") -> bool:
+    tokens = _accept_tokens(accept)
+    if not tokens:
+        return True
+    return any(_matches_accept_token(filename, file_type, token) for token in tokens)
+
+
 class UploadedFile:
     def __init__(self, name, value):
         self.name = name
@@ -64,6 +119,7 @@ def UploadFile(
     label: str = "Upload file",
     max_file_size: str = "100MB",
     multiple: bool = False,
+    accept: str | list[str] = "",
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -90,6 +146,10 @@ def UploadFile(
     multiple : bool
         If `True`, the user can upload multiple files.
         The default is `False`.
+    accept : str | list[str]
+        Optional list of accepted file extensions or MIME types.
+        Examples: ``".csv"``, ``[".csv", ".tsv"]``, ``"image/*"``.
+        The default is empty, which allows all files.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed:
 
@@ -134,12 +194,14 @@ def UploadFile(
     """
 
     max_file_size = _normalize_max_file_size(max_file_size)
+    accept = _normalize_accept(accept)
 
-    args = [label, max_file_size, multiple, position, disabled, hidden]
+    args = [label, max_file_size, multiple, accept, position, disabled, hidden]
     kwargs = {
         "label": label,
         "max_file_size": max_file_size,
         "multiple": multiple,
+        "accept": accept,
         "position": position,
         "disabled": disabled,
         "hidden": hidden,
@@ -148,10 +210,11 @@ def UploadFile(
     code_uid = WidgetsManager.get_code_uid("UploadFile", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
     if cached:
+        apply_widget_render_metadata(cached)
         display(cached)
         return cached
 
-    instance = UploadFileWidget(**kwargs)
+    instance = UploadFileWidget(**with_widget_render_metadata(kwargs))
     WidgetsManager.add_widget(code_uid, instance)
     display(instance)
     return instance
@@ -184,6 +247,9 @@ class UploadFileWidget(anywidget.AnyWidget):
       const dzHint = document.createElement("div");
       dzHint.classList.add("mljar-file-drop-hint");
 
+      const dzAcceptHint = document.createElement("div");
+      dzAcceptHint.classList.add("mljar-file-drop-hint");
+
       const browseBtn = document.createElement("button");
       browseBtn.classList.add("mljar-file-browse-btn");
       browseBtn.type = "button";
@@ -195,6 +261,7 @@ class UploadFileWidget(anywidget.AnyWidget):
 
       dropzone.appendChild(dzText);
       dropzone.appendChild(dzHint);
+      dropzone.appendChild(dzAcceptHint);
       dropzone.appendChild(browseBtn);
 
       container.appendChild(labelEl);
@@ -202,6 +269,10 @@ class UploadFileWidget(anywidget.AnyWidget):
       container.appendChild(input);
       container.appendChild(fileList);
       el.appendChild(container);
+
+      let operationQueue = Promise.resolve();
+      let localOperationRevision = model.get("revision") || 0;
+      let operationInProgress = false;
 
       function parseMaxSize(str) {
         if (!str || typeof str !== "string") return null;
@@ -215,38 +286,140 @@ class UploadFileWidget(anywidget.AnyWidget):
         return null;
       }
 
-      function handleFiles(files) {
+      function parseAccept(value) {
+        if (!value || typeof value !== "string") return [];
+        return value
+          .split(",")
+          .map(token => token.trim().toLowerCase())
+          .filter(Boolean);
+      }
+
+      function isAllowedFile(file, accept) {
+        const tokens = parseAccept(accept);
+        if (!tokens.length) return true;
+        const fileName = String(file?.name || "").toLowerCase();
+        const fileType = String(file?.type || "").toLowerCase();
+
+        return tokens.some(token => {
+          if (token.startsWith(".")) {
+            return fileName.endsWith(token);
+          }
+          if (token.endsWith("/*")) {
+            const prefix = token.slice(0, -1);
+            return fileType.startsWith(prefix);
+          }
+          return fileType === token;
+        });
+      }
+
+      function setOperationState(isRunning) {
+        operationInProgress = !!isRunning;
+        const disabled = !!model.get("disabled") || operationInProgress;
+        input.disabled = disabled;
+        browseBtn.disabled = disabled;
+        dropzone.classList.toggle("is-disabled", disabled);
+      }
+
+      function enqueueOperation(operation) {
+        operationQueue = operationQueue
+          .catch(() => {})
+          .then(async () => {
+            setOperationState(true);
+            try {
+              await operation();
+            } finally {
+              setOperationState(false);
+            }
+          });
+        return operationQueue;
+      }
+
+      function readAcceptedFiles(files) {
         const maxStr = model.get("max_file_size") || "100MB";
+        const accept = model.get("accept") || "";
         const maxBytes = parseMaxSize(maxStr);
         const multiple = !!model.get("multiple");
         const selectedFiles = Array.from(files || []);
         const acceptedFiles = multiple ? selectedFiles : selectedFiles.slice(0, 1);
-        let pending = 0;
-        const nextVals = multiple ? [...(model.get("values") || [])] : [];
-        const nextNames = multiple ? [...(model.get("filenames") || [])] : [];
-
-        acceptedFiles.forEach(file => {
+        const readers = acceptedFiles.map(file => {
+          if (!isAllowedFile(file, accept)) {
+            alert(`File ${file.name} is not allowed. Accepted: ${accept}`);
+            return null;
+          }
           if (maxBytes !== null && file.size > maxBytes) {
             alert(`File ${file.name} is too large! Limit ${maxStr} per file.`);
+            return null;
+          }
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              resolve({
+                name: file.name,
+                size: file.size,
+                buffer: evt.target.result
+              });
+            };
+            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
+            reader.readAsArrayBuffer(file);
+          });
+        }).filter(Boolean);
+
+        input.value = "";
+        if (readers.length === 0) {
+          return Promise.resolve([]);
+        }
+        return Promise.all(readers);
+      }
+
+      function handleFiles(files) {
+        void readAcceptedFiles(files).then(readFiles => {
+          if (!readFiles.length) {
             return;
           }
-          pending += 1;
+          return enqueueOperation(async () => {
+            const multiple = !!model.get("multiple");
+            const nextNames = multiple ? [...(model.get("filenames") || [])] : [];
+            const nextSizes = multiple ? [...(model.get("file_sizes") || [])] : [];
+            const uploadedNames = [];
+            const uploadedSizes = [];
+            const buffers = [];
 
-          const reader = new FileReader();
-          reader.onload = (evt) => {
-            nextVals.push(Array.from(new Uint8Array(evt.target.result)));
-            nextNames.push(file.name);
-            pending -= 1;
+            readFiles.forEach(file => {
+              uploadedNames.push(file.name);
+              uploadedSizes.push(file.size);
+              buffers.push(file.buffer);
+              nextNames.push(file.name);
+              nextSizes.push(file.size);
+            });
 
-            if (pending === 0) {
-              model.set("values", nextVals);
-              model.set("filenames", nextNames);
-              model.save_changes();
-            }
-          };
-          reader.readAsArrayBuffer(file);
+            // `revision` guarantees a widget state update even if a user
+            // replaces a file with the same name/size as before.
+            const nextRevision = Math.max(
+              localOperationRevision,
+              model.get("revision") || 0
+            ) + 1;
+
+            model.send(
+              {
+                event: "upload_files",
+                uploaded_filenames: uploadedNames,
+                uploaded_file_sizes: uploadedSizes,
+                uploaded_file_types: readFiles.map(file => file.type || ""),
+                replace: !multiple,
+                revision: nextRevision
+              },
+              {},
+              buffers
+            );
+            model.set("filenames", nextNames);
+            model.set("file_sizes", nextSizes);
+            model.set("revision", nextRevision);
+            model.save_changes();
+            localOperationRevision = nextRevision;
+          });
+        }).catch(error => {
+          console.error(error);
         });
-        input.value = "";
       }
 
       input.addEventListener("change", () => handleFiles(input.files));
@@ -289,13 +462,30 @@ class UploadFileWidget(anywidget.AnyWidget):
           remove.type = "button";
           remove.textContent = "×";
           remove.onclick = () => {
-            const newVals = [...(model.get("values") || [])];
-            const newNames = [...(model.get("filenames") || [])];
-            newVals.splice(i, 1);
-            newNames.splice(i, 1);
-            model.set("values", newVals);
-            model.set("filenames", newNames);
-            model.save_changes();
+            void enqueueOperation(async () => {
+              const newNames = [...(model.get("filenames") || [])];
+              const newSizes = [...(model.get("file_sizes") || [])];
+              newNames.splice(i, 1);
+              newSizes.splice(i, 1);
+              // Removal also bumps `revision`, so Mercury auto-rerun
+              // triggers even when the remaining filenames stay unchanged.
+              const nextRevision = Math.max(
+                localOperationRevision,
+                model.get("revision") || 0
+              ) + 1;
+              model.send({
+                event: "remove_file",
+                index: i,
+                filenames: newNames,
+                file_sizes: newSizes,
+                revision: nextRevision
+              });
+              model.set("filenames", newNames);
+              model.set("file_sizes", newSizes);
+              model.set("revision", nextRevision);
+              model.save_changes();
+              localOperationRevision = nextRevision;
+            });
           };
 
           li.appendChild(icon);
@@ -308,24 +498,29 @@ class UploadFileWidget(anywidget.AnyWidget):
       function syncFromModel() {
         labelEl.innerHTML = model.get("label") || "Upload file";
         dzHint.textContent = `Limit ${model.get("max_file_size") || "100MB"} per file`;
-
-        const disabled = !!model.get("disabled");
-        input.disabled = disabled;
-        browseBtn.disabled = disabled;
-        dropzone.classList.toggle("is-disabled", disabled);
+        const accept = model.get("accept") || "";
+        dzAcceptHint.textContent = accept ? `Accepted types: ${accept}` : "";
+        dzAcceptHint.style.display = accept ? "block" : "none";
 
         const multiple = !!model.get("multiple");
         input.multiple = multiple;
+        input.accept = accept;
+        localOperationRevision = Math.max(
+          localOperationRevision,
+          model.get("revision") || 0
+        );
+        setOperationState(operationInProgress);
 
         const hidden = !!model.get("hidden");
         container.style.display = hidden ? "none" : "flex";
       }
 
-      model.on("change:values", updateList);
       model.on("change:filenames", updateList);
+      model.on("change:file_sizes", updateList);
 
       model.on("change:label", syncFromModel);
       model.on("change:max_file_size", syncFromModel);
+      model.on("change:accept", syncFromModel);
       model.on("change:disabled", syncFromModel);
       model.on("change:hidden", syncFromModel);
       model.on("change:multiple", syncFromModel);
@@ -496,21 +691,86 @@ class UploadFileWidget(anywidget.AnyWidget):
 
     label = traitlets.Unicode("Upload file").tag(sync=True)
     max_file_size = traitlets.Unicode("100MB").tag(sync=True)
+    accept = traitlets.Unicode("").tag(sync=True)
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)
     multiple = traitlets.Bool(False).tag(sync=True)
     key = traitlets.Unicode("").tag(sync=True)
 
-    values = traitlets.List(traitlets.List(traitlets.Int()), default_value=[]).tag(sync=True)
     filenames = traitlets.List(traitlets.Unicode(), default_value=[]).tag(sync=True)
+    file_sizes = traitlets.List(traitlets.Int(), default_value=[]).tag(sync=True)
+    revision = traitlets.Int(0).tag(sync=True)
 
     position = traitlets.Enum(["sidebar", "inline", "bottom"], default_value="sidebar").tag(sync=True)
     cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
+    source_cell_id = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+    render_slot_id = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+    layout_path = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._file_contents: list[bytes] = []
+        self._last_operation_revision = 0
+        self.on_msg(self._handle_file_message)
+
+    def _handle_file_message(self, _widget, content, buffers):
+        event = content.get("event")
+        revision = int(content.get("revision", 0) or 0)
+
+        if revision <= self._last_operation_revision:
+            return
+
+        self._last_operation_revision = revision
+
+        if event == "upload_files":
+            uploaded = [bytes(buffer) for buffer in (buffers or [])]
+            uploaded_filenames = [
+                str(name) for name in content.get("uploaded_filenames", [])
+            ]
+            uploaded_file_types = [
+                str(file_type) for file_type in content.get("uploaded_file_types", [])
+            ]
+            replace = bool(content.get("replace", False))
+
+            if len(uploaded_filenames) != len(uploaded):
+                raise ValueError(
+                    "UploadFile: uploaded filenames and buffers length mismatch."
+                )
+            if len(uploaded_file_types) != len(uploaded):
+                raise ValueError(
+                    "UploadFile: uploaded file types and buffers length mismatch."
+                )
+            for filename, file_type in zip(uploaded_filenames, uploaded_file_types):
+                if not _is_allowed_file(filename, self.accept, file_type):
+                    raise ValueError(
+                        f"UploadFile: file {filename!r} is not allowed by accept={self.accept!r}."
+                    )
+
+            if replace:
+                self._file_contents = uploaded
+            else:
+                self._file_contents.extend(uploaded)
+            return
+
+        if event == "remove_file":
+            index = int(content.get("index", -1))
+            if 0 <= index < len(self._file_contents):
+                self._file_contents.pop(index)
+            return
+
+    @property
+    def values(self):
+        return [list(value) for value in self._file_contents]
+
+    @values.setter
+    def values(self, new_values):
+        self._file_contents = [bytes(value) for value in (new_values or [])]
+        self.file_sizes = [len(value) for value in self._file_contents]
 
     @property
     def value(self):
-        if self.values:
-            return bytes(self.values[0])
+        if self._file_contents:
+            return self._file_contents[0]
         return None
 
     @property
@@ -524,11 +784,14 @@ class UploadFileWidget(anywidget.AnyWidget):
 
     @property
     def files(self):
-        return [UploadedFile(name, value) for name, value in zip(self.filenames, self.values)]
+        return [
+            UploadedFile(name, value)
+            for name, value in zip(self.filenames, self._file_contents)
+        ]
 
     @property
     def values_bytes(self):
-        return [bytes(val) for val in self.values]
+        return list(self._file_contents)
 
     @property
     def names(self):
