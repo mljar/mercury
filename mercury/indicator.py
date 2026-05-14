@@ -15,7 +15,7 @@ class Indicator:
     --------
     - Large, readable value display
     - Optional label (title)
-    - Optional delta badge with up/down arrow and color coding
+    - Optional delta badge with up/down/neutral color coding
     - Responsive layout (row → column on small screens)
     - Theme-friendly styling via CSS variables
 
@@ -31,7 +31,8 @@ class Indicator:
     delta : float | str | None, optional
         Optional delta value representing change.
         - If numeric, a positive value shows an upward arrow (green),
-          and a negative value shows a downward arrow (red).
+          a negative value shows a downward arrow (red),
+          and zero is rendered as neutral.
         - If non-numeric, the value is displayed as-is.
         Default is `None`.
     background_color : str, optional
@@ -74,8 +75,10 @@ class Indicator:
 
     GREEN = "#00B275"
     RED = "#FF6384"
+    NEUTRAL = "#6B7280"
     BG_GREEN = "rgba(0, 178, 117, 0.12)"
     BG_RED = "rgba(255, 99, 132, 0.13)"
+    BG_NEUTRAL = "rgba(107, 114, 128, 0.12)"
 
     def __init__(
         self,
@@ -104,7 +107,8 @@ class Indicator:
             Optional delta (change) value.
 
             - If numeric, a positive value shows an upward arrow and green badge,
-              while a negative value shows a downward arrow and red badge.
+              a negative value shows a downward arrow and red badge,
+              and zero shows a neutral badge without an arrow.
             - If non-numeric, the value is displayed without arrow logic.
             Default is `None`.
         background_color : str, optional
@@ -159,8 +163,6 @@ class Indicator:
             }
         }
         .mljar-indicator-card {
-            background: var(--bg, #fff);
-            border: 1px solid var(--border, #ebebeb);
             border-radius: 10px;
             padding: 20px 18px 14px 18px;    
             text-align: center;
@@ -182,7 +184,6 @@ class Indicator:
         }
         .mljar-indicator-title {
             font-size: 1.25em !important;
-            color: var(--label, #555);
             margin-bottom: 8px;
             font-family: "IBM Plex Sans", system-ui, "Segoe UI", Arial, sans-serif !important;
             font-weight: 500;
@@ -190,7 +191,6 @@ class Indicator:
         }
         .mljar-indicator-value {
             font-size: 2.3em;                
-            color: var(--value, #222);
             font-family: 'Menlo', 'Consolas', monospace;
             
             margin-bottom: 10px;
@@ -206,14 +206,6 @@ class Indicator:
             font-family: 'Menlo', monospace;
             font-weight: bold;
         }
-        .mljar-indicator-delta.up {
-            background: var(--bg-green, rgba(0,178,117,0.12));
-            color: var(--green, #00B275);
-        }
-        .mljar-indicator-delta.down {
-            background: var(--bg-red, rgba(255,99,132,0.13));
-            color: var(--red, #FF6384);
-        }
         </style>
         """
 
@@ -222,20 +214,47 @@ class Indicator:
         if self.delta is not None:
             try:
                 d = float(self.delta)
-                up = d > 0
-                delta_text = f"<span style='font-size:1.15em'>{'&#8593;' if up else '&#8595;'}</span> {abs(d)}%"
-                cls = "mljar-indicator-delta up" if up else "mljar-indicator-delta down"
-                delta_html = f"<div class='{cls}'>{delta_text}</div>"
+                if d > 0:
+                    delta_text = (
+                        f"<span style='font-size:1.15em'>&#8593;</span> {abs(d)}%"
+                    )
+                    delta_style = (
+                        f"background:{self.BG_GREEN};color:{self.GREEN};"
+                    )
+                elif d < 0:
+                    delta_text = (
+                        f"<span style='font-size:1.15em'>&#8595;</span> {abs(d)}%"
+                    )
+                    delta_style = (
+                        f"background:{self.BG_RED};color:{self.RED};"
+                    )
+                else:
+                    delta_text = "0%"
+                    delta_style = (
+                        f"background:{self.BG_NEUTRAL};color:{self.NEUTRAL};"
+                    )
+                delta_html = (
+                    f"<div class='mljar-indicator-delta' style='{delta_style}'>"
+                    f"{delta_text}</div>"
+                )
             except Exception:
                 delta_html = f"<div class='mljar-indicator-delta'>{self.delta}</div>"
 
-        label_html = f"<div class='mljar-indicator-title'>{self.label}</div>" if self.label else ""
-        value_html = f"<div class='mljar-indicator-value'>{self.value}</div>"
+        label_html = (
+            f"<div class='mljar-indicator-title' style='color:{self.label_color}'>"
+            f"{self.label}</div>"
+            if self.label
+            else ""
+        )
+        value_html = (
+            f"<div class='mljar-indicator-value' style='color:{self.value_color}'>"
+            f"{self.value}</div>"
+        )
         card_cls = "mljar-indicator-card mljar-indicator-card-single" if single else "mljar-indicator-card"
 
         return f"""
 <div class="{card_cls}"
-     style="--bg:{self.background_color};--border:{self.border_color};--value:{self.value_color};--label:{self.label_color};--green:{self.GREEN};--bg-green:{self.BG_GREEN};--red:{self.RED};--bg-red:{self.BG_RED}">
+     style="background:{self.background_color};border:1px solid {self.border_color};">
     {label_html}
     {value_html}
     {delta_html}
