@@ -114,6 +114,49 @@ It is a per-file limit, not a combined total limit for all uploaded files.
 
 ---
 
+### Accepted File Types
+
+Use `accept` to restrict which file types a user can upload.
+The restriction is enforced at three levels: the browser file picker, drag-and-drop validation, and a final server-side check before the file reaches Python.
+
+**Code**
+
+```python
+uploader = mr.UploadFile(
+    label="Upload dataset",
+    accept=".csv"
+)
+```
+
+Pass a list to allow multiple types:
+
+```python
+uploader = mr.UploadFile(
+    label="Upload data",
+    accept=[".csv", ".tsv"]
+)
+```
+
+You can also use MIME types or wildcards:
+
+```python
+mr.UploadFile(accept="text/csv")      # exact MIME
+mr.UploadFile(accept="image/*")       # any image
+mr.UploadFile(accept=".csv,text/csv") # extension or MIME
+```
+
+* `".csv"` — file extension match (recommended for text formats)
+* `"text/csv"` — exact MIME type
+* `"image/*"` — MIME wildcard
+
+If a file does not match, the upload is blocked and the user receives an alert. The widget also displays a helper text below the upload area, for example *Accepted types: .csv,.tsv*.
+
+<Aside>
+Browser-reported MIME types can be empty or unreliable for some formats. For CSV, TSV, and similar files, use the file extension (`.csv`) rather than `"text/csv"` for more consistent validation.
+</Aside>
+
+---
+
 ### Layout
 
 Use the `position` argument to control where the widget is displayed.
@@ -177,6 +220,24 @@ With `multiple=True`, selecting or dropping files appends them to the current li
 
 ---
 
+### accept
+
+**type:** `string`
+
+Restricts which file types can be uploaded.
+The default is `""` (all file types allowed).
+
+Supported formats:
+
+* File extension: `".csv"`, `".png"`
+* Exact MIME type: `"text/csv"`, `"application/json"`
+* MIME wildcard: `"image/*"`, `"video/*"`
+
+Pass a list or a comma-separated string to allow multiple types: `[".csv", ".tsv"]` or `".csv,.tsv"`.
+Invalid values raise a `ValueError`. When `multiple=True`, each file is validated independently.
+
+---
+
 ### position
 
 **type:** `"sidebar" | "inline" | "bottom"`
@@ -232,3 +293,5 @@ The `key` value is required when widgets are created inside loops.
   * `.value` — file content as `bytes`
 * For `multiple=False`, `.value` and `.name` refer to the **first file**.
 * For `multiple=True`, use `.files`, `.names`, `.values_bytes`, or iteration to handle all uploads.
+* `accept` is enforced in the browser file picker, on drag-and-drop, and again server-side
+  before the file reaches Python. For text formats like CSV, prefer `.csv` over `"text/csv"`.
