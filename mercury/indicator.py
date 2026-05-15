@@ -157,7 +157,7 @@ class Indicator:
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
-        @container (min-width: 1200px) {
+        @container (min-width: 1150px) {
             .mljar-indicator-row {
                 grid-template-columns: repeat(4, minmax(0, 1fr));
             }
