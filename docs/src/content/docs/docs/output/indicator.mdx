@@ -36,18 +36,23 @@ mr.Indicator(
 
 * `value` is displayed as the main metric
 * `label` is shown above the value
-* `delta` shows an up/down badge (green/red) if numeric
+* `delta` shows a directional badge (green/red/neutral) if numeric
 
 ## Delta (Change Badge)
 
 `delta` can be numeric or text:
 
-* numeric `delta > 0` → green badge with ↑
-* numeric `delta < 0` → red badge with ↓
+* `delta > 0` → green badge with ↑
+* `delta == 0` → neutral badge, no arrow
+* `delta < 0` → red badge with ↓
 * non-numeric delta → displayed as-is (no arrow logic)
 
 ```python
 mr.Indicator(value="98%", label="Accuracy", delta=-1.2)
+```
+
+```python
+mr.Indicator(value="0%", label="Change", delta=0)
 ```
 
 ```python
@@ -100,6 +105,9 @@ mr.Indicator(
 
 ---
 
+Color parameters (`background_color`, `border_color`, `value_color`, `label_color`) are applied
+directly to the rendered HTML card.
+
 ## Indicator Params
 
 ### value (required)
@@ -130,8 +138,10 @@ Default: `""`
 
 Optional change badge.
 
-* numeric → shows arrow and color logic
-* string → shown as provided
+* `delta > 0` → green badge with ↑
+* `delta == 0` → neutral badge, no arrow
+* `delta < 0` → red badge with ↓
+* `string` → shown as provided, no arrow logic
 * `None` → no badge
 
 Default: `None`
@@ -182,5 +192,5 @@ Default: `"#555"`
 
 * `Indicator` renders HTML using the `_repr_html_` protocol.
 * Multiple indicators can be grouped into a responsive row.
-* Numeric deltas are interpreted as percentages (`abs(delta)%`).
+* Numeric deltas are interpreted as percentages (`abs(delta)%`). Zero is treated as a neutral state — no arrow, no color.
 

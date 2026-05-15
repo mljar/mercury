@@ -242,6 +242,7 @@ export class AppWidget extends Panel {
   private _cellsChangedConnected = false;
   private _widgetUpdatedConnected = false;
   private _mercuryWidgetAddedConnected = false;
+  private _leftTopbar!: Panel;
   private _leftHeader!: Panel;   // NEW: fixed header area
   private _leftContent!: Panel;  // NEW: scrollable area for sidebar widgets
   private _sidebarTitle?: string;
@@ -249,6 +250,10 @@ export class AppWidget extends Panel {
   private _autoRerun = true;
   private _leftFooter!: Panel;
   private _runAllBtn!: HTMLButtonElement;
+  private _collapseSidebarBtn?: HTMLButtonElement;
+  private _expandSidebarBtn?: HTMLButtonElement;
+  private _sidebarBackdrop?: HTMLDivElement;
+  private _rightTopbarWidget?: Widget;
   private _busy?: BusyIndicator;
   private _fullWidth = false;
   private _toastContainer?: HTMLDivElement;
@@ -256,8 +261,23 @@ export class AppWidget extends Panel {
   private _bottomMutationObserver?: MutationObserver;
   private _bottomObservedElements = new WeakSet<Element>();
   private _bottomResizeFrame: number | null = null;
+  private _sidebarHideTimer: number | null = null;
+  private _sidebarExpanded = false;
   private _requestedBottomContentHeights = new Map<string, number>();
   private _requestedBottomResizeSeqs = new Map<string, number>();
+  private readonly _mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+  private _isMobileLayout(): boolean {
+    return this._mobileMediaQuery.matches;
+  }
+  private _onResponsiveLayoutChange = () => {
+    this.updatePanelVisibility();
+
+    if (this._isMobileLayout()) {
+      this._split?.setRelativeSizes([0, 1]);
+    } else if (this._lastLeftVisible) {
+      this._split?.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+    }
+  };
   private _requestBottomResize = (event?: Event) => {
     const detail = (event as CustomEvent<{
       height?: number;
@@ -288,6 +308,23 @@ export class AppWidget extends Panel {
       /* empty */
     }
   };
+  private _toggleSidebar = () => {
+    const leftContentHasOutputs =
+      this.panelWidgets(this._leftContent).some(
+        w => (w as any).model?.length > 0
+      ) || !this._autoRerun;
+
+    if (!leftContentHasOutputs) {
+      this._notifySidebarVisibility(false);
+      return;
+    }
+
+    if (!this._sidebarExpanded) {
+      this._showSidebarFromToggle();
+    } else {
+      this._hideSidebarFromToggle();
+    }
+  };
 
   constructor(model: AppModel) {
     super();
@@ -315,8 +352,11 @@ export class AppWidget extends Panel {
       position: 'top-right'
     });
 
+    this.createRightTopbar();
+
     // Add root container to this widget
     this.addWidget(this._split);
+    this.createSidebarBackdrop();
 
     this.createToastContainer();
 
@@ -392,6 +432,11 @@ export class AppWidget extends Panel {
       'mercury:bottom-resize-requested',
       this._requestBottomResize
     );
+    window.addEventListener('mercury:toggle-sidebar', this._toggleSidebar);
+    this._mobileMediaQuery.addEventListener(
+      'change',
+      this._onResponsiveLayoutChange
+    );
   }
 
   private createToastContainer(): void {
@@ -402,6 +447,31 @@ export class AppWidget extends Panel {
     el.className = 'mercury-toast-container';
     this.node.appendChild(el);
     this._toastContainer = el;
+  }
+
+  private createSidebarBackdrop(): void {
+    if (this._sidebarBackdrop) {
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'mercury-sidebar-backdrop';
+    el.addEventListener('click', () => {
+      if (this._isMobileLayout() && this._sidebarExpanded) {
+        this._hideSidebarFromToggle();
+      }
+    });
+    this.node.appendChild(el);
+    this._sidebarBackdrop = el;
+  }
+
+  private createRightTopbar(): void {
+    if (this._rightTopbarWidget) {
+      return;
+    }
+    const topbar = new Widget();
+    topbar.addClass('mercury-right-topbar');
+    this._rightTop.addWidget(topbar);
+    this._rightTopbarWidget = topbar;
   }
 
   private onExecutionError(_model: AppModel, err: IExecutionError): void {
@@ -485,7 +555,11 @@ export class AppWidget extends Panel {
     // Set split sizes after first paint
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        this._split.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+        if (this._isMobileLayout()) {
+          this._split.setRelativeSizes([0, 1]);
+        } else {
+          this._split.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+        }
         this._rightSplit.setRelativeSizes([TOP_RATIO, BOTTOM_RATIO]);
       });
     });
@@ -495,6 +569,14 @@ export class AppWidget extends Panel {
     if (this.isDisposed) {
       return;
     }
+    try {
+      this._rightTopbarWidget?.dispose();
+      this._rightTopbarWidget = undefined;
+    } catch { }
+    try {
+      this._sidebarBackdrop?.remove();
+      this._sidebarBackdrop = undefined;
+    } catch { }
     try {
       if (this._toastContainer) {
         this._toastContainer.remove();
@@ -541,6 +623,7 @@ export class AppWidget extends Panel {
       window.cancelAnimationFrame(this._bottomResizeFrame);
       this._bottomResizeFrame = null;
     }
+    this._clearSidebarHideTimer();
     this._bottomResizeObserver?.disconnect();
     this._bottomMutationObserver?.disconnect();
     try { this._busy?.dispose(); } catch { }
@@ -551,6 +634,11 @@ export class AppWidget extends Panel {
     window.removeEventListener(
       'mercury:bottom-resize-requested',
       this._requestBottomResize
+    );
+    window.removeEventListener('mercury:toggle-sidebar', this._toggleSidebar);
+    this._mobileMediaQuery.removeEventListener(
+      'change',
+      this._onResponsiveLayoutChange
     );
     super.dispose();
   }
@@ -787,6 +875,7 @@ export class AppWidget extends Panel {
       this._rightSplit = rightSplit;
       this._rightTop = rightTop;
       this._rightBottom = rightBottom;
+      this.createRightTopbar();
       this._split = this.createMainSplit(this._left, this._rightSplit);
       this.addWidget(this._split);
       this.installSidebarToggles();
@@ -961,11 +1050,14 @@ export class AppWidget extends Panel {
     targetOrder?: number,
     targetKind: 'input' | 'output' | 'other' = 'other'
   ): number {
+    const baseIndex =
+      container === this._rightTop && this._rightTopbarWidget ? 1 : 0;
+
     if (targetOrder === undefined) {
-      return this.panelWidgets(container).length;
+      return this.panelWidgets(container).length + baseIndex;
     }
 
-    let idx = 0;
+    let idx = baseIndex;
     for (const w of this.panelWidgets(container)) {
       const ci = this._cellItems.find(
         c =>
@@ -1405,6 +1497,9 @@ export class AppWidget extends Panel {
     left.node.style.backgroundColor =
       pageConfig?.theme?.sidebar_background_color ?? DEFAULT_SIDEBAR_BG;
 
+    this._leftTopbar = new Panel();
+    this._leftTopbar.addClass('mercury-left-topbar');
+
     // Header panel (fixed at top)
     this._leftHeader = new Panel();
     this._leftHeader.addClass('mercury-left-header');
@@ -1434,7 +1529,8 @@ export class AppWidget extends Panel {
     this._runAllBtn.style.display = 'none';
     this._leftFooter.node.appendChild(this._runAllBtn);
 
-    // Compose: header → content → footer
+    // Compose: topbar -> header -> content -> footer
+    left.addWidget(this._leftTopbar);
     left.addWidget(this._leftHeader);
     left.addWidget(this._leftContent);
     left.addWidget(this._leftFooter);
@@ -1493,31 +1589,29 @@ export class AppWidget extends Panel {
 
   private installSidebarToggles(): void {
     const collapseBtn = document.createElement('button');
-    collapseBtn.innerHTML = '«';
+    collapseBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevrons-left"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M11 7l-5 5l5 5" /><path d="M17 7l-5 5l5 5" /></svg>`;
     collapseBtn.className = 'mercury-sidebar-toggle mercury-sidebar-collapse';
     collapseBtn.title = 'Hide sidebar';
-    this._left.node.appendChild(collapseBtn);
+    this._leftTopbar.node.appendChild(collapseBtn);
 
     const expandBtn = document.createElement('button');
-    expandBtn.innerHTML = '»';
+    expandBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevrons-right"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M7 7l5 5l-5 5" /><path d="M13 7l5 5l-5 5" /></svg>`;
     expandBtn.className = 'mercury-sidebar-toggle mercury-sidebar-expand';
     expandBtn.title = 'Show sidebar';
     expandBtn.style.display = 'none';
-    this.node.appendChild(expandBtn);
+    this._rightTopbarWidget?.node.appendChild(expandBtn);
+    this._collapseSidebarBtn = collapseBtn;
+    this._expandSidebarBtn = expandBtn;
 
     collapseBtn.onclick = () => {
-      this._left.hide();
-      this._split.setRelativeSizes([0, 1]);
-      collapseBtn.style.display = 'none';
-      expandBtn.style.display = '';
+      this._hideSidebarFromToggle();
     };
 
     expandBtn.onclick = () => {
-      this._left.show();
-      this._split.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
-      collapseBtn.style.display = '';
-      expandBtn.style.display = 'none';
+      this._showSidebarFromToggle();
     };
+
+    this._syncSidebarToggleButtons();
   }
 
   private updatePanelVisibility(): void {
@@ -1532,14 +1626,64 @@ export class AppWidget extends Panel {
       w => (w as any).model?.length > 0
     );
 
-    if (!leftContentHasOutputs) {
-      this._left?.hide();
-      if (this._lastLeftVisible !== false) this._split?.setRelativeSizes([0, 1]);
+    if (this._isMobileLayout()) {
+      if (!leftContentHasOutputs) {
+        this._clearSidebarHideTimer();
+        this._left.node.classList.remove('mercury-left-panel-visible');
+        this._left.node.classList.add('mercury-left-panel-collapsed');
+        this._sidebarExpanded = false;
+        this._sidebarHideTimer = window.setTimeout(() => {
+          this._sidebarHideTimer = null;
+          if (!this._left.node.classList.contains('mercury-left-panel-visible')) {
+            this._left.hide();
+          }
+        }, AppWidget.SIDEBAR_TRANSITION_MS);
+      } else {
+        this._clearSidebarHideTimer();
+        this._left.show();
+        this._left.node.classList.remove('mercury-left-panel-collapsed');
+        this._refreshSplitConstraints();
+        requestAnimationFrame(() => {
+          this._left.node.classList.add('mercury-left-panel-visible');
+        });
+        this._sidebarExpanded = true;
+      }
+
+      // On mobile the right side should always keep full width.
+      this._split?.setRelativeSizes([0, 1]);
+
+      // Do not let mobile state affect desktop bookkeeping.
+      this._lastLeftVisible = false;
     } else {
-      this._left?.show();
-      if (this._lastLeftVisible !== true) this._split?.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+      if (!leftContentHasOutputs) {
+        this._clearSidebarHideTimer();
+        this._left.node.classList.remove('mercury-left-panel-visible');
+        this._left.node.classList.add('mercury-left-panel-collapsed');
+        this._sidebarExpanded = false;
+        this._left.hide();
+        this._refreshSplitConstraints();
+        this._split?.setRelativeSizes([0, 1]);
+      } else {
+        this._clearSidebarHideTimer();
+        this._left.show();
+        this._left.node.classList.remove('mercury-left-panel-collapsed');
+        this._refreshSplitConstraints();
+        requestAnimationFrame(() => {
+          this._left.node.classList.add('mercury-left-panel-visible');
+        });
+        this._sidebarExpanded = true;
+        if (this._lastLeftVisible !== true) {
+          this._split?.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+        }
+      }
+
+      this._lastLeftVisible = leftContentHasOutputs;
     }
-    this._lastLeftVisible = leftContentHasOutputs;
+
+    this._notifySidebarVisibility(this._sidebarExpanded);
+    this._syncSidebarToggleButtons();
+    this._syncSidebarBackdrop();
+    // this._syncDesktopCollapsedLayout();
 
     // refresh bottom height
     void this._rightBottom.node.offsetHeight;
@@ -1558,6 +1702,133 @@ export class AppWidget extends Panel {
   }
 
   private static readonly MAX_BOTTOM_PX = 320;
+  private static readonly SIDEBAR_TRANSITION_MS = 220;
+
+  private _clearSidebarHideTimer(): void {
+    if (this._sidebarHideTimer !== null) {
+      window.clearTimeout(this._sidebarHideTimer);
+      this._sidebarHideTimer = null;
+    }
+  }
+
+  private _notifySidebarVisibility(visible: boolean): void {
+    window.dispatchEvent(
+      new CustomEvent('mercury:sidebar-visibility-changed', {
+        detail: { visible }
+      })
+    );
+  }
+
+  private _refreshSplitConstraints(): void {
+    try {
+      this._split?.fit();
+      this._split?.update();
+    } catch {
+      /* empty */
+    }
+  }
+
+  private _syncSidebarToggleButtons(): void {
+    if (!this._collapseSidebarBtn || !this._expandSidebarBtn) {
+      return;
+    }
+
+    const sidebarHasContent =
+      this.panelWidgets(this._leftContent).some(
+        w => (w as any).model?.length > 0
+      ) || !this._autoRerun;
+
+    if (this._isMobileLayout()) {
+      this._collapseSidebarBtn.style.display = this._sidebarExpanded ? '' : 'none';
+      this._expandSidebarBtn.style.display =
+        !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
+      if (this._sidebarExpanded || !sidebarHasContent) {
+        this._rightTopbarWidget?.removeClass('mercury-right-topbar-visible');
+      } else {
+        this._rightTopbarWidget?.addClass('mercury-right-topbar-visible');
+      }
+      return;
+    }
+
+    this._collapseSidebarBtn.style.display = this._sidebarExpanded ? '' : 'none';
+    this._expandSidebarBtn.style.display =
+      !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
+    if (this._sidebarExpanded || !sidebarHasContent) {
+      this._rightTopbarWidget?.removeClass('mercury-right-topbar-visible');
+    } else {
+      this._rightTopbarWidget?.addClass('mercury-right-topbar-visible');
+    }
+  }
+
+  private _syncSidebarBackdrop(): void {
+    if (!this._sidebarBackdrop) {
+      return;
+    }
+
+    this._sidebarBackdrop.classList.toggle(
+      'mercury-sidebar-backdrop-visible',
+      this._isMobileLayout() && this._sidebarExpanded
+    );
+  }
+
+  // private _syncDesktopCollapsedLayout(): void {
+  //   this.node.classList.toggle(
+  //     'mercury-desktop-sidebar-collapsed',
+  //     !this._isMobileLayout() && !this._sidebarExpanded
+  //   );
+  // }
+
+  private _hideSidebarFromToggle(): void {
+    this._clearSidebarHideTimer();
+    this._left.node.classList.remove('mercury-left-panel-visible');
+    this._left.node.classList.add('mercury-left-panel-collapsed');
+    this._refreshSplitConstraints();
+    this._split.setRelativeSizes([0, 1]);
+    this._sidebarExpanded = false;
+
+    if (!this._isMobileLayout()) {
+      this._lastLeftVisible = false;
+      this._notifySidebarVisibility(false);
+      this._syncSidebarToggleButtons();
+      this._syncSidebarBackdrop();
+      // this._syncDesktopCollapsedLayout();
+      return;
+    }
+
+    this._notifySidebarVisibility(false);
+    this._syncSidebarToggleButtons();
+    this._syncSidebarBackdrop();
+    // this._syncDesktopCollapsedLayout();
+    this._sidebarHideTimer = window.setTimeout(() => {
+      this._sidebarHideTimer = null;
+      if (!this._left.node.classList.contains('mercury-left-panel-visible')) {
+        this._left.hide();
+      }
+    }, AppWidget.SIDEBAR_TRANSITION_MS);
+  }
+
+  private _showSidebarFromToggle(): void {
+    this._clearSidebarHideTimer();
+    this._left.show();
+    this._left.node.classList.remove('mercury-left-panel-collapsed');
+    this._refreshSplitConstraints();
+
+    if (this._isMobileLayout()) {
+      this._split.setRelativeSizes([0, 1]);
+    } else {
+      this._split.setRelativeSizes([SIDEBAR_RATIO, MAIN_RATIO]);
+      this._lastLeftVisible = true;
+    }
+    this._sidebarExpanded = true;
+
+    requestAnimationFrame(() => {
+      this._left.node.classList.add('mercury-left-panel-visible');
+    });
+    this._notifySidebarVisibility(true);
+    this._syncSidebarToggleButtons();
+    this._syncSidebarBackdrop();
+    // this._syncDesktopCollapsedLayout();
+  }
 
   private observeBottomContent(root: HTMLElement): void {
     if (!this._bottomResizeObserver) {
