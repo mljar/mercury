@@ -110,6 +110,7 @@ export default defineConfig({
               { label: 'Examples', slug: 'examples' },
               { label: 'Ollama', autogenerate: { directory: 'examples/ollama' } },
               { label: 'Chat', autogenerate: { directory: 'examples/chat' } },
+              { label: 'Utility Apps', autogenerate: { directory: 'examples/utility-apps' } },
             ],
           },
           {
