@@ -1,0 +1,69 @@
+from mercury.indicator import Indicator
+
+
+def test_indicator_single_renders_inline_colors():
+    html = Indicator(
+        value="123",
+        label="Users",
+        background_color="#ff0000",
+        border_color="#00ff00",
+        value_color="#0000ff",
+        label_color="#999999",
+    )._repr_html_()
+
+    assert "background:#ff0000" in html
+    assert "border:1px solid #00ff00" in html
+    assert "style='color:#999999'" in html
+    assert "style='color:#0000ff'" in html
+    assert "Users" in html
+    assert "123" in html
+
+
+def test_indicator_positive_delta_renders_up_badge():
+    html = Indicator(value="123", delta=5.4)._repr_html_()
+
+    assert "&#8593;" in html
+    assert "5.4%" in html
+    assert Indicator.GREEN in html
+    assert Indicator.BG_GREEN in html
+
+
+def test_indicator_negative_delta_renders_down_badge():
+    html = Indicator(value="123", delta=-1.2)._repr_html_()
+
+    assert "&#8595;" in html
+    assert "1.2%" in html
+    assert Indicator.RED in html
+    assert Indicator.BG_RED in html
+
+
+def test_indicator_zero_delta_renders_neutral_badge():
+    html = Indicator(value="123", delta=0)._repr_html_()
+
+    assert "0%" in html
+    assert "&#8593;" not in html
+    assert "&#8595;" not in html
+    assert Indicator.NEUTRAL in html
+    assert Indicator.BG_NEUTRAL in html
+
+
+def test_indicator_non_numeric_delta_renders_raw_text():
+    html = Indicator(value="OK", delta="stable")._repr_html_()
+
+    assert "stable" in html
+    assert "&#8593;" not in html
+    assert "&#8595;" not in html
+
+
+def test_indicator_list_renders_row_of_cards():
+    html = Indicator(
+        [
+            Indicator(value="123", label="Users"),
+            Indicator(value="98%", label="Accuracy"),
+        ]
+    )._repr_html_()
+
+    assert "mljar-indicator-row" in html
+    assert html.count("mljar-indicator-card") >= 2
+    assert "Users" in html
+    assert "Accuracy" in html
