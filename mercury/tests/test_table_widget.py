@@ -1,5 +1,4 @@
 import pytest
-import anywidget
 from traitlets import TraitError
 import pandas as pd
 import polars as pl
@@ -188,6 +187,7 @@ def test_table_invalid_page_size_none_raises(sample_pandas_df):
     with pytest.raises(Exception, match="page_size"):
         Table(sample_pandas_df, page_size=None)
 
+
 def test_table_invalid_width_string_raises(sample_pandas_df):
     with pytest.raises(ValueError, match="width"):
         Table(sample_pandas_df, width="wide")
@@ -208,6 +208,22 @@ def test_table_invalid_height_number_raises(sample_pandas_df):
         Table(sample_pandas_df, height=400)
 
 
+def test_table_zero_page_size_clamps_to_first_page(sample_pandas_df):
+    w = Table(sample_pandas_df, page_size=0)
+
+    assert len(w.data) == 1
+    assert w.table_page == 1
+    assert w._filtered_length == len(sample_pandas_df)
+
+
+def test_table_negative_page_size_clamps_to_first_page(sample_pandas_df):
+    w = Table(sample_pandas_df, page_size=-5)
+
+    assert len(w.data) == 1
+    assert w.table_page == 1
+    assert w._filtered_length == len(sample_pandas_df)
+
+
 # ====== PANDAS ====== #
 def test_pandas_table_basic_creation(sample_pandas_df):
     w = Table(sample_pandas_df)
@@ -218,6 +234,16 @@ def test_pandas_table_basic_creation(sample_pandas_df):
 def test_table_pandas_multiindex_raises(sample_pandas_df):
     df = sample_pandas_df.copy()
     df.index = pd.MultiIndex.from_arrays([df["year"], df["month"]])
+
+    with pytest.raises(TraitError):
+        Table(df)
+
+
+def test_table_pandas_multiindex_columns_raises(sample_pandas_df):
+    df = sample_pandas_df.copy()
+    df.columns = pd.MultiIndex.from_tuples(
+        [("date", "month"), ("date", "year"), ("metric", "sale"), ("meta", "text"), ("meta", "category")]
+    )
 
     with pytest.raises(TraitError):
         Table(df)

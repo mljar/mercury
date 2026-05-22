@@ -332,6 +332,18 @@ class TableWidget(anywidget.AnyWidget):
 function render({ model, el }) {
   const c = (tag, props = {}) =>
     Object.assign(document.createElement(tag), props);
+  const syncEllipsisTitle = cell => {
+    const text = cell.textContent || '';
+    if (!text) {
+      cell.removeAttribute('title');
+      return;
+    }
+    if (cell.scrollWidth > cell.clientWidth) {
+      cell.title = text;
+    } else {
+      cell.removeAttribute('title');
+    }
+  };
 
   let data = model.get('data') || [];
   let page = model.get('table_page');
@@ -349,6 +361,11 @@ function render({ model, el }) {
 
   const container = c('div', { className: 'mljar-mercury-table-widget-table-container' });
   el.appendChild(container);
+
+  const wrap = c('div', { className: 'mljar-mercury-table-widget-table-wrapper' });
+  const table = c('table', { className: 'mljar-mercury-table-widget-tbl' });
+  container.appendChild(wrap);
+  wrap.appendChild(table);
 
   const controls = c('div', { className: 'mljar-mercury-table-widget-table-controls' });
   const controlsLeft = c('div', { className: 'mljar-mercury-table-widget-controls-left' });
@@ -429,8 +446,6 @@ function render({ model, el }) {
   }
 
   function renderTable() {
-    container.innerHTML = '';
-
     const hasData = data.length > 0;
     const hiddenCols = showIndexCol ? new Set() : new Set([MERCURY_INDEX_NAME]);
     const selectionEnabled = rowsSelectionEnabled();
@@ -444,8 +459,16 @@ function render({ model, el }) {
       cols = lastKnownColumns;
     }
     
-    const wrap = c('div', { className: 'mljar-mercury-table-widget-table-wrapper' });
-    const table = c('table', { className: 'mljar-mercury-table-widget-tbl' });
+    const existingOverlay = container.querySelector(
+      '.mljar-mercury-table-widget-no-data-overlay'
+    );
+    if (existingOverlay) {
+      existingOverlay.remove();
+    }
+
+    table.innerHTML = '';
+    table.classList.toggle('has-row-selection', selectionEnabled);
+
     const w = model.get('width');
     const h = model.get('height');
     if (w) {
@@ -463,7 +486,6 @@ function render({ model, el }) {
       const trh = thead.appendChild(c('tr'));
 
       if (selectionEnabled) {
-        table.classList.add('has-row-selection');
         trh.appendChild(c('th', { textContent: '' }));
       }
 
@@ -489,6 +511,7 @@ function render({ model, el }) {
         };
 
         trh.appendChild(th);
+        requestAnimationFrame(() => syncEllipsisTitle(th));
       });
     }
 
@@ -512,13 +535,12 @@ function render({ model, el }) {
         }
 
         cols.forEach(col => {
-          tr.appendChild(c('td', { textContent: row[col] }));
+          const td = c('td', { textContent: row[col] });
+          tr.appendChild(td);
+          requestAnimationFrame(() => syncEllipsisTitle(td));
         });
       });
     }
-
-    wrap.appendChild(table);
-    container.appendChild(wrap);
 
     if (!hasData) {
       const overlay = c('div', {
@@ -764,9 +786,10 @@ export default { render };
 
 .mljar-mercury-table-widget-tbl {
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
   font-family: sans-serif;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
 }
 
 .mljar-mercury-table-widget-tbl th,
@@ -778,6 +801,7 @@ export default { render };
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 160px;
+  max-width: 200px;
 }
 
 .mljar-mercury-table-widget-tbl th {
