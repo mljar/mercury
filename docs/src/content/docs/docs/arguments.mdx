@@ -18,3 +18,14 @@ To enable session sharing please use `--keep-session`.
 
 Would you like to limit your server resources with usage timeout?  
 Please set `--timeout=600`. The timeout value is in seconds.
+
+## Working directory
+
+By default, Mercury uses the current directory as the base for notebooks and related files.
+To override it, use `--working-dir=/path/to/notebooks`.
+
+When provided, Mercury will use that directory as the base for:
+- notebook discovery,
+- relative notebook paths passed on startup,
+- `config.toml` lookup,
+- relative file reads from inside notebooks.

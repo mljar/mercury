@@ -84,7 +84,19 @@ Start server with the following command:
 mercury
 ```
 
-It will detect all notebooks in the current directory and serve them as web apps.
+By default, it will detect all notebooks in the current directory and serve them as web apps.
+
+To serve notebooks from a different directory and make relative paths resolve from there:
+
+```
+mercury --working-dir /path/to/notebooks
+```
+
+You can combine it with a notebook argument:
+
+```
+mercury app.ipynb --working-dir /path/to/notebooks
+```
 
 Example view of notebooks home page:
 ![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/notebooks-home.png)
@@ -147,7 +159,7 @@ If you want to have user-based authentication in your Mercury. It is paid option
 
 We want you to customize your web apps so they look and feel exactly the way you like.
 
-To do this, create a file called `config.toml` in the same directory as your notebooks.
+To do this, create a file called `config.toml` in the active notebooks directory. By default, this is the current directory. If you start Mercury with `--working-dir`, place `config.toml` there instead.
 
 ```toml
 [main]
@@ -181,6 +193,8 @@ We have option to share the same session between multiple users. What does it me
 
 Would you like to limit your server resources with usage timeout? Please set `--timeout=600`, the timeout value is in seconds. Be generous.
 
+Would you like Mercury to use a specific directory as the base for notebooks, `config.toml`, and relative file access? Please use `--working-dir=/path/to/notebooks`.
+
 ## Previous versions
 
 If you are looking for previous version codebase, the stable v2 codebase is available on the `v2.4.3` tag.
@@ -194,4 +208,3 @@ Mercury is licensed under Apache-2.0. See LICENSE for details.
 ---
 
 Stay safe! ❤️
-

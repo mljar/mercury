@@ -41,6 +41,13 @@ app_dir = get_app_dir()
 version = __version__
 
 
+def get_effective_notebooks_dir(serverapp) -> str:
+    root_dir = getattr(serverapp, "root_dir", None)
+    if root_dir:
+        return os.path.abspath(root_dir)
+    return os.getcwd()
+
+
 def is_mercury_app(argv0: str | None = None) -> bool:
     """
     Returns True when Mercury is started as the Mercury Standalone App,
@@ -133,7 +140,7 @@ class MercuryApp(LabServerApp):
             sa.contents_manager = wrapped
             self.settings["contents_manager"] = wrapped
 
-            self.settings.setdefault("notebooks_dir", os.getcwd())
+            self.settings["notebooks_dir"] = get_effective_notebooks_dir(sa)
 
             from jinja2 import ChoiceLoader, FileSystemLoader
             templates_dir = os.path.join(HERE, "templates")

@@ -12,11 +12,11 @@ import liveAppPreviewImg from "../../../assets/quickstart/live-app-preview.png"
 import oneNotebookImg from "../../../assets/quickstart/one-notebook.png"
 import simpleAppImg from "../../../assets/quickstart/simple-app.png"
 
-Mercury detects all Python notebooks available in the current directory and serve them as web apps. Please run the following command to start server:
+By default, Mercury detects all Python notebooks available in the current directory and serves them as web apps. Please run the following command to start the server:
 
 <Code code={`mercury`} lang='bash' title='Start Mercury Server'/>
 
-It should open a web page at `localhost:8888` with information that no notebooks found if there are no notebooks (`*.ipynb` files) in the current directory you should see 
+It should open a web page at `localhost:8888` with information that no notebooks were found. If there are no `*.ipynb` files in the current directory, you should see:
 
 <Image 
   src={noNotebooksImg} 
@@ -63,6 +63,12 @@ Start a server with command:
 
 ```bash
 mercury
+```
+
+If you want Mercury to use a different base directory for notebooks, `config.toml`, and relative file access, start it like this:
+
+```bash
+mercury --working-dir /path/to/notebooks
 ```
 
 You should see a card with notebook. The title in the card will be the same as notebook filename.

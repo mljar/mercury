@@ -20,6 +20,16 @@ logo = r"""
 
 LEVEL_NAMES = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
+def _resolve_working_dir(working_dir: str | None) -> str | None:
+    if working_dir is None:
+        return None
+
+    resolved = os.path.abspath(os.path.expanduser(working_dir))
+    if not os.path.isdir(resolved):
+        raise ValueError(f"Working directory does not exist: {working_dir}")
+    return resolved
+
+
 def _parse_and_inject(argv):
     """
     Parse command-line args and apply:
@@ -36,8 +46,12 @@ def _parse_and_inject(argv):
     # New: optional generic --token flag
     parser.add_argument("--token", help="Token for Jupyter server", default=None)
 
+    # Mercury working directory used as the process cwd and Jupyter root dir
+    parser.add_argument("--working-dir", help="Directory used as Mercury working directory", default=None)
+
     ns, rest = parser.parse_known_args(argv[1:])
     new_argv = [argv[0]] + rest
+    working_dir = _resolve_working_dir(ns.working_dir)
 
     # ----------------------------
     # LOG LEVEL
@@ -193,6 +207,9 @@ def _parse_and_inject(argv):
     # ----------------------------
     # OTHER DEFAULTS
     # ----------------------------
+    if working_dir and not any(a.startswith("--ServerApp.root_dir=") for a in new_argv):
+        new_argv.append(f"--ServerApp.root_dir={working_dir}")
+
     new_argv.append("--ContentsManager.allow_hidden=True")
     new_argv.append("--MappingKernelManager.default_kernel_name='python3'")
 
@@ -245,14 +262,25 @@ def _parse_and_inject(argv):
 
         new_argv.append(f"--ServerApp.tornado_settings={tornado_settings!r}")
 
-    return new_argv
+    return new_argv, working_dir
+
+
+def _activate_working_dir(working_dir: str | None) -> None:
+    if working_dir is not None:
+        os.chdir(working_dir)
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
     print(logo)
     print(f"Version: {__version__}")
-    sys.argv = _parse_and_inject(argv)
+    try:
+        sys.argv, working_dir = _parse_and_inject(argv)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        raise SystemExit(1) from exc
+
+    _activate_working_dir(working_dir)
     from mercury_app.app import main as _app_main
     return _app_main()
 

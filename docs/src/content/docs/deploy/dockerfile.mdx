@@ -41,7 +41,7 @@ CMD ["mercury", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
 
 <Aside type="note" title="Workspace directory">
 The <code>/workspace</code> directory is important.  
-Your local notebooks directory will be mounted there so Mercury can discover and serve your notebooks.
+Your local notebooks directory will be mounted there so Mercury can discover and serve your notebooks. In this setup, `/workspace` becomes Mercury's default base directory for notebooks and `config.toml`.
 </Aside>
 
 
@@ -79,6 +79,7 @@ http://localhost:8888
 
 <Aside type="note" title="Mount notebooks directory">
 The <code>-v</code> option mounts your local notebooks directory `/my/directory/with/notebooks` into the container.  
+Because the container `WORKDIR` is `/workspace`, Mercury uses that mounted directory as its default base unless you explicitly pass `--working-dir`.
 </Aside>
 
 ### Run the container (background mode)
