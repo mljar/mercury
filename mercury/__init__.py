@@ -30,8 +30,12 @@ from .image import ImageCard
 from .download import Download
 from .pdf import PDF
 from .progressbar import ProgressBar
+from .download import Download
 
 # chat widgets
 from .chat.chat import Chat
 from .chat.chatinput import ChatInput
 from .chat.message import Message 
+
+# other widgets 
+from .stop import Stop
