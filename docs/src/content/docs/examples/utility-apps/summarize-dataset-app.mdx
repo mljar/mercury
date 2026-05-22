@@ -7,11 +7,11 @@ import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
 
-import indicatorsImg from "../../../../assets/tutorials/utility-apps/summarize-dataset/indicators-view.webp"
-import columnTypeSummaryImg from "../../../../assets/tutorials/utility-apps/summarize-dataset/column-type-summary.webp"
-import skrubDataPreviewImg from "../../../../assets/tutorials/utility-apps/summarize-dataset/skrub-data-preview.webp"
-import appWithoutDatasetImg from "../../../../assets/tutorials/utility-apps/summarize-dataset/app-without-dataset.webp"
-import appOverviewImg from "../../../../assets/tutorials/utility-apps/summarize-dataset/app-overview.webp"
+import indicatorsImg from "../../../../assets/examples/utility-apps/summarize-dataset/indicators-view.webp"
+import columnTypeSummaryImg from "../../../../assets/examples/utility-apps/summarize-dataset/column-type-summary.webp"
+import skrubDataPreviewImg from "../../../../assets/examples/utility-apps/summarize-dataset/skrub-data-preview.webp"
+import appWithoutDatasetImg from "../../../../assets/examples/utility-apps/summarize-dataset/app-without-dataset.webp"
+import appOverviewImg from "../../../../assets/examples/utility-apps/summarize-dataset/app-overview.webp"
 
 
 In this tutorial we will build a **CSV dataset summarizer** — a web app where you upload any CSV file and immediately get a structured overview of what's inside.
@@ -67,12 +67,6 @@ welcome_md = mr.Markdown("# Upload the dataset and check the summary")
 
 This message is shown before the user uploads anything. Once a file is uploaded, it gets replaced by the actual summary title.
 
-<Image
-  src={appWithoutDatasetImg}
-  alt="CSV Dataset Summarizer app before upload — welcome heading and file upload button visible in the sidebar"
-  class="docs-image-100"
-/>
-
 ## 4. Add the file upload widget
 
 ```python
@@ -81,6 +75,12 @@ input_file = mr.UploadFile(label="Upload your Dataset", accept='.csv', max_file_
 
 [`UploadFile`](/docs/widgets/uploadfile/) renders a file picker in the app sidebar.
 We restrict it to `.csv` files and allow up to 1 GB.
+
+<Image
+  src={appWithoutDatasetImg}
+  alt="CSV Dataset Summarizer app before upload — welcome heading and file upload button visible in the sidebar"
+  class="docs-image-100"
+/>
 
 When the user picks a file:
 - `input_file.name` becomes the filename (non-empty string)
