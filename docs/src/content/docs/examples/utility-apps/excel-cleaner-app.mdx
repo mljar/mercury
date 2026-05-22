@@ -1,0 +1,386 @@
+---
+title: Excel Cleaner
+description: Learn how to build a web app that opens any Excel file, shows per-sheet stats, lets the user pick a sheet, apply cleaning operations, and download the result as a CSV.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+
+import appOverviewImg from "../../../../assets/examples/utility-apps/excel-cleaner/app-overview.webp"
+import appWithoutFileImg from "../../../../assets/examples/utility-apps/excel-cleaner/app-without-file.webp"
+import sheetsInfoImg from "../../../../assets/examples/utility-apps/excel-cleaner/sheets-info.webp"
+import sheetSelectImg from "../../../../assets/examples/utility-apps/excel-cleaner/sheet-select.webp"
+import checkboxesImg from "../../../../assets/examples/utility-apps/excel-cleaner/checkboxes.webp"
+import resultsTableImg from "../../../../assets/examples/utility-apps/excel-cleaner/results-table.webp"
+import downloadButtonImg from "../../../../assets/examples/utility-apps/excel-cleaner/download-button.webp" 
+
+
+In this tutorial we will build an **Excel cleaner** — a web app where you upload any `.xlsx` file, browse its sheets, apply common cleaning operations, and download the result as a CSV.
+
+<Image
+  src={appOverviewImg}
+  alt="Excel Cleaner app in Mercury — uploaded file name, sheets overview table, sheet selector, original data preview, cleaning checkboxes in the sidebar, and the cleaned results table"
+  class="docs-image-100"
+/>
+
+No code, no Excel macros, no manual find-and-replace. Just upload, click, and download.
+
+We will use:
+
+- **pandas** for reading the Excel file and applying cleaning operations
+- **Mercury** to turn the notebook into a web app with file upload, sheet selection, checkboxes, and a download button
+
+The full notebook code is available in our [GitHub repository](https://github.com/mljar/mercury-notebook-apps/tree/main/excel-cleaner).
+
+You can also try the [live demo](https://utility-apps.ismvp.org/mercury/excel-cleaner).
+
+## What the app shows
+
+After the user uploads an Excel file, the app displays:
+
+1. **Sheets overview** — a table listing every sheet with row count, column count, empty cells, and duplicate rows
+2. **Sheet selector** — a dropdown to pick which sheet to inspect and clean
+3. **Original data preview** — the raw content of the chosen sheet
+4. **Cleaning options** — checkboxes in the sidebar to normalize column names and/or remove duplicate rows
+5. **Results table** — the cleaned data, updated live as the user toggles options
+6. **Download button** — exports the cleaned sheet as a CSV file
+
+## 1. Install packages
+
+```bash
+pip install mercury pandas openpyxl
+```
+
+<Aside>
+`openpyxl` is required by pandas to read `.xlsx` files. Without it, `pd.read_excel` will fail with a missing-dependency error.
+</Aside>
+
+## 2. Import libraries
+
+```python
+import mercury as mr
+from IPython.display import clear_output
+```
+
+`clear_output` from IPython is used to hide empty cells when no file has been uploaded yet, keeping the app clean on first load.
+
+## 3. Add a welcome message
+
+```python
+welcome_md = mr.Markdown("# Upload the Excel file to start")
+```
+
+This message is shown before the user uploads anything. Once a file is uploaded, it gets replaced by the actual file title.
+
+## 4. Add the file upload widget
+
+```python
+file = mr.UploadFile(label="Upload your Excel file", accept=".xlsx")
+```
+
+[`UploadFile`](/docs/widgets/uploadfile/) renders a file picker in the app sidebar, restricted to `.xlsx` files.
+
+<Image
+  src={appWithoutFileImg}
+  alt="Excel Cleaner app before upload — welcome heading and file upload button visible in the sidebar"
+  class="docs-image-100"
+/>
+
+When the user picks a file:
+- `file.name` becomes the filename (non-empty string)
+- `file.value` contains the raw file bytes
+
+Mercury automatically re-runs the notebook when the upload changes, so all cells below react immediately.
+
+## 5. Define the cleaning functions
+
+Two operations the user will be able to toggle: normalize column names and remove duplicate rows.
+
+### Normalizing column names
+
+```python
+import re
+import unicodedata
+
+def normalize_column_name(column_name):
+    # Convert to string
+    column_name = str(column_name)
+
+    # Remove accents
+    column_name = unicodedata.normalize("NFKD", column_name)
+    column_name = column_name.encode("ascii", "ignore").decode("ascii")
+
+    # Convert to lowercase
+    column_name = column_name.lower()
+
+    # Remove extra spaces
+    column_name = column_name.strip()
+
+    # Replace special characters with _
+    column_name = re.sub(r"[^a-z0-9]+", "_", column_name)
+
+    # Remove _ from start and end
+    column_name = column_name.strip("_")
+
+    return column_name
+
+def normalize_column_names(df):
+    df = df.copy()
+    df.columns = [normalize_column_name(col) for col in df.columns]
+    return df
+```
+
+This turns something like `"Customer Name (€)"` into `customer_name`. Useful when the Excel file was filled out by hand and column headers contain accents, mixed casing, or punctuation that breaks downstream code.
+
+We will also reuse `normalize_column_name` later for the downloaded filename, so that sheet names with spaces or special characters don't end up in the CSV name.
+
+### Removing duplicate rows
+
+```python
+def remove_duplicate_rows(df):
+    df_clean = df.copy()
+    df_clean = df_clean.drop_duplicates()
+    return df_clean
+```
+
+Straightforward pandas — nothing unusual here.
+
+## 6. Read the Excel file and collect per-sheet stats
+
+```python
+if file.name is not None:
+    title_md = mr.Markdown(f"## Uploaded file: {file.name}", key='md1')
+    import pandas as pd
+    from io import BytesIO
+    data = BytesIO(file.value)
+    excel = pd.ExcelFile(data)
+    sheet_names = excel.sheet_names
+    sheets_info = []
+    df_list = []
+    ready_df = []
+
+    for sheet_name in excel.sheet_names:
+        df = pd.read_excel(data, sheet_name=sheet_name)
+        df_list.append(df)
+        ready_df.append(df)
+        rows = df.shape[0]
+        columns = df.shape[1]
+        empty_cells = df.isna().sum().sum()
+        duplicate_rows = df.duplicated().sum()
+
+        sheets_info.append({
+            "Sheet Name": sheet_name,
+            "Rows": rows,
+            "Columns": columns,
+            "Empty Cells": empty_cells,
+            "Duplicate Rows": duplicate_rows
+        })
+
+    sheets_info_df = pd.DataFrame(sheets_info)
+```
+
+We wrap the raw bytes in `BytesIO` so pandas can read them directly, without saving the file to disk first. Two lists are kept in parallel:
+
+- `df_list` — the original, untouched DataFrames (used for the "before" preview)
+- `ready_df` — the working copies that cleaning operations modify
+
+This way the user can always see what changed.
+
+## 7. Show the welcome message or file title
+
+```python
+if file.name is None:
+    display(welcome_md)
+else:
+    display(title_md)
+```
+
+A simple branch: when nothing has been uploaded yet, show the welcome heading; otherwise show the filename of the uploaded workbook.
+
+## 8. Show the sheets overview
+
+```python
+if file.name is not None:
+    sheets_info_table = mr.Table(sheets_info_df, page_size=20, key='sheets-info')
+else:
+    clear_output()
+```
+
+[`Table`](/docs/widgets/table/) renders the per-sheet stats as a clean HTML table. `clear_output()` hides the cell entirely when there's no file yet, so the app doesn't leave empty gaps on first load.
+
+<Image
+  src={sheetsInfoImg}
+  alt="Sheets overview table with columns Sheet Name, Rows, Columns, Empty Cells, and Duplicate Rows — one row per sheet in the uploaded Excel file"
+  class="docs-image-100"
+/>
+
+## 9. Let the user pick a sheet
+
+```python
+if file.name is not None:
+    sheet_select = mr.Select(label="Choose sheet", choices=sheet_names)
+else:
+    clear_output()
+```
+
+[`Select`](/docs/widgets/select/) renders a dropdown in the sidebar populated with the sheet names from the uploaded file.
+
+We use `sheet_names.index(sheet_select.value)` later to look up the right DataFrame from `df_list` and `ready_df`.
+
+## 10. Preview the original sheet
+
+```python
+if file.name is not None:
+    display(mr.Markdown(f"## Sheet: {sheet_select.value}", key='sheet_md'))
+else:
+    clear_output()
+```
+
+```python
+if file.name is not None:
+    oryginal_data_table = mr.Table(
+        df_list[sheet_names.index(sheet_select.value)],
+        page_size=20,
+        key=f"oryginal-df-{sheet_select.value}"
+    )
+else:
+    clear_output()
+```
+
+<Image
+  src={sheetSelectImg}
+  alt="Sheet selector dropdown in the sidebar listing every sheet name from the uploaded Excel file"
+  class="docs-image-100"
+/>
+
+Note the dynamic `key` — it includes the sheet name. Mercury uses `key` to identify widgets across re-runs, and varying it per sheet forces the table to fully re-render when the user switches sheets.
+
+## 11. Add the cleaning checkboxes
+
+```python
+if file.name is not None:
+    display(mr.Markdown("### Choose operation", position="sidebar", key='checkboxes'))
+    normalize_col_names_checkbox = mr.CheckBox(
+        label="Normalize column names",
+        appearance="box",
+        key=f"normalize_col_names_checkbox-{sheet_select.value}"
+    )
+    remove_duplicate_rows_checkbox = mr.CheckBox(
+        label="Remove duplicate rows",
+        appearance="box",
+        key=f"remove_duplicate_rows_checkbox-{sheet_select.value}"
+    )
+else:
+    clear_output()
+```
+
+[`CheckBox`](/docs/widgets/checkbox/) with `appearance="box"` renders as a tappable card rather than a plain checkbox. `position="sidebar"` keeps the controls grouped with the file upload.
+
+Including `sheet_select.value` in the `key` means the checkboxes reset whenever the user switches to another sheet — exactly what you want, since the cleaning state shouldn't leak across sheets.
+
+<Image
+  src={checkboxesImg}
+  alt="Two checkbox cards in the sidebar — Normalize column names and Remove duplicate rows — under a Choose operation heading"
+  class="docs-image-100"
+/>
+
+## 12. Apply the selected operations
+
+```python
+if file.name is not None:
+    if normalize_col_names_checkbox.value:
+        normalize_col_names_checkbox.disabled = True
+        ready_df[sheet_names.index(sheet_select.value)] = normalize_column_names(
+            ready_df[sheet_names.index(sheet_select.value)]
+        )
+
+    if remove_duplicate_rows_checkbox.value:
+        remove_duplicate_rows_checkbox.disabled = True
+        ready_df[sheet_names.index(sheet_select.value)] = remove_duplicate_rows(
+            ready_df[sheet_names.index(sheet_select.value)]
+        )
+```
+
+Each operation:
+1. Checks if the user ticked the box
+2. Disables the box so it can't be toggled off mid-pipeline (the operation has already been applied)
+3. Updates the working DataFrame in-place for the current sheet
+
+The disabling step is a small UX touch — once you've cleaned the data, you can't "untick" your way back to the original; you'd need to refresh.
+
+## 13. Show the cleaned results
+
+```python
+if file.name is not None:
+    if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
+        display(mr.Markdown("## Results", key='results'))
+        edited_data_table = mr.Table(
+            ready_df[sheet_names.index(sheet_select.value)],
+            page_size=20,
+            key=f"results-table-{sheet_select.value}"
+        )
+    else:
+        clear_output()
+```
+
+The results table only appears once at least one cleaning option is active. Until then the user just sees the original preview, which avoids visual clutter on first load.
+
+<Image
+  src={resultsTableImg}
+  alt="Results table showing the cleaned sheet — normalized lowercase column names and no duplicate rows — under a Results heading"
+  class="docs-image-100"
+/>
+
+## 14. Add the download button
+
+```python
+if file.name is not None:
+    csv_data = ready_df[sheet_names.index(sheet_select.value)].to_csv(index=False)
+```
+
+```python
+if file.name is not None:
+    if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
+        display(mr.Markdown("### Download edited sheet", position="sidebar", key='download'))
+        mr.Download(
+            data=csv_data,
+            filename=f"{normalize_column_name(sheet_select.value)}-edited.csv",
+            mime="text/csv",
+            label="Download as CSV",
+            key=f"csv-download-{sheet_select.value}-{normalize_col_names_checkbox.value}-{remove_duplicate_rows_checkbox.value}"
+        )
+    else:
+        clear_output()
+```
+
+[`Download`](/docs/widgets/download/) renders a button in the sidebar that streams `csv_data` as a file when clicked. The cleaned DataFrame is serialized to CSV (without the pandas index).
+
+Two small details worth noting:
+
+- The filename is built from `normalize_column_name(sheet_select.value)` so that a sheet called `"Q1 Sales 2024"` downloads as `q1_sales_2024-edited.csv` rather than something with awkward spaces or accents.
+- The `key` includes both checkbox values so the download button refreshes whenever the cleaning pipeline changes — without this, the user might end up downloading stale CSV bytes after toggling an option.
+
+<Image
+  src={downloadButtonImg}
+  alt="Download as CSV button in the sidebar, shown under a Download edited sheet heading"
+  class="docs-image-100"
+/>
+
+## 15. Run as a web app
+
+Start the Mercury server from the folder containing the notebook:
+
+```bash
+mercury 
+```
+
+Mercury will detect all `*.ipynb` files and serve them as web applications.
+
+## Notes and tips
+
+- This app exports only the **currently selected sheet** as CSV. If you want to export every sheet at once, build a workbook with `pd.ExcelWriter` and offer it with `mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"`.
+- The two cleaning operations are intentionally minimal. Easy extensions: trim whitespace from string cells, drop fully empty columns, convert date-like text columns to proper datetimes, fill missing values with a default.
+- `pd.read_excel` is slow on large workbooks because it parses every sheet upfront. For files with many sheets, consider lazy-loading: list sheet names first, then read only the sheet the user picks.
+- The dynamic `key` pattern (`f"normalize_col_names_checkbox-{sheet_select.value}"`) is the easiest way to reset widget state when a parent selection changes. Use it whenever a downstream widget's meaning depends on an upstream choice.
+- To support older `.xls` files, add `accept=".xlsx,.xls"` to `UploadFile` and install `xlrd` alongside `openpyxl`.
