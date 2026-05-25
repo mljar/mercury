@@ -1,4 +1,34 @@
+import mercury.indicator as indicator_module
 from mercury.indicator import Indicator
+
+
+def test_indicator_display_now_false_does_not_display(monkeypatch):
+    displayed = []
+    monkeypatch.setattr(indicator_module, "display", lambda widget: displayed.append(widget))
+
+    indicator = Indicator(value="123", label="Users", display_now=False)
+
+    assert isinstance(indicator, Indicator)
+    assert displayed == []
+
+
+def test_indicator_display_now_true_displays_once(monkeypatch):
+    displayed = []
+    monkeypatch.setattr(indicator_module, "display", lambda widget: displayed.append(widget))
+
+    indicator = Indicator(value="123", label="Users", display_now=True)
+
+    assert displayed == [indicator]
+
+
+def test_indicator_display_method_displays_once(monkeypatch):
+    displayed = []
+    monkeypatch.setattr(indicator_module, "display", lambda widget: displayed.append(widget))
+
+    indicator = Indicator(value="123", label="Users")
+    indicator.display()
+
+    assert displayed == [indicator]
 
 
 def test_indicator_single_renders_inline_colors():

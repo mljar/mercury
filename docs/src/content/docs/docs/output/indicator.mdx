@@ -34,18 +34,18 @@ mr.Indicator(
 )
 ```
 
-* `value` is displayed as the main metric
-* `label` is shown above the value
-* `delta` shows a directional badge (green/red/neutral) if numeric
+- `value` is displayed as the main metric
+- `label` is shown above the value
+- `delta` shows a directional badge (green/red/neutral) if numeric
 
 ## Delta (Change Badge)
 
 `delta` can be numeric or text:
 
-* `delta > 0` → green badge with ↑
-* `delta == 0` → neutral badge, no arrow
-* `delta < 0` → red badge with ↓
-* non-numeric delta → displayed as-is (no arrow logic)
+- `delta > 0` → green badge with ↑
+- `delta == 0` → neutral badge, no arrow
+- `delta < 0` → red badge with ↓
+- non-numeric delta → displayed as-is (no arrow logic)
 
 ```python
 mr.Indicator(value="98%", label="Accuracy", delta=-1.2)
@@ -60,12 +60,12 @@ mr.Indicator(value="OK", label="Status", delta="stable")
 ```
 
 <Aside>
-The delta badge formats numeric values as a percentage (`abs(delta)%`).  
+The delta badge formats numeric values as a percentage (`abs(delta)%`), with trailing zeros
+stripped — for example `5.0%` is displayed as `5%`.  
 If you want custom formatting, pass `delta` as a string (for example: `"−1.2 pp"`).
 </Aside>
 
-
-## Multiple Indicators in One Row 
+## Multiple Indicators in One Row
 
 To render a row of indicators, pass a list of `Indicator` objects as the `value`
 of another `Indicator`:
@@ -74,20 +74,73 @@ of another `Indicator`:
 import mercury as mr
 
 mr.Indicator([
-    mr.Indicator(value="123", label="Users", delta=5.4),
-    mr.Indicator(value="98%", label="Accuracy", delta=-1.2),
+    mr.Indicator(value="123",  label="Users",    delta=5.4),
+    mr.Indicator(value="98%",  label="Accuracy", delta=-1.2),
     mr.Indicator(value="1.3s", label="Latency"),
 ])
 ```
 
 The row is responsive:
 
-* on wide screens it displays as a row of cards
-* on small screens it switches to a single-column layout
+- on wide screens it displays as a row of cards
+- on small screens it switches to a single-column layout
+
+## Variants
+
+Use the `variant` parameter to apply a predefined color scheme. Each variant sets the
+accent bar, border, and badge colors automatically. The card background is always white.
+
+### Semantic variants
+
+```python
+mr.Indicator(value="1,024", label="Users",    delta=5.4,  variant="primary")
+mr.Indicator(value="98%",   label="Accuracy", delta=2.1,  variant="success")
+mr.Indicator(value="340ms", label="Latency",  delta=18.0, variant="warning")
+mr.Indicator(value="4.2%",  label="Error rate", delta=-11.0, variant="danger")
+mr.Indicator(value="1.3s",  label="P99",                  variant="neutral")
+```
+
+| Variant | Use case |
+|---|---|
+| `primary` | Default, Mercury brand blue |
+| `success` | Good metric, target hit |
+| `warning` | Needs attention |
+| `danger` | Bad metric, threshold breached |
+| `neutral` | No signal, structural info |
+
+### Domain variants
+
+```python
+mr.Indicator(value="0.94",   label="AUC",       delta=0.02, variant="ml")
+mr.Indicator(value="17",     label="Columns",               variant="info")
+mr.Indicator(value="$12k",   label="Revenue",   delta=3.1,  variant="teal")
+mr.Indicator(value="63%",    label="CTR",       delta=4.0,  variant="pink")
+mr.Indicator(value="82%",    label="CPU",       delta=-1.0, variant="orange")
+```
+
+| Variant | Use case |
+|---|---|
+| `ml` | Model metrics — AUC, accuracy, F1 |
+| `info` | Informational counts |
+| `teal` | Financial / revenue |
+| `pink` | Marketing / engagement |
+| `orange` | Performance / ops |
+
+### Row with variants
+
+```python
+mr.Indicator([
+    mr.Indicator(value="123",  label="Users",    delta=5.4,  variant="primary"),
+    mr.Indicator(value="98%",  label="Accuracy", delta=-1.2, variant="danger"),
+    mr.Indicator(value="1.3s", label="Latency",              variant="warning"),
+    mr.Indicator(value="0.94", label="AUC",      delta=0.02, variant="ml"),
+])
+```
 
 ## Styling
 
-You can customize colors per indicator:
+For full control, override individual color parameters. These always take precedence
+over `variant`.
 
 ```python
 import mercury as mr
@@ -96,17 +149,15 @@ mr.Indicator(
     value="$12,340",
     label="Revenue",
     delta=3.1,
-    background_color="#fff",
-    border_color="#ebebeb",
-    value_color="#222",
-    label_color="#555",
+    accent_color="#7c3aed",
+    border_color="#ddd6fe",
+    value_color="#111827",
+    label_color="#6b7280",
 )
 ```
 
----
-
-Color parameters (`background_color`, `border_color`, `value_color`, `label_color`) are applied
-directly to the rendered HTML card.
+`accent_color` controls the 3px top bar. `border_color`, `value_color`, and `label_color`
+are applied directly to the rendered HTML card.
 
 ## Indicator Params
 
@@ -116,9 +167,7 @@ directly to the rendered HTML card.
 
 Main value displayed in the card.
 
-Special case:
-
-* if `value` is a list of `Indicator` instances, they are rendered together as a row.
+Special case: if `value` is a list of `Indicator` instances, they are rendered together as a row.
 
 ---
 
@@ -138,13 +187,37 @@ Default: `""`
 
 Optional change badge.
 
-* `delta > 0` → green badge with ↑
-* `delta == 0` → neutral badge, no arrow
-* `delta < 0` → red badge with ↓
-* `string` → shown as provided, no arrow logic
-* `None` → no badge
+- `delta > 0` → green badge with ↑
+- `delta == 0` → neutral badge, no arrow
+- `delta < 0` → red badge with ↓
+- `string` → shown as provided, no arrow logic
+- `None` → no badge
 
 Default: `None`
+
+---
+
+### variant
+
+**type:** `string`
+
+Predefined color preset. Sets `accent_color`, `border_color`, and badge colors in one go.
+
+Semantic: `"primary"`, `"success"`, `"warning"`, `"danger"`, `"neutral"`
+
+Domain: `"ml"`, `"info"`, `"teal"`, `"pink"`, `"orange"`
+
+Default: `"primary"`
+
+---
+
+### accent_color
+
+**type:** `string`
+
+Color of the 3px top accent bar. Overrides `variant` when set.
+
+Default: `None` (resolved from `variant`)
 
 ---
 
@@ -154,7 +227,7 @@ Default: `None`
 
 Card background color.
 
-Default: `"#fff"`
+Default: `"#ffffff"`
 
 ---
 
@@ -162,9 +235,9 @@ Default: `"#fff"`
 
 **type:** `string`
 
-Card border color.
+Card border color. Overrides `variant` when set.
 
-Default: `"#ebebeb"`
+Default: `None` (resolved from `variant`)
 
 ---
 
@@ -174,7 +247,7 @@ Default: `"#ebebeb"`
 
 Text color of the main value.
 
-Default: `"#222"`
+Default: `"#111827"`
 
 ---
 
@@ -184,13 +257,14 @@ Default: `"#222"`
 
 Text color of the label.
 
-Default: `"#555"`
+Default: `"#6b7280"`
 
 ---
 
 ## Notes
 
-* `Indicator` renders HTML using the `_repr_html_` protocol.
-* Multiple indicators can be grouped into a responsive row.
-* Numeric deltas are interpreted as percentages (`abs(delta)%`). Zero is treated as a neutral state — no arrow, no color.
-
+- `Indicator` renders HTML using the `_repr_html_` protocol.
+- Multiple indicators can be grouped into a responsive row.
+- Numeric deltas are formatted as percentages (`abs(delta)%`) with trailing zeros stripped.
+  Zero is treated as a neutral state — no arrow, badge color is taken from the active `variant`.
+- Explicit color params (`accent_color`, `border_color`) always take precedence over `variant`.
