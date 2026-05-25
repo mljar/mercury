@@ -5,6 +5,7 @@ import traitlets
 from IPython.display import display
 
 from .manager import WidgetsManager, MERCURY_MIMETYPE
+from .render_context import apply_widget_render_metadata, with_widget_render_metadata
 
 try:
     # Optional: nice markdown → HTML conversion
@@ -29,6 +30,10 @@ class MarkdownWidget(widgets.HTML):
         default_value="inline",
         help="Widget placement: sidebar, inline, or bottom",
     ).tag(sync=True)
+    cell_id = traitlets.Unicode(allow_none=True).tag(sync=True)
+    source_cell_id = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+    render_slot_id = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
+    layout_path = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
 
     def __init__(self, text: str = "hello", position: str = "inline", **kwargs):
         # store raw markdown
@@ -120,15 +125,21 @@ def Markdown(
     MarkdownWidget
         The widget instance.
     """
-    code_uid = WidgetsManager.get_code_uid("Markdown", key=key)
+    args = [text, position]
+    kwargs = {"text": text, "position": position}
+
+    code_uid = WidgetsManager.get_code_uid("Markdown", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
 
     if cached is not None:
         widget: MarkdownWidget = cached
         widget.text = text
         widget.position = position
+        apply_widget_render_metadata(widget)
+        display(widget)
         return widget
 
-    widget = MarkdownWidget(text=text, position=position)
+    widget = MarkdownWidget(**with_widget_render_metadata(kwargs))
     WidgetsManager.add_widget(code_uid, widget)
+    display(widget)
     return widget

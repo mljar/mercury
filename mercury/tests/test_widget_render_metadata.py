@@ -2,6 +2,7 @@ import mercury.button as button_module
 import mercury.checkbox as checkbox_module
 import mercury.columns as columns_module
 import mercury.expander as expander_module
+import mercury.md as md_module
 import mercury.multiselect as multiselect_module
 import mercury.number as number_module
 import mercury.select as select_module
@@ -13,6 +14,7 @@ from mercury.checkbox import CheckBox
 from mercury.columns import Columns
 from mercury.expander import Expander
 from mercury.manager import WidgetsManager
+from mercury.md import Markdown
 from mercury.multiselect import MultiSelect
 from mercury.number import NumberInput
 from mercury.render_context import source_cell_context
@@ -27,6 +29,7 @@ def _disable_display(monkeypatch):
     monkeypatch.setattr(checkbox_module, "display", lambda *_: None)
     monkeypatch.setattr(columns_module, "display", lambda *_: None)
     monkeypatch.setattr(expander_module, "display", lambda *_: None)
+    monkeypatch.setattr(md_module, "display", lambda *_: None)
     monkeypatch.setattr(multiselect_module, "display", lambda *_: None)
     monkeypatch.setattr(number_module, "display", lambda *_: None)
     monkeypatch.setattr(select_module, "display", lambda *_: None)
@@ -211,6 +214,40 @@ def test_multiselect_gets_nested_layout_render_metadata(monkeypatch):
     assert "tabs:" in multiselect.layout_path
     assert "columns:" in multiselect.layout_path
     assert "expander:" in multiselect.layout_path
+
+
+def test_markdown_gets_source_cell_metadata_outside_layout(monkeypatch):
+    _disable_display(monkeypatch)
+
+    with source_cell_context("cell-markdown-plain"):
+        md = Markdown("hello")
+
+    assert md.source_cell_id == "cell-markdown-plain"
+    assert md.cell_id == "cell-markdown-plain"
+    assert md.render_slot_id is None
+    assert md.layout_path is None
+
+
+def test_markdown_gets_nested_layout_render_metadata(monkeypatch):
+    _disable_display(monkeypatch)
+
+    with source_cell_context("cell-markdown-nested"):
+        tabs = Tabs(labels=["a"])
+        with tabs[0]:
+            cols = Columns(2)
+            with cols[1]:
+                exp = Expander("Details")
+                with exp:
+                    md = Markdown("nested")
+
+    assert md.source_cell_id == "cell-markdown-nested"
+    assert md.cell_id == "cell-markdown-nested"
+    assert md.render_slot_id is not None
+    assert md.layout_path is not None
+    assert md.layout_path.endswith(md.render_slot_id)
+    assert "tabs:" in md.layout_path
+    assert "columns:" in md.layout_path
+    assert "expander:" in md.layout_path
 
 
 def test_textinput_gets_source_cell_metadata_outside_layout(monkeypatch):
