@@ -710,33 +710,6 @@ function render({ model, el }) {
   model.on('change:height', rerender);
   rerender();
 
-  // read cell id (used to sync widget with notebook cell)
-  const ID_ATTR = 'data-cell-id';
-  const hostWithId = el.closest(`[${ID_ATTR}]`);
-  const cellId = hostWithId ? hostWithId.getAttribute(ID_ATTR) : null;
-
-  if (cellId) {
-    model.set('cell_id', cellId);
-    model.save_changes();
-    model.send({ type: 'cell_id_detected', value: cellId });
-  } else {
-    // if the attribute appears later, watch DOM mutations
-    const mo = new MutationObserver(() => {
-      const host = el.closest(`[${ID_ATTR}]`);
-      const newId = host?.getAttribute(ID_ATTR);
-      if (newId) {
-        model.set('cell_id', newId);
-        model.save_changes();
-        model.send({ type: 'cell_id_detected', value: newId });
-        mo.disconnect();
-      }
-    });
-    mo.observe(document.body, {
-      attributes: true,
-      subtree: true,
-      attributeFilter: [ID_ATTR]
-    });
-  }
 }
 export default { render };
 """
