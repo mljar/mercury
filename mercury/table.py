@@ -755,6 +755,28 @@ export default { render };
   overflow-x: auto;
   display: block;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #b8b8b8 #f1f1f1;
+}
+
+.mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-thumb {
+  background: #b8b8b8;
+  border-radius: 8px;
+  border: 2px solid #f1f1f1;
+}
+
+.mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #9d9d9d;
 }
 
 .mljar-mercury-table-widget-tbl {
