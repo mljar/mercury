@@ -26,9 +26,9 @@ No code, no terminal, no pandas knowledge required from the user. Just upload an
 
 We will use:
 
-- **pandas** for reading and analysing the CSV
-- **skrub** for the interactive data preview table
-- **Mercury** to turn the notebook into a web app
+- **pandas** for reading and analysing the CSV,
+- **skrub** for the interactive data preview table,
+- **Mercury** to turn the notebook into a web app.
 
 The full notebook code is available in our [GitHub repository](https://github.com/mljar/mercury-notebook-apps/tree/main/summarize-dataset).
 
@@ -38,9 +38,9 @@ You can also try the [live demo](https://utility-apps.ismvp.org/mercury/summariz
 
 After the user uploads a CSV, the app displays three sections:
 
-1. **Key indicators** — rows, columns, duplicate rows (with %), missing values (with %)
-2. **Column type summary** — a table breaking down how many columns are numeric, categorical, text, datetime, boolean, or constant
-3. **Data preview** — an interactive table with the first 15 rows, powered by skrub's `TableReport`
+1. **Key indicators** — rows, columns, duplicate rows (with %), missing values (with %).
+2. **Column type summary** — a table breaking down how many columns are numeric, categorical, text, datetime, boolean, or constant.
+3. **Data preview** — an interactive table with the first 15 rows, powered by skrub's `TableReport`.
 
 ## 1. Install packages
 
@@ -83,8 +83,8 @@ We restrict it to `.csv` files and allow up to 1 GB.
 />
 
 When the user picks a file:
-- `input_file.name` becomes the filename (non-empty string)
-- `input_file.value` contains the raw file bytes
+- `input_file.name` becomes the filename (non-empty string),
+- `input_file.value` contains the raw file bytes.
 
 Mercury automatically re-runs the notebook when the upload changes, so all cells below react immediately.
 

@@ -28,8 +28,8 @@ No code, no Excel macros, no manual find-and-replace. Just upload, click, and do
 
 We will use:
 
-- **pandas** for reading the Excel file and applying cleaning operations
-- **Mercury** to turn the notebook into a web app with file upload, sheet selection, checkboxes, and a download button
+- **pandas** for reading the Excel file and applying cleaning operations,
+- **Mercury** to turn the notebook into a web app with file upload, sheet selection, checkboxes, and a download button.
 
 The full notebook code is available in our [GitHub repository](https://github.com/mljar/mercury-notebook-apps/tree/main/excel-cleaner).
 
@@ -39,12 +39,12 @@ You can also try the [live demo](https://utility-apps.ismvp.org/mercury/excel-cl
 
 After the user uploads an Excel file, the app displays:
 
-1. **Sheets overview** — a table listing every sheet with row count, column count, empty cells, and duplicate rows
-2. **Sheet selector** — a dropdown to pick which sheet to inspect and clean
-3. **Original data preview** — the raw content of the chosen sheet
-4. **Cleaning options** — checkboxes in the sidebar to normalize column names and/or remove duplicate rows
-5. **Results table** — the cleaned data, updated live as the user toggles options
-6. **Download button** — exports the cleaned sheet as a CSV file
+1. **Sheets overview** — a table listing every sheet with row count, column count, empty cells, and duplicate rows.
+2. **Sheet selector** — a dropdown to pick which sheet to inspect and clean.
+3. **Original data preview** — the raw content of the chosen sheet.
+4. **Cleaning options** — checkboxes in the sidebar to normalize column names and/or remove duplicate rows.
+5. **Results table** — the cleaned data, updated live as the user toggles options.
+6. **Download button** — exports the cleaned sheet as a CSV file.
 
 ## 1. Install packages
 
@@ -88,8 +88,8 @@ file = mr.UploadFile(label="Upload your Excel file", accept=".xlsx")
 />
 
 When the user picks a file:
-- `file.name` becomes the filename (non-empty string)
-- `file.value` contains the raw file bytes
+- `file.name` becomes the filename (non-empty string),
+- `file.value` contains the raw file bytes.
 
 Mercury automatically re-runs the notebook when the upload changes, so all cells below react immediately.
 
@@ -182,8 +182,8 @@ if file.name is not None:
 
 We wrap the raw bytes in `BytesIO` so pandas can read them directly, without saving the file to disk first. Two lists are kept in parallel:
 
-- `df_list` — the original, untouched DataFrames (used for the "before" preview)
-- `ready_df` — the working copies that cleaning operations modify
+- `df_list` — the original, untouched DataFrames (used for the "before" preview),
+- `ready_df` — the working copies that cleaning operations modify.
 
 This way the user can always see what changed.
 
@@ -303,9 +303,9 @@ if file.name is not None:
 ```
 
 Each operation:
-1. Checks if the user ticked the box
-2. Disables the box so it can't be toggled off mid-pipeline (the operation has already been applied)
-3. Updates the working DataFrame in-place for the current sheet
+1. Checks if the user ticked the box.
+2. Disables the box so it can't be toggled off mid-pipeline (the operation has already been applied).
+3. Updates the working DataFrame in-place for the current sheet.
 
 The disabling step is a small UX touch — once you've cleaned the data, you can't "untick" your way back to the original; you'd need to refresh.
 
