@@ -1,6 +1,3 @@
-from .app import MercuryApp
-from .serverextension import _load_jupyter_server_extension
-
 try:
     from ._version import __version__
 except ImportError:
@@ -13,9 +10,29 @@ except ImportError:
     __version__ = "dev"
 
 
+def __getattr__(name):
+    if name == "MercuryApp":
+        from .app import MercuryApp
+
+        return MercuryApp
+    if name == "_load_jupyter_server_extension":
+        from .serverextension import _load_jupyter_server_extension
+
+        return _load_jupyter_server_extension
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 def _jupyter_labextension_paths():
     return [{"src": "labextension", "dest": "@mljar/mercury-extension"}]
 
 
 def _jupyter_server_extension_points():
+    from .app import MercuryApp
+
     return [{"module": "mercury_app", "app": MercuryApp}]
+
+
+def _load_jupyter_server_extension(serverapp):
+    from .serverextension import _load_jupyter_server_extension as _load_impl
+
+    return _load_impl(serverapp)

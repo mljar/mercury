@@ -176,13 +176,14 @@ class TextInputWidget(anywidget.AnyWidget):
 
     .mljar-textinput-input {{
       width: 100%;
-      padding: 6px 10px;
-      min-height: 1.6em;
+      min-height: 40px;
+      padding: 9px 10px;
       box-sizing: border-box;
       border: {"1px solid " + THEME.get('border_color', '#ccc') if THEME.get('border_visible', True) else "none"};
       border-radius: {THEME.get('border_radius', '6px')};
       background: {THEME.get('widget_background_color', '#fff')};
       color: {THEME.get('text_color', '#222')};
+      line-height: 1.4;
 
       appearance: none !important;
       background-color: {THEME.get('widget_background_color', '#fff')} !important;
@@ -190,13 +191,22 @@ class TextInputWidget(anywidget.AnyWidget):
 
     .mljar-textinput-input:focus {{
       outline: none;
-      border-color: {THEME.get('primary_color', '#007bff')};
+      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-width: 2px;
+      box-shadow: none;
     }}
 
     .mljar-textinput-input:disabled {{
       background: #f5f5f5;
       color: #888;
       cursor: not-allowed;
+    }}
+
+    @media (max-width: 768px) {{
+      .mljar-textinput-input {{
+        min-height: 44px;
+        padding: 10px 12px;
+      }}
     }}
     """
 

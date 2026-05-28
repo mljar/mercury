@@ -1,6 +1,7 @@
 import os
 import sys
 import types
+import importlib
 
 import pytest
 
@@ -42,11 +43,13 @@ def test_main_changes_directory_before_launch(monkeypatch, tmp_path):
     workdir.mkdir()
     original_cwd = os.getcwd()
     calls = {}
+    original_config_dir = os.environ.get("MERCURY_CONFIG_DIR")
 
     fake_app_module = types.ModuleType("mercury_app.app")
 
     def fake_app_main():
         calls["cwd"] = os.getcwd()
+        calls["config_dir"] = os.environ.get("MERCURY_CONFIG_DIR")
         calls["argv"] = list(sys.argv)
         return "started"
 
@@ -56,11 +59,16 @@ def test_main_changes_directory_before_launch(monkeypatch, tmp_path):
     try:
         result = __main__.main(["mercury", "app.ipynb", "--working-dir", str(workdir)])
     finally:
+        if original_config_dir is None:
+            os.environ.pop("MERCURY_CONFIG_DIR", None)
+        else:
+            os.environ["MERCURY_CONFIG_DIR"] = original_config_dir
         os.chdir(original_cwd)
         sys.modules.pop("mercury_app.app", None)
 
     assert result == "started"
     assert calls["cwd"] == str(workdir.resolve())
+    assert calls["config_dir"] == str(workdir.resolve())
     assert "app.ipynb" in calls["argv"]
     assert f"--ServerApp.root_dir={workdir.resolve()}" in calls["argv"]
 
@@ -73,3 +81,14 @@ def test_effective_notebooks_dir_prefers_server_root_dir(tmp_path):
         root_dir = str(workdir)
 
     assert get_effective_notebooks_dir(ServerAppStub()) == str(workdir.resolve())
+
+
+def test_importing_main_does_not_import_app_or_handlers(monkeypatch):
+    for mod in list(sys.modules):
+        if mod == "mercury_app" or mod.startswith("mercury_app."):
+            sys.modules.pop(mod, None)
+
+    importlib.import_module("mercury_app.__main__")
+
+    assert "mercury_app.app" not in sys.modules
+    assert "mercury_app.handlers" not in sys.modules

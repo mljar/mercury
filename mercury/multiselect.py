@@ -513,7 +513,8 @@ class MultiSelectWidget(anywidget.AnyWidget):
 
     .mljar-ms-control:focus-within {{
       border-color: {THEME.get('accent_color', '#4c7cf0')};
-      box-shadow: 0 0 0 3px rgba(76, 124, 240, 0.16);
+      border-width: 2px;
+      box-shadow: none;
     }}
 
     .mljar-ms-selected {{

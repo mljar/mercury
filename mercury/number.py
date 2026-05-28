@@ -154,18 +154,60 @@ class NumberInputWidget(anywidget.AnyWidget):
       const topLabel = document.createElement("div");
       topLabel.classList.add("mljar-number-label");
 
+      const fieldRow = document.createElement("div");
+      fieldRow.classList.add("mljar-number-field-row");
+
       const input = document.createElement("input");
       input.type = "number";
       input.classList.add("mljar-number-input");
 
+      const decrementBtn = document.createElement("button");
+      decrementBtn.type = "button";
+      decrementBtn.classList.add("mljar-number-step-btn", "mljar-number-step-down");
+      decrementBtn.textContent = "-";
+      decrementBtn.setAttribute("aria-label", "Decrease value");
+
+      const incrementBtn = document.createElement("button");
+      incrementBtn.type = "button";
+      incrementBtn.classList.add("mljar-number-step-btn", "mljar-number-step-up");
+      incrementBtn.textContent = "+";
+      incrementBtn.setAttribute("aria-label", "Increase value");
+
+      const controls = document.createElement("div");
+      controls.classList.add("mljar-number-controls");
+
+      controls.appendChild(decrementBtn);
+      controls.appendChild(incrementBtn);
+      fieldRow.appendChild(input);
+      fieldRow.appendChild(controls);
+
       container.appendChild(topLabel);
-      container.appendChild(input);
+      container.appendChild(fieldRow);
       el.appendChild(container);
 
       function clamp(val, min, max) {
         if (Number.isFinite(min) && val < min) return min;
         if (Number.isFinite(max) && val > max) return max;
         return val;
+      }
+
+      function normalizeStep(step) {
+        return Number.isFinite(step) && step > 0 ? step : 1;
+      }
+
+      function commitValue(nextValue, saveNow = true) {
+        const min = Number(model.get("min"));
+        const max = Number(model.get("max"));
+        let v = Number(nextValue);
+        if (!Number.isFinite(v)) return;
+
+        v = clamp(v, min, max);
+        input.value = String(v);
+        model.set("value", v);
+
+        if (saveNow) {
+          model.save_changes();
+        }
       }
 
       function syncFromModel() {
@@ -184,6 +226,8 @@ class NumberInputWidget(anywidget.AnyWidget):
 
         const disabled = !!model.get("disabled");
         input.disabled = disabled;
+        incrementBtn.disabled = disabled;
+        decrementBtn.disabled = disabled;
 
         const hidden = !!model.get("hidden");
         container.style.display = hidden ? "none" : "flex";
@@ -205,6 +249,22 @@ class NumberInputWidget(anywidget.AnyWidget):
         model.set("value", v);
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => model.save_changes(), 200);
+      });
+
+      incrementBtn.addEventListener("click", () => {
+        if (model.get("disabled")) return;
+        const current = Number(model.get("value"));
+        const step = normalizeStep(Number(model.get("step")));
+        const base = Number.isFinite(current) ? current : 0;
+        commitValue(base + step);
+      });
+
+      decrementBtn.addEventListener("click", () => {
+        if (model.get("disabled")) return;
+        const current = Number(model.get("value"));
+        const step = normalizeStep(Number(model.get("step")));
+        const base = Number.isFinite(current) ? current : 0;
+        commitValue(base - step);
       });
 
       model.on("change:value", syncFromModel);
@@ -263,23 +323,119 @@ class NumberInputWidget(anywidget.AnyWidget):
       font-weight: 600;
     }}
 
-    .mljar-number-input {{
+    .mljar-number-field-row {{
+      display: flex;
+      align-items: stretch;
       width: 100%;
-      padding: 6px;
+      min-height: 40px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: #fff;
       box-sizing: border-box;
+      overflow: hidden;
+    }}
 
-      appearance: none !important;
+    .mljar-number-input {{
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 100%;
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 0;
+      background: #fff;
+      box-sizing: border-box;
       background-color: #ffffff !important;
       color: {THEME.get('text_color', '#222')} !important;
+      font: inherit;
+      line-height: 1.2;
+      -moz-appearance: textfield;
+    }}
+
+    .mljar-number-input::-webkit-outer-spin-button,
+    .mljar-number-input::-webkit-inner-spin-button {{
+      -webkit-appearance: none;
+      margin: 0;
     }}
 
     .mljar-number-input:disabled {{
       background: #f5f5f5;
       color: #888;
       cursor: not-allowed;
+    }}
+
+    .mljar-number-input:focus {{
+      outline: none;
+    }}
+
+    .mljar-number-field-row:focus-within {{
+      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-width: 2px;
+      box-shadow: none;
+    }}
+
+    .mljar-number-controls {{
+      display: flex;
+      align-items: stretch;
+      flex: 0 0 auto;
+      border-left: 1px solid {THEME.get('border_color', '#ccc')};
+      background: #f7f7f7;
+    }}
+
+    .mljar-number-step-btn {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      min-width: 38px;
+      min-height: 100%;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: {THEME.get('text_color', '#222')};
+      font: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }}
+
+    .mljar-number-step-up {{
+      border-left: 1px solid {THEME.get('border_color', '#ccc')};
+    }}
+
+    .mljar-number-step-btn:hover {{
+      background: #ececec;
+    }}
+
+    .mljar-number-step-btn:active {{
+      background: #e0e0e0;
+    }}
+
+    .mljar-number-step-btn:disabled {{
+      background: #f5f5f5;
+      color: #aaa;
+      cursor: not-allowed;
+    }}
+
+    @media (max-width: 768px) {{
+      .mljar-number-field-row {{
+        min-height: 44px;
+      }}
+
+      .mljar-number-input {{
+        min-height: 44px;
+        padding: 8px 12px;
+      }}
+
+      .mljar-number-step-btn {{
+        font-size: 19px;
+        width: 44px;
+        min-width: 44px;
+      }}
     }}
     """
 

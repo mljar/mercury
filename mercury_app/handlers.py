@@ -6,7 +6,6 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import toml
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerJinjaMixin,
@@ -18,6 +17,8 @@ from jupyterlab_server.config import LabConfig, get_page_config, recursive_updat
 from jupyterlab_server.handlers import _camelCase, is_url
 from tornado import web
 
+from mercury.config import load_config_file
+
 from ._version import __version__
 from .notebook_sanitize import sanitize_notebook_for_mercury_runtime
 
@@ -25,11 +26,7 @@ version = __version__
 
 
 def load_config(config_path="config.toml"):
-    config_file = Path(config_path)
-    if not config_file.exists():
-        return {"theme": {}, "main": {}, "welcome": {}}
-
-    config = toml.load(config_file)
+    config = load_config_file(config_path)
     return {
         "theme": config.get("theme", {}),
         "main": config.get("main", {}),

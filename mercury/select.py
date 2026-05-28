@@ -386,7 +386,8 @@ class SelectWidget(anywidget.AnyWidget):
     .mljar-select-widget-input:focus {{
       outline: none;
       border-color: {THEME.get('accent_color', '#4c7cf0')};
-      box-shadow: 0 0 0 3px rgba(76, 124, 240, 0.16);
+      border-width: 2px;
+      box-shadow: none;
       cursor: text;
     }}
 

@@ -188,18 +188,34 @@ class DateTimeInputWidget(anywidget.AnyWidget):
 
     .mljar-datetime-input {{
       width: 100%;
-      padding: 6px;
+      min-height: 40px;
+      padding: 9px 10px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: {THEME.get('widget_background_color', '#fff')};
       color: {THEME.get('text_color', '#222')};
       box-sizing: border-box;
+      line-height: 1.4;
     }}
 
     .mljar-datetime-input:disabled {{
       background: #f5f5f5;
       color: #888;
       cursor: not-allowed;
+    }}
+
+    .mljar-datetime-input:focus {{
+      outline: none;
+      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-width: 2px;
+      box-shadow: none;
+    }}
+
+    @media (max-width: 768px) {{
+      .mljar-datetime-input {{
+        min-height: 44px;
+        padding: 10px 12px;
+      }}
     }}
     """
 

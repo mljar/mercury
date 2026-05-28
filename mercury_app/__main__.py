@@ -8,6 +8,8 @@ import sys
 
 from ._version import __version__
 
+CONFIG_ENV_VAR = "MERCURY_CONFIG_DIR"
+
 logo = r"""                            
 
      _ __ ___   ___ _ __ ___ _   _ _ __ _   _ 
@@ -267,6 +269,7 @@ def _parse_and_inject(argv):
 
 def _activate_working_dir(working_dir: str | None) -> None:
     if working_dir is not None:
+        os.environ[CONFIG_ENV_VAR] = working_dir
         os.chdir(working_dir)
 
 def main(argv=None):
