@@ -3,9 +3,12 @@ title: Customization
 description: Customize the look and feel of Mercury web apps
 ---
 
-We want you to customize your web apps so they look and feel exactly the way you like.
+Mercury apps can be customized with a `config.toml` file placed in the active notebooks directory.
 
-To do this, create a file called `config.toml` in the active notebooks directory. By default, this is the current directory. If you start Mercury with `--working-dir`, place `config.toml` there instead.
+- If you start Mercury in a directory, put `config.toml` there.
+- If you start Mercury with `--working-dir`, Mercury loads `config.toml` from that working directory.
+
+## Basic app settings
 
 ```toml
 [main]
@@ -14,84 +17,246 @@ footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
 
 [welcome]
-header = ""
-message = ""
+header = "Welcome"
+message = "Choose a notebook below."
+```
 
+Available settings:
+
+- `main.title` - title shown in the app navbar and listing page
+- `main.footer` - footer text
+- `main.favicon_emoji` - emoji used as the browser tab icon
+- `welcome.header` - optional welcome header on the notebook listing page
+- `welcome.message` - optional welcome message on the notebook listing page
+
+## Theming
+
+Mercury uses a compact theme API. Most apps only need a few tokens in `[theme]`, and Mercury derives the rest.
+
+```toml
 [theme]
 font = "Inter, ui-sans-serif, system-ui, sans-serif"
 font_size = "15px"
-
 background_color = "#f8fafc"
 surface_color = "#ffffff"
 text_color = "#0f172a"
 primary_color = "#2563eb"
-
-[theme.overrides]
-sidebar_background_color = "#f1f5f9"
-topbar_background_color = "#0f172a"
-topbar_text_color = "#f8fafc"
 ```
 
-## What you can customize
+These core tokens affect the whole app:
 
-* **`title`** – the title of your web app
-* **`footer`** – text shown at the bottom of the page
-* **`favicon_emoji`** – emoji shown as the browser tab icon
-* **`welcome.header`** – optional welcome header
-* **`welcome.message`** – optional welcome message for users
-* **`theme.*`** – typography, colors, widgets, app chrome, loader, and landing pages
-
-## Theming
-
-Mercury now supports a broader theme model inspired by app frameworks such as Streamlit. The theme is configured with the `[theme]` section in `config.toml`.
+- notebook listing page
+- notebook app navbar
+- sidebar
+- widgets
+- tables
+- Markdown output
+- loader and toasts
 
 ### Core theme tokens
 
-Most apps should only need these:
+- `font` - base font stack for pages and widgets
+- `font_size` - base UI font size
+- `background_color` - outer page background
+- `surface_color` - cards, panels, widgets, and content surfaces
+- `text_color` - main text color
+- `primary_color` - primary accent and interactive color
 
-* **`font`** – base font stack for pages and widgets
-* **`font_size`** – base UI font size
-* **`background_color`** – overall page background
-* **`surface_color`** – cards, panels, widgets, and content surfaces
-* **`text_color`** – main text color
-* **`primary_color`** – primary action color
+Mercury derives many other values from these automatically, including:
 
-Mercury derives the rest from these values:
+- muted text
+- borders
+- focus color
+- hover and selected states
+- sidebar colors
+- top navbar colors
+- footer colors
+- widget surfaces
+- button and run button styling
 
-* muted text
-* borders
-* focus color
-* widget backgrounds
-* card and panel surfaces
-* sidebar, footer, top bar, loader, and toast colors
-* run button styling
+## Web fonts
 
-### Optional overrides
+If you want to use a Google Font or another hosted stylesheet, add `font_url`.
 
-If you need precise branding, use `[theme.overrides]` for advanced values. Examples:
+```toml
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+background_color = "#f8fafc"
+surface_color = "#ffffff"
+text_color = "#0f172a"
+primary_color = "#2563eb"
+```
 
-* `accent_color`
-* `focus_border_color`
-* `sidebar_background_color`
-* `topbar_background_color`
-* `topbar_text_color`
-* `border_radius`
-* `run_button_background`
-* `toast_background_color`
+Notes:
+
+- `font` only sets the CSS `font-family`
+- `font_url` tells Mercury to load the stylesheet in the app pages
+- for Google Fonts, Mercury also adds the standard preconnect tags
+
+## Advanced overrides
+
+If you need more control, use `[theme.overrides]`.
+
+```toml
+[theme]
+font = "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+font_size = "14px"
+background_color = "#0b1220"
+surface_color = "#111827"
+text_color = "#e5e7eb"
+primary_color = "#22c55e"
+
+[theme.overrides]
+topbar_background_color = "#111827"
+topbar_text_color = "#f8fafc"
+sidebar_background_color = "#0f172a"
+sidebar_text_color = "#e5e7eb"
+focus_border_color = "#38bdf8"
+border_radius = "12px"
+```
+
+Useful override keys:
+
+- `accent_color`
+- `focus_border_color`
+- `border_color`
+- `muted_text_color`
+- `hover_background_color`
+- `selected_background_color`
+- `topbar_background_color`
+- `topbar_text_color`
+- `topbar_border_color`
+- `sidebar_background_color`
+- `sidebar_text_color`
+- `sidebar_title_color`
+- `footer_background_color`
+- `footer_text_color`
+- `widget_background_color`
+- `card_background_color`
+- `run_button_background`
+- `run_button_background_hover`
+- `run_button_text_color`
+- `border_radius`
+
+## Examples
+
+### Minimal
+
+```toml
+[main]
+title = "Mercury"
+footer = "Internal tools"
+favicon_emoji = "⚡"
+
+[welcome]
+header = "Welcome"
+message = "Choose an app below."
+
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_size = "15px"
+background_color = "#f8fafc"
+surface_color = "#ffffff"
+text_color = "#0f172a"
+primary_color = "#2563eb"
+```
+
+### Darkish
+
+```toml
+[main]
+title = "Ops Console"
+footer = "Platform Engineering"
+favicon_emoji = "🛠️"
+
+[welcome]
+header = "Operations"
+message = "Run notebooks as internal apps."
+
+[theme]
+font = "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+font_size = "14px"
+background_color = "#0b1220"
+surface_color = "#111827"
+text_color = "#e5e7eb"
+primary_color = "#22c55e"
+
+[theme.overrides]
+accent_color = "#38bdf8"
+topbar_background_color = "#111827"
+topbar_text_color = "#f8fafc"
+sidebar_background_color = "#0f172a"
+sidebar_text_color = "#e5e7eb"
+sidebar_title_color = "#f8fafc"
+```
+
+### Editorial
+
+```toml
+[main]
+title = "Research Hub"
+footer = "Notebook publishing"
+favicon_emoji = "📘"
+
+[welcome]
+header = "Research Apps"
+message = "Interactive notebooks with a calmer visual style."
+
+[theme]
+font = "Source Serif 4, Georgia, serif"
+font_url = "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700;800&display=swap"
+font_size = "16px"
+background_color = "#fcfaf7"
+surface_color = "#fffdf9"
+text_color = "#2f241f"
+primary_color = "#b45309"
+
+[theme.overrides]
+topbar_background_color = "#3f2d23"
+topbar_text_color = "#fff7ed"
+sidebar_background_color = "#f6efe7"
+sidebar_text_color = "#2f241f"
+sidebar_title_color = "#2f241f"
+```
+
+## What gets themed
+
+The theme is applied consistently across:
+
+- notebook listing page
+- notebook app navbar
+- app sidebar
+- text, number, select, multiselect, date, time, and datetime widgets
+- tables
+- Markdown output
+- buttons, tabs, expanders, file upload, slider, checkbox, download
+- loader and toast messages
 
 ## Compatibility
 
-Mercury still accepts several older theme keys and normalizes them internally. Existing configs using keys like `primary_color`, `panel_bg`, `widget_background_color`, or `sidebar_background_color` will keep working.
+Mercury still accepts several older or alternative keys and normalizes them internally.
 
-Some common camelCase aliases are also accepted, for example:
+Examples:
 
-* `backgroundColor`
-* `secondaryBackgroundColor`
-* `textColor`
-* `primaryColor`
-* `accentColor`
-* `surfaceColor`
+- `backgroundColor`
+- `secondaryBackgroundColor`
+- `textColor`
+- `primaryColor`
+- `accentColor`
+- `surfaceColor`
+- `fontFamily`
+- `fontUrl`
 
-Feel free to change these values and make the app your own.
+Legacy Mercury keys such as `panel_bg`, `widget_background_color`, or `sidebar_background_color` also continue to work.
 
-If something is missing or you would like to customize more things, please let us know.
+## Example files
+
+Example configs are available in the repository:
+
+- `config.minimal.toml`
+- `config.darkish.toml`
+- `config.editorial.toml`
+- `config.google-font.toml`
+
+If something important is still not customizable enough, please open an issue.
