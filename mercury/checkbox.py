@@ -185,7 +185,7 @@ class CheckboxWidget(anywidget.AnyWidget):
     }}
 
     .mljar-checkbox-input:focus-visible + .mljar-checkbox-control {{
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.35);
+        box-shadow: inset 0 0 0 2px {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
     }}
 
     .mljar-checkbox-label {{
@@ -251,7 +251,8 @@ class CheckboxWidget(anywidget.AnyWidget):
     }}
 
     .mljar-checkbox-container:not(.is-disabled):hover .mljar-checkbox-control {{
-        filter: brightness(0.98);
+        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+        background: {THEME.get('hover_background_color', THEME.get('panel_bg_hover', '#e5e7eb'))};
     }}
     """
 

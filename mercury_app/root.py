@@ -3,7 +3,9 @@ import os
 import tornado.web
 from jupyter_server.base.handlers import JupyterHandler
 
-from .handlers import MAIN_CONFIG, WELCOME_CONFIG
+from mercury.config import build_theme_css_vars, build_theme_font_links
+
+from .handlers import MAIN_CONFIG, THEME, WELCOME_CONFIG
 from .notebooks_meta import list_notebooks
 
 
@@ -23,7 +25,10 @@ class RootIndexHandler(JupyterHandler):
                 "root.html",
                 notebooks=[],
                 base_url=base,
-                error=f"Notebooks directory '{notebooks_dir}' does not exist."
+                error=f"Notebooks directory '{notebooks_dir}' does not exist.",
+                theme=THEME,
+                theme_css_vars=build_theme_css_vars(THEME),
+                theme_font_links=build_theme_font_links(THEME),
             )
             self.set_header("Content-Type", "text/html; charset=UTF-8")
             self.finish(html)
@@ -63,6 +68,9 @@ class RootIndexHandler(JupyterHandler):
                                     title=MAIN_CONFIG.get("title", "Mercury"),           
                                     footer=MAIN_CONFIG.get("footer", "MLJAR - next generation of AI tools"),
                                     header=WELCOME_CONFIG.get("header", "Hi there! 👋"),
-                                    message=WELCOME_CONFIG.get("message", default_welcome_msg))
+                                    message=WELCOME_CONFIG.get("message", default_welcome_msg),
+                                    theme=THEME,
+                                    theme_css_vars=build_theme_css_vars(THEME),
+                                    theme_font_links=build_theme_font_links(THEME))
         self.set_header("Content-Type", "text/html; charset=UTF-8")
         self.finish(html)

@@ -6,16 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{page_title or 'Mercury'}}</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{{ favicon_emoji or '🎉' }}</text></svg>">
+  {% set theme = page_config.get('theme', {}) %}
+  {{ page_config.get('themeFontLinks', '') | safe }}
 
   <style>
     /* Base reset / typography */
+    :root {
+      color-scheme: light;
+      {{ page_config.get('themeCssVars', '') | safe }}
+    }
     html, body {
       padding: 0;
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: #0f172a;
+      font-family: var(--mercury-font-family);
+      font-size: var(--mercury-font-size);
+      color: var(--mercury-text-color);
       line-height: 1.55;
-      background: #f9fafb;
+      background: var(--mercury-background-color);
     }
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -36,7 +43,7 @@
       right: 0;
       bottom: 0;
       z-index: 2147483647;
-      background: rgba(249,250,251,0.85);
+      background: var(--mercury-loader-background-color);
       /* Prevent scroll behind on mobile */
       -webkit-overflow-scrolling: touch;
       touch-action: none;
@@ -51,15 +58,15 @@
       transform: translate(-50%, -50%);
       z-index: 2147483648;
 
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      background: var(--mercury-loader-card-background-color);
+      border: 1px solid var(--mercury-loader-border-color);
       border-radius: 1rem;
       padding: 5.1rem 2.25rem 2rem;
       text-align: center;
       font-size: 18px;
       font-weight: 600;
       box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      color: #475569;
+      color: var(--mercury-loader-text-color);
 
       background-image:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
@@ -105,6 +112,78 @@
 
     html.no-navbar {
       --header-height: 0px;
+    }
+
+    body .mercury-left-panel {
+      background: var(--mercury-sidebar-background-color) !important;
+      color: var(--mercury-sidebar-text-color) !important;
+      box-shadow: var(--mercury-sidebar-shadow) !important;
+    }
+
+    body .mercury-left-content,
+    body .mercury-left-header,
+    body .mercury-left-footer {
+      background: var(--mercury-sidebar-background-color) !important;
+      color: var(--mercury-sidebar-text-color) !important;
+    }
+
+    body .mercury-right-top-panel,
+    body .mercury-right-bottom-panel {
+      background: var(--mercury-content-background-color) !important;
+      color: var(--mercury-text-color) !important;
+    }
+
+    body .mercury-left-panel .mercury-sidebar-title {
+      color: var(--mercury-sidebar-title-color) !important;
+      font-family: var(--mercury-heading-font-family);
+    }
+
+    body .mercury-sidebar-toggle {
+      color: var(--mercury-text-color);
+      border: 1px solid transparent;
+    }
+
+    body .mercury-left-panel .mercury-sidebar-toggle {
+      color: var(--mercury-sidebar-text-color);
+    }
+
+    body .mercury-sidebar-toggle:hover {
+      background: var(--mercury-hover-background-color);
+    }
+
+    body .mercury-sidebar-toggle:focus,
+    body .mercury-sidebar-toggle:focus-visible,
+    body .mercury-sidebar-toggle:active {
+      color: var(--mercury-focus-border-color);
+      border-color: var(--mercury-focus-border-color);
+      box-shadow: none !important;
+    }
+
+    body .mercury-runall-btn {
+      background: var(--mercury-run-button-background) !important;
+      color: var(--mercury-run-button-text-color) !important;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.3) inset,
+        0 3px 6px rgba(22, 179, 100, 0.25);
+    }
+
+    body .mercury-runall-btn:hover {
+      background: var(--mercury-run-button-background-hover) !important;
+    }
+
+    body .mercury-runall-btn:focus-visible {
+      outline: 2px solid var(--mercury-run-button-focus-color) !important;
+      outline-offset: 2px;
+    }
+
+    body .mercury-toast {
+      background: var(--mercury-toast-background-color);
+      color: var(--mercury-toast-text-color);
+      box-shadow: var(--mercury-shadow-md);
+    }
+
+    body .mercury-toast-error {
+      border-left-color: var(--mercury-toast-error-border-color);
     }
   </style>
 </head>

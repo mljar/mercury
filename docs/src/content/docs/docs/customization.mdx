@@ -16,6 +16,20 @@ favicon_emoji = "🎉"
 [welcome]
 header = ""
 message = ""
+
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_size = "15px"
+
+background_color = "#f8fafc"
+surface_color = "#ffffff"
+text_color = "#0f172a"
+primary_color = "#2563eb"
+
+[theme.overrides]
+sidebar_background_color = "#f1f5f9"
+topbar_background_color = "#0f172a"
+topbar_text_color = "#f8fafc"
 ```
 
 ## What you can customize
@@ -25,8 +39,59 @@ message = ""
 * **`favicon_emoji`** – emoji shown as the browser tab icon
 * **`welcome.header`** – optional welcome header
 * **`welcome.message`** – optional welcome message for users
+* **`theme.*`** – typography, colors, widgets, app chrome, loader, and landing pages
+
+## Theming
+
+Mercury now supports a broader theme model inspired by app frameworks such as Streamlit. The theme is configured with the `[theme]` section in `config.toml`.
+
+### Core theme tokens
+
+Most apps should only need these:
+
+* **`font`** – base font stack for pages and widgets
+* **`font_size`** – base UI font size
+* **`background_color`** – overall page background
+* **`surface_color`** – cards, panels, widgets, and content surfaces
+* **`text_color`** – main text color
+* **`primary_color`** – primary action color
+
+Mercury derives the rest from these values:
+
+* muted text
+* borders
+* focus color
+* widget backgrounds
+* card and panel surfaces
+* sidebar, footer, top bar, loader, and toast colors
+* run button styling
+
+### Optional overrides
+
+If you need precise branding, use `[theme.overrides]` for advanced values. Examples:
+
+* `accent_color`
+* `focus_border_color`
+* `sidebar_background_color`
+* `topbar_background_color`
+* `topbar_text_color`
+* `border_radius`
+* `run_button_background`
+* `toast_background_color`
+
+## Compatibility
+
+Mercury still accepts several older theme keys and normalizes them internally. Existing configs using keys like `primary_color`, `panel_bg`, `widget_background_color`, or `sidebar_background_color` will keep working.
+
+Some common camelCase aliases are also accepted, for example:
+
+* `backgroundColor`
+* `secondaryBackgroundColor`
+* `textColor`
+* `primaryColor`
+* `accentColor`
+* `surfaceColor`
 
 Feel free to change these values and make the app your own.
 
-We are actively working on adding **more customization options**.
-If something is missing or you would like to customize more things, please let us know - your feedback really matters to us 🚀
+If something is missing or you would like to customize more things, please let us know.

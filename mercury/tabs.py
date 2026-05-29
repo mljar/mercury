@@ -44,7 +44,15 @@ def _ensure_global_tabs_styles():
         border-radius: 0;
       }}
       .mljar-tablist button:hover {{
-        background: {THEME.get('panel_bg_hover_2', '#efefef')};
+        background: {THEME.get('hover_background_color', THEME.get('panel_bg_hover_2', '#efefef'))};
+      }}
+      .mljar-tablist button:active {{
+        background: {THEME.get('selected_background_color', '#eef3ff')};
+        color: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
+      }}
+      .mljar-tablist button:focus-visible {{
+        outline: none;
+        box-shadow: inset 0 0 0 2px {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
       }}
       .mljar-tablist button[aria-selected="true"] {{
         color: {THEME.get('primary_color', '#007bff')};

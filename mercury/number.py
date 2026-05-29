@@ -330,7 +330,7 @@ class NumberInputWidget(anywidget.AnyWidget):
       min-height: 40px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       box-sizing: border-box;
       overflow: hidden;
     }}
@@ -342,9 +342,9 @@ class NumberInputWidget(anywidget.AnyWidget):
       padding: 7px 10px;
       border: 0;
       border-radius: 0;
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       box-sizing: border-box;
-      background-color: #ffffff !important;
+      background-color: {THEME.get('widget_background_color', '#fff')} !important;
       color: {THEME.get('text_color', '#222')} !important;
       font: inherit;
       line-height: 1.2;
@@ -368,9 +368,13 @@ class NumberInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-number-field-row:focus-within {{
-      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
       border-width: 2px;
       box-shadow: none;
+    }}
+
+    .mljar-number-field-row:focus-within .mljar-number-controls {{
+      border-left-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
     }}
 
     .mljar-number-controls {{
@@ -378,7 +382,7 @@ class NumberInputWidget(anywidget.AnyWidget):
       align-items: stretch;
       flex: 0 0 auto;
       border-left: 1px solid {THEME.get('border_color', '#ccc')};
-      background: #f7f7f7;
+      background: {THEME.get('panel_bg_hover', '#f7f7f7')};
     }}
 
     .mljar-number-step-btn {{
@@ -401,6 +405,7 @@ class NumberInputWidget(anywidget.AnyWidget):
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
+      transition: background-color 0.14s ease, color 0.14s ease;
     }}
 
     .mljar-number-step-up {{
@@ -408,11 +413,18 @@ class NumberInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-number-step-btn:hover {{
-      background: #ececec;
+      background: {THEME.get('hover_background_color', '#ececec')};
     }}
 
     .mljar-number-step-btn:active {{
-      background: #e0e0e0;
+      background: {THEME.get('selected_background_color', '#e0e0e0')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
+    }}
+
+    .mljar-number-step-btn:focus-visible {{
+      outline: none;
+      background: {THEME.get('selected_background_color', '#e0e0e0')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
     }}
 
     .mljar-number-step-btn:disabled {{

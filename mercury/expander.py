@@ -266,7 +266,14 @@ class _ExpanderHeaderWidget(anywidget.AnyWidget):
       position: relative;
     }}
     .mljar-expander-header:hover {{
-      background: {THEME.get('panel_bg_hover_2', '#efefef')};
+      background: {THEME.get('hover_background_color', THEME.get('panel_bg_hover_2', '#efefef'))};
+    }}
+    .mljar-expander-header:active {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+    }}
+    .mljar-expander-header:focus-visible {{
+      outline: none;
+      box-shadow: inset 0 0 0 2px {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
     }}
     .mljar-expander-header.is-transparent {{
       background: transparent;

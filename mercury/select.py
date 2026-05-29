@@ -372,20 +372,20 @@ class SelectWidget(anywidget.AnyWidget):
       padding: 9px 36px 9px 10px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       box-sizing: border-box;
       line-height: 1.4;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
       appearance: none !important;
-      background-color: #ffffff !important;
+      background-color: {THEME.get('widget_background_color', '#fff')} !important;
       color: {THEME.get('text_color', '#222')} !important;
       cursor: default;
     }}
 
     .mljar-select-widget-input:focus {{
       outline: none;
-      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
       border-width: 2px;
       box-shadow: none;
       cursor: text;
@@ -415,7 +415,7 @@ class SelectWidget(anywidget.AnyWidget):
       margin-top: 6px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
-      background: #fff;
+      background: {THEME.get('panel_bg', '#fff')};
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
       overflow: hidden;
     }}
@@ -435,22 +435,34 @@ class SelectWidget(anywidget.AnyWidget):
       text-align: left;
       cursor: pointer;
       font: inherit;
+      transition: background-color 0.14s ease, color 0.14s ease;
     }}
 
     .mljar-select-option:hover {{
-      background: #f5f7fb;
+      background: {THEME.get('hover_background_color', '#f5f7fb')};
+    }}
+
+    .mljar-select-option:active {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
     }}
 
     .mljar-select-option.is-selected {{
-      background: #eef3ff;
-      color: #1f4fd1;
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
       font-weight: 600;
+    }}
+
+    .mljar-select-option.is-selected:hover,
+    .mljar-select-option.is-selected:active {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
     }}
 
     .mljar-select-empty {{
       display: none;
       padding: 10px;
-      color: #777;
+      color: {THEME.get('muted_text_color', '#777')};
       font-size: 0.95em;
     }}
 

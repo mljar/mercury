@@ -17,7 +17,12 @@ from jupyterlab_server.config import LabConfig, get_page_config, recursive_updat
 from jupyterlab_server.handlers import _camelCase, is_url
 from tornado import web
 
-from mercury.config import load_config_file
+from mercury.config import (
+    build_theme_css_vars,
+    build_theme_font_links,
+    load_config_file,
+    normalize_theme,
+)
 
 from ._version import __version__
 from .notebook_sanitize import sanitize_notebook_for_mercury_runtime
@@ -28,7 +33,7 @@ version = __version__
 def load_config(config_path="config.toml"):
     config = load_config_file(config_path)
     return {
-        "theme": config.get("theme", {}),
+        "theme": normalize_theme(config.get("theme", {})),
         "main": config.get("main", {}),
         "welcome": config.get("welcome", {})
     }
@@ -63,6 +68,8 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
             "notebookPath": notebook_path,
             "title": MAIN_CONFIG.get("title", "Mercury"),
             "mercuryStandalone": True,
+            "themeCssVars": build_theme_css_vars(THEME),
+            "themeFontLinks": build_theme_font_links(THEME),
         }
 
         mathjax_config = self.settings.get("mathjax_config", "TeX-AMS_HTML-full,Safe")

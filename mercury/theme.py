@@ -1,7 +1,6 @@
-from .config import load_config_file
+from .config import load_theme_config
 
 def load_theme(config_path="config.toml"):
-    config = load_config_file(config_path)
-    return config.get("theme", {})
+    return load_theme_config(config_path)
 
 THEME = load_theme()

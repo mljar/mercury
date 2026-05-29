@@ -187,12 +187,20 @@ class ButtonWidget(anywidget.AnyWidget):
     .mljar-button:hover:not(:disabled) {{
         transform: translateY(-1px);
         box-shadow: {THEME.get('button_shadow_hover', '0 2px 6px rgba(0,0,0,0.08)')};
-        border-color: {THEME.get('primary_color', '#007bff')};
+        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+        background: {THEME.get('hover_background_color', '#f8fafc')};
     }}
 
     .mljar-button:active:not(:disabled) {{
         transform: translateY(0);
         box-shadow: {THEME.get('button_shadow', '0 1px 2px rgba(0,0,0,0.06)')};
+        background: {THEME.get('selected_background_color', '#eef3ff')};
+    }}
+
+    .mljar-button:focus-visible {{
+        outline: none;
+        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+        box-shadow: none;
     }}
 
     .mljar-button:disabled {{
@@ -207,7 +215,8 @@ class ButtonWidget(anywidget.AnyWidget):
         border-color: {THEME.get('primary_color', '#007bff')};
     }}
     .mljar-button.is-primary:hover:not(:disabled) {{
-        filter: brightness(0.98);
+        background: {THEME.get('run_button_background_hover', THEME.get('primary_color', '#007bff'))};
+        color: {THEME.get('button_primary_text', '#fff')};
     }}
 
     .mljar-button.is-secondary {{
@@ -221,14 +230,19 @@ class ButtonWidget(anywidget.AnyWidget):
         border: 1px solid {THEME.get('primary_color', '#007bff')};
     }}
     .mljar-button.is-outline:hover:not(:disabled) {{
-        background: {THEME.get('primary_color', '#007bff')};
-        color: #fff;
+        background: {THEME.get('hover_background_color', '#f8fafc')};
+        color: {THEME.get('primary_color', '#007bff')};
     }}
 
     .mljar-button.is-danger {{
         background: {THEME.get('danger_color', '#dc3545')};
         color: #fff;
         border-color: {THEME.get('danger_color', '#dc3545')};
+    }}
+    .mljar-button.is-danger:hover:not(:disabled) {{
+        filter: brightness(0.98);
+        background: {THEME.get('danger_color', '#dc3545')};
+        color: #fff;
     }}
 
     /* Sizes */
