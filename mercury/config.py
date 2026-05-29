@@ -331,6 +331,20 @@ def _derive_border_color(text_color: str, background_color: str) -> str:
     return _mix_colors(text_color, background_color, 0.18)
 
 
+def _derive_hover_background_color(surface_color: str, primary_color: str, text_color: str) -> str:
+    luminance = _relative_luminance(surface_color)
+    if luminance is not None and luminance < 0.35:
+        return _mix_colors(primary_color, surface_color, 0.14)
+    return _mix_colors(text_color, surface_color, 0.05)
+
+
+def _derive_selected_background_color(surface_color: str, primary_color: str) -> str:
+    luminance = _relative_luminance(surface_color)
+    if luminance is not None and luminance < 0.35:
+        return _mix_colors(primary_color, surface_color, 0.24)
+    return _mix_colors(primary_color, surface_color, 0.10)
+
+
 def _derive_topbar_background(background_color: str) -> str:
     luminance = _relative_luminance(background_color)
     if luminance is None:
@@ -435,6 +449,14 @@ def normalize_theme(theme: dict | None) -> dict:
         normalized["panel_bg_hover_2"] = _mix_colors(
             normalized["text_color"], normalized["surface_color"], 0.10
         )
+    if "hover_background_color" not in provided or not normalized.get("hover_background_color"):
+        normalized["hover_background_color"] = _derive_hover_background_color(
+            normalized["surface_color"], normalized["primary_color"], normalized["text_color"]
+        )
+    if "selected_background_color" not in provided or not normalized.get("selected_background_color"):
+        normalized["selected_background_color"] = _derive_selected_background_color(
+            normalized["surface_color"], normalized["primary_color"]
+        )
     if "widget_background_color" not in provided or not normalized.get("widget_background_color"):
         normalized["widget_background_color"] = normalized["surface_color"]
     if "card_background_color" not in provided or not normalized.get("card_background_color"):
@@ -454,17 +476,26 @@ def normalize_theme(theme: dict | None) -> dict:
             normalized["text_color"], normalized["sidebar_background_color"]
         )
     if "topbar_background_color" not in provided or not normalized.get("topbar_background_color"):
-        normalized["topbar_background_color"] = _derive_topbar_background(
-            normalized["background_color"]
-        )
+        if "background_color" in provided:
+            normalized["topbar_background_color"] = _derive_topbar_background(
+                normalized["background_color"]
+            )
+        else:
+            normalized["topbar_background_color"] = DEFAULT_THEME["topbar_background_color"]
     if "topbar_text_color" not in provided or not normalized.get("topbar_text_color"):
-        normalized["topbar_text_color"] = _derive_topbar_text(
-            normalized["topbar_background_color"], normalized["text_color"]
-        )
+        if "topbar_background_color" in provided or "background_color" in provided or "text_color" in provided:
+            normalized["topbar_text_color"] = _derive_topbar_text(
+                normalized["topbar_background_color"], normalized["text_color"]
+            )
+        else:
+            normalized["topbar_text_color"] = DEFAULT_THEME["topbar_text_color"]
     if "topbar_border_color" not in provided or not normalized.get("topbar_border_color"):
-        normalized["topbar_border_color"] = _derive_border_color(
-            normalized["topbar_text_color"], normalized["topbar_background_color"]
-        )
+        if "topbar_background_color" in provided or "background_color" in provided or "text_color" in provided:
+            normalized["topbar_border_color"] = _derive_border_color(
+                normalized["topbar_text_color"], normalized["topbar_background_color"]
+            )
+        else:
+            normalized["topbar_border_color"] = DEFAULT_THEME["topbar_border_color"]
     if "footer_text_color" not in provided or not normalized.get("footer_text_color"):
         normalized["footer_text_color"] = normalized["muted_text_color"]
     if "footer_background_color" not in provided or not normalized.get("footer_background_color"):
