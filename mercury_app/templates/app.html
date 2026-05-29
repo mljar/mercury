@@ -27,6 +27,97 @@
     a { color: inherit; text-decoration: none; }
     a:hover { text-decoration: underline; }
 
+    body #header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 52px;
+      background: var(--mercury-topbar-background-color) !important;
+      border-bottom: 1px solid var(--mercury-topbar-border-color);
+      box-shadow: none;
+    }
+
+    body #header .header-bar {
+      display: none;
+    }
+
+    body #header #header-container.container {
+      width: min(100%, calc(56rem + 2rem));
+      margin: 0 auto;
+      padding: .7rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      float: none;
+    }
+
+    body #header #jupyter_server.navbar-brand {
+      float: none;
+      height: auto;
+      margin: 0;
+      padding: 0;
+      font-family: var(--mercury-heading-font-family);
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 750;
+      letter-spacing: -.01em;
+      line-height: 1.2;
+    }
+
+    body #header #jupyter_server.navbar-brand a {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      color: var(--mercury-topbar-text-color) !important;
+      text-decoration: none;
+    }
+
+    body #header #jupyter_server.navbar-brand img {
+      height: 28px;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    body #header,
+    body #header a,
+    body #header .nav,
+    body #header .navbar-brand,
+    body #header .navbar-text {
+      color: var(--mercury-topbar-text-color) !important;
+    }
+
+    body #header button,
+    body #header .btn,
+    body #header a.btn {
+      border: 1px solid var(--mercury-topbar-border-color) !important;
+      background: transparent !important;
+      color: var(--mercury-topbar-text-color) !important;
+      border-radius: .5rem;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+    }
+
+    body #header button:hover,
+    body #header .btn:hover,
+    body #header a.btn:hover {
+      background: color-mix(in srgb, var(--mercury-topbar-text-color) 10%, transparent) !important;
+      border-color: color-mix(in srgb, var(--mercury-topbar-text-color) 18%, var(--mercury-topbar-border-color)) !important;
+      text-decoration: none;
+    }
+
+    body #header button:focus,
+    body #header button:focus-visible,
+    body #header .btn:focus,
+    body #header .btn:focus-visible,
+    body #header a.btn:focus,
+    body #header a.btn:focus-visible {
+      outline: none;
+      border-color: var(--mercury-focus-border-color) !important;
+      box-shadow: none !important;
+    }
+
     /* ===== Persistent loader overlay (below header), mobile-friendly ===== */
     :root {
       /* default fallback; JS will set the real header height */
