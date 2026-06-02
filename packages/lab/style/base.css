@@ -252,7 +252,19 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: visible;
+  overflow-x: hidden;
+}
+
+.mercury-left-content .jp-Cell-outputWrapper,
+.mercury-left-content .jp-OutputArea-child,
+.mercury-left-content .jp-OutputArea-output {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.mercury-left-content .jp-OutputArea-output {
+  overflow-x: hidden !important;
 }
 
 .mercury-left-panel.mercury-left-panel-visible {
