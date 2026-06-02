@@ -282,6 +282,13 @@ class SliderWidget(anywidget.AnyWidget):
       outline: none;
     }}
 
+    .mljar-slider-input:focus-visible::-webkit-slider-thumb {{
+      box-shadow: 0 0 0 3px {THEME.get('selected_background_color', '#eef3ff')};
+    }}
+    .mljar-slider-input:focus-visible::-moz-range-thumb {{
+      box-shadow: 0 0 0 3px {THEME.get('selected_background_color', '#eef3ff')};
+    }}
+
     /* Track */
     .mljar-slider-input::-webkit-slider-runnable-track {{
       height: 6px;
@@ -305,6 +312,7 @@ class SliderWidget(anywidget.AnyWidget):
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
       margin-top: -5px;
+      transition: transform 0.14s ease, background-color 0.14s ease;
     }}
     .mljar-slider-input::-moz-range-thumb {{
       width: 16px;
@@ -312,6 +320,16 @@ class SliderWidget(anywidget.AnyWidget):
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
+      transition: transform 0.14s ease, background-color 0.14s ease;
+    }}
+
+    .mljar-slider-input:active::-webkit-slider-thumb {{
+      transform: scale(1.08);
+      background: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
+    }}
+    .mljar-slider-input:active::-moz-range-thumb {{
+      transform: scale(1.08);
+      background: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
     }}
 
     .mljar-slider-value-label {{

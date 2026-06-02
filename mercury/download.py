@@ -1,6 +1,7 @@
 # Copyright MLJAR Sp. z o.o.
 # Licensed under the Apache License, Version 2.0 (Apache-2.0)
 
+import json
 from typing import Literal, Union
 
 import anywidget
@@ -8,6 +9,7 @@ import traitlets
 from IPython.display import display
 
 from .manager import WidgetsManager, MERCURY_MIMETYPE
+from .theme import THEME
 
 Position = Literal["sidebar", "inline", "bottom"]
 
@@ -113,18 +115,18 @@ def Download(
 
 
 class DownloadWidget(anywidget.AnyWidget):
-    _esm = """
-    function base64ToBlob(base64, mime) {
+    _esm = f"""
+    function base64ToBlob(base64, mime) {{
         const binary = atob(base64);
         const array = [];
-        for (let i = 0; i < binary.length; i++) {
+        for (let i = 0; i < binary.length; i++) {{
             array.push(binary.charCodeAt(i));
-        }
-        return new Blob([new Uint8Array(array)], {type: mime});
-    }
+        }}
+        return new Blob([new Uint8Array(array)], {{type: mime}});
+    }}
 
-    function render({ model, el }) {
-        el.innerHTML = ""; // Clear old content
+    function render({{ model, el }}) {{
+        el.innerHTML = "";
 
         let container = document.createElement("div");
         container.style.display = "flex";
@@ -135,23 +137,23 @@ class DownloadWidget(anywidget.AnyWidget):
         btn.innerHTML = model.get("label") || "Download";
         btn.classList.add("mljar-download-btn");
 
-        btn.onclick = () => {
+        btn.onclick = () => {{
             const data = model.get("data") || "";
             const filename = model.get("filename") || "file.txt";
             const mime = model.get("mime") || "application/octet-stream";
 
-            if (model.get("is_base64")) {
+            if (model.get("is_base64")) {{
                 const blob = base64ToBlob(data, mime);
                 const url = URL.createObjectURL(blob);
                 triggerDownload(url, filename);
-            } else {
-                const blob = new Blob([data], {type: mime});
+            }} else {{
+                const blob = new Blob([data], {{type: mime}});
                 const url = URL.createObjectURL(blob);
                 triggerDownload(url, filename);
-            }
-        };
+            }}
+        }};
 
-        function triggerDownload(url, filename) {
+        function triggerDownload(url, filename) {{
             const a = document.createElement("a");
             a.href = url;
             a.download = filename;
@@ -159,30 +161,44 @@ class DownloadWidget(anywidget.AnyWidget):
             a.click();
             document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-        }
+        }}
 
         container.appendChild(btn);
         el.appendChild(container);
 
         let styleTag = document.createElement("style");
         styleTag.textContent = `
-        .mljar-download-btn {
+        .mljar-download-btn {{
             padding: 6px 20px;
-            background: #0081fa;
-            color: #fff;
-            border-radius: 7px;
-            border: none;
-            font-size: 1em;
+            background: {json.dumps(THEME.get("primary_color", "#0081fa"))};
+            color: {json.dumps(THEME.get("button_primary_text", "#fff"))};
+            border-radius: {json.dumps(THEME.get("border_radius", "7px"))};
+            border: 1px solid {json.dumps(THEME.get("primary_color", "#0081fa"))};
+            font-size: {json.dumps(THEME.get("font_size", "14px"))};
+            font-family: {json.dumps(THEME.get("font_family", "Arial, sans-serif"))};
+            box-shadow: {json.dumps(THEME.get("button_shadow", "0 1px 2px rgba(0,0,0,0.06)"))};
             cursor: pointer;
             margin: 4px 0;
-        }
-        .mljar-download-btn:hover {
-            background: #0059a8;
-        }
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+        }}
+        .mljar-download-btn:hover {{
+            background: {json.dumps(THEME.get("run_button_background_hover", THEME.get("hover_background_color", "#0059a8")))};
+            border-color: {json.dumps(THEME.get("focus_border_color", THEME.get("accent_color", "#4c7cf0")))};
+            box-shadow: {json.dumps(THEME.get("button_shadow_hover", "0 2px 6px rgba(0,0,0,0.08)"))};
+        }}
+        .mljar-download-btn:active {{
+            background: {json.dumps(THEME.get("selected_background_color", "#0059a8"))};
+            color: {json.dumps(THEME.get("button_primary_text", "#fff"))};
+        }}
+        .mljar-download-btn:focus-visible {{
+            outline: none;
+            border-color: {json.dumps(THEME.get("focus_border_color", THEME.get("accent_color", "#4c7cf0")))};
+            box-shadow: none;
+        }}
         `;
         el.appendChild(styleTag);
-    }
-    export default { render };
+    }}
+    export default {{ render }};
     """
 
     data = traitlets.Unicode("").tag(sync=True)  # base64 or text

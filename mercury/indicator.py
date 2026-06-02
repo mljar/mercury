@@ -1,5 +1,7 @@
 from IPython.display import display
 
+from .theme import THEME
+
 
 class Indicator:
     """
@@ -164,12 +166,12 @@ class Indicator:
         return """
 <style>
 .mljar-ind-wrap {
-    width: 100%;
+    width: 100%%;
     container-type: inline-size;
-    font-family: -apple-system, "Segoe UI", system-ui, Arial, sans-serif;
+    font-family: %(font_family)s;
 }
 .mljar-ind-row {
-    width: 100%;
+    width: 100%%;
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
@@ -190,9 +192,9 @@ class Indicator:
     border-radius: 10px;
     padding: 18px 20px 16px;
     box-sizing: border-box;
-    width: 100%;
+    width: 100%%;
     text-align: left;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background-color 0.15s;
 }
 .mljar-ind-card::before {
     content: '';
@@ -204,6 +206,7 @@ class Indicator:
 }
 .mljar-ind-card:hover {
     border-color: var(--mljar-accent) !important;
+    background: %(hover_background_color)s;
 }
 .mljar-ind-card-single {
     max-width: none;
@@ -236,7 +239,10 @@ class Indicator:
     line-height: 1.6;
 }
 .mljar-ind-arrow { font-size: 10px; line-height: 1; }
-</style>"""
+</style>""" % {
+            "font_family": THEME.get("font_family", '-apple-system, "Segoe UI", system-ui, Arial, sans-serif'),
+            "hover_background_color": THEME.get("hover_background_color", "#f8fafc"),
+        }
 
     # ------------------------------------------------------------------ #
     # Delta badge                                                           #

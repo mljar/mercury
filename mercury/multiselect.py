@@ -505,14 +505,14 @@ class MultiSelectWidget(anywidget.AnyWidget):
       padding: 4px 60px 4px 8px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       box-sizing: border-box;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
       cursor: default;
     }}
 
     .mljar-ms-control:focus-within {{
-      border-color: {THEME.get('accent_color', '#4c7cf0')};
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
       border-width: 2px;
       box-shadow: none;
     }}
@@ -544,8 +544,8 @@ class MultiSelectWidget(anywidget.AnyWidget):
       min-height: 28px;
       padding: 3px 8px;
       border-radius: 999px;
-      background: #eef3ff;
-      color: #1f4fd1;
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
       box-sizing: border-box;
     }}
 
@@ -581,10 +581,10 @@ class MultiSelectWidget(anywidget.AnyWidget):
       max-width: none;
       padding: 3px 0;
       border: 0;
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       box-sizing: border-box;
       appearance: none !important;
-      background-color: #ffffff !important;
+      background-color: {THEME.get('widget_background_color', '#fff')} !important;
       color: {THEME.get('text_color', '#222')} !important;
       line-height: 1.4;
       cursor: default;
@@ -694,7 +694,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
       margin-top: 6px;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
-      background: #fff;
+      background: {THEME.get('panel_bg', '#fff')};
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
       overflow: hidden;
     }}
@@ -716,23 +716,35 @@ class MultiSelectWidget(anywidget.AnyWidget):
       text-align: left;
       cursor: pointer;
       font: inherit;
+      transition: background-color 0.14s ease, color 0.14s ease;
     }}
 
     .mljar-ms-option:hover {{
-      background: #f5f7fb;
+      background: {THEME.get('hover_background_color', '#f5f7fb')};
+    }}
+
+    .mljar-ms-option:active {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
     }}
 
     .mljar-ms-option.is-selected {{
-      background: #eef3ff;
-      color: #1f4fd1;
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
       font-weight: 600;
+    }}
+
+    .mljar-ms-option.is-selected:hover,
+    .mljar-ms-option.is-selected:active {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', '#1f4fd1')};
     }}
 
     .mljar-ms-option-marker {{
       width: 16px;
       flex: 0 0 16px;
       text-align: center;
-      color: #1f4fd1;
+      color: {THEME.get('accent_color', '#1f4fd1')};
       font-weight: 700;
     }}
 

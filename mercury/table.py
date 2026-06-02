@@ -9,6 +9,7 @@ from typing import Any, List, Dict
 import datetime
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 from .render_context import apply_widget_render_metadata, with_widget_render_metadata
+from .theme import THEME
 
 
 _CSS_SIZE_UNITS = ("px", "%", "vh", "vw", "rem", "em")
@@ -721,8 +722,9 @@ export default { render };
   padding: 10px 0px 0px 0px;
   align-items: center;
   gap: 16px;
-  font-family: sans-serif;
-  font-size: 13px;
+  font-family: %(font_family)s;
+  font-size: %(font_size)s;
+  color: %(text_color)s;
 }
 
 .mljar-mercury-table-widget-controls-left,
@@ -734,10 +736,20 @@ export default { render };
 
 .mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn {
   padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background: #f8f8f8;
+  border-radius: %(border_radius_sm)s;
+  border: 1px solid %(border_color)s;
+  background: %(widget_background_color)s;
+  color: %(text_color)s;
   cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn:hover:not(:disabled) {
+  background: %(hover_background_color)s;
+  border-color: %(focus_border_color)s;
 }
 
 .mljar-mercury-table-widget-mljar-mercury-table-widget-pager-btn:disabled {
@@ -755,8 +767,9 @@ export default { render };
   overflow-x: auto;
   display: block;
   box-sizing: border-box;
+  background: %(widget_background_color)s;
   scrollbar-width: thin;
-  scrollbar-color: #b8b8b8 #f1f1f1;
+  scrollbar-color: %(muted_text_color)s %(panel_bg_hover)s;
 }
 
 .mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar {
@@ -765,31 +778,34 @@ export default { render };
 }
 
 .mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: %(panel_bg_hover)s;
   border-radius: 8px;
 }
 
 .mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-thumb {
-  background: #b8b8b8;
+  background: %(muted_text_color)s;
   border-radius: 8px;
-  border: 2px solid #f1f1f1;
+  border: 2px solid %(panel_bg_hover)s;
 }
 
 .mljar-mercury-table-widget-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #9d9d9d;
+  background: %(accent_color)s;
 }
 
 .mljar-mercury-table-widget-tbl {
   border-collapse: collapse;
   table-layout: auto;
-  font-family: sans-serif;
+  font-family: %(font_family)s;
+  font-size: %(font_size)s;
+  color: %(text_color)s;
+  background: %(widget_background_color)s;
   width: max-content;
-  min-width: 100%;
+  min-width: 100%%;
 }
 
 .mljar-mercury-table-widget-tbl th,
 .mljar-mercury-table-widget-tbl td {
-  border: 1px solid #ccc;
+  border: 1px solid %(border_color)s;
   padding: 8px;
   text-align: left;
   white-space: nowrap;
@@ -800,9 +816,34 @@ export default { render };
 }
 
 .mljar-mercury-table-widget-tbl th {
-  background: #f2f2f2;
+  background: %(panel_bg_hover)s;
+  color: %(text_color)s;
   cursor: pointer;
   text-align: center;
+  font-family: %(heading_font_family)s;
+  font-weight: 700;
+  transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.mljar-mercury-table-widget-tbl th:hover {
+  background: %(hover_background_color)s;
+}
+
+.mljar-mercury-table-widget-tbl th:active {
+  background: %(selected_background_color)s;
+  color: %(accent_color)s;
+}
+
+.mljar-mercury-table-widget-tbl tbody tr:nth-child(even) td {
+  background: %(panel_bg)s;
+}
+
+.mljar-mercury-table-widget-tbl tbody tr:nth-child(odd) td {
+  background: %(widget_background_color)s;
+}
+
+.mljar-mercury-table-widget-tbl tbody tr:hover td {
+  background: %(hover_background_color)s;
 }
 
 .mljar-mercury-table-widget-pager {
@@ -816,6 +857,12 @@ export default { render };
   width: 56px;
   text-align: center;
   padding: 4px 6px;
+  font-family: %(font_family)s;
+  font-size: %(font_size)s;
+  color: %(text_color)s;
+  background: %(widget_background_color)s;
+  border: 1px solid %(border_color)s;
+  border-radius: %(border_radius_sm)s;
   -moz-appearance: textfield;
 }
 .mljar-mercury-table-widget-page-input::-webkit-outer-spin-button,
@@ -827,7 +874,24 @@ export default { render };
 .mljar-mercury-table-widget-search-box {
   padding: 6px 8px;
   width: 200px;
-  font-size: 13px;
+  font-family: %(font_family)s;
+  font-size: %(font_size)s;
+  color: %(text_color)s;
+  background: %(widget_background_color)s;
+  border: 1px solid %(border_color)s;
+  border-radius: %(border_radius)s;
+}
+
+.mljar-mercury-table-widget-search-box::placeholder {
+  color: %(muted_text_color)s;
+}
+
+.mljar-mercury-table-widget-page-input:focus,
+.mljar-mercury-table-widget-search-box:focus {
+  outline: none;
+  border-color: %(focus_border_color)s;
+  border-width: 2px;
+  box-shadow: none;
 }
 
 .mljar-mercury-table-widget-table-container {
@@ -843,29 +907,29 @@ export default { render };
 .mljar-mercury-table-widget-table-container.loading::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%%;
+  left: 50%%;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #333;
-  transform: translate(-50%, -50%);
+  border-radius: 50%%;
+  border: 4px solid %(border_color)s;
+  border-top-color: %(accent_color)s;
+  transform: translate(-50%%, -50%%);
   animation: spin 0.8s linear infinite;
   z-index: 10;
 }
 
 @keyframes spin {
   from {
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: translate(-50%%, -50%%) rotate(0deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(360deg);
+    transform: translate(-50%%, -50%%) rotate(360deg);
   }
 }
 
 .mljar-mercury-table-widget-row-selected {
-  background-color: #e0f2fe;
+  background-color: %(selected_background_color)s;
 }
 
 .mljar-mercury-table-widget-tbl.has-row-selection td:first-child,
@@ -891,14 +955,30 @@ export default { render };
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: sans-serif;
+  font-family: %(font_family)s;
   font-size: 20px;
   font-weight: bold;
-  color: #666;
-  background: white;
+  color: %(muted_text_color)s;
+  background: %(widget_background_color)s;
   pointer-events: none;
 }
-"""
+""" % {
+        "font_family": THEME.get("font_family"),
+        "heading_font_family": THEME.get("heading_font_family", THEME.get("font_family")),
+        "font_size": THEME.get("font_size"),
+        "text_color": THEME.get("text_color"),
+        "muted_text_color": THEME.get("muted_text_color"),
+        "border_color": THEME.get("border_color"),
+        "border_radius": THEME.get("border_radius", "6px"),
+        "border_radius_sm": THEME.get("border_radius_sm", "4px"),
+        "widget_background_color": THEME.get("widget_background_color"),
+        "panel_bg": THEME.get("panel_bg"),
+        "panel_bg_hover": THEME.get("panel_bg_hover", THEME.get("panel_bg")),
+        "hover_background_color": THEME.get("hover_background_color"),
+        "selected_background_color": THEME.get("selected_background_color"),
+        "focus_border_color": THEME.get("focus_border_color", THEME.get("accent_color")),
+        "accent_color": THEME.get("accent_color", THEME.get("primary_color")),
+    }
 
     # --- backend flags / storage ---
 

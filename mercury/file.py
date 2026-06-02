@@ -602,8 +602,13 @@ class UploadFileWidget(anywidget.AnyWidget):
     }}
 
     .mljar-file-dropzone.dragover {{
-      border-color: {THEME.get('primary_color', '#00b1e4')};
-      background: {THEME.get('panel_bg_hover', '#e9f6fa')};
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+      background: {THEME.get('hover_background_color', '#e9f6fa')};
+    }}
+
+    .mljar-file-dropzone:focus-within {{
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+      background: {THEME.get('hover_background_color', THEME.get('panel_bg_hover', '#fafbfc'))};
     }}
 
     .mljar-file-dropzone.is-disabled {{
@@ -613,12 +618,12 @@ class UploadFileWidget(anywidget.AnyWidget):
 
     .mljar-file-drop-hint {{
       font-size: 0.93em;
-      color: #666;
+      color: {THEME.get('muted_text_color', '#666')};
       margin-top: 3px;
     }}
 
     .mljar-file-browse-btn {{
-      background: #fff;
+      background: {THEME.get('widget_background_color', '#fff')};
       color: {THEME.get('primary_color', '#007bff')};
       border: 2px solid {THEME.get('primary_color', '#007bff')};
       border-radius: {THEME.get('border_radius', '8px')};
@@ -634,8 +639,18 @@ class UploadFileWidget(anywidget.AnyWidget):
     }}
 
     .mljar-file-browse-btn:hover:not(:disabled) {{
-      background: {THEME.get('primary_color', '#007bff')};
-      color: #fff;
+      background: {THEME.get('hover_background_color', '#f8fafc')};
+      color: {THEME.get('primary_color', '#007bff')};
+    }}
+
+    .mljar-file-browse-btn:active:not(:disabled) {{
+      background: {THEME.get('selected_background_color', '#eef3ff')};
+      color: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
+    }}
+
+    .mljar-file-browse-btn:focus-visible {{
+      outline: none;
+      border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
     }}
 
     .mljar-file-browse-btn:disabled {{
@@ -673,10 +688,15 @@ class UploadFileWidget(anywidget.AnyWidget):
       margin-left: 8px;
       background: none;
       border: none;
-      color: #f44;
+      color: {THEME.get('danger_color', '#f44')};
       font-size: 1.1em;
       cursor: pointer;
       font-weight: 700;
+    }}
+
+    .mljar-file-remove-btn:hover {{
+      color: {THEME.get('danger_color', '#f44')};
+      opacity: 0.9;
     }}
 
     @container (max-width: 320px) {{

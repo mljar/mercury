@@ -1,11 +1,15 @@
 # markdown.py
 
+from html import escape
+import re
+
 import ipywidgets as widgets
 import traitlets
 from IPython.display import display
 
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 from .render_context import apply_widget_render_metadata, with_widget_render_metadata
+from .theme import THEME
 
 try:
     # Optional: nice markdown → HTML conversion
@@ -53,9 +57,106 @@ class MarkdownWidget(widgets.HTML):
     def _to_html(self, text: str) -> str:
         """Convert markdown to HTML if possible; otherwise use <pre>."""
         if md_lib is not None:
-            return md_lib.markdown(text)
-        # Fallback: keep it visible, but not nicely formatted
-        return f"<pre>{text}</pre>"
+            body = md_lib.markdown(text)
+        else:
+            # Fallback: keep it visible, but not nicely formatted
+            body = f"<pre>{escape(text)}</pre>"
+
+        return self._apply_inline_theme(body)
+
+    def _add_inline_style(self, html: str, tag: str, style: str) -> str:
+        pattern = rf"<{tag}(\s[^>]*)?>"
+
+        def repl(match):
+            attrs = match.group(1) or ""
+            if "style=" in attrs:
+                return re.sub(
+                    r'style=(["\'])(.*?)\1',
+                    lambda m: f'style={m.group(1)}{m.group(2)}; {style}{m.group(1)}',
+                    match.group(0),
+                    count=1,
+                )
+            return f"<{tag}{attrs} style=\"{style}\">"
+
+        return re.sub(pattern, repl, html)
+
+    def _apply_inline_theme(self, body: str) -> str:
+        radius_sm = THEME.get("border_radius_sm", "4px")
+        radius = THEME.get("border_radius", "6px")
+        heading_font = THEME.get("heading_font_family", THEME.get("font_family"))
+        heading_weight = THEME.get("heading_font_weight", "800")
+
+        for tag, size in (
+            ("h1", "2.0em"),
+            ("h2", "1.6em"),
+            ("h3", "1.35em"),
+            ("h4", "1.15em"),
+            ("h5", "1em"),
+            ("h6", "0.92em"),
+        ):
+            body = self._add_inline_style(
+                body,
+                tag,
+                f"font-family: {heading_font}; font-weight: {heading_weight}; color: {THEME.get('text_color')}; line-height: 1.25; margin: 1.15em 0 0.45em; font-size: {size};",
+            )
+
+        body = self._add_inline_style(body, "p", "margin: 0 0 1em;")
+        body = self._add_inline_style(body, "ul", "margin: 0 0 1em; padding-left: 1.4em;")
+        body = self._add_inline_style(body, "ol", "margin: 0 0 1em; padding-left: 1.4em;")
+        body = self._add_inline_style(
+            body,
+            "a",
+            f"color: {THEME.get('primary_color')}; text-decoration: underline; text-underline-offset: 0.14em;",
+        )
+        body = self._add_inline_style(body, "strong", "font-weight: 700;")
+        body = self._add_inline_style(
+            body,
+            "code",
+            f"font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size: 0.92em; color: {THEME.get('text_color')}; background: {THEME.get('panel_bg_hover', THEME.get('panel_bg'))}; border: 1px solid {THEME.get('border_color')}; border-radius: {radius_sm}; padding: 0.12em 0.38em;",
+        )
+        body = self._add_inline_style(
+            body,
+            "pre",
+            f"margin: 0 0 1em; background: {THEME.get('panel_bg')}; border: 1px solid {THEME.get('border_color')}; border-radius: {radius}; color: {THEME.get('text_color')}; overflow-x: auto; padding: 0.85em 1em;",
+        )
+        body = self._add_inline_style(
+            body,
+            "blockquote",
+            f"margin: 0 0 1em; padding-left: 1em; border-left: 3px solid {THEME.get('accent_color', THEME.get('primary_color'))}; color: {THEME.get('muted_text_color')};",
+        )
+        body = self._add_inline_style(
+            body,
+            "hr",
+            f"border: 0; border-top: 1px solid {THEME.get('border_color')}; margin: 1.25em 0;",
+        )
+        body = self._add_inline_style(
+            body,
+            "table",
+            "width: 100%; border-collapse: collapse; margin: 0 0 1em;",
+        )
+        body = self._add_inline_style(
+            body,
+            "th",
+            f"border: 1px solid {THEME.get('border_color')}; padding: 0.55em 0.7em; text-align: left; background: {THEME.get('panel_bg_hover', THEME.get('panel_bg'))}; font-weight: 700;",
+        )
+        body = self._add_inline_style(
+            body,
+            "td",
+            f"border: 1px solid {THEME.get('border_color')}; padding: 0.55em 0.7em; text-align: left;",
+        )
+        body = self._add_inline_style(
+            body,
+            "img",
+            "max-width: 100%; height: auto;",
+        )
+
+        return (
+            f"<div style=\"font-family: {THEME.get('font_family')}; "
+            f"font-size: {THEME.get('font_size')}; "
+            f"font-weight: {THEME.get('font_weight', 'normal')}; "
+            f"line-height: 1.65; color: {THEME.get('text_color')}; "
+            f"word-break: break-word;\">{body}</div>"
+        )
 
     @property
     def text(self) -> str:
