@@ -1739,6 +1739,7 @@ export class AppWidget extends Panel {
       ) || !this._autoRerun;
 
     if (this._isMobileLayout()) {
+      this._rightTop?.addClass('mercury-right-top-panel-with-sidebar-toggle');
       this._collapseSidebarBtn.style.display = this._sidebarExpanded ? '' : 'none';
       this._expandSidebarBtn.style.display =
         !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
@@ -1755,8 +1756,10 @@ export class AppWidget extends Panel {
       !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
     if (this._sidebarExpanded || !sidebarHasContent) {
       this._rightTopbarWidget?.removeClass('mercury-right-topbar-visible');
+      this._rightTop?.removeClass('mercury-right-top-panel-with-sidebar-toggle');
     } else {
       this._rightTopbarWidget?.addClass('mercury-right-topbar-visible');
+      this._rightTop?.addClass('mercury-right-top-panel-with-sidebar-toggle');
     }
   }
 
