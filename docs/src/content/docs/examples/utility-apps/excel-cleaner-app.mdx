@@ -65,15 +65,7 @@ from IPython.display import clear_output
 
 `clear_output` from IPython is used to hide empty cells when no file has been uploaded yet, keeping the app clean on first load.
 
-## 3. Add a welcome message
-
-```python
-welcome_md = mr.Markdown("# Upload the Excel file to start")
-```
-
-This message is shown before the user uploads anything. Once a file is uploaded, it gets replaced by the actual file title.
-
-## 4. Add the file upload widget
+## 3. Add the file upload widget
 
 ```python
 file = mr.UploadFile(label="Upload your Excel file", accept=".xlsx")
@@ -88,12 +80,13 @@ file = mr.UploadFile(label="Upload your Excel file", accept=".xlsx")
 />
 
 When the user picks a file:
+
 - `file.name` becomes the filename (non-empty string),
 - `file.value` contains the raw file bytes.
 
 Mercury automatically re-runs the notebook when the upload changes, so all cells below react immediately.
 
-## 5. Define the cleaning functions
+## 4. Define the cleaning functions
 
 Two operations the user will be able to toggle: normalize column names and remove duplicate rows.
 
@@ -146,11 +139,10 @@ def remove_duplicate_rows(df):
 
 Straightforward pandas — nothing unusual here.
 
-## 6. Read the Excel file and collect per-sheet stats
+## 5. Read the Excel file and collect per-sheet stats
 
 ```python
 if file.name is not None:
-    title_md = mr.Markdown(f"## Uploaded file: {file.name}", key='md1')
     import pandas as pd
     from io import BytesIO
     data = BytesIO(file.value)
@@ -187,18 +179,20 @@ We wrap the raw bytes in `BytesIO` so pandas can read them directly, without sav
 
 This way the user can always see what changed.
 
-## 7. Show the welcome message or file title
+## 6. Show the welcome message or file title
 
 ```python
 if file.name is None:
-    display(welcome_md)
+    mr.Markdown("# Upload the Excel file to start")
 else:
-    display(title_md)
+    mr.Markdown(f"# Uploaded file: {file.name}", key='title_md')
 ```
 
 A simple branch: when nothing has been uploaded yet, show the welcome heading; otherwise show the filename of the uploaded workbook.
 
-## 8. Show the sheets overview
+Calling `mr.Markdown(...)` directly inside a cell renders it — no `display()` wrapper needed when the Mercury widget is created right there. The same inline pattern shows up in every conditional cell below.
+
+## 7. Show the sheets overview
 
 ```python
 if file.name is not None:
@@ -215,7 +209,7 @@ else:
   class="docs-image-100"
 />
 
-## 9. Let the user pick a sheet
+## 8. Let the user pick a sheet
 
 ```python
 if file.name is not None:
@@ -228,11 +222,11 @@ else:
 
 We use `sheet_names.index(sheet_select.value)` later to look up the right DataFrame from `df_list` and `ready_df`.
 
-## 10. Preview the original sheet
+## 9. Preview the original sheet
 
 ```python
 if file.name is not None:
-    display(mr.Markdown(f"## Sheet: {sheet_select.value}", key='sheet_md'))
+    mr.Markdown(f"## Sheet: {sheet_select.value}", key='sheet_md')
 else:
     clear_output()
 ```
@@ -256,11 +250,11 @@ else:
 
 Note the dynamic `key` — it includes the sheet name. Mercury uses `key` to identify widgets across re-runs, and varying it per sheet forces the table to fully re-render when the user switches sheets.
 
-## 11. Add the cleaning checkboxes
+## 10. Add the cleaning checkboxes
 
 ```python
 if file.name is not None:
-    display(mr.Markdown("### Choose operation", position="sidebar", key='checkboxes'))
+    mr.Markdown("### Choose operation", position="sidebar", key='checkboxes')
     normalize_col_names_checkbox = mr.CheckBox(
         label="Normalize column names",
         appearance="box",
@@ -285,7 +279,7 @@ Including `sheet_select.value` in the `key` means the checkboxes reset whenever 
   class="docs-image-100"
 />
 
-## 12. Apply the selected operations
+## 11. Apply the selected operations
 
 ```python
 if file.name is not None:
@@ -303,18 +297,19 @@ if file.name is not None:
 ```
 
 Each operation:
+
 1. Checks if the user ticked the box.
 2. Disables the box so it can't be toggled off mid-pipeline (the operation has already been applied).
 3. Updates the working DataFrame in-place for the current sheet.
 
 The disabling step is a small UX touch — once you've cleaned the data, you can't "untick" your way back to the original; you'd need to refresh.
 
-## 13. Show the cleaned results
+## 12. Show the cleaned results
 
 ```python
 if file.name is not None:
     if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
-        display(mr.Markdown("## Results", key='results'))
+        mr.Markdown("## Results", key='results')
         edited_data_table = mr.Table(
             ready_df[sheet_names.index(sheet_select.value)],
             page_size=20,
@@ -332,7 +327,7 @@ The results table only appears once at least one cleaning option is active. Unti
   class="docs-image-100"
 />
 
-## 14. Add the download button
+## 13. Add the download button
 
 ```python
 if file.name is not None:
@@ -342,7 +337,7 @@ if file.name is not None:
 ```python
 if file.name is not None:
     if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
-        display(mr.Markdown("### Download edited sheet", position="sidebar", key='download'))
+        mr.Markdown("### Download edited sheet", position="sidebar", key='download')
         mr.Download(
             data=csv_data,
             filename=f"{normalize_column_name(sheet_select.value)}-edited.csv",
@@ -367,7 +362,7 @@ Two small details worth noting:
   class="docs-image-100"
 />
 
-## 15. Run as a web app
+## 14. Run as a web app
 
 Start the Mercury server from the folder containing the notebook:
 
