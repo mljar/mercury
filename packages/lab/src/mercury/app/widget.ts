@@ -253,7 +253,7 @@ export class AppWidget extends Panel {
   private _collapseSidebarBtn?: HTMLButtonElement;
   private _expandSidebarBtn?: HTMLButtonElement;
   private _sidebarBackdrop?: HTMLDivElement;
-  private _rightTopbarWidget?: Widget;
+  private _rightTopbarEl?: HTMLDivElement;
   private _busy?: BusyIndicator;
   private _fullWidth = false;
   private _toastContainer?: HTMLDivElement;
@@ -465,13 +465,13 @@ export class AppWidget extends Panel {
   }
 
   private createRightTopbar(): void {
-    if (this._rightTopbarWidget) {
+    if (this._rightTopbarEl) {
       return;
     }
-    const topbar = new Widget();
-    topbar.addClass('mercury-right-topbar');
-    this._rightTop.addWidget(topbar);
-    this._rightTopbarWidget = topbar;
+    const topbar = document.createElement('div');
+    topbar.className = 'mercury-right-topbar';
+    this._rightTop.node.appendChild(topbar);
+    this._rightTopbarEl = topbar;
   }
 
   private onExecutionError(_model: AppModel, err: IExecutionError): void {
@@ -570,8 +570,8 @@ export class AppWidget extends Panel {
       return;
     }
     try {
-      this._rightTopbarWidget?.dispose();
-      this._rightTopbarWidget = undefined;
+      this._rightTopbarEl?.remove();
+      this._rightTopbarEl = undefined;
     } catch { }
     try {
       this._sidebarBackdrop?.remove();
@@ -1050,8 +1050,7 @@ export class AppWidget extends Panel {
     targetOrder?: number,
     targetKind: 'input' | 'output' | 'other' = 'other'
   ): number {
-    const baseIndex =
-      container === this._rightTop && this._rightTopbarWidget ? 1 : 0;
+    const baseIndex = 0;
 
     if (targetOrder === undefined) {
       return this.panelWidgets(container).length + baseIndex;
@@ -1599,7 +1598,7 @@ export class AppWidget extends Panel {
     expandBtn.className = 'mercury-sidebar-toggle mercury-sidebar-expand';
     expandBtn.title = 'Show sidebar';
     expandBtn.style.display = 'none';
-    this._rightTopbarWidget?.node.appendChild(expandBtn);
+    this._rightTopbarEl?.appendChild(expandBtn);
     this._collapseSidebarBtn = collapseBtn;
     this._expandSidebarBtn = expandBtn;
 
@@ -1759,9 +1758,9 @@ export class AppWidget extends Panel {
       this._expandSidebarBtn.style.display =
         !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
       if (this._sidebarExpanded || !sidebarHasContent) {
-        this._rightTopbarWidget?.removeClass('mercury-right-topbar-visible');
+        this._rightTopbarEl?.classList.remove('mercury-right-topbar-visible');
       } else {
-        this._rightTopbarWidget?.addClass('mercury-right-topbar-visible');
+        this._rightTopbarEl?.classList.add('mercury-right-topbar-visible');
       }
       return;
     }
@@ -1770,10 +1769,10 @@ export class AppWidget extends Panel {
     this._expandSidebarBtn.style.display =
       !sidebarHasContent || this._sidebarExpanded ? 'none' : '';
     if (this._sidebarExpanded || !sidebarHasContent) {
-      this._rightTopbarWidget?.removeClass('mercury-right-topbar-visible');
+      this._rightTopbarEl?.classList.remove('mercury-right-topbar-visible');
       this._rightTop?.removeClass('mercury-right-top-panel-with-sidebar-toggle');
     } else {
-      this._rightTopbarWidget?.addClass('mercury-right-topbar-visible');
+      this._rightTopbarEl?.classList.add('mercury-right-topbar-visible');
       this._rightTop?.addClass('mercury-right-top-panel-with-sidebar-toggle');
     }
   }

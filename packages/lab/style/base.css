@@ -198,8 +198,10 @@
   justify-content: flex-start;
   align-items: center;
   width: auto;
+  height: 0;
   min-height: 0;
-  padding: 5px 0 0 0;
+  padding: 0;
+  overflow: visible;
   background: transparent;
   box-sizing: border-box;
   pointer-events: none;
@@ -213,6 +215,7 @@
   position: static;
   margin-left: 0;
   pointer-events: auto;
+  transform: translateY(5px);
 }
 
 .mercury-left-panel {
