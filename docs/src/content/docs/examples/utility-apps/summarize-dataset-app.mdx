@@ -26,9 +26,9 @@ No code, no terminal, no pandas knowledge required from the user. Just upload an
 
 We will use:
 
-- **pandas** for reading and analysing the CSV
-- **skrub** for the interactive data preview table
-- **Mercury** to turn the notebook into a web app
+- **pandas** for reading and analysing the CSV,
+- **skrub** for the interactive data preview table,
+- **Mercury** to turn the notebook into a web app.
 
 The full notebook code is available in our [GitHub repository](https://github.com/mljar/mercury-notebook-apps/tree/main/summarize-dataset).
 
@@ -38,9 +38,9 @@ You can also try the [live demo](https://utility-apps.ismvp.org/mercury/summariz
 
 After the user uploads a CSV, the app displays three sections:
 
-1. **Key indicators** — rows, columns, duplicate rows (with %), missing values (with %)
-2. **Column type summary** — a table breaking down how many columns are numeric, categorical, text, datetime, boolean, or constant
-3. **Data preview** — an interactive table with the first 15 rows, powered by skrub's `TableReport`
+1. **Key indicators** — rows, columns, duplicate rows (with %), missing values (with %).
+2. **Column type summary** — a table breaking down how many columns are numeric, categorical, text, datetime, boolean, or constant.
+3. **Data preview** — an interactive table with the first 15 rows, powered by skrub's `TableReport`.
 
 ## 1. Install packages
 
@@ -59,15 +59,7 @@ from IPython.display import clear_output
 `clear_output` from IPython is used to hide empty cells when no file has been uploaded yet, keeping the app clean on first load.
 </Aside>
 
-## 3. Add a welcome message
-
-```python
-welcome_md = mr.Markdown("# Upload the dataset and check the summary")
-```
-
-This message is shown before the user uploads anything. Once a file is uploaded, it gets replaced by the actual summary title.
-
-## 4. Add the file upload widget
+## 3. Add the file upload widget
 
 ```python
 input_file = mr.UploadFile(label="Upload your Dataset", accept='.csv', max_file_size='1GB')
@@ -83,12 +75,13 @@ We restrict it to `.csv` files and allow up to 1 GB.
 />
 
 When the user picks a file:
-- `input_file.name` becomes the filename (non-empty string)
-- `input_file.value` contains the raw file bytes
+
+- `input_file.name` becomes the filename (non-empty string),
+- `input_file.value` contains the raw file bytes.
 
 Mercury automatically re-runs the notebook when the upload changes, so all cells below react immediately.
 
-## 5. Read the CSV
+## 4. Read the CSV
 
 ```python
 if input_file.name is not None:
@@ -101,7 +94,7 @@ if input_file.name is not None:
 
 We wrap the raw bytes in `BytesIO` so pandas can read them directly, without saving the file to disk first.
 
-## 6. Compute the summary statistics
+## 5. Compute the summary statistics
 
 ```python
 if input_file.name is not None:
@@ -120,7 +113,7 @@ if input_file.name is not None:
 
 Straightforward pandas — nothing unusual here. We keep both the raw counts and percentages so we can show both in the indicators.
 
-## 7. Detect column types
+## 6. Detect column types
 
 This is the most interesting part of the app. We go beyond pandas' built-in dtypes to catch edge cases.
 
@@ -187,7 +180,7 @@ Everything that doesn't fall into numeric, boolean, datetime, or text:
     ]
 ```
 
-## 8. Build the output widgets
+## 7. Build the output widgets
 
 ### Indicators
 
@@ -211,7 +204,7 @@ Everything that doesn't fall into numeric, boolean, datetime, or text:
 ### Column type table
 
 ```python
-    dane = {
+    data = {
         "Metric": ["Numeric Columns", "Categorical Columns", "Text Columns",
                    "Datetime Columns", "Boolean Columns", "Constant Columns"],
         "Value":  [len(numeric_columns), len(categorical_columns), len(text_columns),
@@ -225,7 +218,7 @@ Everything that doesn't fall into numeric, boolean, datetime, or text:
             "Columns with only one unique value",
         ]
     }
-    tabelka = mr.Table(dane)
+    col_type_table = mr.Table(data)
 ```
 
 [`Table`](/docs/widgets/table/) renders a plain dict or DataFrame as a clean HTML table.
@@ -251,16 +244,21 @@ Everything that doesn't fall into numeric, boolean, datetime, or text:
   class="docs-image-100"
 />
 
-## 9. Conditional display
+## 8. Conditional display
 
-The last cells use a simple pattern to show the right content depending on whether a file has been uploaded:
+The last cells switch between the welcome state and the populated state, depending on whether a file has been uploaded:
 
 ```python
+# welcome message
 if input_file.name is None:
-    display(welcome_md)
+    mr.Markdown("# Upload the dataset and check the summary")
 else:
-    display(title_md)
+    mr.Markdown("# Dataset summary", key="title")
 ```
+
+Calling `mr.Markdown(...)` directly inside a cell renders it — no `display()` wrapper needed when the Mercury widget is created right there.
+
+The same conditional pattern repeats for the indicators, the column type table, and the data preview:
 
 ```python
 if input_file.name is not None:
@@ -269,9 +267,9 @@ else:
     clear_output(wait=False)
 ```
 
-The same pattern repeats for the column type table and data preview. `clear_output()` hides the cell output entirely when there's nothing to show, so the app doesn't leave empty gaps on first load.
+`clear_output()` hides the cell output entirely when there's nothing to show, so the app doesn't leave empty gaps on first load. `display(ind_basic)` is needed here because `ind_basic` was created earlier in the computation cell — for Mercury widgets created inline (like the markdown headings and the column type table), the bare call is enough.
 
-## 10. Run as a web app
+## 9. Run as a web app
 
 Start the Mercury server from the folder containing the notebook:
 

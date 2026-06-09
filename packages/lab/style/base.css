@@ -190,17 +190,19 @@
 }
 
 .mercury-right-topbar {
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 5px;
   z-index: 3;
   display: none;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
-  min-height: 30px;
-  padding: 5px 0px 5px 0px;
-  background: inherit;
+  width: auto;
+  min-height: 0;
+  padding: 5px 0 0 0;
+  background: transparent;
   box-sizing: border-box;
+  pointer-events: none;
 }
 
 .mercury-right-topbar.mercury-right-topbar-visible {
@@ -210,6 +212,7 @@
 .mercury-right-topbar .mercury-sidebar-expand {
   position: static;
   margin-left: 0;
+  pointer-events: auto;
 }
 
 .mercury-left-panel {
@@ -249,7 +252,19 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: visible;
+  overflow-x: hidden;
+}
+
+.mercury-left-content .jp-Cell-outputWrapper,
+.mercury-left-content .jp-OutputArea-child,
+.mercury-left-content .jp-OutputArea-output {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.mercury-left-content .jp-OutputArea-output {
+  overflow-x: hidden !important;
 }
 
 .mercury-left-panel.mercury-left-panel-visible {
@@ -270,11 +285,16 @@
 }
 
 .mercury-right-top-panel {
+  position: relative;
   background-color: white;
   padding-top: 0px;
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 5px;
+}
+
+.mercury-right-top-panel.mercury-right-top-panel-with-sidebar-toggle {
+  padding-left: 40px;
 }
 
 .mercury-right-bottom-panel {
@@ -358,6 +378,11 @@
   .mercury-main-panel {
     position: relative;
     overflow: hidden;
+  }
+
+  .mercury-right-top-panel.mercury-right-top-panel-with-sidebar-toggle {
+    padding-left: 5px;
+    padding-top: 40px;
   }
 
   .mercury-left-panel {
