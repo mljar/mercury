@@ -194,6 +194,8 @@ CSS_VARIABLE_MAP = {
     "font_family": "--mercury-font-family",
     "heading_font_family": "--mercury-heading-font-family",
     "font_size": "--mercury-font-size",
+    "font_weight": "--mercury-font-weight",
+    "heading_font_weight": "--mercury-heading-font-weight",
     "text_color": "--mercury-text-color",
     "muted_text_color": "--mercury-muted-text-color",
     "background_color": "--mercury-background-color",

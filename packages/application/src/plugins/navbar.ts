@@ -77,8 +77,8 @@ export class MercuryNavbar {
           box-shadow: none;
         }
         .mrc-hdr-inner {
-          width: min(100%, calc(56rem + 2rem));
-          margin: 0 auto;
+          width: 100%;
+          margin: 0;
           display: flex; align-items: center; justify-content: space-between;
           box-sizing: border-box;
           padding: .7rem 1rem;

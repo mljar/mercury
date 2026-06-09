@@ -59,3 +59,101 @@
     transform: rotate(360deg);
   }
 }
+
+.jp-MarkdownOutput {
+  padding-left: 0 !important;
+  font-family: var(--mercury-font-family);
+  font-size: var(--mercury-font-size);
+  font-weight: var(--mercury-font-weight, normal);
+  color: var(--mercury-text-color);
+  line-height: 1.65;
+}
+
+.jp-MarkdownOutput h1 {
+  font-family: var(--mercury-heading-font-family);
+  font-size: 2em;
+  font-weight: var(--mercury-heading-font-weight, 800) !important;
+  color: var(--mercury-text-color);
+  line-height: 1.2;
+  margin: 0 0 0.55em;
+}
+
+.jp-MarkdownOutput h2 {
+  font-family: var(--mercury-heading-font-family);
+  font-size: 1.6em;
+  font-weight: var(--mercury-heading-font-weight, 800) !important;
+  color: var(--mercury-text-color);
+  line-height: 1.25;
+  margin: 1.1em 0 0.5em;
+}
+
+.jp-MarkdownOutput h3 {
+  font-family: var(--mercury-heading-font-family);
+  font-size: 1.35em;
+  font-weight: var(--mercury-heading-font-weight, 800) !important;
+  color: var(--mercury-text-color);
+  line-height: 1.3;
+  margin: 1em 0 0.45em;
+}
+
+.jp-MarkdownOutput h4,
+.jp-MarkdownOutput h5,
+.jp-MarkdownOutput h6 {
+  font-family: var(--mercury-heading-font-family);
+  font-weight: var(--mercury-heading-font-weight, 800);
+  color: var(--mercury-text-color);
+  line-height: 1.3;
+}
+
+.jp-MarkdownOutput p,
+.jp-MarkdownOutput ul,
+.jp-MarkdownOutput ol,
+.jp-MarkdownOutput blockquote,
+.jp-MarkdownOutput pre,
+.jp-MarkdownOutput table {
+  margin-bottom: 1em;
+}
+
+.jp-MarkdownOutput a {
+  color: var(--mercury-primary-color);
+}
+
+.jp-MarkdownOutput code {
+  background: var(--mercury-panel-bg-hover);
+  border: 1px solid var(--mercury-border-color);
+  border-radius: var(--mercury-border-radius);
+  color: var(--mercury-text-color);
+  padding: 0.12em 0.38em;
+}
+
+.jp-MarkdownOutput pre {
+  background: var(--mercury-panel-bg);
+  border: 1px solid var(--mercury-border-color);
+  border-radius: var(--mercury-border-radius);
+  color: var(--mercury-text-color);
+  padding: 0.85em 1em;
+}
+
+.jp-MarkdownOutput pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.jp-MarkdownOutput blockquote {
+  border-left: 3px solid var(--mercury-accent-color);
+  color: var(--mercury-muted-text-color);
+  margin-left: 0;
+  padding-left: 1em;
+}
+
+.jp-MarkdownOutput th,
+.jp-MarkdownOutput td {
+  border: 1px solid var(--mercury-border-color);
+  padding: 0.55em 0.7em;
+  text-align: left;
+}
+
+.jp-MarkdownOutput th {
+  background: var(--mercury-panel-bg-hover);
+}
