@@ -1,0 +1,31 @@
+[main]
+title = "Slate Workspace"
+footer = "Modern internal analytics"
+favicon_emoji = "🌌"
+
+[welcome]
+header = "Analyst Console"
+message = "Dark surfaces with crisp blue accents."
+
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+font_size = "15px"
+background_color = "#0f172a"
+surface_color = "#162033"
+text_color = "#e2e8f0"
+primary_color = "#38bdf8"
+
+[theme.overrides]
+accent_color = "#60a5fa"
+topbar_background_color = "#111827"
+topbar_text_color = "#f8fafc"
+sidebar_background_color = "#0f172a"
+sidebar_text_color = "#d6e1ef"
+sidebar_title_color = "#f8fafc"
+widget_background_color = "#1a2538"
+card_background_color = "#162033"
+footer_background_color = "#111827"
+footer_text_color = "#94a3b8"
+focus_border_color = "#38bdf8"
+border_color = "#2a3a52"

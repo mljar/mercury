@@ -1,0 +1,29 @@
+[main]
+title = "Mercury"
+footer = "Internal tools"
+favicon_emoji = "⚡"
+
+[welcome]
+header = "Welcome"
+message = "Choose an app below."
+
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+font_size = "15px"
+background_color = "#f8fafc"
+surface_color = "#ffffff"
+text_color = "#0f172a"
+primary_color = "#2563eb"
+
+[theme.overrides]
+topbar_background_color = "#0f172a"
+topbar_text_color = "#f8fafc"
+sidebar_background_color = "#f8fafc"
+sidebar_text_color = "#0f172a"
+sidebar_title_color = "#0f172a"
+widget_background_color = "#ffffff"
+card_background_color = "#ffffff"
+footer_background_color = "#ffffff"
+footer_text_color = "#475569"
+focus_border_color = "#2563eb"

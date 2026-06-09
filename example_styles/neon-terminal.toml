@@ -1,0 +1,34 @@
+[main]
+title = "Neon Terminal"
+footer = "Interactive command notebooks"
+favicon_emoji = "💻"
+
+[welcome]
+header = "Terminal Apps"
+message = "Sharp contrast, bright signals, minimal noise."
+
+[theme]
+font = "IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
+font_url = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+font_size = "14px"
+background_color = "#030303"
+surface_color = "#0a0a0a"
+text_color = "#b7ffb3"
+primary_color = "#39ff14"
+heading_font_family = "IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
+heading_font_weight = "700"
+
+[theme.overrides]
+accent_color = "#7dff72"
+topbar_background_color = "#000000"
+topbar_text_color = "#b7ffb3"
+sidebar_background_color = "#050505"
+sidebar_text_color = "#a0f8a0"
+sidebar_title_color = "#d8ffd7"
+widget_background_color = "#0b0f0b"
+card_background_color = "#090d09"
+footer_background_color = "#000000"
+footer_text_color = "#6dd96a"
+focus_border_color = "#39ff14"
+border_color = "#174d17"
+hover_background_color = "#0f180f"

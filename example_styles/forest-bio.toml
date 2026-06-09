@@ -1,0 +1,31 @@
+[main]
+title = "Bioinformatics Lab"
+footer = "Scientific workflows"
+favicon_emoji = "🧬"
+
+[welcome]
+header = "Science Apps"
+message = "Interactive notebooks for pipelines, reports, and experiments."
+
+[theme]
+font = "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+font_size = "15px"
+background_color = "#f4f8f2"
+surface_color = "#ffffff"
+text_color = "#183126"
+primary_color = "#2f855a"
+
+[theme.overrides]
+accent_color = "#38a169"
+topbar_background_color = "#1f4d3a"
+topbar_text_color = "#effaf3"
+sidebar_background_color = "#e8f3eb"
+sidebar_text_color = "#234433"
+sidebar_title_color = "#183126"
+widget_background_color = "#ffffff"
+card_background_color = "#ffffff"
+footer_background_color = "#f0f7f1"
+footer_text_color = "#587062"
+focus_border_color = "#2f855a"
+border_color = "#bfd6c6"

@@ -1,0 +1,33 @@
+[main]
+title = "Research Hub"
+footer = "Notebook publishing"
+favicon_emoji = "📘"
+
+[welcome]
+header = "Research Apps"
+message = "Interactive notebooks with a calmer visual style."
+
+[theme]
+font = "Source Serif 4, Georgia, serif"
+font_url = "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700;800&display=swap"
+font_size = "16px"
+background_color = "#fcfaf7"
+surface_color = "#fffdf9"
+text_color = "#2f241f"
+primary_color = "#b45309"
+heading_font_family = "Source Serif 4, Georgia, serif"
+heading_font_weight = "700"
+
+[theme.overrides]
+topbar_background_color = "#5a3f2e"
+topbar_text_color = "#fff7ed"
+sidebar_background_color = "#f5ede3"
+sidebar_text_color = "#2f241f"
+sidebar_title_color = "#2f241f"
+widget_background_color = "#fffdf9"
+card_background_color = "#fffdf9"
+footer_background_color = "#f6efe7"
+footer_text_color = "#6b4f3f"
+focus_border_color = "#b45309"
+muted_text_color = "#6b4f3f"
+border_color = "#dcc7b0"

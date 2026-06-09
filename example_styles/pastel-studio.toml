@@ -1,0 +1,32 @@
+[main]
+title = "Studio Workspace"
+footer = "Creative tools"
+favicon_emoji = "🎨"
+
+[welcome]
+header = "Design Apps"
+message = "Soft contrast, playful color, polished interfaces."
+
+[theme]
+font = "Manrope, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+font_size = "15px"
+background_color = "#faf5ff"
+surface_color = "#ffffff"
+text_color = "#3f2a56"
+primary_color = "#8b5cf6"
+
+[theme.overrides]
+accent_color = "#c084fc"
+topbar_background_color = "#7c3aed"
+topbar_text_color = "#faf5ff"
+sidebar_background_color = "#f3e8ff"
+sidebar_text_color = "#4c2d69"
+sidebar_title_color = "#3f2a56"
+widget_background_color = "#ffffff"
+card_background_color = "#fffaff"
+footer_background_color = "#fffaff"
+footer_text_color = "#7c6a95"
+focus_border_color = "#a855f7"
+border_color = "#e6d5ff"
+hover_background_color = "#f5eaff"

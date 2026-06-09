@@ -1,0 +1,31 @@
+[main]
+title = "Data Review"
+footer = "Narrative analytics"
+favicon_emoji = "📰"
+
+[welcome]
+header = "Stories in Data"
+message = "Notebook apps for analysis, reports, and explainers."
+
+[theme]
+font = "Source Sans 3, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap"
+font_size = "16px"
+background_color = "#fbf4e8"
+surface_color = "#fffaf1"
+text_color = "#3d2d1f"
+primary_color = "#d97706"
+
+[theme.overrides]
+accent_color = "#f59e0b"
+topbar_background_color = "#8a5a1f"
+topbar_text_color = "#fff7ed"
+sidebar_background_color = "#f4e6cf"
+sidebar_text_color = "#4a3421"
+sidebar_title_color = "#3d2d1f"
+widget_background_color = "#fffaf1"
+card_background_color = "#fffaf1"
+footer_background_color = "#f7ecd8"
+footer_text_color = "#7a624d"
+focus_border_color = "#d97706"
+border_color = "#dfc39d"

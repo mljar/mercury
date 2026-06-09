@@ -1,0 +1,31 @@
+[main]
+title = "Enterprise Portal"
+footer = "Business intelligence"
+favicon_emoji = "🏢"
+
+[welcome]
+header = "Business Apps"
+message = "Operational notebooks for internal teams."
+
+[theme]
+font = "Inter, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+font_size = "15px"
+background_color = "#f4f7fb"
+surface_color = "#ffffff"
+text_color = "#10233f"
+primary_color = "#1d4ed8"
+
+[theme.overrides]
+accent_color = "#2563eb"
+topbar_background_color = "#133a73"
+topbar_text_color = "#f8fbff"
+sidebar_background_color = "#eef4fb"
+sidebar_text_color = "#163152"
+sidebar_title_color = "#10233f"
+widget_background_color = "#ffffff"
+card_background_color = "#ffffff"
+footer_background_color = "#ffffff"
+footer_text_color = "#5f7391"
+focus_border_color = "#1d4ed8"
+border_color = "#c8d5e6"
