@@ -1728,6 +1728,21 @@ export class AppWidget extends Panel {
     }
   }
 
+  private _refreshRightSplitLayout(): void {
+    try {
+      this._rightSplit?.fit();
+      this._rightSplit?.update();
+    } catch {
+      /* empty */
+    }
+
+    requestAnimationFrame(() => {
+      if (this._rightBottom && !this._rightBottom.isHidden) {
+        this.adjustBottomHeight();
+      }
+    });
+  }
+
   private _syncSidebarToggleButtons(): void {
     if (!this._collapseSidebarBtn || !this._expandSidebarBtn) {
       return;
@@ -1790,10 +1805,12 @@ export class AppWidget extends Panel {
     this._sidebarExpanded = false;
 
     if (!this._isMobileLayout()) {
+      this._left.hide();
       this._lastLeftVisible = false;
       this._notifySidebarVisibility(false);
       this._syncSidebarToggleButtons();
       this._syncSidebarBackdrop();
+      this._refreshRightSplitLayout();
       // this._syncDesktopCollapsedLayout();
       return;
     }
@@ -1830,6 +1847,7 @@ export class AppWidget extends Panel {
     this._notifySidebarVisibility(true);
     this._syncSidebarToggleButtons();
     this._syncSidebarBackdrop();
+    this._refreshRightSplitLayout();
     // this._syncDesktopCollapsedLayout();
   }
 
