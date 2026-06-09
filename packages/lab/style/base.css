@@ -191,7 +191,7 @@
 
 .mercury-right-topbar {
   position: absolute;
-  top: 5px;
+  top: calc(var(--header-height, 0px) + 8px);
   left: 5px;
   z-index: 3;
   display: none;
