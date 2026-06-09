@@ -470,7 +470,7 @@ export class AppWidget extends Panel {
     }
     const topbar = document.createElement('div');
     topbar.className = 'mercury-right-topbar';
-    this._rightTop.node.appendChild(topbar);
+    this.node.appendChild(topbar);
     this._rightTopbarEl = topbar;
   }
 
