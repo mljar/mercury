@@ -1,0 +1,195 @@
+---
+title: Dark Theme Altair Charts
+description: Build an interactive Mercury app with beautiful dark-themed Altair visualizations.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+# Dark Theme Altair Charts
+
+This tutorial shows you how to create a Mercury web app with interactive, dark-themed [Altair](https://altair-viz.github.io/) charts. You'll register a custom dark theme, add Mercury widgets to let users switch charts and toggle the theme, and serve everything as a polished web app.
+
+## What you'll build
+
+A single-notebook Mercury app with:
+- A **dropdown** to switch between three chart types (scatter, line, bar)
+- A **checkbox** to toggle the dark theme on/off
+- Three fully interactive Altair charts styled to match Mercury's dark UI
+
+## Prerequisites
+
+```bash
+pip install mercury altair vega_datasets pandas
+```
+
+---
+
+## Step 1 — Register a dark Altair theme
+
+Altair's theme system lets you define default styles for every chart. Add this near the top of your notebook:
+
+```python
+import altair as alt
+
+def dark_theme():
+    return {
+        "config": {
+            "background": "#1e1e2e",
+            "view": {"stroke": "transparent"},
+            "title": {"color": "#cdd6f4", "fontSize": 16},
+            "axis": {
+                "domainColor": "#45475a",
+                "gridColor": "#313244",
+                "labelColor": "#bac2de",
+                "tickColor": "#45475a",
+                "titleColor": "#cdd6f4",
+            },
+            "legend": {
+                "labelColor": "#bac2de",
+                "titleColor": "#cdd6f4",
+            },
+            "range": {
+                "category": ["#89b4fa", "#a6e3a1", "#fab387", "#f38ba8", "#cba6f7", "#94e2d5"],
+            },
+        }
+    }
+
+alt.themes.register("dark", dark_theme)
+alt.themes.enable("dark")
+```
+
+The color palette here uses [Catppuccin Mocha](https://github.com/catppuccin/catppuccin) tones, which complement Mercury's default dark UI nicely. Feel free to swap in any hex values you prefer.
+
+---
+
+## Step 2 — Add Mercury widgets
+
+```python
+import mercury as mr
+
+chart_select = mr.Select(
+    value="Scatter: Horsepower vs MPG",
+    choices=["Scatter: Horsepower vs MPG", "Line: Stock Prices", "Bar: Seattle Precipitation"],
+    label="Choose Chart",
+)
+
+use_dark = mr.Checkbox(value=True, label="Dark Theme")
+```
+
+`mr.Select` renders as a dropdown in the sidebar. `mr.Checkbox` adds a toggle. When a user changes either widget, Mercury re-executes the notebook cells automatically.
+
+---
+
+## Step 3 — Conditionally apply the theme
+
+In a cell after the widgets, apply or remove the theme based on the checkbox value:
+
+```python
+if use_dark.value:
+    alt.themes.enable("dark")
+else:
+    alt.themes.enable("default")
+```
+
+---
+
+## Step 4 — Create the charts
+
+### Scatter — Horsepower vs MPG
+
+```python
+from vega_datasets import data
+
+cars = data.cars()
+
+scatter = (
+    alt.Chart(cars)
+    .mark_circle(size=70, opacity=0.85)
+    .encode(
+        x=alt.X("Horsepower:Q", title="Horsepower"),
+        y=alt.Y("Miles_per_Gallon:Q", title="Miles per Gallon"),
+        color=alt.Color("Origin:N", legend=alt.Legend(title="Origin")),
+        tooltip=["Name", "Horsepower", "Miles_per_Gallon", "Origin"],
+    )
+    .properties(title="Horsepower vs Miles per Gallon", width=600, height=350)
+    .interactive()
+)
+```
+
+### Line — Stock prices over time
+
+```python
+stocks = data.stocks()
+
+line = (
+    alt.Chart(stocks)
+    .mark_line(strokeWidth=2)
+    .encode(
+        x=alt.X("date:T", title="Date"),
+        y=alt.Y("price:Q", title="Price (USD)"),
+        color=alt.Color("symbol:N", legend=alt.Legend(title="Stock")),
+        tooltip=["symbol", "date", "price"],
+    )
+    .properties(title="Stock Prices Over Time", width=600, height=350)
+    .interactive()
+)
+```
+
+### Bar — Seattle monthly precipitation
+
+```python
+import pandas as pd
+
+seattle = data.seattle_weather()
+seattle["month"] = pd.to_datetime(seattle["date"]).dt.strftime("%b")
+month_order = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+monthly_precip = seattle.groupby("month", as_index=False)["precipitation"].mean()
+
+bar = (
+    alt.Chart(monthly_precip)
+    .mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3)
+    .encode(
+        x=alt.X("month:N", sort=month_order, title="Month"),
+        y=alt.Y("precipitation:Q", title="Avg Precipitation (mm)"),
+        color=alt.Color("precipitation:Q", scale=alt.Scale(scheme="blues"), legend=None),
+        tooltip=["month", alt.Tooltip("precipitation:Q", format=".2f")],
+    )
+    .properties(title="Seattle: Average Monthly Precipitation", width=600, height=350)
+)
+```
+
+---
+
+## Step 5 — Display the selected chart
+
+```python
+charts = {
+    "Scatter: Horsepower vs MPG": scatter,
+    "Line: Stock Prices": line,
+    "Bar: Seattle Precipitation": bar,
+}
+
+charts[chart_select.value]
+```
+
+Mercury re-runs the notebook whenever the dropdown or checkbox changes, so this cell always renders the right chart with the right theme.
+
+---
+
+## Run the app
+
+```bash
+mercury altair_dark_theme.ipynb
+```
+
+Open [http://localhost:8888](http://localhost:8888) and you'll see the sidebar with your widgets on the left and the chart on the right.
+
+---
+
+## Tips
+
+- **Custom color schemes** — swap out `"blues"` in the bar chart's `Scale` for any [Vega color scheme](https://vega.github.io/vega/docs/schemes/).
+- **More widgets** — add `mr.Slider` to filter data ranges before rendering (e.g., filter cars by year).
+- **Dark background in the page** — Mercury's dark UI wraps the chart automatically; no extra CSS needed.
+- **Export** — the chart's built-in toolbar (top-right ⋯ menu) lets users download the chart as SVG or PNG.
+
