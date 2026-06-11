@@ -1,0 +1,73 @@
+---
+title: How to Style Indicators
+description: Learn how to customize the visual style of Indicator widgets using variants and explicit colors in Mercury.
+---
+
+import { Image } from "astro:assets";
+import indicatorExamplesDefault from "../../../assets/indicator/indicator-examples-default.webp";
+import indicatorExamplesCustom from "../../../assets/indicator/indicator-examples-custom.webp";
+
+Indicators are perfect for highlighting key metrics in your Mercury web app. While the default styling is clean and minimal, you have full control over their appearance to match your branding or alert states.
+
+## Default Built-in Indicator
+
+To create a basic indicator, simply pass a `value` and a `label`. By default, the indicator provides a neutral card.
+
+<Image src={indicatorExamplesDefault} alt="Default indicator example" />
+
+```python
+import mercury as mr
+
+mr.Indicator(
+    value="1,024",
+    label="Total Active Users"
+)
+```
+
+## Custom Styled Indicators
+
+You can quickly customize the look of your indicators using semantic variants such as `"success"`, `"warning"`, or `"danger"`. You can also explicitly define colors for borders, accents, labels, and values.
+
+<Image src={indicatorExamplesCustom} alt="Styled indicator examples" />
+
+```python
+import mercury as mr
+from IPython.display import display
+
+ind1 = mr.Indicator(
+    value="98%",
+    label="ACCURACY",
+    variant="success"
+)
+
+ind2 = mr.Indicator(
+    value="340ms",
+    label="LATENCY",
+    variant="warning"
+)
+
+ind3 = mr.Indicator(
+    value="$12k",
+    label="REVENUE",
+    variant="danger"
+)
+
+display(ind1, ind2, ind3)
+```
+
+### Explicit Color Customization
+
+For complete control over the appearance, pass color values directly.
+
+```python
+import mercury as mr
+
+mr.Indicator(
+    value="$12,340",
+    label="CUSTOM PURPLE",
+    accent_color="#7c3aed",
+    border_color="#ddd6fe",
+    value_color="#111827",
+    label_color="#6b7280"
+)
+```
