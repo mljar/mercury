@@ -186,7 +186,27 @@ class SliderWidget(anywidget.AnyWidget):
         const range = max - min;
         const ratio = range <= 0 ? 0 : (value - min) / range;
         const clampedRatio = Math.max(0, Math.min(1, ratio));
-        container.style.setProperty("--mljar-slider-ratio", String(clampedRatio));
+        const computed = getComputedStyle(container);
+        const thumbSize =
+          parseFloat(computed.getPropertyValue("--mljar-slider-thumb-size")) || 16;
+        const inputWidth = slider.clientWidth || 0;
+        const stageWidth = sliderStage.clientWidth || inputWidth || 0;
+        const labelWidth = floatingValueLabel.offsetWidth || 0;
+
+        if (inputWidth <= 0 || stageWidth <= 0) {
+          return;
+        }
+
+        const sliderOffsetLeft = slider.offsetLeft || 0;
+        const usableWidth = Math.max(0, inputWidth - thumbSize);
+        const idealCenter =
+          sliderOffsetLeft + thumbSize / 2 + clampedRatio * usableWidth;
+        const halfLabel = labelWidth / 2;
+        const minCenter = halfLabel;
+        const maxCenter = Math.max(halfLabel, stageWidth - halfLabel);
+        const finalCenter = Math.min(Math.max(idealCenter, minCenter), maxCenter);
+
+        floatingValueLabel.style.left = `${finalCenter}px`;
       }
 
       function syncFromModel() {
@@ -234,6 +254,15 @@ class SliderWidget(anywidget.AnyWidget):
 
       syncFromModel();
 
+      const resizeObserver = new ResizeObserver(() => {
+        positionFloatingValue();
+      });
+      resizeObserver.observe(sliderStage);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+
       // ---- read cell id (no DOM modifications) ----
       /*const ID_ATTR = "data-cell-id";
       const hostWithId = el.closest(`[${ID_ATTR}]`);
@@ -262,7 +291,6 @@ class SliderWidget(anywidget.AnyWidget):
 
     _css = f"""
     .mljar-slider-container {{
-      --mljar-slider-ratio: 0;
       --mljar-slider-thumb-size: 16px;
       display: flex;
       flex-direction: column;
@@ -286,7 +314,7 @@ class SliderWidget(anywidget.AnyWidget):
       width: 100%;
       max-width: 100%;
       min-width: 0;
-      padding-top: 24px;
+      padding-top: 20px;
       overflow: visible;
       box-sizing: border-box;
     }}
@@ -294,10 +322,7 @@ class SliderWidget(anywidget.AnyWidget):
     .mljar-slider-floating-value {{
       position: absolute;
       top: 0;
-      left: calc(
-        var(--mljar-slider-ratio) * (100% - var(--mljar-slider-thumb-size)) +
-        (var(--mljar-slider-thumb-size) / 2)
-      );
+      left: 8px;
       transform: translateX(-50%);
       color: {THEME.get('primary_color', '#007bff')};
       font-weight: 700;
@@ -388,8 +413,8 @@ class SliderWidget(anywidget.AnyWidget):
     .mljar-slider-input::-webkit-slider-thumb {{
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: var(--mljar-slider-thumb-size);
+      height: var(--mljar-slider-thumb-size);
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
@@ -397,8 +422,8 @@ class SliderWidget(anywidget.AnyWidget):
       transition: transform 0.14s ease, background-color 0.14s ease;
     }}
     .mljar-slider-input::-moz-range-thumb {{
-      width: 16px;
-      height: 16px;
+      width: var(--mljar-slider-thumb-size);
+      height: var(--mljar-slider-thumb-size);
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
