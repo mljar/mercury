@@ -197,6 +197,29 @@ class NumberInputWidget(anywidget.AnyWidget):
         return Number.isFinite(step) && step > 0 ? step : 1;
       }
 
+      function snapToStep(value, min, step) {
+        const safeStep = normalizeStep(step);
+        const base = Number.isFinite(min) ? min : 0;
+        const steps = Math.round((value - base) / safeStep);
+        const snapped = base + steps * safeStep;
+        const precision = Math.max(
+          0,
+          (String(safeStep).split(".")[1] || "").length
+        );
+
+        return Number(snapped.toFixed(precision + 2));
+      }
+
+      function isOnStepGrid(value, min, step) {
+        const safeStep = normalizeStep(step);
+        const base = Number.isFinite(min) ? min : 0;
+        const steps = (value - base) / safeStep;
+        const nearest = Math.round(steps);
+        const epsilon = Math.max(1e-9, safeStep * 1e-9);
+
+        return Math.abs(steps - nearest) <= epsilon;
+      }
+
       function getCurrentBounds() {
         return {
           min: Number(model.get("min")),
@@ -209,21 +232,39 @@ class NumberInputWidget(anywidget.AnyWidget):
       }
 
       let isEditing = false;
+      const INPUT_COMMIT_DEBOUNCE_MS = 400;
+
+      function clearPendingDraftCommit() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        pendingDraftValue = null;
+      }
+
+      function parseDraftValue(rawValue) {
+        const raw = String(rawValue).trim();
+        if (isTransientDraft(raw)) {
+          return { kind: "transient" };
+        }
+
+        const value = Number(raw);
+        if (!Number.isFinite(value)) {
+          return { kind: "invalid" };
+        }
+
+        return { kind: "number", value };
+      }
 
       function commitValue(nextValue, saveNow = true) {
         const { min, max } = getCurrentBounds();
-        const raw = String(nextValue).trim();
-        if (isTransientDraft(raw)) {
+        const step = Number(model.get("step"));
+        const parsed = parseDraftValue(nextValue);
+        if (parsed.kind !== "number") {
           syncFromModel();
           return;
         }
 
-        let v = Number(raw);
-        if (!Number.isFinite(v)) {
-          syncFromModel();
-          return;
-        }
-
+        let v = parsed.value;
+        v = clamp(v, min, max);
+        v = snapToStep(v, min, step);
         v = clamp(v, min, max);
         input.value = String(v);
         model.set("value", v);
@@ -259,6 +300,7 @@ class NumberInputWidget(anywidget.AnyWidget):
       }
 
       let debounceTimer = null;
+      let pendingDraftValue = null;
       input.addEventListener("focus", () => {
         isEditing = true;
       });
@@ -266,27 +308,41 @@ class NumberInputWidget(anywidget.AnyWidget):
       input.addEventListener("input", () => {
         if (model.get("disabled")) return;
 
-        const raw = input.value.trim();
-        if (isTransientDraft(raw)) {
-          if (debounceTimer) clearTimeout(debounceTimer);
+        const parsed = parseDraftValue(input.value);
+        if (parsed.kind !== "number") {
+          clearPendingDraftCommit();
           return;
         }
 
-        let v = Number(raw);
-        if (!Number.isFinite(v)) return;
-
+        const v = parsed.value;
         const { min, max } = getCurrentBounds();
-        if (Number.isFinite(min) && v < min) return;
-        if (Number.isFinite(max) && v > max) return;
+        const step = Number(model.get("step"));
+        if (Number.isFinite(min) && v < min) {
+          clearPendingDraftCommit();
+          return;
+        }
+        if (Number.isFinite(max) && v > max) {
+          clearPendingDraftCommit();
+          return;
+        }
+        if (!isOnStepGrid(v, min, step)) {
+          clearPendingDraftCommit();
+          return;
+        }
 
-        model.set("value", v);
+        pendingDraftValue = v;
         if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => model.save_changes(), 200);
+        debounceTimer = setTimeout(() => {
+          if (pendingDraftValue === null) return;
+          model.set("value", pendingDraftValue);
+          model.save_changes();
+          pendingDraftValue = null;
+        }, INPUT_COMMIT_DEBOUNCE_MS);
       });
 
       input.addEventListener("blur", () => {
         isEditing = false;
-        if (debounceTimer) clearTimeout(debounceTimer);
+        clearPendingDraftCommit();
         commitValue(input.value, true);
       });
 
@@ -301,16 +357,18 @@ class NumberInputWidget(anywidget.AnyWidget):
         if (model.get("disabled")) return;
         const current = Number(model.get("value"));
         const step = normalizeStep(Number(model.get("step")));
+        const min = Number(model.get("min"));
         const base = Number.isFinite(current) ? current : 0;
-        commitValue(base + step);
+        commitValue(snapToStep(base + step, min, step));
       });
 
       decrementBtn.addEventListener("click", () => {
         if (model.get("disabled")) return;
         const current = Number(model.get("value"));
         const step = normalizeStep(Number(model.get("step")));
+        const min = Number(model.get("min"));
         const base = Number.isFinite(current) ? current : 0;
-        commitValue(base - step);
+        commitValue(snapToStep(base - step, min, step));
       });
 
       model.on("change:value", syncFromModel);
