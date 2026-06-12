@@ -58,6 +58,24 @@ def test_numberinput_invalid_value_defaults_to_min(monkeypatch):
     assert widget.value == 2.0
 
 
+def test_numberinput_passes_disabled_and_hidden_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = NumberInput(
+        label="Rows",
+        value=5,
+        min=0,
+        max=10,
+        step=1,
+        disabled=True,
+        hidden=True,
+    )
+
+    assert widget.disabled is True
+    assert widget.hidden is True
+
+
 # --- NumberInput url_params -------------------------------------------------------
 
 
@@ -203,6 +221,60 @@ def test_numberinput_url_param_step_snaps_from_min(monkeypatch):
     )
 
     assert widget.value == 2.0
+
+
+def test_numberinput_float_step_is_preserved_for_decimal_steps(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"rows": ["7.2"]})
+
+    widget = NumberInput(
+        label="Rows",
+        value=7.0,
+        min=7.0,
+        max=8.0,
+        step=0.1,
+        url_key="rows",
+    )
+
+    assert widget.value == 7.2
+
+
+def test_numberinput_step_snaps_to_grid_for_non_power_of_ten_steps(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"rows": ["0.5"]})
+
+    widget = NumberInput(
+        label="Rows",
+        value=0.0,
+        min=0.0,
+        max=1.0,
+        step=0.3,
+        url_key="rows",
+    )
+
+    assert widget.value == 0.6
+
+
+def test_numberinput_step_snaps_from_min_for_fractional_grid(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+    clear_runtime_url_params()
+    set_runtime_url_params({"rows": ["1.87"]})
+
+    widget = NumberInput(
+        label="Rows",
+        value=1.5,
+        min=1.5,
+        max=3.0,
+        step=0.25,
+        url_key="rows",
+    )
+
+    assert widget.value == 1.75
 
 
 # --- Trait defaults & validation --------------------------------------------------

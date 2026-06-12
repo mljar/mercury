@@ -77,12 +77,14 @@ def Button(
     1
     """
 
-    args = [label, variant, size, position]
+    args = [label, variant, size, position, disabled, hidden]
     kwargs = {
         "label": label,
         "variant": variant,
         "size": size,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("Button", key=key, args=args, kwargs=kwargs)

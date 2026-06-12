@@ -146,6 +146,22 @@ def test_multiselectwidget_trait_defaults():
     assert w.position == "sidebar"
 
 
+def test_multiselect_passes_disabled_and_hidden_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = MultiSelect(
+        label="Choose fruits",
+        choices=["apple", "banana", "cherry"],
+        value=["banana"],
+        disabled=True,
+        hidden=True,
+    )
+
+    assert widget.disabled is True
+    assert widget.hidden is True
+
+
 def test_multiselectwidget_invalid_position_raises_traiterror():
     w = MultiSelectWidget()
     with pytest.raises(TraitError):

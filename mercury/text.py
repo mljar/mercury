@@ -57,12 +57,14 @@ def TextInput(
     """
     value = resolve_text_value(value=value, url_key=url_key)
 
-    args = [label, value, url_key, position]
+    args = [label, value, url_key, position, disabled, hidden]
     kwargs = {
         "label": label,
         "value": value,
         "url_key": url_key,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("TextInput", key=key, args=args, kwargs=kwargs)

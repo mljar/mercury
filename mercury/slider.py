@@ -125,14 +125,16 @@ def Slider(
         max_value=max_int,
     )
 
-    args = [label, value_int, min_int, max_int, url_key, position]
+    args = [label, value_int, min_int, max_int, url_key, position, disabled, hidden]
     kwargs = {
         "label": label,
         "value": value_int,
         "min": min_int,
         "max": max_int,
         "url_key": url_key,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("Slider", key=key, args=args, kwargs=kwargs)
@@ -157,6 +159,12 @@ class SliderWidget(anywidget.AnyWidget):
       const topLabel = document.createElement("div");
       topLabel.classList.add("mljar-slider-top-label");
 
+      const sliderStage = document.createElement("div");
+      sliderStage.classList.add("mljar-slider-stage");
+
+      const floatingValueLabel = document.createElement("div");
+      floatingValueLabel.classList.add("mljar-slider-floating-value");
+
       const sliderRow = document.createElement("div");
       sliderRow.classList.add("mljar-slider-row");
 
@@ -164,20 +172,59 @@ class SliderWidget(anywidget.AnyWidget):
       slider.type = "range";
       slider.classList.add("mljar-slider-input");
 
-      const valueLabel = document.createElement("span");
-      valueLabel.classList.add("mljar-slider-value-label");
+      const minMaxRow = document.createElement("div");
+      minMaxRow.classList.add("mljar-slider-minmax-row");
+
+      const minLabel = document.createElement("span");
+      minLabel.classList.add("mljar-slider-min-label");
+
+      const maxLabel = document.createElement("span");
+      maxLabel.classList.add("mljar-slider-max-label");
+
+      function positionFloatingValue() {
+        const min = Number(model.get("min"));
+        const max = Number(model.get("max"));
+        const value = Number(model.get("value"));
+        const range = max - min;
+        const ratio = range <= 0 ? 0 : (value - min) / range;
+        const clampedRatio = Math.max(0, Math.min(1, ratio));
+        const computed = getComputedStyle(container);
+        const thumbSize =
+          parseFloat(computed.getPropertyValue("--mljar-slider-thumb-size")) || 16;
+        const inputWidth = slider.clientWidth || 0;
+        const stageWidth = sliderStage.clientWidth || inputWidth || 0;
+        const labelWidth = floatingValueLabel.offsetWidth || 0;
+
+        if (inputWidth <= 0 || stageWidth <= 0) {
+          return;
+        }
+
+        const sliderOffsetLeft = slider.offsetLeft || 0;
+        const usableWidth = Math.max(0, inputWidth - thumbSize);
+        const idealCenter =
+          sliderOffsetLeft + thumbSize / 2 + clampedRatio * usableWidth;
+        const halfLabel = labelWidth / 2;
+        const minCenter = halfLabel;
+        const maxCenter = Math.max(halfLabel, stageWidth - halfLabel);
+        const finalCenter = Math.min(Math.max(idealCenter, minCenter), maxCenter);
+
+        floatingValueLabel.style.left = `${finalCenter}px`;
+      }
 
       function syncFromModel() {
         slider.min = model.get("min");
         slider.max = model.get("max");
         slider.value = model.get("value");
-        valueLabel.textContent = String(model.get("value"));
+        floatingValueLabel.textContent = String(model.get("value"));
+        minLabel.textContent = String(model.get("min"));
+        maxLabel.textContent = String(model.get("max"));
 
         slider.disabled = !!model.get("disabled");
         topLabel.textContent = model.get("label") || "Select number";
 
         // hidden (exists but not visible)
         container.style.display = model.get("hidden") ? "none" : "flex";
+        positionFloatingValue();
       }
 
       let debounceTimer = null;
@@ -196,15 +243,27 @@ class SliderWidget(anywidget.AnyWidget):
       model.on("change:disabled", syncFromModel);
       model.on("change:hidden", syncFromModel);
       model.on("change:label", syncFromModel);
-
       sliderRow.appendChild(slider);
-      sliderRow.appendChild(valueLabel);
+      minMaxRow.appendChild(minLabel);
+      minMaxRow.appendChild(maxLabel);
 
       container.appendChild(topLabel);
-      container.appendChild(sliderRow);
+      sliderStage.appendChild(floatingValueLabel);
+      sliderStage.appendChild(sliderRow);
+      sliderStage.appendChild(minMaxRow);
+      container.appendChild(sliderStage);
       el.appendChild(container);
 
       syncFromModel();
+
+      const resizeObserver = new ResizeObserver(() => {
+        positionFloatingValue();
+      });
+      resizeObserver.observe(sliderStage);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
 
       // ---- read cell id (no DOM modifications) ----
       /*const ID_ATTR = "data-cell-id";
@@ -234,10 +293,13 @@ class SliderWidget(anywidget.AnyWidget):
 
     _css = f"""
     .mljar-slider-container {{
+      --mljar-slider-thumb-size: 16px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      gap: 0;
       width: 100%;
+      max-width: 100%;
       min-width: 120px;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
@@ -249,25 +311,71 @@ class SliderWidget(anywidget.AnyWidget):
       box-sizing: border-box;
     }}
 
-    .mljar-slider-top-label {{
-      margin-bottom: 6px;
-      font-weight: 600;
-    }}
-
-    .mljar-slider-row {{
-      display: grid;
-      grid-template-columns: 1fr 5ch;
-      column-gap: 16px;
-      align-items: center;
+    .mljar-slider-stage {{
+      position: relative;
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding-top: 20px;
       overflow: visible;
       box-sizing: border-box;
     }}
 
-    .mljar-slider-input {{
+    .mljar-slider-floating-value {{
+      position: absolute;
+      top: 0;
+      left: 8px;
+      transform: translateX(-50%);
+      color: {THEME.get('primary_color', '#007bff')};
+      font-weight: 700;
+      font-size: 0.95em;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 1;
+    }}
+
+    .mljar-slider-top-label {{
+      margin-bottom: 6px;
+      font-weight: 600;
+      line-height: 1.2;
+    }}
+
+    .mljar-slider-row {{
+      position: relative;
       width: 100%;
-      min-width: 60px;
       max-width: 100%;
+      min-width: 0;
+      overflow: visible;
+      box-sizing: border-box;
+    }}
+
+    .mljar-slider-minmax-row {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin-top: 6px;
+      color: {THEME.get('muted_text_color', '#8a8f98')};
+      font-size: 0.9em;
+      line-height: 1.2;
+      box-sizing: border-box;
+    }}
+
+    .mljar-slider-min-label,
+    .mljar-slider-max-label {{
+      color: inherit;
+      white-space: nowrap;
+    }}
+
+    .mljar-slider-input {{
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
       background: transparent;
       -webkit-appearance: none;
       appearance: none;
@@ -275,6 +383,7 @@ class SliderWidget(anywidget.AnyWidget):
       height: 24px;
       padding: 0;
       margin: 0;
+      cursor: pointer;
       box-sizing: border-box;
     }}
 
@@ -306,8 +415,8 @@ class SliderWidget(anywidget.AnyWidget):
     .mljar-slider-input::-webkit-slider-thumb {{
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: var(--mljar-slider-thumb-size);
+      height: var(--mljar-slider-thumb-size);
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
@@ -315,12 +424,27 @@ class SliderWidget(anywidget.AnyWidget):
       transition: transform 0.14s ease, background-color 0.14s ease;
     }}
     .mljar-slider-input::-moz-range-thumb {{
-      width: 16px;
-      height: 16px;
+      width: var(--mljar-slider-thumb-size);
+      height: var(--mljar-slider-thumb-size);
       border-radius: 50%;
       background: {THEME.get('primary_color', '#007bff')};
       cursor: pointer;
       transition: transform 0.14s ease, background-color 0.14s ease;
+    }}
+
+    .mljar-slider-input:disabled {{
+      cursor: not-allowed;
+      opacity: 0.7;
+    }}
+
+    .mljar-slider-input:disabled::-webkit-slider-thumb {{
+      cursor: not-allowed;
+      transform: none;
+    }}
+
+    .mljar-slider-input:disabled::-moz-range-thumb {{
+      cursor: not-allowed;
+      transform: none;
     }}
 
     .mljar-slider-input:active::-webkit-slider-thumb {{
@@ -330,16 +454,6 @@ class SliderWidget(anywidget.AnyWidget):
     .mljar-slider-input:active::-moz-range-thumb {{
       transform: scale(1.08);
       background: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
-    }}
-
-    .mljar-slider-value-label {{
-      width: 5ch;
-      text-align: right;
-      font-weight: 700;
-      font-size: 1.1em;
-      color: {THEME.get('text_color', '#000')};
-      white-space: nowrap;
-      line-height: 1;
     }}
     """
 

@@ -115,14 +115,16 @@ def MultiSelect(
         if len(value) == 0:
             value = [choices[0]]
 
-    args = [value, label, choices, url_key, placeholder, position]
+    args = [value, label, choices, url_key, placeholder, position, disabled, hidden]
     kwargs = {
         "value": value,
         "label": label, 
         "choices": choices,
         "url_key": url_key,
         "placeholder": placeholder,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("MultiSelect", key=key, args=args, kwargs=kwargs)

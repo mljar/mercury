@@ -24,6 +24,21 @@ def test_textinput_trait_defaults():
     assert w.position == "sidebar"
 
 
+def test_textinput_passes_disabled_and_hidden_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = TextInput(
+        label="Enter username",
+        value="jan",
+        disabled=True,
+        hidden=True,
+    )
+
+    assert widget.disabled is True
+    assert widget.hidden is True
+
+
 def test_textinput_invalid_position_raises_traiterror():
     w = TextInputWidget()
     with pytest.raises(TraitError):
