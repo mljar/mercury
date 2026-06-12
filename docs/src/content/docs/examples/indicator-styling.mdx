@@ -1,0 +1,127 @@
+---
+title: How to Style Indicators
+description: Learn how to customize the visual style of Indicator widgets using variants and explicit colors in Mercury.
+---
+
+import { Image } from "astro:assets";
+import indicatorExamplesDefault from "../../../assets/indicator/indicator-examples-default.webp";
+import indicatorExamplesVariant from "../../../assets/indicator/indicator-examples-variant.webp";
+import indicatorExamplesCustom from "../../../assets/indicator/indicator-examples-custom.webp";
+
+Indicators are perfect for highlighting key metrics in your Mercury web app. While the default styling is clean and minimal, you have full control over their appearance to match your branding or alert states.
+
+## 1. Default Built-in Indicator
+
+To create a basic indicator, simply pass a `value` and a `label`. By default, the indicator provides a neutral card.
+
+<Image src={indicatorExamplesDefault} alt="Default indicator example" />
+
+```python
+import mercury as mr
+
+mr.Indicator(
+    value="1,024",
+    label="Total Active Users"
+)
+```
+
+## 2. Built-in Variant Styles
+
+You can quickly apply pre-built themes using semantic variant parameters such as `"success"`, `"warning"`, or `"danger"`.
+
+<Image src={indicatorExamplesVariant} alt="Indicator variant styles" />
+
+```python
+import mercury as mr
+
+ind1 = mr.Indicator(
+    value="98%",
+    label="ACCURACY",
+    variant="success"
+)
+
+ind2 = mr.Indicator(
+    value="340ms",
+    label="LATENCY",
+    variant="warning"
+)
+
+ind3 = mr.Indicator(
+    value="$12k",
+    label="REVENUE",
+    variant="danger"
+)
+
+```
+
+## 3. Custom Styled Indicators
+
+For complete control over the widget's appearance, you can explicitly define hex colors. This overrides variants and allows you to customize:
+
+- `background_color`
+- `accent_color`
+- `border_color`
+- `label_color`
+- `value_color`
+
+<Image src={indicatorExamplesCustom} alt="Custom styled indicators" />
+
+```python
+import mercury as mr
+
+# 1. Dark Mode / Cyberpunk
+ind_dark = mr.Indicator(
+    value="142 IOPS",
+    label="DISK READ",
+    background_color="#1e1e2f",
+    accent_color="#ff007f",
+    border_color="#ff007f",
+    value_color="#00ffff",
+    label_color="#aaaaaa"
+)
+
+# 2. Soft Pastel / Elegant
+ind_pastel = mr.Indicator(
+    value="8.4 hrs",
+    label="AVG SLEEP",
+    background_color="#fdf6e3",
+    accent_color="#b58900",
+    border_color="#eee8d5",
+    value_color="#657b83",
+    label_color="#93a1a1"
+)
+
+# 3. High Contrast Alert
+ind_alert = mr.Indicator(
+    value="OFFLINE",
+    label="SERVER STATUS",
+    background_color="#7f0000",
+    accent_color="#ff4444",
+    border_color="#ff0000",
+    value_color="#ffffff",
+    label_color="#ffcccc"
+)
+
+# 4. Deep Corporate / FinTech
+ind_corp = mr.Indicator(
+    value="$4.2M",
+    label="Q3 REVENUE",
+    background_color="#0f172a",
+    accent_color="#38bdf8",
+    border_color="#1e293b",
+    value_color="#f8fafc",
+    label_color="#94a3b8"
+)
+
+# 5. Eco / Nature
+ind_eco = mr.Indicator(
+    value="94 AQI",
+    label="AIR QUALITY",
+    background_color="#f0fdf4",
+    accent_color="#22c55e",
+    border_color="#bbf7d0",
+    value_color="#166534",
+    label_color="#15803d"
+)
+
+```
