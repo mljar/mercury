@@ -197,11 +197,32 @@ class NumberInputWidget(anywidget.AnyWidget):
         return Number.isFinite(step) && step > 0 ? step : 1;
       }
 
+      function getCurrentBounds() {
+        return {
+          min: Number(model.get("min")),
+          max: Number(model.get("max")),
+        };
+      }
+
+      function isTransientDraft(raw) {
+        return raw === "" || raw === "-" || raw === "." || raw === "-.";
+      }
+
+      let isEditing = false;
+
       function commitValue(nextValue, saveNow = true) {
-        const min = Number(model.get("min"));
-        const max = Number(model.get("max"));
-        let v = Number(nextValue);
-        if (!Number.isFinite(v)) return;
+        const { min, max } = getCurrentBounds();
+        const raw = String(nextValue).trim();
+        if (isTransientDraft(raw)) {
+          syncFromModel();
+          return;
+        }
+
+        let v = Number(raw);
+        if (!Number.isFinite(v)) {
+          syncFromModel();
+          return;
+        }
 
         v = clamp(v, min, max);
         input.value = String(v);
@@ -224,7 +245,9 @@ class NumberInputWidget(anywidget.AnyWidget):
         if (Number.isFinite(step)) input.step = String(step); else input.removeAttribute("step");
 
         const v = Number(model.get("value"));
-        input.value = Number.isFinite(v) ? String(v) : "";
+        if (!isEditing) {
+          input.value = Number.isFinite(v) ? String(v) : "";
+        }
 
         const disabled = !!model.get("disabled");
         input.disabled = disabled;
@@ -236,21 +259,42 @@ class NumberInputWidget(anywidget.AnyWidget):
       }
 
       let debounceTimer = null;
+      input.addEventListener("focus", () => {
+        isEditing = true;
+      });
+
       input.addEventListener("input", () => {
         if (model.get("disabled")) return;
 
-        const min = Number(model.get("min"));
-        const max = Number(model.get("max"));
+        const raw = input.value.trim();
+        if (isTransientDraft(raw)) {
+          if (debounceTimer) clearTimeout(debounceTimer);
+          return;
+        }
 
-        let v = Number(input.value);
+        let v = Number(raw);
         if (!Number.isFinite(v)) return;
 
-        v = clamp(v, min, max);
-        input.value = String(v);
+        const { min, max } = getCurrentBounds();
+        if (Number.isFinite(min) && v < min) return;
+        if (Number.isFinite(max) && v > max) return;
 
         model.set("value", v);
         if (debounceTimer) clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => model.save_changes(), 200);
+      });
+
+      input.addEventListener("blur", () => {
+        isEditing = false;
+        if (debounceTimer) clearTimeout(debounceTimer);
+        commitValue(input.value, true);
+      });
+
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          input.blur();
+        }
       });
 
       incrementBtn.addEventListener("click", () => {
