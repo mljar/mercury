@@ -39,13 +39,15 @@ def CheckBox(
     """
     value = resolve_boolean_value(value=bool(value), url_key=url_key)
 
-    args = [label, bool(value), url_key, appearance, position]
+    args = [label, bool(value), url_key, appearance, position, disabled, hidden]
     kwargs = {
         "label": label,
         "value": bool(value),
         "url_key": url_key,
         "appearance": appearance,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("Checkbox", key=key, args=args, kwargs=kwargs)

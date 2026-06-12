@@ -121,7 +121,7 @@ def NumberInput(
         step=step_f,
     )
 
-    args = [label, value_f, min_f, max_f, step_f, url_key, position]
+    args = [label, value_f, min_f, max_f, step_f, url_key, position, disabled, hidden]
     kwargs = {
         "label": label,
         "value": value_f,
@@ -129,7 +129,9 @@ def NumberInput(
         "max": max_f,
         "step": step_f,
         "url_key": url_key,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("NumberInput", key=key, args=args, kwargs=kwargs)

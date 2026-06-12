@@ -103,13 +103,15 @@ def Select(
         value = choices[0]
         warnings.warn("\nYour value is not included in choices. Automatically set value to first element from choices.")
 
-    args = [value, label, choices, url_key, position]
+    args = [value, label, choices, url_key, position, disabled, hidden]
     kwargs = {
         "value": value,
         "label": label,
         "choices": choices,
         "url_key": url_key,
-        "position": position
+        "position": position,
+        "disabled": disabled,
+        "hidden": hidden,
     }
 
     code_uid = WidgetsManager.get_code_uid("Select", key=key, args=args, kwargs=kwargs)

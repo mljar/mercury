@@ -36,6 +36,21 @@ def test_checkbox_defaults():
     assert widget.appearance == "toggle"
 
 
+def test_checkbox_passes_disabled_and_hidden_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = CheckBox(
+        label="Enable feature",
+        value=True,
+        disabled=True,
+        hidden=True,
+    )
+
+    assert widget.disabled is True
+    assert widget.hidden is True
+
+
 def test_checkbox_invalid_position_raises():
     with pytest.raises(TraitError):
         CheckboxWidget(position="left")

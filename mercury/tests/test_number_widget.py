@@ -58,6 +58,24 @@ def test_numberinput_invalid_value_defaults_to_min(monkeypatch):
     assert widget.value == 2.0
 
 
+def test_numberinput_passes_disabled_and_hidden_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = NumberInput(
+        label="Rows",
+        value=5,
+        min=0,
+        max=10,
+        step=1,
+        disabled=True,
+        hidden=True,
+    )
+
+    assert widget.disabled is True
+    assert widget.hidden is True
+
+
 # --- NumberInput url_params -------------------------------------------------------
 
 
