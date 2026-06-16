@@ -26,6 +26,7 @@ class RootIndexHandler(JupyterHandler):
                 notebooks=[],
                 base_url=base,
                 error=f"Notebooks directory '{notebooks_dir}' does not exist.",
+                notebooks_button_label=MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
                 theme=THEME,
                 theme_css_vars=build_theme_css_vars(THEME),
                 theme_font_links=build_theme_font_links(THEME),
@@ -69,6 +70,7 @@ class RootIndexHandler(JupyterHandler):
                                     footer=MAIN_CONFIG.get("footer", "MLJAR - next generation of AI tools"),
                                     header=WELCOME_CONFIG.get("header", "Hi there! 👋"),
                                     message=WELCOME_CONFIG.get("message", default_welcome_msg),
+                                    notebooks_button_label=MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
                                     theme=THEME,
                                     theme_css_vars=build_theme_css_vars(THEME),
                                     theme_font_links=build_theme_font_links(THEME))

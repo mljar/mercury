@@ -67,6 +67,7 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
             "frontendUrl": ujoin(self.base_url, "mercury/"),
             "notebookPath": notebook_path,
             "title": MAIN_CONFIG.get("title", "Mercury"),
+            "notebooksButtonLabel": MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
             "mercuryStandalone": True,
             "themeCssVars": build_theme_css_vars(THEME),
             "themeFontLinks": build_theme_font_links(THEME),
