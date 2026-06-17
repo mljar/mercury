@@ -2,6 +2,7 @@
 title = "(Mercury) 123"
 footer = "MLJAR - next generation of AI tools 123"
 favicon_emoji = "🎉"
+notebooks_button_label = "Notebooks"
 
 [welcome]
 header = ""

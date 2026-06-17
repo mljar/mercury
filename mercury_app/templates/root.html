@@ -185,7 +185,7 @@
       {% if notebooks %}
       <div style="position:relative">
         <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
-          Notebooks
+         {{ notebooks_button_label or 'Notebooks' }}
           <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
           </svg>
@@ -220,7 +220,7 @@
 
       {% if notebooks %}
       <div class="toprow">
-        <h2 class="section-title">Notebooks</h2>
+        <h2 class="section-title">{{ notebooks_button_label or 'Notebooks' }}</h2>
         <div class="search-wrap">
           <label for="nb-search" class="hidden">Search notebooks</label>
           <input id="nb-search" class="search" placeholder="Search notebooks…" />

@@ -171,6 +171,7 @@ To do this, create a file called `config.toml` in the active notebooks directory
 title = "Mercury"
 footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
+notebooks_button_label = "Notebooks"
 
 [welcome]
 header = ""
@@ -182,6 +183,7 @@ message = ""
 * **`title`** – the title of your web app
 * **`footer`** – text shown at the bottom of the page
 * **`favicon_emoji`** – emoji shown as the browser tab icon
+* **`notebooks_button_label`** – label shown on the notebooks dropdown button in the navbar
 * **`welcome.header`** – optional welcome header
 * **`welcome.message`** – optional welcome message for users
 

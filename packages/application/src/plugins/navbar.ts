@@ -14,6 +14,8 @@ export type MercuryNavbarOptions = {
   baseUrl: string;
   /** Title from PageConfig.getOption('title') */
   title: string;
+   /** Label for the notebooks dropdown button */
+  notebooksButtonLabel?: string;
   /** URL that returns the notebooks JSON array */
   apiUrl: string;
   /** Callback fired when the header height is known/changes (e.g., mount) */
@@ -178,7 +180,7 @@ export class MercuryNavbar {
     btn.id = 'mrcNbBtn';
     btn.setAttribute('aria-haspopup', 'menu');
     btn.setAttribute('aria-expanded', 'false');
-    btn.textContent = 'Notebooks';
+    btn.textContent = this.opts.notebooksButtonLabel || 'Notebooks';
 
     const caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     caret.setAttribute('class', 'mrc-caret');

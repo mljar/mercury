@@ -68,6 +68,7 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               const navbar = new MercuryNavbar({
                 baseUrl,
                 title: PageConfig.getOption('title') || 'Mercury',
+                notebooksButtonLabel: PageConfig.getOption('notebooksButtonLabel') || 'Notebooks',
                 apiUrl: `${baseUrl}mercury/api/notebooks`,
                 onHeightChange: px => {
                   // add top padding below fixed header
