@@ -185,45 +185,38 @@ class DownloadWidget(anywidget.AnyWidget):
     }}
 
     .mljar-download-btn {{
-        border: 1px solid {THEME.get('primary_color', '#007bff')};
         background: {THEME.get('primary_color', '#007bff')};
-        color: {THEME.get('button_primary_text', '#fff')};
+        color: {THEME.get('widget_background_color', '#fff')};
+        border: 2px solid {THEME.get('primary_color', '#007bff')};
         border-radius: {THEME.get('border_radius', '8px')};
-        padding: 4px 12px 4px 12px;
+        padding: 6px 18px;
         margin-top: 5px;
         margin-bottom: 5px;
         cursor: pointer;
-        transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
         user-select: none;
         outline: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        font-size: {THEME.get('font_size', '14px')};
-        font-weight: {THEME.get('font_weight', '600')};
-        box-shadow: {THEME.get('button_shadow', '0 1px 2px rgba(0,0,0,0.06)')};
+        font-size: 1.08em;
+        font-weight: 600;
     }}
 
     .mljar-download-btn:hover {{
-        transform: translateY(-1px);
-        box-shadow: {THEME.get('button_shadow_hover', '0 2px 6px rgba(0,0,0,0.08)')};
-        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
-        background: {THEME.get('run_button_background_hover', THEME.get('primary_color', '#007bff'))};
-        color: {THEME.get('button_primary_text', '#fff')};
+        background: {THEME.get('hover_background_color', '#f8fafc')};
+        color: {THEME.get('primary_color', '#007bff')};
     }}
 
     .mljar-download-btn:active {{
-        transform: translateY(0);
-        box-shadow: {THEME.get('button_shadow', '0 1px 2px rgba(0,0,0,0.06)')};
         background: {THEME.get('selected_background_color', '#eef3ff')};
-        color: {THEME.get('button_primary_text', '#fff')};
+        color: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
     }}
 
     .mljar-download-btn:focus-visible {{
         outline: none;
         border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
-        box-shadow: none;
     }}
     """
 
