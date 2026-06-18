@@ -1,0 +1,31 @@
+[main]
+title = "Ops Console"
+footer = "Platform engineering"
+favicon_emoji = "🛠️"
+
+[welcome]
+header = "Operations"
+message = "Run notebooks as internal apps."
+
+[theme]
+font = "IBM Plex Sans, ui-sans-serif, system-ui, sans-serif"
+font_url = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+font_size = "14px"
+background_color = "#07111f"
+surface_color = "#0f1b2d"
+text_color = "#e6edf7"
+primary_color = "#22c55e"
+
+[theme.overrides]
+accent_color = "#38bdf8"
+topbar_background_color = "#081423"
+topbar_text_color = "#ecfdf5"
+sidebar_background_color = "#0b1728"
+sidebar_text_color = "#d8e6f7"
+sidebar_title_color = "#f8fafc"
+widget_background_color = "#132238"
+card_background_color = "#0f1b2d"
+footer_background_color = "#081423"
+footer_text_color = "#93a8c3"
+focus_border_color = "#22c55e"
+border_color = "#1f3653"

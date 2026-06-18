@@ -108,10 +108,10 @@ export default defineConfig({
             icon: 'pencil',
             items: [
               { label: 'Examples', slug: 'examples' },
-              { label: 'Indicator Styling', slug: 'examples/indicator-styling' },
               { label: 'Ollama', autogenerate: { directory: 'examples/ollama' } },
               { label: 'Chat', autogenerate: { directory: 'examples/chat' } },
               { label: 'Utility Apps', autogenerate: { directory: 'examples/utility-apps' } },
+              { label: 'Custom Styles', autogenerate: { directory: 'examples/custom-styles' } },
             ],
           },
           {
