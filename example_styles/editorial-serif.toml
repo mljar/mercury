@@ -2,6 +2,8 @@
 title = "Research Hub"
 footer = "Notebook publishing"
 favicon_emoji = "📘"
+thumbnail_text = "📚"
+thumbnail_bg = "#f6f1e8"
 
 [welcome]
 header = "Research Apps"

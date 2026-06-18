@@ -2,6 +2,8 @@
 title = "Enterprise Portal"
 footer = "Business intelligence"
 favicon_emoji = "🏢"
+thumbnail_text = "📊"
+thumbnail_bg = "#eaf2ff"
 
 [welcome]
 header = "Business Apps"

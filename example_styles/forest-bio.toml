@@ -2,6 +2,8 @@
 title = "Bioinformatics Lab"
 footer = "Scientific workflows"
 favicon_emoji = "🧬"
+thumbnail_text = "🌿"
+thumbnail_bg = "#e8f3ea"
 
 [welcome]
 header = "Science Apps"
