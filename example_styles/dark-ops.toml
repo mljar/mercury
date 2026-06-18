@@ -2,6 +2,8 @@
 title = "Ops Console"
 footer = "Platform engineering"
 favicon_emoji = "🛠️"
+thumbnail_text = "🛡️"
+thumbnail_bg = "#0f172a"
 
 [welcome]
 header = "Operations"

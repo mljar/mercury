@@ -2,6 +2,8 @@ import json
 import os
 from typing import Any, Dict, List, Optional, Tuple
 
+from mercury.config import load_config_file
+
 # ipynb "mercury" metadata keys -> API field names
 MERCURY_THUMBNAIL_KEYS: Dict[str, str] = {
     "thumbnail_bg": "thumbnail_bg",
@@ -16,6 +18,25 @@ DEFAULT_THUMBNAILS = {
     "thumbnail_text": "📒",           # notebook emoji
     "thumbnail_text_color": "#0f172a" # slate-900
 }
+
+
+def _default_thumbnails_for_root(root: str) -> Dict[str, Any]:
+    """
+    Resolve default thumbnail values for a notebooks root.
+
+    Priority:
+    1. Hardcoded DEFAULT_THUMBNAILS
+    2. [main].thumbnail_* from config.toml in notebooks root
+    """
+    defaults = dict(DEFAULT_THUMBNAILS)
+    config = load_config_file(os.path.join(root, "config.toml"))
+    main = (config or {}).get("main", {}) or {}
+
+    for key in ("thumbnail_bg", "thumbnail_text", "thumbnail_text_color"):
+        if main.get(key) is not None:
+            defaults[key] = main[key]
+
+    return defaults
 
 
 def _read_ipynb_metadata(path: str) -> Tuple[Dict[str, Any], Optional[Exception]]:
@@ -104,6 +125,7 @@ def list_notebooks(
     """
     root = os.path.abspath(notebooks_dir or ".")
     files = _iter_notebooks(root, recursive=recursive)
+    default_thumbnails = _default_thumbnails_for_root(root)
 
     out: List[Dict[str, Any]] = []
     for full_path in files:
@@ -111,7 +133,7 @@ def list_notebooks(
         rel_path = os.path.relpath(full_path, start=root).replace(os.sep, "/")
 
         # Merge optional extras with defaults
-        extras = dict(DEFAULT_THUMBNAILS)
+        extras = dict(default_thumbnails)
         extras.update(meta.get("extra_fields", {}) or {})
 
         item = {

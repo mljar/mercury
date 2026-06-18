@@ -2,6 +2,8 @@
 title = "Mercury"
 footer = "Internal tools"
 favicon_emoji = "⚡"
+thumbnail_text = "📄"
+thumbnail_bg = "#f5f7fa"
 
 [welcome]
 header = "Welcome"

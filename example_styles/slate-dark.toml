@@ -2,6 +2,8 @@
 title = "Slate Workspace"
 footer = "Modern internal analytics"
 favicon_emoji = "🌌"
+thumbnail_text = "🌑"
+thumbnail_bg = "#232a34"
 
 [welcome]
 header = "Analyst Console"

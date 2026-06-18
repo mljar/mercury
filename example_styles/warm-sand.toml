@@ -2,6 +2,8 @@
 title = "Data Review"
 footer = "Narrative analytics"
 favicon_emoji = "📰"
+thumbnail_text = "☀️"
+thumbnail_bg = "#f6ead7"
 
 [welcome]
 header = "Stories in Data"
