@@ -91,7 +91,7 @@
   position: absolute;
   inset: 0;
   z-index: 900;
-  background: var(--mercury-sidebar-backdrop-color, rgb(15 23 42 / 22%));
+  background: var(--mercury-sidebar-backdrop-color);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -124,7 +124,7 @@
   border-radius: 10px;
 
   background: transparent;
-  color: rgb(17 24 39 / 88%);
+  color: var(--mercury-text-color); 
 
   box-shadow: none !important;
   outline: none;
@@ -140,7 +140,7 @@
 }
 
 .mercury-sidebar-toggle:hover {
-  background: rgb(209 213 219 / 55%);
+  background: var(--mercury-hover-background-color);
   box-shadow: none !important;
 }
 
@@ -220,6 +220,7 @@
 
 .mercury-left-panel {
   position: relative;
+  background: var(--mercury-sidebar-background-color) !important;
   top: 0;
   left: 0;
   display: flex;
@@ -234,7 +235,7 @@
   padding-bottom: 5px;
 
   overflow: visible;
-  box-shadow: var(--mercury-sidebar-shadow, 2px 0 12px rgb(0 0 0 / 18%));
+  box-shadow: var(--mercury-sidebar-shadow);
   min-width: 250px;
   opacity: 0;
   transform: translateX(calc(-100% - 16px));
@@ -264,6 +265,7 @@
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
+
 }
 
 .mercury-left-content .jp-OutputArea-output {
@@ -289,7 +291,7 @@
 
 .mercury-right-top-panel {
   position: relative;
-  background-color: white;
+  background: var(--mercury-surface-color); 
   padding-top: 0px;
   padding-left: 14px;
   padding-right: 5px;
@@ -302,7 +304,6 @@
 
 .mercury-right-bottom-panel {
   overflow: hidden !important;
-  /* border-top: 1px solid var(--jp-border-color2); */
   padding-top: 5px;
   padding-left: 14px;
   padding-right: 5px;
@@ -397,8 +398,8 @@
     max-width: 85vw;
     height: 100% !important;
     z-index: 1000;
-    box-shadow: 2px 0 12px rgb(0 0 0 / 18%);
-  }
+    box-shadow: 2px 0 12px rgb(from var(--mercury-primary-color) r g b  / 18%); 
+    }
 
   .mercury-right-split-panel {
     width: 100% !important;
@@ -519,6 +520,7 @@
 
 /* App title */
 .mercury-left-panel .mercury-sidebar-title {
+  color: var(--mercury-sidebar-title-color);
   font-weight: 700;
   font-size: 18px;
   padding: 10px 0px;
@@ -723,3 +725,8 @@
 .lm-Widget .jp-RenderedHTMLCommon .jp-RenderedHTML .jp-mod-trusted .jp-OutputArea-output {
   padding-right: 0px !important;
 }
+
+/* .lm-Widget .lm-Panel .jp-OutputArea-output {
+  background: var(--mercury-surface-color) !important;
+  padding: 5px !important;
+} */

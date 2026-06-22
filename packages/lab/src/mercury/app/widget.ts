@@ -134,15 +134,64 @@ const TOP_RATIO = 0.85; // 85% height
 const BOTTOM_RATIO = 0.15; // 15% height
 const DEFAULT_SIDEBAR_BG = '#f8f9fa';
 
+const THEME_CSS_VARIABLE_MAP = {
+  font_family: '--mercury-font-family',
+  heading_font_family: '--mercury-heading-font-family',
+  font_size: '--mercury-font-size',
+  font_weight: '--mercury-font-weight',
+  heading_font_weight: '--mercury-heading-font-weight',
+  text_color: '--mercury-text-color',
+  muted_text_color: '--mercury-muted-text-color',
+  background_color: '--mercury-background-color',
+  surface_color: '--mercury-surface-color',
+  content_background_color: '--mercury-content-background-color',
+  panel_bg: '--mercury-panel-bg',
+  card_background_color: '--mercury-card-background-color',
+  border_color: '--mercury-border-color',
+  border_radius: '--mercury-border-radius',
+  primary_color: '--mercury-primary-color',
+  accent_color: '--mercury-accent-color',
+  focus_border_color: '--mercury-focus-border-color',
+  hover_background_color: '--mercury-hover-background-color',
+  selected_background_color: '--mercury-selected-background-color',
+  sidebar_background_color: '--mercury-sidebar-background-color',
+  sidebar_text_color: '--mercury-sidebar-text-color',
+  sidebar_title_color: '--mercury-sidebar-title-color',
+  sidebar_shadow: '--mercury-sidebar-shadow',
+  sidebar_backdrop_color: '--mercury-sidebar-backdrop-color',
+  topbar_background_color: '--mercury-topbar-background-color',
+  topbar_text_color: '--mercury-topbar-text-color',
+  topbar_border_color: '--mercury-topbar-border-color',
+  footer_background_color: '--mercury-footer-background-color',
+  footer_text_color: '--mercury-footer-text-color',
+  footer_border_color: '--mercury-footer-border-color',
+  loader_background_color: '--mercury-loader-background-color',
+  loader_card_background_color: '--mercury-loader-card-background-color',
+  loader_text_color: '--mercury-loader-text-color',
+  loader_border_color: '--mercury-loader-border-color',
+  loader_icon_color: '--mercury-loader-icon-color',
+  loader_steam_color: '--mercury-loader-steam-color',
+  toast_background_color: '--mercury-toast-background-color',
+  toast_text_color: '--mercury-toast-text-color',
+  toast_error_border_color: '--mercury-toast-error-border-color',
+  run_button_background: '--mercury-run-button-background',
+  run_button_background_hover: '--mercury-run-button-background-hover',
+  run_button_text_color: '--mercury-run-button-text-color',
+  run_button_focus_color: '--mercury-run-button-focus-color',
+  shadow_sm: '--mercury-shadow-sm',
+  shadow_md: '--mercury-shadow-md',
+  shadow_lg: '--mercury-shadow-lg'
+} as const;
+
+type ThemeCssKey = keyof typeof THEME_CSS_VARIABLE_MAP;
+
 /**
  * Minimal page-config structure we actually consume.
  */
 interface IPageConfigLike {
   baseUrl?: string;
   showCode?: boolean;
-  theme?: {
-    sidebar_background_color?: string;
-  };
+  theme?: Partial<Record<ThemeCssKey, string>>;
 }
 
 /**
@@ -167,18 +216,21 @@ function getPageConfig(): IPageConfigLike {
  * Fetch theme overrides.
  * The `url` parameter is accepted for future flexibility.
  */
-// async function fetchTheme(_url: string) {
-//   try {
-//     const response = await fetch('http://localhost:8888/mercury/api/theme');
-//     if (!response.ok) {
-//       throw new Error(`Theme API error: ${response.status}`);
-//     }
-//     return await response.json();
-//   } catch (err) {
-//     console.warn('Failed to fetch theme overrides', err);
-//     return {};
-//   }
-// }
+async function fetchTheme(baseUrl = ''): Promise<IPageConfigLike['theme']> {
+  const prefix = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  const url = `${prefix}mercury/api/theme`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Theme API error: ${response.status}`);
+    }
+    return (await response.json()) as IPageConfigLike['theme'];
+  } catch (err) {
+    console.warn('Failed to fetch theme overrides', err);
+    return {};
+  }
+}
 
 /**
  * Main application widget that lays out notebook cells into
@@ -326,16 +378,38 @@ export class AppWidget extends Panel {
     }
   };
 
+  private applyThemeCssVars(theme?: IPageConfigLike['theme']): void {
+    if (!theme) {
+      return;
+    }
+
+    for (const [key, cssVar] of Object.entries(THEME_CSS_VARIABLE_MAP) as Array<
+      [ThemeCssKey, (typeof THEME_CSS_VARIABLE_MAP)[ThemeCssKey]]
+    >) {
+      const value = theme[key]?.trim();
+      if (!value) {
+        continue;
+      }
+      this.node.style.setProperty(cssVar, value);
+    }
+  }
+
+  private async loadThemeCssVars(baseUrl = ''): Promise<void> {
+    const theme = await fetchTheme(baseUrl);
+    this.applyThemeCssVars(theme);
+  }
+
   constructor(model: AppModel) {
     super();
 
     const pageConfig = getPageConfig();
-    // void fetchTheme(pageConfig.baseUrl || '');
 
     this._model = model;
 
     this.id = 'mercury-main-panel';
     this.addClass('mercury-main-panel');
+    this.applyThemeCssVars(pageConfig.theme);
+    void this.loadThemeCssVars(pageConfig.baseUrl || '');
 
     // Build static layout containers
     this._left = this.createSidebar(pageConfig);
