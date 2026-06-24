@@ -159,6 +159,7 @@ class MercuryApp(LabServerApp):
             if env:
                 env.globals.setdefault("page_title", MAIN_CONFIG.get("title", "Mercury"))
                 env.globals.setdefault("favicon_emoji", MAIN_CONFIG.get("favicon_emoji", "🎉"))
+                env.globals.setdefault("waiting_message", MAIN_CONFIG.get("waiting_message", "Initializing web application..."))
             
 
     def initialize(self, argv=None):
