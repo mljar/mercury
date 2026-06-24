@@ -117,7 +117,6 @@ class PDFWidget(anywidget.AnyWidget):
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
       color: {THEME.get('text_color', '#222')};
-      margin-bottom: 8px;
     }}
     .mljar-pdf-label {{
       margin-bottom: 6px;

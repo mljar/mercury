@@ -487,7 +487,6 @@ class MultiSelectWidget(anywidget.AnyWidget):
       flex-direction: column;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
-      margin-bottom: 8px;
       padding-left: 4px;
       padding-right: 4px;
     }}
