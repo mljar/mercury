@@ -274,7 +274,7 @@
 }
 
 .mercury-left-content .jp-OutputArea-output {
-  background: var(--mercury-sidebar-background-color);
+  background: var(--mercury-sidebar-background-color) !important;
   overflow-x: hidden !important;
 }
 
@@ -747,4 +747,8 @@
 
 .lm-Widget .lm-Panel .jp-OutputArea-output pre {
   color: var(--mercury-text-color);
+}
+
+.lm-Widget .lm-Panel .jp-OutputArea-output  {
+  background: var(--mercury-surface-color);
 }
