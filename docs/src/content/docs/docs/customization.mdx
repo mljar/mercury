@@ -16,6 +16,9 @@ title = "Mercury"
 footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
 notebooks_button_label = "Notebooks"
+thumbnail_text = "📘"
+thumbnail_bg = "#f1f5f9"
+thumbnail_text_color = "#0f172a"
 
 [welcome]
 header = "Welcome"
@@ -28,8 +31,13 @@ Available settings:
 - `main.footer` - footer text
 - `main.favicon_emoji` - emoji used as the browser tab icon
 - `main.notebooks_button_label` - label shown on the notebooks dropdown button in the navbar
+- `main.thumbnail_text` - default text or emoji shown on notebook thumbnails in the listing page
+- `main.thumbnail_bg` - default thumbnail background color for notebooks in the listing page
+- `main.thumbnail_text_color` - default thumbnail text color for notebooks in the listing page
 - `welcome.header` - optional welcome header on the notebook listing page
 - `welcome.message` - optional welcome message on the notebook listing page
+
+Notebook thumbnails can still be overridden per notebook through notebook metadata. Values from `[main]` act as defaults for the whole notebooks directory.
 
 ## Theming
 
