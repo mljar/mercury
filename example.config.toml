@@ -4,6 +4,9 @@ footer = "MLJAR - next generation of AI tools 123"
 favicon_emoji = "🎉"
 notebooks_button_label = "Notebooks"
 
+search_filter_label = "Search notebooks"
+show_search_filter = true
+
 [welcome]
 header = ""
 message = ""
