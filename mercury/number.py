@@ -416,7 +416,6 @@ class NumberInputWidget(anywidget.AnyWidget):
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
       color: {THEME.get('text_color', '#222')};
-      margin-bottom: 8px;
       padding-left: 4px;
       padding-right: 4px;
       box-sizing: border-box;

@@ -160,7 +160,6 @@ class ButtonWidget(anywidget.AnyWidget):
         display: inline-flex;
         width: auto;
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
-        margin-bottom: 8px;
         padding-left: 4px;
         padding-right: 4px;
     }}

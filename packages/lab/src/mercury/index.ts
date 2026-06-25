@@ -17,6 +17,7 @@ import { MercuryWidgetFactory } from './factory';
 import { IMercuryTracker, MercuryWidget } from './widget';
 
 import { OpenMercuryButton } from './toolbar/button';
+import { getPageConfig, applyThemeCssVars, loadThemeCssVars } from './themeCssVars';
 
 export * from './factory';
 export * from './widget';
@@ -38,6 +39,10 @@ export const mercury: JupyterFrontEndPlugin<IMercuryTracker> = {
     rendermime: IRenderMimeRegistry
   ) => {
     console.log('Mercury extension is active.');
+    const pageConfig = getPageConfig();
+    applyThemeCssVars(pageConfig.theme);
+    void loadThemeCssVars(pageConfig.baseUrl || '');
+
     const tracker = new WidgetTracker<MercuryWidget>({
       namespace: '@mljar/mercury-extension:widget-tracker'
     });

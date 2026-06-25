@@ -561,7 +561,6 @@ class UploadFileWidget(anywidget.AnyWidget):
       flex-direction: column;
       align-items: flex-start;
       width: 100%;
-      margin-bottom: 1em;
       padding-left: 4px;
       padding-right: 4px;
       box-sizing: border-box;

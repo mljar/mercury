@@ -305,7 +305,6 @@ class SliderWidget(anywidget.AnyWidget):
       font-size: {THEME.get('font_size', '14px')};
       font-weight: {THEME.get('font_weight', 'normal')};
       color: {THEME.get('text_color', '#222')};
-      margin-bottom: 8px;
       padding-left: 4px;
       padding-right: 4px;
       box-sizing: border-box;

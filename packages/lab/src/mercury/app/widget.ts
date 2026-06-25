@@ -40,6 +40,10 @@ import type { INotebookModel } from '@jupyterlab/notebook';
 import type { DocumentRegistry } from '@jupyterlab/docregistry';
 import type { IObservableJSON } from '@jupyterlab/observables';
 import { BusyIndicator } from './busyIndicator';
+import {
+  getPageConfig,
+  IPageConfigLike
+} from '../themeCssVars';
 
 function readShowCodeFromContext(
   context: DocumentRegistry.IContext<INotebookModel>
@@ -133,52 +137,6 @@ const MAIN_RATIO = 0.8; // 80% width
 const TOP_RATIO = 0.85; // 85% height
 const BOTTOM_RATIO = 0.15; // 15% height
 const DEFAULT_SIDEBAR_BG = '#f8f9fa';
-
-/**
- * Minimal page-config structure we actually consume.
- */
-interface IPageConfigLike {
-  baseUrl?: string;
-  showCode?: boolean;
-  theme?: {
-    sidebar_background_color?: string;
-  };
-}
-
-/**
- * Read the inline Jupyter page config JSON.
- * Throws if the element does not exist or contains invalid JSON.
- */
-function getPageConfig(): IPageConfigLike {
-  const el = document.getElementById('jupyter-config-data');
-  if (!el) {
-    throw new Error('Page config script not found');
-  }
-
-  try {
-    return JSON.parse(el.textContent || '{}') as IPageConfigLike;
-  } catch (err) {
-    console.warn('Invalid page config JSON:', err);
-    return {};
-  }
-}
-
-/**
- * Fetch theme overrides.
- * The `url` parameter is accepted for future flexibility.
- */
-// async function fetchTheme(_url: string) {
-//   try {
-//     const response = await fetch('http://localhost:8888/mercury/api/theme');
-//     if (!response.ok) {
-//       throw new Error(`Theme API error: ${response.status}`);
-//     }
-//     return await response.json();
-//   } catch (err) {
-//     console.warn('Failed to fetch theme overrides', err);
-//     return {};
-//   }
-// }
 
 /**
  * Main application widget that lays out notebook cells into
@@ -330,7 +288,6 @@ export class AppWidget extends Panel {
     super();
 
     const pageConfig = getPageConfig();
-    // void fetchTheme(pageConfig.baseUrl || '');
 
     this._model = model;
 
