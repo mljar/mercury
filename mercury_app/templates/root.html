@@ -218,18 +218,34 @@
         
       </section>
 
-      {% if notebooks %}
-      <div class="toprow">
-        <h2 class="section-title">{{ notebooks_button_label or 'Notebooks' }}</h2>
-        <div class="search-wrap">
-          <label for="nb-search" class="hidden">Search notebooks</label>
-          <input id="nb-search" class="search" placeholder="Search notebooks…" />
-          <div class="search-ico" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/>
-            </svg>
-          </div>
+      {% if show_search_filter %}
+      <div class="search-wrap">
+        <label for="nb-search" class="hidden">
+          {{ search_filter_label or "Search notebooks" }}
+        </label>
+
+        <input
+          id="nb-search"
+          class="search"
+          placeholder="{{ search_filter_label or 'Search notebooks' }}"
+        />
+
+        <div class="search-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 21l-4.3-4.3"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="6.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+          </svg>
         </div>
       </div>
       {% endif %}

@@ -172,6 +172,8 @@ title = "Mercury"
 footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
 notebooks_button_label = "Notebooks"
+search_filter_label = "Search notebooks"
+show_search_filter = true
 thumbnail_text = "📘"
 thumbnail_bg = "#f1f5f9"
 thumbnail_text_color = "#0f172a"
@@ -187,9 +189,11 @@ message = ""
 * **`footer`** – text shown at the bottom of the page
 * **`favicon_emoji`** – emoji shown as the browser tab icon
 * **`notebooks_button_label`** – label shown on the notebooks dropdown button in the navbar
-* **`thumbnail_text`** – default text or emoji shown on notebook thumbnails in the listing page
-* **`thumbnail_bg`** – default thumbnail background color for notebooks in the listing page
-* **`thumbnail_text_color`** – default thumbnail text color for notebooks in the listing page
+* **`search_filter_label`** – label and placeholder shown in the notebook search field
+* **`show_search_filter`** – whether the notebook search field should be displayed
+* **`thumbnail_text`** – emoji or text displayed on notebook thumbnails
+* **`thumbnail_bg`** – background color for notebook thumbnails
+* **`thumbnail_text_color`** – text color for notebook thumbnails
 * **`welcome.header`** – optional welcome header
 * **`welcome.message`** – optional welcome message for users
 

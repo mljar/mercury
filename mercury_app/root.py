@@ -65,12 +65,34 @@ class RootIndexHandler(JupyterHandler):
         <p class="lead2">Feel free to interact and explore - everything is designed to be <b>simple and safe</b>.</p>
         """
 
-        html = self.render_template("root.html", notebooks=notebooks, base_url=base, 
-                                    title=MAIN_CONFIG.get("title", "Mercury"),           
-                                    footer=MAIN_CONFIG.get("footer", "MLJAR - next generation of AI tools"),
+        html = self.render_template("root.html", notebooks=notebooks,
+                                    base_url=base,
+                                    title=MAIN_CONFIG.get("title", "Mercury"),
+                                    footer=MAIN_CONFIG.get(
+                                        "footer",
+                                        "MLJAR - next generation of AI tools",
+                                    ),
                                     header=WELCOME_CONFIG.get("header", "Hi there! 👋"),
-                                    message=WELCOME_CONFIG.get("message", default_welcome_msg),
-                                    notebooks_button_label=MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
+                                    message=WELCOME_CONFIG.get(
+                                        "message",
+                                        default_welcome_msg,
+                                    ),
+                                    notebooks_button_label=MAIN_CONFIG.get(
+                                        "notebooks_button_label",
+                                        "Notebooks",
+                                    ),
+                                    notebooks_button_label=MAIN_CONFIG.get(
+                                        "notebooks_button_label",
+                                        "Notebooks",
+                                    ),
+                                    search_filter_label=MAIN_CONFIG.get(
+                                        "search_filter_label",
+                                        "Search notebooks",
+                                    ),
+                                    show_search_filter=MAIN_CONFIG.get(
+                                        "show_search_filter",
+                                        True,
+                                    ),
                                     theme=THEME,
                                     theme_css_vars=build_theme_css_vars(THEME),
                                     theme_font_links=build_theme_font_links(THEME))
