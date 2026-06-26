@@ -142,7 +142,7 @@
 
     /* Coffee box centered BELOW the header */
     html::after {
-      content: "Initializing web application…";
+      content: "{{ page_config.get('waiting_message', 'Initializing web application…') }}";
       position: fixed;
       top: calc(var(--header-height) + var(--safe-top) + 50%);
       left: 50%;
@@ -346,7 +346,5 @@
     // Loader is hidden explicitly by the app once cells finish executing.
   </script>
   
-  <!-- Body may be replaced by the app; overlay stays visible and responsive. -->
-
-</body>
+  </body>
 </html>
