@@ -3,10 +3,15 @@
 {% block stylesheet %}
 <style>
   html, body {
-    padding: 0; margin: 0;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    background: #f9fafb; color: #0f172a; line-height: 1.55;
-    font-size: 12px; 
+    padding: 0; 
+    margin: 0;
+    background: var(--mercury-background-color);
+    color: var(--mercury-text-color); 
+    line-height: 1.55;
+    
+    font-family: var(--mercury-font-family);
+    font-size: var(--mercury-font-size);
+    font-weight: var(--mercury-font-weight);
   }
  
 
@@ -16,8 +21,9 @@
     /* Header */
     .hdr {
       position: sticky; top: 0; z-index: 50;
-      background: #0b0b0c;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: var(--mercury-topbar-background-color);
+      color: var(--mercury-topbar-text-color);
+      border-bottom: 1px solid var(--mercury-border-color);
       height: 52px;
     }
     .hdr-inner {
@@ -26,8 +32,9 @@
       padding: .9rem .75rem;
     }
     .brand {
-      font-weight: 750; letter-spacing: -.01em;
-      color: #f3f4f6; font-size: clamp(16px, 2vw, 20px);
+      color: var(--mercury-topbar-text-color);
+      font-family: var(--mercury-heading-font-family);
+      font-weight: var(--mercury-heading-font-weight);
     }
 
     .btn {
