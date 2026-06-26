@@ -16,6 +16,8 @@ into view.
 import ipywidgets as widgets
 from IPython.display import display, HTML as DHTML, Javascript, Markdown
 
+from ..theme import THEME
+
 MSG_CSS_CLASS = "mljar-chat-msg"
 
 
@@ -72,11 +74,24 @@ class Message(widgets.HBox):
         """
         super().__init__()
 
-        avatar_bg = "#84c4ff" if role == "user" else "#eeeeee"
+        avatar_bg = (
+            THEME.get("primary_color", "#84c4ff")
+            if role == "user"
+            else THEME.get("panel_bg_hover", THEME.get("panel_bg", "#eeeeee"))
+        )
+        avatar_fg = (
+            THEME.get(
+                "button_text_color",
+                THEME.get("widget_background_color", "#fff"),
+            )
+            if role == "user"
+            else THEME.get("text_color", "#222")
+        )
+        role_kind = self._get_role_kind(role)
         avatar_html = (
-            f'<div style="width:36px;height:36px;background:{avatar_bg};'
-            f'border-radius:12px;display:flex;align-items:center;justify-content:center;'
-            f'box-shadow:0 1px 4px rgba(60,60,60,0.10);">'
+            f"<style>{self._message_css()}</style>"
+            f'<div class="mljar-chat-msg-avatar mljar-chat-msg-avatar-{role_kind}" '
+            f'style="background:{avatar_bg};color:{avatar_fg};">'
             f'<span style="font-size:18px;line-height:1;">{emoji}</span>'
             f'</div>'
         )
@@ -89,15 +104,27 @@ class Message(widgets.HBox):
         self.output = widgets.Output(
             layout=widgets.Layout(
                 align_self="flex-start",
-                margin="8px 0 0 0",
+                margin="0 0 0 0",
                 overflow_y="visible",
                 overflow_x="visible",
+                padding="4px 12px",
+                width="auto",
+                flex="0 1 auto",
+                border=(
+                    f"1px solid {THEME.get('border_color', '#ccc')}"
+                    if THEME.get("border_visible", True)
+                    else "none"
+                ),
             )
         )
         self.output.add_class(MSG_CSS_CLASS)
+        self.output.add_class("mljar-chat-msg-bubble")
+        self.output.add_class(f"mljar-chat-msg-bubble-{role_kind}")
 
         self.children = [avatar, self.output]
         self.layout.align_items = "flex-start"
+        self.layout.width = "100%"
+        self.add_class("mljar-chat-msg-row")
 
         # Buffers and rendering mode
         self._mode = None  # one of {"markdown", "html", "text", None}
@@ -108,6 +135,124 @@ class Message(widgets.HBox):
 
         if markdown != "":
             self.set_content(markdown=markdown)
+
+    @staticmethod
+    def _get_role_kind(role):
+        role_key = str(role or "").lower()
+        if role_key in {"user", "human"}:
+            return "user"
+        if role_key == "tool":
+            return "tool"
+        return "assistant"
+
+    @staticmethod
+    def _message_css():
+        return f"""
+        .mljar-chat-msg-row {{
+            width: 100%;
+            box-sizing: border-box;
+            align-items: flex-start;
+        }}
+
+        .mljar-chat-msg-avatar {{
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: {THEME.get('border_radius', '6px')};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            margin: 0 8px 8px 0;
+            box-shadow: 0 1px 4px rgb(60 60 60 / 10%);
+            border: {('1px solid ' + THEME.get('border_color', '#ccc')) if THEME.get('border_visible', True) else 'none'};
+        }}
+
+        .mljar-chat-msg-bubble {{
+            display: inline-block;
+            width: fit-content;
+            max-width: 100%;
+            vertical-align: top;
+            box-sizing: border-box;
+            border-radius: {THEME.get('border_radius', '6px')};
+            color: {THEME.get('text_color', '#222')};
+            font-family: {THEME.get('font_family', 'Arial, sans-serif')};
+            font-size: {THEME.get('font_size', '14px')};
+            font-weight: {THEME.get('font_weight', 'normal')};
+            line-height: 1.5;
+        }}
+
+        .mljar-chat-msg-bubble > .jp-OutputArea,
+        .mljar-chat-msg-bubble .jp-OutputArea-child,
+        .mljar-chat-msg-bubble .jp-OutputArea-output,
+        .mljar-chat-msg-bubble .jp-RenderedHTMLCommon,
+        .mljar-chat-msg-bubble .lm-Widget {{
+            background: transparent !important;
+            width: auto !important;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
+
+        .mljar-chat-msg-bubble .jp-OutputArea-child,
+        .mljar-chat-msg-bubble .jp-OutputArea-output {{
+            display: inline-block;
+            vertical-align: top;
+        }}
+
+        .mljar-chat-msg-bubble .jp-MarkdownOutput,
+        .mljar-chat-msg-bubble .jp-MarkdownOutput p,
+        .mljar-chat-msg-bubble .jp-RenderedHTMLCommon,
+        .mljar-chat-msg-bubble .jp-RenderedHTMLCommon p {{
+            color: {THEME.get('text_color', '#222')} !important;
+        }}
+
+        .mljar-chat-msg-bubble p {{
+            margin: 0;
+        }}
+
+        .mljar-chat-msg-bubble-user {{
+            background: transparent;
+            color: {THEME.get('text_color', '#222')};
+            border-color: {THEME.get('border_color', '#ccc')};
+        }}
+
+        .mljar-chat-msg-bubble-assistant {{
+            background: transparent;
+            color: {THEME.get('text_color', '#222')};
+        }}
+
+        .mljar-chat-msg-bubble-tool {{
+            background: transparent;
+            color: {THEME.get('text_color', '#222')};
+        }}
+
+        .mljar-chat-msg-bubble a {{
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 0.14em;
+        }}
+
+        .mljar-chat-msg-bubble code {{
+            color: inherit;
+            background: {THEME.get('panel_bg_hover', THEME.get('panel_bg', '#f7f7f9'))};
+            border: 1px solid {THEME.get('border_color', '#ccc')};
+            border-radius: {THEME.get('border_radius_sm', '4px')};
+            padding: 0.12em 0.38em;
+        }}
+
+        .mljar-chat-msg-bubble pre {{
+            margin: 0;
+            background: {THEME.get('panel_bg', THEME.get('widget_background_color', '#fff'))};
+            border: 1px solid {THEME.get('border_color', '#ccc')};
+            border-radius: {THEME.get('border_radius', '6px')};
+            padding: 0.85em 1em;
+            overflow-x: auto;
+        }}
+        """
+
 
     # ------------------------------------------------------------------
     # Internal helpers

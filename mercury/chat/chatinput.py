@@ -319,9 +319,9 @@ class ChatInputWidget(anywidget.AnyWidget):
         box-sizing: border-box;
         font-family: {THEME.get('font_family', 'Arial, sans-serif')};
         font-size: {THEME.get('font_size', '14px')};
+        font-weight: {THEME.get('font_weight', 'normal')};
         color: {THEME.get('text_color', '#222')};
-        padding-top: 8px;
-        padding-bottom: 8px;
+        padding: 8px 4px;
     }}
 
     .mljar-chatinput-input {{
@@ -336,14 +336,23 @@ class ChatInputWidget(anywidget.AnyWidget):
         background: {THEME.get('widget_background_color', '#fff')};
         color: {THEME.get('text_color', '#222')};
         box-sizing: border-box;
-        padding: 10px 72px 10px 12px;
-        font-size: 0.9rem;
+        padding: 9px 56px 9px 10px;
+        font: inherit;
         line-height: 1.4;
+        appearance: none !important;
+        background-color: {THEME.get('widget_background_color', '#fff')} !important;
+    }}
+
+    .mljar-chatinput-input::placeholder {{
+        color: {THEME.get('muted_text_color', '#777')};
+        opacity: 1;
     }}
 
     .mljar-chatinput-input:focus {{
         outline: none;
-        border-color: {THEME.get('primary_color', '#007bff')};
+        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
+        border-width: 2px;
+        box-shadow: none;
     }}
 
     .mljar-chatinput-measure {{
@@ -367,27 +376,33 @@ class ChatInputWidget(anywidget.AnyWidget):
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: none;
+        border: 2px solid {THEME.get('primary_color', '#007bff')};
         border-radius: 0 {THEME.get('border_radius', '6px')} {THEME.get('border_radius', '6px')} 0 !important;
         width: 60px;
         cursor: pointer;
         background: {THEME.get('primary_color', '#007bff')};
-        color: {THEME.get('button_text_color', '#fff')};
-        font-weight: bold;
+        color: {THEME.get('button_text_color', THEME.get('widget_background_color', '#fff'))};
+        font: inherit;
+        font-weight: 600;
         padding: 0;
         line-height: 1;
-        box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
-        transition: filter 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+        transition: background 0.2s, color 0.2s, border-color 0.2s, transform 120ms ease;
     }}
 
-    .mljar-chatinput-button:hover {{
-        filter: brightness(0.95);
-        box-shadow: 0 3px 10px rgb(0 0 0 / 16%);
+    .mljar-chatinput-button:hover:not(:disabled) {{
+        background: {THEME.get('hover_background_color', '#f8fafc')};
+        color: {THEME.get('primary_color', '#007bff')};
     }}
 
-    .mljar-chatinput-button:active {{
+    .mljar-chatinput-button:active:not(:disabled) {{
+        background: {THEME.get('selected_background_color', '#eef3ff')};
+        color: {THEME.get('accent_color', THEME.get('primary_color', '#007bff'))};
         transform: translateY(1px);
-        box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+    }}
+
+    .mljar-chatinput-button:focus-visible {{
+        outline: none;
+        border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
     }}
 
     .mljar-chatinput-send-icon {{
