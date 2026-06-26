@@ -1,10 +1,11 @@
-                                             _ __ ___   ___ _ __ ___ _   _ _ __ _   _
-                                            | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
-                                            | | | | | |  __/ | | (__| |_| | |  | |_| |
-                                            |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
-                                                                                 __/ |
-                                                                                |___/ 
-                                                                                
+Markdown
+                                            _ __ ___   ___ _ __ ___ _   _ _ __ _   _
+                                           | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
+                                           | | | | | |  __/ | | (__| |_| | |  | |_| |
+                                           |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
+                                                                                __/ |
+                                                                               |___/ 
+                                                                               
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.txt)
 [![PyPI version](https://badge.fury.io/py/mercury.svg)](https://pypi.org/project/mercury/)
 [![Downloads](https://pepy.tech/badge/mercury)](https://pepy.tech/project/mercury)
@@ -38,19 +39,13 @@ Example bot app that will respond with echo:
 ```python
 # import package
 import mercury as mr
-```
-
-```python
+Python
 # create Chat widget
 chat = mr.Chat()
-```
-
-```python
+Python
 # create chat prompt
 prompt = mr.ChatInput()
-```
-
-```python
+Python
 if prompt.value:
     # user message
     user_msg = mr.Message(prompt.value, role="user")
@@ -63,54 +58,31 @@ if prompt.value:
         emoji="🤖",
     )
     chat.add(response_msg)
-```
-
-### Live App Preview
-
+Live App Preview
 Yes, you can preview the app during development. Please click 🎉 in the top notebook toolbar to open preview.
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat.png)
-
-### Production App
-
+Production App
 You can serve your notebook as standalone web app:
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/main/docs/src/assets/examples/basic-echo-chat-app.png)
-
-## Installation
-
-```
+Installation
 pip install mercury
-```
-
 Start server with the following command:
 
-```
 mercury
-```
-
 By default, it will detect all notebooks in the current directory and serve them as web apps.
 
 To serve notebooks from a different directory and make relative paths resolve from there:
 
-```
 mercury --working-dir /path/to/notebooks
-```
-
 You can combine it with a notebook argument:
 
-```
 mercury app.ipynb --working-dir /path/to/notebooks
-```
-
 Example view of notebooks home page:
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/notebooks-home.png)
 
-
-## Deployment
-
+Deployment
 Here is minimal Dockerfile to serve Mercury:
-```docker
+
+Dockerfile
 FROM python:3.12-slim
 
 # Install Mercury
@@ -128,90 +100,89 @@ EXPOSE 8888
 
 # Start Mercury server
 CMD ["mercury", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
-```
+We also offer managed cloud service for 1-click app deployment. Please check our website platform.mljar.com.
 
-We also offer **managed cloud** service for 1-click app deployment. Please check our website [platform.mljar.com](https://platform.mljar.com).
+Run at click (disable auto re-run)
+Maybe you don't want to re-execute cells after widget update and would like to run all cells from top to the bottom on the button click. You can disable auto re-rerun by unchecking it in app preview in the top toolbar. Your web app will have added Run button in the sidebar that will trigger cells re-execution.
 
-## Run at click (disable auto re-run)
+Notebook appearance in home page
+In the app preview toolbar you can also set:
 
-Maybe you don't want to re-execute cells after widget update and would like to run all cells from top to the bottom on the button click. You can disable auto re-rerun by unchecking it in app preview in the top toolbar. Your web app will have added **Run** button in the sidebar that will trigger cells re-execution.
+notebook title and description, they are displayed in the home page,
 
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/disable-auto-re-run.png)
+emoji and colors of icon in the home page,
 
-## Notebook appearance in home page
+you can display notebook code - useful for teachers :+1:,
 
-In the app preview toolbar you can also set: 
-- notebook title and description, they are displayed in the home page, 
-- emoji and colors of icon in the home page,
-- you can display notebook code - useful for teachers :+1:,
-- go app full width.
+go app full width.
 
-## Authentication
-
+Authentication
 You can restrict access to your web apps by setting password when starting server:
 
-```
 mercury --pass=your-secret-here
-```
-
 Before opening the notebook user needs to provide the password:
-
-![](https://raw.githubusercontent.com/mljar/mercury/refs/heads/v3/docs/src/assets/examples/mercury-login.png)
 
 If you want to have user-based authentication in your Mercury. It is paid option. Please reach us for more details contact - at - mljar.com
 
-## Configuration and customization
-
+Configuration and customization
 We want you to customize your web apps so they look and feel exactly the way you like.
 
-To do this, create a file called `config.toml` in the active notebooks directory. By default, this is the current directory. If you start Mercury with `--working-dir`, place `config.toml` there instead.
+To do this, create a file called config.toml in the active notebooks directory. By default, this is the current directory. If you start Mercury with --working-dir, place config.toml there instead.
 
-```toml
+Ini, TOML
 [main]
 title = "Mercury"
 footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
 notebooks_button_label = "Notebooks"
+waiting_message = "Initializing web application..."
 
 [welcome]
 header = ""
 message = ""
-```
+What you can customize
+title – the title of your web app
 
-### What you can customize
+footer – text shown at the bottom of the page
 
-* **`title`** – the title of your web app
-* **`footer`** – text shown at the bottom of the page
-* **`favicon_emoji`** – emoji shown as the browser tab icon
-* **`notebooks_button_label`** – label shown on the notebooks dropdown button in the navbar
-* **`welcome.header`** – optional welcome header
-* **`welcome.message`** – optional welcome message for users
+favicon_emoji – emoji shown as the browser tab icon
+
+notebooks_button_label – label shown on the notebooks dropdown button in the navbar
+
+waiting_message – text displayed while the web application is loading/initializing
+
+welcome.header – optional welcome header
+
+welcome.message – optional welcome message for users
 
 Feel free to change these values and make the app your own.
 
-We are actively working on adding **more customization options**.
+We are actively working on adding more customization options.
 If something is missing or you would like to customize more things, please let us know - your feedback really matters to us 🚀
 
-## Arguments
+Arguments
+Would you like to see more logs from mercury, please use --log-level=INFO or --log-level=DEBUG. The default log level is CRITICAL.
 
-Would you like to see more logs from `mercury`, please use `--log-level=INFO` or `--log-level=DEBUG`. The default log level is `CRITICAL`.
+We have option to share the same session between multiple users. What does it mean? You can deploy app, and when you click on it, others will see this. The enable session sharing please use --keep-session. Amazing, isn't it?
 
-We have option to share the same session between multiple users. What does it mean? You can deploy app, and when you click on it, others will see this. The enable session sharing please use `--keep-session`. Amazing, isn't it?
+Would you like to limit your server resources with usage timeout? Please set --timeout=600, the timeout value is in seconds. Be generous.
 
-Would you like to limit your server resources with usage timeout? Please set `--timeout=600`, the timeout value is in seconds. Be generous.
+Would you like Mercury to use a specific directory as the base for notebooks, config.toml, and relative file access? Please use --working-dir=/path/to/notebooks.
 
-Would you like Mercury to use a specific directory as the base for notebooks, `config.toml`, and relative file access? Please use `--working-dir=/path/to/notebooks`.
+Previous versions
+If you are looking for previous version codebase, the stable v2 codebase is available on the v2.4.3 tag.
 
-## Previous versions
+Previous documentation webpage is available at old.runmercury.com.
 
-If you are looking for previous version codebase, the stable v2 codebase is available on the `v2.4.3` tag.
-
-Previous documentation webpage is available at [old.runmercury.com](https://old.runmercury.com).
-
-## License
-
+License
 Mercury is licensed under Apache-2.0. See LICENSE for details.
 
----
-
 Stay safe! ❤️
+
+
+### The Final Push
+Once you have pasted and saved that file, go back to your terminal and run these commands to update your Pull Request:
+
+1. Stage both the `app.html` file (which we missed last time) and the updated `README.md`:
+   ```bash
+   git add mercury_app/templates/app.html README.md
