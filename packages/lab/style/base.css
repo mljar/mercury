@@ -318,6 +318,7 @@
 }
 
 .mercury-right-bottom-panel {
+  background: var(--mercury-surface-color);
   overflow: hidden !important;
   padding-top: 5px;
   padding-left: 14px;
@@ -426,6 +427,9 @@
   }
 }
 
+.mercury-right-split-panel {
+  background: var(--mercury-primary-color);
+}
 @media (min-width: 769px) {
   .mercury-sidebar-backdrop {
     display: none !important;
@@ -446,7 +450,6 @@
 }
 
 .mercury-main-panel > .lm-SplitPanel-handle {
-  background: lightgrey;
   width: 0px !important;
   cursor: ew-resize;
 }
