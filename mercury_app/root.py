@@ -81,10 +81,6 @@ class RootIndexHandler(JupyterHandler):
                                         "notebooks_button_label",
                                         "Notebooks",
                                     ),
-                                    notebooks_button_label=MAIN_CONFIG.get(
-                                        "notebooks_button_label",
-                                        "Notebooks",
-                                    ),
                                     search_filter_label=MAIN_CONFIG.get(
                                         "search_filter_label",
                                         "Search notebooks",

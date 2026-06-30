@@ -427,6 +427,9 @@
   }
 }
 
+.mercury-right-split-panel {
+  background: var(--mercury-primary-color);
+}
 @media (min-width: 769px) {
   .mercury-sidebar-backdrop {
     display: none !important;
