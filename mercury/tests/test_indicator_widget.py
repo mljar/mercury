@@ -42,9 +42,9 @@ def test_indicator_single_renders_inline_colors():
     )._repr_html_()
 
     assert "background:#ff0000" in html
-    assert "border:1px solid #00ff00" in html
-    assert "style='color:#999999'" in html
-    assert "style='color:#0000ff'" in html
+    assert "border:0.5px solid #00ff00" in html
+    assert "style='color:#999999;'" in html
+    assert "style='color:#0000ff;'" in html
     assert "Users" in html
     assert "123" in html
 
@@ -54,8 +54,8 @@ def test_indicator_positive_delta_renders_up_badge():
 
     assert "&#8593;" in html
     assert "5.4%" in html
-    assert Indicator.GREEN in html
-    assert Indicator.BG_GREEN in html
+    assert f"background:{Indicator._DELTA_UP_BG}" in html
+    assert f"color:{Indicator._DELTA_UP_FG}" in html
 
 
 def test_indicator_negative_delta_renders_down_badge():
@@ -63,18 +63,20 @@ def test_indicator_negative_delta_renders_down_badge():
 
     assert "&#8595;" in html
     assert "1.2%" in html
-    assert Indicator.RED in html
-    assert Indicator.BG_RED in html
+    assert f"background:{Indicator._DELTA_DOWN_BG}" in html
+    assert f"color:{Indicator._DELTA_DOWN_FG}" in html
 
 
 def test_indicator_zero_delta_renders_neutral_badge():
-    html = Indicator(value="123", delta=0)._repr_html_()
+    indicator = Indicator(value="123", delta=0)
+    html = indicator._repr_html_()
 
     assert "0%" in html
     assert "&#8593;" not in html
     assert "&#8595;" not in html
-    assert Indicator.NEUTRAL in html
-    assert Indicator.BG_NEUTRAL in html
+    assert "&#8212;&nbsp;0%" in html
+    assert f"background:{indicator._badge_bg}" in html
+    assert f"color:{indicator._badge_fg}" in html
 
 
 def test_indicator_non_numeric_delta_renders_raw_text():
@@ -93,7 +95,7 @@ def test_indicator_list_renders_row_of_cards():
         ]
     )._repr_html_()
 
-    assert "mljar-indicator-row" in html
-    assert html.count("mljar-indicator-card") >= 2
+    assert "mljar-ind-row" in html
+    assert html.count("mljar-ind-card") >= 2
     assert "Users" in html
     assert "Accuracy" in html
