@@ -1,10 +1,11 @@
 import pytest
 from traitlets import TraitError
 import pandas as pd
-import polars as pl
 import mercury.table as m
 from mercury.manager import WidgetsManager
 from mercury.table import Table, TableWidget
+
+pl = pytest.importorskip("polars")
 
 
 def setup_function():

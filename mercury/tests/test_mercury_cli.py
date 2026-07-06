@@ -38,6 +38,36 @@ def test_parse_and_inject_rejects_missing_working_dir():
         __main__._parse_and_inject(["mercury", "--working-dir", "missing-dir"])
 
 
+def test_parse_and_inject_maps_timeout_to_server_shutdown():
+    argv, _ = __main__._parse_and_inject(["mercury", "app.ipynb", "--timeout=600"])
+
+    assert "--timeout=600" in argv
+    assert "--ServerApp.shutdown_no_activity_timeout=600" in argv
+
+
+def test_parse_and_inject_preserves_explicit_server_shutdown_timeout():
+    argv, _ = __main__._parse_and_inject(
+        [
+            "mercury",
+            "app.ipynb",
+            "--timeout=600",
+            "--ServerApp.shutdown_no_activity_timeout=120",
+        ]
+    )
+
+    assert "--ServerApp.shutdown_no_activity_timeout=120" in argv
+    assert "--ServerApp.shutdown_no_activity_timeout=600" not in argv
+
+
+def test_parse_and_inject_maps_env_timeout_to_server_shutdown(monkeypatch):
+    monkeypatch.setenv("MERCURY_TIMEOUT", "900")
+
+    argv, _ = __main__._parse_and_inject(["mercury", "app.ipynb"])
+
+    assert "--MercuryApp.timeout=900" in argv
+    assert "--ServerApp.shutdown_no_activity_timeout=900" in argv
+
+
 def test_main_changes_directory_before_launch(monkeypatch, tmp_path):
     workdir = tmp_path / "apps"
     workdir.mkdir()

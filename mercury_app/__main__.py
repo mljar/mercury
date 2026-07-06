@@ -32,6 +32,14 @@ def _resolve_working_dir(working_dir: str | None) -> str | None:
     return resolved
 
 
+def _get_arg_value(argv: list[str], *prefixes: str) -> str | None:
+    for prefix in prefixes:
+        for arg in argv:
+            if arg.startswith(prefix):
+                return arg.split("=", 1)[1]
+    return None
+
+
 def _parse_and_inject(argv):
     """
     Parse command-line args and apply:
@@ -173,16 +181,10 @@ def _parse_and_inject(argv):
     # - no password
     # ----------------------------
 
-    def _get_arg_value(prefix: str):
-        for a in new_argv:
-            if a.startswith(prefix):
-                return a.split("=", 1)[1]
-        return None
-
     # Detect "no token" after your injection
     # You inject: --IdentityProvider.token=''  OR --IdentityProvider.token='<token>'
-    idp_token_val = _get_arg_value("--IdentityProvider.token=")
-    srv_token_val = _get_arg_value("--ServerApp.token=")
+    idp_token_val = _get_arg_value(new_argv, "--IdentityProvider.token=")
+    srv_token_val = _get_arg_value(new_argv, "--ServerApp.token=")
 
     # Normalize: treat '' or "" as empty
     def _is_empty_token(v):
@@ -211,6 +213,15 @@ def _parse_and_inject(argv):
     # ----------------------------
     if working_dir and not any(a.startswith("--ServerApp.root_dir=") for a in new_argv):
         new_argv.append(f"--ServerApp.root_dir={working_dir}")
+
+    mercury_timeout = _get_arg_value(
+        new_argv,
+        "--MercuryApp.timeout=",
+        "--timeout=",
+    )
+    if mercury_timeout not in (None, ""):
+        if not any(a.startswith("--ServerApp.shutdown_no_activity_timeout=") for a in new_argv):
+            new_argv.append(f"--ServerApp.shutdown_no_activity_timeout={mercury_timeout}")
 
     new_argv.append("--ContentsManager.allow_hidden=True")
     new_argv.append("--MappingKernelManager.default_kernel_name='python3'")
