@@ -9,6 +9,7 @@ import anywidget
 import traitlets
 
 from .message import Message, MSG_CSS_CLASS
+from ..theme import THEME
 
 
 class ScrollHelper(anywidget.AnyWidget):
@@ -132,14 +133,35 @@ function render({ model, el }) {
 export default { render };
     """
 
-    _css = """
-    .mljar-chat-scroll-helper {
+    _css = f"""
+    .mljar-chat-scroll-helper {{
         display: none;
-    }
+    }}
 
-    .mljar-chat-container {
-        background-color: #fff;
-    }
+    .mljar-chat-container {{
+        background: transparent;
+        box-sizing: border-box;
+    }}
+
+    .mljar-chat-container > .widget-box,
+    .mljar-chat-container > .jupyter-widgets,
+    .mljar-chat-container .widget-box,
+    .mljar-chat-container .jupyter-widgets {{
+        box-sizing: border-box;
+    }}
+
+    .mljar-chat-placeholder {{
+        color: {THEME.get('muted_text_color', '#777')};
+        text-align: center;
+        padding: 32px 0;
+        font-family: {THEME.get('font_family', 'Arial, sans-serif')};
+        font-size: {THEME.get('font_size', '14px')};
+        font-weight: {THEME.get('font_weight', 'normal')};
+        line-height: 1.6;
+        background: transparent;
+        border: {('1px dashed ' + THEME.get('border_color', '#ccc')) if THEME.get('border_visible', True) else 'none'};
+        border-radius: {THEME.get('border_radius', '6px')};
+    }}
     """
 
     tick = traitlets.Int(0).tag(sync=True)
@@ -220,13 +242,7 @@ class Chat:
         # Placeholder label (same as before)
         self.placeholder_label = widgets.HTML(
             f"""
-            <div style="
-              color:#b5b5b5;
-              text-align:center;
-              padding:40px 0;
-              font-size:1.1em;
-              background:#fff;
-            ">{placeholder}</div>
+            <div class="mljar-chat-placeholder">{placeholder}</div>
             """
         )
 
@@ -236,7 +252,7 @@ class Chat:
             layout=widgets.Layout(
                 width="100%",
                 height=self.height or None,
-                padding="4px",
+                padding="4px 4px 0 4px",
                 overflow="auto" if self.height else "visible",
             ),
         )
