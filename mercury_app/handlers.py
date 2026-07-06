@@ -1,6 +1,7 @@
 # Copyright MLJAR Sp. z o.o.
 # Licensed under the Apache License, Version 2.0 (Apache-2.0)
 
+import json
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -37,6 +38,17 @@ def load_config(config_path="config.toml"):
         "main": config.get("main", {}),
         "welcome": config.get("welcome", {})
     }
+
+
+def _css_string_literal(value: str) -> str:
+    return json.dumps(value)
+
+
+def _normalize_starting_icon(value: str | None) -> str:
+    normalized = str(value or "").strip().lower()
+    if normalized in {"coffee", "spinner", "none"}:
+        return normalized
+    return "coffee"
 
 
 CONFIG = load_config()
@@ -294,6 +306,7 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
         # Hand the final path to the frontend (no frontend changes!)
         page_config["notebookPath"] = effective_notebook_path
         page_config["keepSession"] = keep_session
+        starting_icon = _normalize_starting_icon(MAIN_CONFIG.get("starting_icon"))
 
         return self.write(
             self.render_template(
@@ -302,5 +315,9 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
                 base_url=self.base_url,
                 token=self.settings["token"],
                 page_config=page_config,
+                starting_icon=starting_icon,
+                loading_message_css=_css_string_literal(
+                    MAIN_CONFIG.get("starting_message", "Initializing web application…")
+                ),
             )
         )

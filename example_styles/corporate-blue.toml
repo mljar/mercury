@@ -2,6 +2,8 @@
 title = "Enterprise Portal"
 footer = "Business intelligence"
 favicon_emoji = "🏢"
+starting_message = "Loading enterprise portal…"
+starting_icon = "spinner"
 thumbnail_text = "📊"
 thumbnail_bg = "#eaf2ff"
 

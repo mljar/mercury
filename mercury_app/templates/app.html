@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="loader-{{ starting_icon or 'coffee' }}">
 
 <head>
   <meta charset="utf-8">
@@ -134,44 +134,75 @@
       right: 0;
       bottom: 0;
       z-index: 2147483647;
-      background: var(--mercury-loader-background-color);
+      background: color-mix(in srgb, var(--mercury-background-color) 88%, transparent);
       /* Prevent scroll behind on mobile */
       -webkit-overflow-scrolling: touch;
       touch-action: none;
     }
 
-    /* Coffee box centered BELOW the header */
+    body::before {
+      content: "";
+      position: fixed;
+      top: calc(var(--header-height) + var(--safe-top) + 50%);
+      left: 50%;
+      transform: translate(-50%, calc(-50% - 2.1rem));
+      z-index: 2147483649;
+      pointer-events: none;
+    }
+
+    html.loader-coffee body::before {
+      width: 56px;
+      height: 56px;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><path d='M22 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M34 30c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M46 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
+      background-repeat: no-repeat, no-repeat;
+      background-position: center center, center -6px;
+      background-size: 56px 56px, 48px 48px;
+      animation: mercury-steam-float 1.8s ease-in-out infinite;
+    }
+
+    html.loader-spinner body::before {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 4px solid color-mix(in srgb, var(--mercury-primary-color) 20%, transparent);
+      border-top-color: var(--mercury-primary-color);
+      animation: mercury-spinner 0.9s linear infinite;
+    }
+
+    html.loader-none body::before {
+      display: none;
+    }
+
+    /* Loader box centered BELOW the header */
     html::after {
-      content: "Initializing web application…";
+      content: {{ loading_message_css | safe }};
       position: fixed;
       top: calc(var(--header-height) + var(--safe-top) + 50%);
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 2147483648;
 
-      background: var(--mercury-loader-card-background-color);
-      border: 1px solid var(--mercury-loader-border-color);
+      background: var(--mercury-surface-color);
+      border: 1px solid var(--mercury-primary-color);
       border-radius: 1rem;
       padding: 5.1rem 2.25rem 2rem;
       text-align: center;
       font-size: 18px;
       font-weight: 600;
       box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      color: var(--mercury-loader-text-color);
-
-      background-image:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><path d='M22 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M34 30c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M46 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
-      background-repeat: no-repeat, no-repeat;
-      background-position: center 1.9rem, center 1.3rem;
-      background-size: 56px 56px, 48px 48px;
-      animation: mercury-steam-float 1.8s ease-in-out infinite;
+      color: var(--mercury-text-color);
 
       /* Mobile-friendly sizing */
       width: min(92vw, 28rem);
       box-sizing: border-box;
       word-wrap: break-word;
       overflow-wrap: anywhere;
+    }
+
+    html.loader-none::after {
+      padding-top: 2rem;
     }
 
     /* Small screens: tighten spacing and font size */
@@ -181,25 +212,47 @@
         font-size: 16px;
         border-radius: .75rem;
         width: min(94vw, 24rem);
-        background-position: center 1.7rem, center 1.1rem;
+      }
+
+      html.loader-none::after {
+        padding-top: 1.5rem;
+      }
+
+      html.loader-coffee body::before {
+        width: 48px;
+        height: 48px;
+        transform: translate(-50%, calc(-50% - 1.9rem));
         background-size: 48px 48px, 40px 40px;
+      }
+
+      html.loader-spinner body::before {
+        width: 36px;
+        height: 36px;
+        transform: translate(-50%, calc(-50% - 1.8rem));
       }
     }
 
     @keyframes mercury-steam-float {
       0%, 100% {
-        background-position: center 1.9rem, center 1.3rem;
+        background-position: center center, center -6px;
         background-size: 56px 56px, 46px 46px;
       }
       50% {
-        background-position: center 1.9rem, center 1.3rem;
+        background-position: center center, center -6px;
         background-size: 56px 56px, 48px 50px;
+      }
+    }
+
+    @keyframes mercury-spinner {
+      to {
+        transform: translate(-50%, calc(-50% - 2.1rem)) rotate(360deg);
       }
     }
 
     /* Hide overlay when ready */
     html.hide-loader::before,
-    html.hide-loader::after { display: none !important; }
+    html.hide-loader::after,
+    html.hide-loader body::before { display: none !important; }
 
     html.no-navbar {
       --header-height: 0px;

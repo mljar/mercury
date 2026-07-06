@@ -2,6 +2,8 @@
 title = "Ops Console"
 footer = "Platform engineering"
 favicon_emoji = "🛠️"
+starting_message = "Booting ops console…"
+starting_icon = "spinner"
 thumbnail_text = "🛡️"
 thumbnail_bg = "#0f172a"
 

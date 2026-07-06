@@ -2,6 +2,8 @@
 title = "Slate Workspace"
 footer = "Modern internal analytics"
 favicon_emoji = "🌌"
+starting_message = "Loading slate workspace…"
+starting_icon = "spinner"
 thumbnail_text = "🌑"
 thumbnail_bg = "#232a34"
 

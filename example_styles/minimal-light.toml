@@ -2,6 +2,8 @@
 title = "Mercury"
 footer = "Internal tools"
 favicon_emoji = "⚡"
+starting_message = "Loading app…"
+starting_icon = "none"
 thumbnail_text = "📄"
 thumbnail_bg = "#f5f7fa"
 

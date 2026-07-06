@@ -2,6 +2,8 @@
 title = "Research Hub"
 footer = "Notebook publishing"
 favicon_emoji = "📘"
+starting_message = "Preparing research hub…"
+starting_icon = "coffee"
 thumbnail_text = "📚"
 thumbnail_bg = "#f6f1e8"
 

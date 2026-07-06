@@ -172,6 +172,8 @@ title = "Mercury"
 footer = "MLJAR - next generation of AI tools"
 favicon_emoji = "🎉"
 notebooks_button_label = "Notebooks"
+starting_message = "Initializing web application…"
+starting_icon = "coffee"
 search_filter_label = "Search notebooks"
 show_search_filter = true
 thumbnail_text = "📘"
@@ -189,6 +191,8 @@ message = ""
 * **`footer`** – text shown at the bottom of the page
 * **`favicon_emoji`** – emoji shown as the browser tab icon
 * **`notebooks_button_label`** – label shown on the notebooks dropdown button in the navbar
+* **`starting_message`** – text shown on the startup loading overlay before the app is ready
+* **`starting_icon`** – startup icon shown in the loading overlay: `coffee`, `spinner`, or `none`
 * **`search_filter_label`** – label and placeholder shown in the notebook search field
 * **`show_search_filter`** – whether the notebook search field should be displayed
 * **`thumbnail_text`** – emoji or text displayed on notebook thumbnails

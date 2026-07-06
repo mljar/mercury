@@ -2,6 +2,8 @@
 title = "Bioinformatics Lab"
 footer = "Scientific workflows"
 favicon_emoji = "🧬"
+starting_message = "Loading bioinformatics lab…"
+starting_icon = "spinner"
 thumbnail_text = "🌿"
 thumbnail_bg = "#e8f3ea"
 

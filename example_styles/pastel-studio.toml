@@ -2,6 +2,8 @@
 title = "Studio Workspace"
 footer = "Creative tools"
 favicon_emoji = "🎨"
+starting_message = "Opening studio workspace…"
+starting_icon = "coffee"
 thumbnail_text = "🎨"
 thumbnail_bg = "#fff1fb"
 

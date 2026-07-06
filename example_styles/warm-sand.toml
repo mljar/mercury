@@ -2,6 +2,8 @@
 title = "Data Review"
 footer = "Narrative analytics"
 favicon_emoji = "📰"
+starting_message = "Preparing data review…"
+starting_icon = "coffee"
 thumbnail_text = "☀️"
 thumbnail_bg = "#f6ead7"
 
