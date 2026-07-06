@@ -9,6 +9,12 @@ from .handlers import MAIN_CONFIG, THEME, WELCOME_CONFIG
 from .notebooks_meta import list_notebooks
 
 
+def should_show_search_filter(notebooks: list[dict], main_config: dict) -> bool:
+    if "show_search_filter" in main_config:
+        return bool(main_config.get("show_search_filter"))
+    return len(notebooks) > 3
+
+
 class RootIndexHandler(JupyterHandler):
     @tornado.web.authenticated
     def get(self):
@@ -85,9 +91,9 @@ class RootIndexHandler(JupyterHandler):
                                         "search_filter_label",
                                         "Search notebooks",
                                     ),
-                                    show_search_filter=MAIN_CONFIG.get(
-                                        "show_search_filter",
-                                        True,
+                                    show_search_filter=should_show_search_filter(
+                                        notebooks,
+                                        MAIN_CONFIG,
                                     ),
                                     theme=THEME,
                                     theme_css_vars=build_theme_css_vars(THEME),
