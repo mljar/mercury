@@ -11,10 +11,12 @@ from jupyterlab_server import LabServerApp
 from tornado.routing import PathMatches, Rule
 from traitlets import Bool, Integer
 
+from mercury.config import build_theme_css_vars, build_theme_font_links
+
 from ._version import __version__
 from .block_handler import BLOCKED_PATTERNS, BlockedHandler
 from .custom_contents_handler import MercuryContentsHandler
-from .handlers import MAIN_CONFIG, MercuryHandler
+from .handlers import MAIN_CONFIG, THEME, MercuryHandler, _normalize_starting_icon
 from .idle_timeout import (
     TimeoutActivityTransform,
     TimeoutManager,
@@ -159,6 +161,16 @@ class MercuryApp(LabServerApp):
             if env:
                 env.globals.setdefault("page_title", MAIN_CONFIG.get("title", "Mercury"))
                 env.globals.setdefault("favicon_emoji", MAIN_CONFIG.get("favicon_emoji", "🎉"))
+                env.globals.setdefault("theme_css_vars", build_theme_css_vars(THEME))
+                env.globals.setdefault("theme_font_links", build_theme_font_links(THEME))
+                env.globals.setdefault(
+                    "starting_icon",
+                    _normalize_starting_icon(MAIN_CONFIG.get("starting_icon")),
+                )
+                env.globals.setdefault(
+                    "starting_message",
+                    MAIN_CONFIG.get("starting_message", "Initializing web application..."),
+                )
             
 
     def initialize(self, argv=None):

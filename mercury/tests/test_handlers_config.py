@@ -38,7 +38,7 @@ def test_normalize_starting_icon_accepts_supported_values():
     assert _normalize_starting_icon("none") == "none"
 
 
-def test_normalize_starting_icon_falls_back_to_coffee():
-    assert _normalize_starting_icon("coffee+spinner") == "coffee"
-    assert _normalize_starting_icon("invalid") == "coffee"
-    assert _normalize_starting_icon(None) == "coffee"
+def test_normalize_starting_icon_falls_back_to_spinner():
+    assert _normalize_starting_icon("coffee+spinner") == "spinner"
+    assert _normalize_starting_icon("invalid") == "spinner"
+    assert _normalize_starting_icon(None) == "spinner"

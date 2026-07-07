@@ -42,7 +42,7 @@ def _normalize_starting_icon(value: str | None) -> str:
     normalized = str(value or "").strip().lower()
     if normalized in {"coffee", "spinner", "none"}:
         return normalized
-    return "coffee"
+    return "spinner"
 
 
 CONFIG = load_config()

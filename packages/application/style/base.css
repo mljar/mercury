@@ -11,7 +11,7 @@
   background-color: black;
 }
 
-.mercury-loader-container {
+.mercury-app-loader-container {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -20,13 +20,13 @@
   justify-content: center;
 }
 
-.mercury-loader-label {
+.mercury-app-loader-label {
   color: var(--jp-ui-font-color0);
   font-size: var(--jp-ui-font-size2);
   font-family: var(--jp-ui-font-family);
 }
 
-.mercury-loader {
+.mercury-app-loader {
   width: 48px;
   height: 48px;
   border: 3px solid var(--jp-inverse-layout-color4);
@@ -34,10 +34,10 @@
   display: inline-block;
   position: relative;
   box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+  animation: mercury-app-loader-rotation 1s linear infinite;
 }
 
-.mercury-loader::after {
+.mercury-app-loader::after {
   content: '';
   box-sizing: border-box;
   position: absolute;
@@ -51,7 +51,7 @@
   border-color: #2684ff transparent;
 }
 
-@keyframes rotation {
+@keyframes mercury-app-loader-rotation {
   0% {
     transform: rotate(0deg);
   }

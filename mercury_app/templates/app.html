@@ -126,7 +126,7 @@
     }
 
     /* Background overlay BELOW the header + safe area */
-    .mercury-loader {
+    .mercury-starting-loader {
       position: fixed;
       top: calc(var(--header-height) + var(--safe-top));
       left: 0;
@@ -143,11 +143,11 @@
       box-sizing: border-box;
     }
 
-    .mercury-loader.is-hidden {
+    .mercury-starting-loader.is-hidden {
       display: none !important;
     }
 
-    .mercury-loader-card {
+    .mercury-starting-loader-card {
       background: var(--mercury-surface-color);
       border: 1px solid var(--mercury-border-color);
       border-radius: 1rem;
@@ -168,17 +168,17 @@
       overflow-wrap: anywhere;
     }
 
-    .mercury-loader-icon {
+    .mercury-starting-loader-icon {
       display: block;
       flex: 0 0 auto;
       margin: 0;
     }
 
-    .mercury-loader-message {
+    .mercury-starting-loader-message {
       width: 100%;
     }
 
-    .mercury-loader-icon.mercury-loader-coffee {
+    .mercury-starting-loader-icon-coffee {
       width: 56px;
       height: 56px;
       background-image:
@@ -187,44 +187,40 @@
       background-repeat: no-repeat, no-repeat;
       background-position: center center, center -6px;
       background-size: 56px 56px, 48px 48px;
-      animation: mercury-steam-float 1.8s ease-in-out infinite;
+      animation: mercury-starting-steam-float 1.8s ease-in-out infinite;
     }
 
-    .mercury-loader-icon.mercury-loader-spinner {
+    .mercury-starting-loader-icon-spinner {
       width: 42px;
       height: 42px;
       border-radius: 50%;
       border: 4px solid color-mix(in srgb, var(--mercury-primary-color) 20%, transparent);
       border-top-color: var(--mercury-primary-color);
-      animation: mercury-spinner 0.9s linear infinite;
-    }
-
-    .mercury-loader-icon.mercury-loader-none {
-      display: none;
+      animation: mercury-starting-spinner 0.9s linear infinite;
     }
 
     /* Small screens: tighten spacing and font size */
     @media (max-width: 480px) {
-      .mercury-loader-card {
+      .mercury-starting-loader-card {
         padding: 1.5rem 1.25rem;
         font-size: 16px;
         border-radius: .75rem;
         width: min(94vw, 24rem);
       }
 
-      .mercury-loader-icon.mercury-loader-coffee {
+      .mercury-starting-loader-icon-coffee {
         width: 48px;
         height: 48px;
         background-size: 48px 48px, 40px 40px;
       }
 
-      .mercury-loader-icon.mercury-loader-spinner {
+      .mercury-starting-loader-icon-spinner {
         width: 36px;
         height: 36px;
       }
     }
 
-    @keyframes mercury-spinner {
+    @keyframes mercury-starting-spinner {
       from {
         transform: rotate(0deg);
       }
@@ -233,7 +229,7 @@
       }
     }
 
-    @keyframes mercury-steam-float {
+    @keyframes mercury-starting-steam-float {
       0%, 100% {
         background-position: center center, center -6px;
         background-size: 56px 56px, 46px 46px;
@@ -324,10 +320,12 @@
 
 <body>
 
-  <div id="mercury-loader" class="mercury-loader">
-    <div class="mercury-loader-card">
-      <div class="mercury-loader-icon mercury-loader-{{ starting_icon or 'coffee' }}" aria-hidden="true"></div>
-      <div class="mercury-loader-message">{{ loading_message or 'Initializing web application...' }}</div>
+  <div id="mercury-loader" class="mercury-starting-loader">
+    <div class="mercury-starting-loader-card">
+      {% if starting_icon != 'none' %}
+      <div class="mercury-starting-loader-icon mercury-starting-loader-icon-{{ starting_icon or 'spinner' }}" aria-hidden="true"></div>
+      {% endif %}
+      <div class="mercury-starting-loader-message">{{ loading_message or 'Initializing web application...' }}</div>
     </div>
   </div>
 

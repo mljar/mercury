@@ -7,83 +7,160 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Starting ...</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{{ favicon_emoji or '🎉' }}</text></svg>">
+  {{ theme_font_links | default('', true) | safe }}
 
   <style>
+    :root {
+      color-scheme: light;
+      --mercury-background-color: #f9fafb;
+      --mercury-surface-color: #ffffff;
+      --mercury-text-color: #0f172a;
+      --mercury-muted-text-color: #334155;
+      --mercury-border-color: #e2e8f0;
+      --mercury-primary-color: #0ea5e9;
+      --mercury-topbar-background-color: #0b0b0c;
+      --mercury-topbar-border-color: rgba(255,255,255,0.08);
+      --mercury-topbar-text-color: #f3f4f6;
+      --mercury-font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --mercury-font-size: 16px;
+      --mercury-heading-font-family: var(--mercury-font-family);
+      {{ theme_css_vars | default('', true) | safe }}
+    }
+
     html, body {
       padding: 0;
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: #f9fafb;
-      color: #0f172a;
+      min-height: 100%;
+      font-family: var(--mercury-font-family);
+      font-size: var(--mercury-font-size);
+      background: var(--mercury-background-color);
+      color: var(--mercury-text-color);
       line-height: 1.55;
     }
 
-    a { color: #0ea5e9; text-decoration: none; }
+    a {
+      color: var(--mercury-primary-color);
+      text-decoration: none;
+    }
+
     a:hover { text-decoration: underline; }
 
-    /* Header */
-    .hdr {
-      background: #0b0b0c;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      height: 52px;
-    }
-    .hdr-inner {
-      /* display: flex;
-      align-items: center;
-      padding: .75rem 1rem;
-       */
-      margin: 0 auto; max-width: 56rem;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: .6rem .75rem;
-    }
-    .brand {
-      font-weight: 750;
-      color: #f3f4f6;
-      font-size: clamp(16px, 2vw, 20px);
-      letter-spacing: -0.01em;
+    .mercury-browser-open-header {
+      background: var(--mercury-topbar-background-color);
+      border-bottom: 1px solid var(--mercury-topbar-border-color);
+      min-height: 52px;
     }
 
-    /* Static info box */
-    .box {
-      margin: 3rem auto;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 1rem;
-      padding: 2rem 2.5rem;
-      text-align: center;
-      max-width: 32rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    .mercury-browser-open-header-inner {
+      width: min(100%, calc(56rem + 2rem));
+      margin: 0 auto;
+      padding: .7rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
     }
-    .box-emoji {
-      width: 64px;
-      height: 64px;
+
+    .mercury-browser-open-brand {
+      font-weight: 750;
+      color: var(--mercury-topbar-text-color);
+      font-family: var(--mercury-heading-font-family);
+      font-size: 20px;
+    }
+
+    .mercury-browser-open-main {
+      padding: 3rem 1rem;
+    }
+
+    .mercury-browser-open-card {
+      margin: 0 auto;
+      background: var(--mercury-surface-color);
+      border: 1px solid var(--mercury-border-color);
+      border-radius: 1rem;
+      padding: 2rem 2.25rem;
+      text-align: center;
+      width: min(92vw, 32rem);
+      box-sizing: border-box;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      color: var(--mercury-text-color);
+    }
+
+    .mercury-browser-open-icon {
+      display: block;
       margin: 0 auto 1rem;
+    }
+
+    .mercury-browser-open-icon-coffee {
+      width: 56px;
+      height: 56px;
       background-image:
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><rect width='72' height='72' fill='none'/><path d='M18 26h30a0 0 0 0 1 0 0v12a10 10 0 0 1-10 10H28a10 10 0 0 1-10-10V26Z' fill='%23ffffff' stroke='%230f172a' stroke-width='2'/><path d='M48 28h6a6 6 0 0 1 0 12h-6' fill='none' stroke='%230f172a' stroke-width='2'/><path d='M20 22h26' stroke='%230f172a' stroke-width='2' stroke-linecap='round'/><rect x='16' y='46' width='32' height='4' rx='2' fill='%230f172a'/></svg>"),
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><path d='M22 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M34 30c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/><path d='M46 28c6-6 6-12 0-18c-6-6-6-12 0-18' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'/></svg>");
       background-repeat: no-repeat, no-repeat;
-      background-position: center 1.1rem, center 0.7rem;
-      background-size: 56px 56px, 44px 44px;
-      animation: mercury-steam-float 2s ease-in-out infinite;
+      background-position: center center, center -6px;
+      background-size: 56px 56px, 48px 48px;
+      animation: mercury-browser-open-steam-float 1.8s ease-in-out infinite;
     }
-    .box-title {
+
+    .mercury-browser-open-icon-spinner {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 4px solid color-mix(in srgb, var(--mercury-primary-color) 20%, transparent);
+      border-top-color: var(--mercury-primary-color);
+      animation: mercury-browser-open-spinner 0.9s linear infinite;
+    }
+
+    .mercury-browser-open-title {
       font-size: 1.4rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
     }
-    .box-text {
-      color: #334155;
+
+    .mercury-browser-open-text {
+      color: var(--mercury-muted-text-color);
       font-size: 15px;
       margin-bottom: 1rem;
     }
 
-    @keyframes mercury-steam-float {
+    @media (max-width: 480px) {
+      .mercury-browser-open-main {
+        padding: 2rem 1rem;
+      }
+
+      .mercury-browser-open-card {
+        padding: 1.5rem 1.25rem;
+        border-radius: .75rem;
+      }
+
+      .mercury-browser-open-icon-coffee {
+        width: 48px;
+        height: 48px;
+        background-size: 48px 48px, 40px 40px;
+      }
+
+      .mercury-browser-open-icon-spinner {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    @keyframes mercury-browser-open-spinner {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes mercury-browser-open-steam-float {
       0%, 100% {
-        background-position: center 1.1rem, center 0.7rem;
-        background-size: 56px 56px, 44px 44px;
+        background-position: center center, center -6px;
+        background-size: 56px 56px, 46px 46px;
       }
       50% {
-        background-position: center 1.1rem, center 0.7rem;
+        background-position: center center, center -6px;
         background-size: 56px 56px, 46px 48px;
       }
     }
@@ -92,19 +169,21 @@
 
 <body>
 
-  <header class="hdr">
-    <div class="hdr-inner">
-      <div class="brand">{{ page_title or 'Mercury'}}</div>
+  <header class="mercury-browser-open-header">
+    <div class="mercury-browser-open-header-inner">
+      <div class="mercury-browser-open-brand">{{ page_title or 'Mercury'}}</div>
     </div>
   </header>
 
-  <main>
-    <div class="box">
-      <div class="box-emoji" aria-hidden="true"></div>
+  <main class="mercury-browser-open-main">
+    <div class="mercury-browser-open-card">
+      {% if starting_icon != 'none' %}
+      <div class="mercury-browser-open-icon mercury-browser-open-icon-{{ starting_icon or 'spinner' }}" aria-hidden="true"></div>
+      {% endif %}
 
-      <div class="box-title">Starting your app ...</div> 
+      <div class="mercury-browser-open-title">{{ starting_message or 'Starting your app...' }}</div>
 
-      <div class="box-text">
+      <div class="mercury-browser-open-text">
         You will be redirected automatically.<br>
         If it doesn’t happen in a moment,
         <a href="{{ open_url }}">click here to open app</a>.
