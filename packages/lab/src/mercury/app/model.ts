@@ -1,4 +1,4 @@
-import { showDialog } from '@jupyterlab/apputils';
+import { showDialog, Dialog } from '@jupyterlab/apputils';
 import { CellChange, YNotebook, createMutex } from '@jupyter/ydoc';
 import type { ISessionContext } from '@jupyterlab/apputils';
 import {
@@ -795,12 +795,19 @@ export class AppModel {
       return;
     }
     this._disconnectedNotified = true;
-    await showDialog({
+    const result = await showDialog({
       title: 'Connection Lost',
       body: 'Oops! It looks like we lost connection to the computing backend.',
-      buttons: [] // Dialog.cancelButton({ label: 'Close' })
+      buttons: [Dialog.createButton({ label: 'Refresh', accept: true })]
     });
+
+    if (result.button.accept) {
+      window.location.reload();
+    } else {
+      this._disconnectedNotified = false;
+    }
   }
+
   private async _notifyKernelDisconnected(): Promise<void> {
     if (this._disconnectedNotified) {
       return;
