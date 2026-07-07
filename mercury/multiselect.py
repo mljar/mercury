@@ -205,13 +205,23 @@ class MultiSelectWidget(anywidget.AnyWidget):
       dropdown.appendChild(emptyState);
 
       container.appendChild(control);
-      container.appendChild(dropdown);
       el.appendChild(container);
 
       let isOpen = false;
       let isEditing = false;
       let filteredChoices = [];
       let blurTimeout = null;
+      document.body.appendChild(dropdown);
+
+      const updateDropdownPosition = () => {
+        if (!isOpen) {
+          return;
+        }
+        const rect = control.getBoundingClientRect();
+        dropdown.style.top = `${rect.bottom + 6}px`;
+        dropdown.style.left = `${rect.left}px`;
+        dropdown.style.width = `${rect.width}px`;
+      };
 
       const setOpen = next => {
         if (isDisabled()) {
@@ -221,6 +231,9 @@ class MultiSelectWidget(anywidget.AnyWidget):
         }
         container.classList.toggle("is-open", isOpen);
         dropdown.style.display = isOpen ? "block" : "none";
+        if (isOpen) {
+          updateDropdownPosition();
+        }
       };
 
       const syncEditingState = () => {
@@ -371,12 +384,28 @@ class MultiSelectWidget(anywidget.AnyWidget):
         setOpen(true);
       };
 
+      const closeDropdown = () => {
+        if (blurTimeout !== null) {
+          window.clearTimeout(blurTimeout);
+          blurTimeout = null;
+        }
+        isEditing = false;
+        setOpen(false);
+        input.value = "";
+        syncEditingState();
+      };
+
       control.addEventListener("click", event => {
         event.stopPropagation();
         if (isDisabled()) {
           return;
         }
         if (event.target === input || clearBtn.contains(event.target)) {
+          return;
+        }
+        if (event.target === caret && isOpen) {
+          closeDropdown();
+          input.blur();
           return;
         }
         openWithCurrentQuery();
@@ -429,19 +458,14 @@ class MultiSelectWidget(anywidget.AnyWidget):
       });
 
       const handleDocumentClick = event => {
-        if (!container.contains(event.target)) {
-          if (blurTimeout !== null) {
-            window.clearTimeout(blurTimeout);
-            blurTimeout = null;
-          }
-          isEditing = false;
-          setOpen(false);
-          input.value = "";
-          syncEditingState();
+        if (!container.contains(event.target) && !dropdown.contains(event.target)) {
+          closeDropdown();
         }
       };
 
       document.addEventListener("click", handleDocumentClick);
+      window.addEventListener("resize", updateDropdownPosition);
+      document.addEventListener("scroll", updateDropdownPosition, true);
 
       model.on("change:value", () => {
         renderSummary();
@@ -454,9 +478,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
       model.on("change:disabled", () => {
         updateDisabledState();
         if (isDisabled()) {
-          isEditing = false;
-          setOpen(false);
-          syncEditingState();
+          closeDropdown();
         }
       });
       model.on("change:hidden", () => {
@@ -474,7 +496,10 @@ class MultiSelectWidget(anywidget.AnyWidget):
         if (blurTimeout !== null) {
           window.clearTimeout(blurTimeout);
         }
+        dropdown.remove();
         document.removeEventListener("click", handleDocumentClick);
+        window.removeEventListener("resize", updateDropdownPosition);
+        document.removeEventListener("scroll", updateDropdownPosition, true);
       };
     }
     export default { render };
@@ -483,12 +508,14 @@ class MultiSelectWidget(anywidget.AnyWidget):
     # minimal CSS
     _css = f"""
     .mljar-ms-container {{
+      position: relative;
       display: flex;
       flex-direction: column;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
       font-size: {THEME.get('font_size', '14px')};
       padding-left: 4px;
       padding-right: 4px;
+      overflow: visible;
     }}
 
     .mljar-ms-label {{
@@ -511,11 +538,15 @@ class MultiSelectWidget(anywidget.AnyWidget):
       box-sizing: border-box;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
       cursor: default;
+      overflow: visible;
+    }}
+
+    .mljar-ms-container.is-open {{
+      z-index: 20;
     }}
 
     .mljar-ms-control:focus-within {{
       border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
-      border-width: 2px;
       box-shadow: none;
     }}
 
@@ -693,7 +724,8 @@ class MultiSelectWidget(anywidget.AnyWidget):
 
     .mljar-ms-dropdown {{
       display: none;
-      margin-top: 6px;
+      position: fixed;
+      z-index: 10000;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: {THEME.get('panel_bg', '#fff')};

@@ -626,7 +626,7 @@ class UploadFileWidget(anywidget.AnyWidget):
       background: {THEME.get('widget_background_color', '#fff')};
       color: {THEME.get('primary_color', '#007bff')};
       border: 2px solid {THEME.get('primary_color', '#007bff')};
-      border-radius: {THEME.get('border_radius', '8px')};
+      border-radius: {THEME.get('border_radius', '8px')} !important;
       padding: 6px 18px;
       font-size: 1.08em;
       font-weight: 600;

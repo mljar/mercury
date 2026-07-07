@@ -168,7 +168,7 @@ class ButtonWidget(anywidget.AnyWidget):
         border: 2px solid {THEME.get('primary_color', '#007bff')};
         background: {THEME.get('primary_color', '#007bff')};
         color: {THEME.get('widget_background_color', '#ffffff')};
-        border-radius: {THEME.get('border_radius', '8px')};
+        border-radius: {THEME.get('border_radius', '8px')} !important;
         padding: 6px 18px;
         margin-top: 5px;
         margin-bottom: 5px;

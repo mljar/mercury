@@ -176,13 +176,23 @@ class SelectWidget(anywidget.AnyWidget):
       dropdown.appendChild(emptyState);
 
       container.appendChild(control);
-      container.appendChild(dropdown);
       el.appendChild(container);
 
       let isOpen = false;
       let filteredChoices = [];
       let lastCommittedValue = "";
       let isEditing = false;
+      document.body.appendChild(dropdown);
+
+      const updateDropdownPosition = () => {
+        if (!isOpen) {
+          return;
+        }
+        const rect = control.getBoundingClientRect();
+        dropdown.style.top = `${rect.bottom + 6}px`;
+        dropdown.style.left = `${rect.left}px`;
+        dropdown.style.width = `${rect.width}px`;
+      };
 
       const setOpen = next => {
         if (isDisabled()) {
@@ -192,6 +202,9 @@ class SelectWidget(anywidget.AnyWidget):
         }
         container.classList.toggle("is-open", isOpen);
         dropdown.style.display = isOpen ? "block" : "none";
+        if (isOpen) {
+          updateDropdownPosition();
+        }
       };
 
       const updateDisabledState = () => {
@@ -263,9 +276,20 @@ class SelectWidget(anywidget.AnyWidget):
         setOpen(true);
       };
 
+      const closeDropdown = () => {
+        isEditing = false;
+        setOpen(false);
+        input.value = lastCommittedValue;
+      };
+
       control.addEventListener("click", event => {
         event.stopPropagation();
         if (isDisabled()) {
+          return;
+        }
+        if (event.target === caret && isOpen) {
+          closeDropdown();
+          input.blur();
           return;
         }
         openWithCurrentQuery();
@@ -293,14 +317,14 @@ class SelectWidget(anywidget.AnyWidget):
       });
 
       const handleDocumentClick = event => {
-        if (!container.contains(event.target)) {
-          isEditing = false;
-          setOpen(false);
-          input.value = lastCommittedValue;
+        if (!container.contains(event.target) && !dropdown.contains(event.target)) {
+          closeDropdown();
         }
       };
 
       document.addEventListener("click", handleDocumentClick);
+      window.addEventListener("resize", updateDropdownPosition);
+      document.addEventListener("scroll", updateDropdownPosition, true);
 
       model.on("change:value", () => {
         syncInputWithValue();
@@ -321,8 +345,7 @@ class SelectWidget(anywidget.AnyWidget):
       model.on("change:disabled", () => {
         updateDisabledState();
         if (isDisabled()) {
-          isEditing = false;
-          setOpen(false);
+          closeDropdown();
         }
       });
 
@@ -337,7 +360,10 @@ class SelectWidget(anywidget.AnyWidget):
       setOpen(false);
 
       return () => {
+        dropdown.remove();
         document.removeEventListener("click", handleDocumentClick);
+        window.removeEventListener("resize", updateDropdownPosition);
+        document.removeEventListener("scroll", updateDropdownPosition, true);
       };
     }
     export default { render };
@@ -346,6 +372,7 @@ class SelectWidget(anywidget.AnyWidget):
     # simplified CSS
     _css = f"""
     .mljar-select-container {{
+      position: relative;
       display: flex;
       flex-direction: column;
       font-family: {THEME.get('font_family', 'Arial, sans-serif')};
@@ -353,6 +380,7 @@ class SelectWidget(anywidget.AnyWidget):
       color: {THEME.get('text_color', '#222')};
       padding-left: 4px;
       padding-right: 4px;
+      overflow: visible;
     }}
 
     .mljar-select-label {{
@@ -366,6 +394,11 @@ class SelectWidget(anywidget.AnyWidget):
       display: flex;
       align-items: center;
       cursor: default;
+      overflow: visible;
+    }}
+
+    .mljar-select-container.is-open {{
+      z-index: 20;
     }}
 
     .mljar-select-widget-input {{
@@ -388,7 +421,6 @@ class SelectWidget(anywidget.AnyWidget):
     .mljar-select-widget-input:focus {{
       outline: none;
       border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
-      border-width: 2px;
       box-shadow: none;
       cursor: text;
     }}
@@ -414,7 +446,8 @@ class SelectWidget(anywidget.AnyWidget):
 
     .mljar-select-dropdown {{
       display: none;
-      margin-top: 6px;
+      position: fixed;
+      z-index: 10000;
       border: 1px solid {THEME.get('border_color', '#ccc')};
       border-radius: {THEME.get('border_radius', '6px')};
       background: {THEME.get('panel_bg', '#fff')};

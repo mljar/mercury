@@ -890,7 +890,6 @@ export default { render };
 .mljar-mercury-table-widget-search-box:focus {
   outline: none;
   border-color: %(focus_border_color)s;
-  border-width: 2px;
   box-shadow: none;
 }
 

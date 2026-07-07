@@ -45,6 +45,13 @@ def test_textinput_invalid_position_raises_traiterror():
         w.position = "top"
 
 
+def test_textinput_focus_keeps_constant_border_width():
+    css = TextInputWidget._css
+
+    assert ".mljar-textinput-input:focus" in css
+    assert "border-width: 2px;" not in css
+
+
 # --- TextInput url_params ---------------------------------------------------------
 
 

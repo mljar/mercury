@@ -207,7 +207,6 @@ class DateTimeInputWidget(anywidget.AnyWidget):
     .mljar-datetime-input:focus {{
       outline: none;
       border-color: {THEME.get('focus_border_color', THEME.get('accent_color', '#4c7cf0'))};
-      border-width: 2px;
       box-shadow: none;
     }}
 

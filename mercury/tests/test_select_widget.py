@@ -148,6 +148,14 @@ def test_selectwidget_invalid_position_raises_traiterror():
         w.position = "top"  # invalid
 
 
+def test_select_widget_caret_click_toggles_open_dropdown():
+    esm = SelectWidget._esm
+
+    assert "if (event.target === caret && isOpen)" in esm
+    assert "closeDropdown();" in esm
+    assert "input.blur();" in esm
+
+
 # --- _repr_mimebundle_ / MERCURY_MIMETYPE integration -----------------------------
 
 def test_repr_mimebundle_adds_mercury_metadata(monkeypatch):

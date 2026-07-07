@@ -152,6 +152,11 @@
       border: 1px solid var(--mercury-border-color);
       border-radius: 1rem;
       padding: 2rem 2.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
       text-align: center;
       font-size: 18px;
       font-weight: 600;
@@ -164,10 +169,16 @@
     }
 
     .mercury-loader-icon {
-      margin: 0 auto 1rem;
+      display: block;
+      flex: 0 0 auto;
+      margin: 0;
     }
 
-    .mercury-loader-coffee .mercury-loader-icon {
+    .mercury-loader-message {
+      width: 100%;
+    }
+
+    .mercury-loader-icon.mercury-loader-coffee {
       width: 56px;
       height: 56px;
       background-image:
@@ -179,7 +190,7 @@
       animation: mercury-steam-float 1.8s ease-in-out infinite;
     }
 
-    .mercury-loader-spinner .mercury-loader-icon {
+    .mercury-loader-icon.mercury-loader-spinner {
       width: 42px;
       height: 42px;
       border-radius: 50%;
@@ -188,7 +199,7 @@
       animation: mercury-spinner 0.9s linear infinite;
     }
 
-    .mercury-loader-none .mercury-loader-icon {
+    .mercury-loader-icon.mercury-loader-none {
       display: none;
     }
 
@@ -201,15 +212,24 @@
         width: min(94vw, 24rem);
       }
 
-      .mercury-loader-coffee .mercury-loader-icon {
+      .mercury-loader-icon.mercury-loader-coffee {
         width: 48px;
         height: 48px;
         background-size: 48px 48px, 40px 40px;
       }
 
-      .mercury-loader-spinner .mercury-loader-icon {
+      .mercury-loader-icon.mercury-loader-spinner {
         width: 36px;
         height: 36px;
+      }
+    }
+
+    @keyframes mercury-spinner {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
       }
     }
 
@@ -304,9 +324,9 @@
 
 <body>
 
-  <div id="mercury-loader" class="mercury-loader mercury-loader-{{ starting_icon or 'coffee' }}">
+  <div id="mercury-loader" class="mercury-loader">
     <div class="mercury-loader-card">
-      <div class="mercury-loader-icon" aria-hidden="true"></div>
+      <div class="mercury-loader-icon mercury-loader-{{ starting_icon or 'coffee' }}" aria-hidden="true"></div>
       <div class="mercury-loader-message">{{ loading_message or 'Initializing web application...' }}</div>
     </div>
   </div>
