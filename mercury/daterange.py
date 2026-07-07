@@ -218,6 +218,7 @@ class DateRangeWidget(anywidget.AnyWidget):
     }}
 
     .mljar-daterange-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}

@@ -119,6 +119,7 @@ class PDFWidget(anywidget.AnyWidget):
       color: {THEME.get('text_color', '#222')};
     }}
     .mljar-pdf-label {{
+      padding-top: 6px;
       margin-bottom: 6px;
       font-weight: bold;
     }}

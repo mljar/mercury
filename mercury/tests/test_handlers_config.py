@@ -1,5 +1,4 @@
 from mercury_app.handlers import (
-    _css_string_literal,
     _normalize_starting_icon,
     load_config,
 )
@@ -31,12 +30,6 @@ def test_load_config_reads_main_starting_icon(monkeypatch, tmp_path):
     loaded = load_config()
 
     assert loaded["main"]["starting_icon"] == "spinner"
-
-
-def test_css_string_literal_escapes_quotes_and_newlines():
-    escaped = _css_string_literal('Loading "Demo"\nPlease wait')
-
-    assert escaped == '"Loading \\"Demo\\"\\nPlease wait"'
 
 
 def test_normalize_starting_icon_accepts_supported_values():

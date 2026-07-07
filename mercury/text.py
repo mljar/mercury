@@ -169,6 +169,7 @@ class TextInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-textinput-top-label {{
+      padding-top: 6px;
       margin-bottom: 6px;
       text-align: left;
       width: 100%;

@@ -153,6 +153,7 @@ class JSONViewer(anywidget.AnyWidget):
       box-sizing: border-box;
     }}
     .mljar-json-label {{
+      padding-top: 6px;
       margin-bottom: 6px;
       font-weight: bold;
     }}

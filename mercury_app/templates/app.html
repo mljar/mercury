@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="loader-{{ starting_icon or 'coffee' }}">
+<html>
 
 <head>
   <meta charset="utf-8">
@@ -126,8 +126,7 @@
     }
 
     /* Background overlay BELOW the header + safe area */
-    html::before {
-      content: "";
+    .mercury-loader {
       position: fixed;
       top: calc(var(--header-height) + var(--safe-top));
       left: 0;
@@ -135,22 +134,40 @@
       bottom: 0;
       z-index: 2147483647;
       background: color-mix(in srgb, var(--mercury-background-color) 88%, transparent);
-      /* Prevent scroll behind on mobile */
       -webkit-overflow-scrolling: touch;
       touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: calc(var(--header-height) + var(--safe-top) + 50%);
-      left: 50%;
-      transform: translate(-50%, calc(-50% - 2.1rem));
-      z-index: 2147483649;
-      pointer-events: none;
+    .mercury-loader.is-hidden {
+      display: none !important;
     }
 
-    html.loader-coffee body::before {
+    .mercury-loader-card {
+      background: var(--mercury-surface-color);
+      border: 1px solid var(--mercury-border-color);
+      border-radius: 1rem;
+      padding: 2rem 2.25rem;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      color: var(--mercury-text-color);
+      width: min(92vw, 28rem);
+      box-sizing: border-box;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .mercury-loader-icon {
+      margin: 0 auto 1rem;
+    }
+
+    .mercury-loader-coffee .mercury-loader-icon {
       width: 56px;
       height: 56px;
       background-image:
@@ -162,7 +179,7 @@
       animation: mercury-steam-float 1.8s ease-in-out infinite;
     }
 
-    html.loader-spinner body::before {
+    .mercury-loader-spinner .mercury-loader-icon {
       width: 42px;
       height: 42px;
       border-radius: 50%;
@@ -171,64 +188,28 @@
       animation: mercury-spinner 0.9s linear infinite;
     }
 
-    html.loader-none body::before {
+    .mercury-loader-none .mercury-loader-icon {
       display: none;
-    }
-
-    /* Loader box centered BELOW the header */
-    html::after {
-      content: {{ loading_message_css | safe }};
-      position: fixed;
-      top: calc(var(--header-height) + var(--safe-top) + 50%);
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2147483648;
-
-      background: var(--mercury-surface-color);
-      border: 1px solid var(--mercury-primary-color);
-      border-radius: 1rem;
-      padding: 5.1rem 2.25rem 2rem;
-      text-align: center;
-      font-size: 18px;
-      font-weight: 600;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-      color: var(--mercury-text-color);
-
-      /* Mobile-friendly sizing */
-      width: min(92vw, 28rem);
-      box-sizing: border-box;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-    }
-
-    html.loader-none::after {
-      padding-top: 2rem;
     }
 
     /* Small screens: tighten spacing and font size */
     @media (max-width: 480px) {
-      html::after {
-        padding: 4.6rem 1.25rem 1.5rem;
+      .mercury-loader-card {
+        padding: 1.5rem 1.25rem;
         font-size: 16px;
         border-radius: .75rem;
         width: min(94vw, 24rem);
       }
 
-      html.loader-none::after {
-        padding-top: 1.5rem;
-      }
-
-      html.loader-coffee body::before {
+      .mercury-loader-coffee .mercury-loader-icon {
         width: 48px;
         height: 48px;
-        transform: translate(-50%, calc(-50% - 1.9rem));
         background-size: 48px 48px, 40px 40px;
       }
 
-      html.loader-spinner body::before {
+      .mercury-loader-spinner .mercury-loader-icon {
         width: 36px;
         height: 36px;
-        transform: translate(-50%, calc(-50% - 1.8rem));
       }
     }
 
@@ -242,17 +223,6 @@
         background-size: 56px 56px, 48px 50px;
       }
     }
-
-    @keyframes mercury-spinner {
-      to {
-        transform: translate(-50%, calc(-50% - 2.1rem)) rotate(360deg);
-      }
-    }
-
-    /* Hide overlay when ready */
-    html.hide-loader::before,
-    html.hide-loader::after,
-    html.hide-loader body::before { display: none !important; }
 
     html.no-navbar {
       --header-height: 0px;
@@ -334,6 +304,13 @@
 
 <body>
 
+  <div id="mercury-loader" class="mercury-loader mercury-loader-{{ starting_icon or 'coffee' }}">
+    <div class="mercury-loader-card">
+      <div class="mercury-loader-icon" aria-hidden="true"></div>
+      <div class="mercury-loader-message">{{ loading_message or 'Initializing web application...' }}</div>
+    </div>
+  </div>
+
   {# Copy so we do not modify the page_config with updates. #}
   {% set page_config_full = page_config.copy() %}
   {% set _ = page_config_full.update(baseUrl=base_url, wsUrl=ws_url) %}
@@ -355,7 +332,10 @@
 
     /* Expose a helper to hide the persistent loader when ready */
     window.hideMercuryLoader = function () {
-      document.documentElement.classList.add('hide-loader');
+      var loader = document.getElementById('mercury-loader');
+      if (loader) {
+        loader.classList.add('is-hidden');
+      }
     };
 
     /* Dynamically set --header-height to the real header height for perfect positioning */

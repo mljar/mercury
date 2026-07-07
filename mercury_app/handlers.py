@@ -1,7 +1,6 @@
 # Copyright MLJAR Sp. z o.o.
 # Licensed under the Apache License, Version 2.0 (Apache-2.0)
 
-import json
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -38,11 +37,6 @@ def load_config(config_path="config.toml"):
         "main": config.get("main", {}),
         "welcome": config.get("welcome", {})
     }
-
-
-def _css_string_literal(value: str) -> str:
-    return json.dumps(value)
-
 
 def _normalize_starting_icon(value: str | None) -> str:
     normalized = str(value or "").strip().lower()
@@ -316,8 +310,6 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
                 token=self.settings["token"],
                 page_config=page_config,
                 starting_icon=starting_icon,
-                loading_message_css=_css_string_literal(
-                    MAIN_CONFIG.get("starting_message", "Initializing web application…")
-                ),
+                loading_message=MAIN_CONFIG.get("starting_message", "Initializing web application..."),
             )
         )

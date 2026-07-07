@@ -307,6 +307,7 @@ class SliderWidget(anywidget.AnyWidget):
       color: {THEME.get('text_color', '#222')};
       padding-left: 4px;
       padding-right: 4px;
+      overflow: hidden;
       box-sizing: border-box;
     }}
 
@@ -336,6 +337,7 @@ class SliderWidget(anywidget.AnyWidget):
     }}
 
     .mljar-slider-top-label {{
+      padding-top: 6px;
       margin-bottom: 6px;
       font-weight: 600;
       line-height: 1.2;

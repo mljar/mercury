@@ -155,6 +155,7 @@ class DateInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-date-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}

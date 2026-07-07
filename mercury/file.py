@@ -570,6 +570,7 @@ class UploadFileWidget(anywidget.AnyWidget):
     }}
 
     .mljar-file-label {{
+      padding-top: 6px;
       font-weight: 600;
       margin-bottom: 8px;
       font-size: {THEME.get('font_size', '14px')};

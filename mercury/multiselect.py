@@ -492,6 +492,7 @@ class MultiSelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-ms-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
       color: {THEME.get('text_color', '#222')};

@@ -356,6 +356,7 @@ class SelectWidget(anywidget.AnyWidget):
     }}
 
     .mljar-select-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}

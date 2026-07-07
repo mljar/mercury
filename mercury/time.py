@@ -172,6 +172,7 @@ class TimeInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-time-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}

@@ -422,6 +422,7 @@ class NumberInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-number-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}

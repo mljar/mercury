@@ -181,6 +181,7 @@ class DateTimeInputWidget(anywidget.AnyWidget):
     }}
 
     .mljar-datetime-label {{
+      padding-top: 6px;
       margin-bottom: 4px;
       font-weight: 600;
     }}
