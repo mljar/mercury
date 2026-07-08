@@ -1,6 +1,6 @@
 import mercury.chat.chat as chat_module
 from mercury.chat.chat import Chat
-from mercury.chat.message import Message
+from mercury.chat.message import DEFAULT_EMOJI_BACKGROUND, Message
 
 
 class FakeTimer:
@@ -172,3 +172,19 @@ def test_scroll_debounce_zero_scrolls_immediately(monkeypatch):
 
     assert chat._scroller.tick == tick_after_add + 1
     assert FakeTimer.instances == []
+
+
+def test_message_uses_default_emoji_background():
+    msg = Message(role="assistant")
+
+    avatar_html = msg.children[0].value
+
+    assert f"background:{DEFAULT_EMOJI_BACKGROUND};" in avatar_html
+
+
+def test_message_accepts_custom_emoji_background():
+    msg = Message(role="assistant", emoji_background="#123456")
+
+    avatar_html = msg.children[0].value
+
+    assert "background:#123456;" in avatar_html

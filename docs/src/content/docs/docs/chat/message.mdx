@@ -48,7 +48,8 @@ chat.add(
     mr.Message(
         markdown="Hello! How can I help you?",
         role="assistant",
-        emoji="🤖"
+        emoji="🤖",
+        emoji_background="#e5e7eb"
     )
 )
 ```
@@ -56,7 +57,7 @@ chat.add(
 Each `Message` is displayed with:
 
 * an avatar (emoji)
-* role-based styling
+* configurable avatar background color
 * rich content rendering
 
 
@@ -222,7 +223,7 @@ Initial Markdown content rendered when the message is created.
 
 **type:** `string`
 
-Used to determine avatar styling.
+Used to determine message role.
 Common values:
 
 * `"user"`
@@ -236,6 +237,25 @@ Common values:
 
 Emoji displayed in the avatar.
 The default is `"👤"`.
+
+---
+
+### emoji_background
+
+**type:** `string`
+
+Avatar background color as a hex string.
+The default is a hardcoded gray: `#e5e7eb`.
+
+Example:
+
+```python
+msg = mr.Message(
+    markdown="Hello!",
+    emoji="🤖",
+    emoji_background="#dbeafe"
+)
+```
 
 ---
 
@@ -304,4 +324,3 @@ msg.clear()
 * Text rendering mode affects only text content.
 * Auto-scrolling is handled by the parent `Chat` widget.
 * Messages share a common CSS class: `mljar-chat-msg`.
-
