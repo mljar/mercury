@@ -1,13 +1,5 @@
-![](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/mercury-starter-640.gif)
+![](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/mercury-starter-720.gif)
 
-                                             
-                                             _ __ ___   ___ _ __ ___ _   _ _ __ _   _
-                                            | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
-                                            | | | | | |  __/ | | (__| |_| | |  | |_| |
-                                            |_| |_| |_|\___|_|  \___|\__,_|_|   \__, |
-                                                                                 __/ |
-                                                                                |___/ 
-                                                                                
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE.txt)
 [![PyPI version](https://badge.fury.io/py/mercury.svg)](https://pypi.org/project/mercury/)
 [![Downloads](https://pepy.tech/badge/mercury)](https://pepy.tech/project/mercury)
