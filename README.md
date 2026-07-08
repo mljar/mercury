@@ -1,3 +1,6 @@
+![](https://raw.githubusercontent.com/mljar/mercury/main/docs/media/mercury-starter-640.gif)
+
+                                             
                                              _ __ ___   ___ _ __ ___ _   _ _ __ _   _
                                             | '_ ` _ \ / _ \ '__/ __| | | | '__| | | |
                                             | | | | | |  __/ | | (__| |_| | |  | |_| |
