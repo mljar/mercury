@@ -434,7 +434,7 @@ class SelectWidget(anywidget.AnyWidget):
       border-right: 1.5px solid {THEME.get('text_color', '#222')};
       border-bottom: 1.5px solid {THEME.get('text_color', '#222')};
       transform: translateY(-65%) rotate(45deg);
-      pointer-events: none;
+      pointer-events: auto;
       opacity: 0.5;
       transition: transform 0.18s ease, opacity 0.18s ease;
     }}

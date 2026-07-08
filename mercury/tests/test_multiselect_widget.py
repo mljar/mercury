@@ -170,10 +170,12 @@ def test_multiselectwidget_invalid_position_raises_traiterror():
 
 def test_multiselect_widget_caret_click_toggles_open_dropdown():
     esm = MultiSelectWidget._esm
+    css = MultiSelectWidget._css
 
     assert "if (event.target === caret && isOpen)" in esm
     assert "closeDropdown();" in esm
     assert "input.blur();" in esm
+    assert "pointer-events: auto;" in css
 
 
 # --- _repr_mimebundle_ / MERCURY_MIMETYPE integration -----------------------------
