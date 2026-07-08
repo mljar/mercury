@@ -428,7 +428,11 @@
 }
 
 .mercury-right-split-panel {
-  background: var(--mercury-primary-color);
+  background: var(--mercury-surface-color);
+}
+
+.mercury-right-split-panel > .lm-SplitPanel-handle {
+  display: none !important;
 }
 @media (min-width: 769px) {
   .mercury-sidebar-backdrop {
