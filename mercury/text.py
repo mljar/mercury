@@ -19,6 +19,7 @@ def TextInput(
     label: str = "Enter text",
     value: str = "",
     url_key: str = "",
+    rows: int = 1,
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
@@ -41,6 +42,10 @@ def TextInput(
     url_key : str, optional
         URL query parameter name used to override the initial value.
         If the parameter is missing or invalid, the widget falls back to ``value``.
+    rows : int, optional
+        Number of visible text lines. When ``rows > 1`` the widget renders as a
+        multi-line ``<textarea>`` instead of a single-line ``<input>``.
+        The default is `1`.
     position : {"sidebar", "inline", "bottom"}, optional
         Controls where the widget is displayed.
     disabled : bool, optional
@@ -57,11 +62,12 @@ def TextInput(
     """
     value = resolve_text_value(value=value, url_key=url_key)
 
-    args = [label, value, url_key, position, disabled, hidden]
+    args = [label, value, url_key, rows, position, disabled, hidden]
     kwargs = {
         "label": label,
         "value": value,
         "url_key": url_key,
+        "rows": rows,
         "position": position,
         "disabled": disabled,
         "hidden": hidden,
@@ -89,9 +95,20 @@ class TextInputWidget(anywidget.AnyWidget):
       const topLabel = document.createElement("div");
       topLabel.classList.add("mljar-textinput-top-label");
 
-      const input = document.createElement("input");
-      input.type = "text";
+      const rows = model.get("rows") ?? 1;
+      const isMultiline = rows > 1;
+
+      const input = isMultiline
+        ? document.createElement("textarea")
+        : document.createElement("input");
+      if (!isMultiline) {
+        input.type = "text";
+      }
       input.classList.add("mljar-textinput-input");
+      if (isMultiline) {
+        input.rows = rows;
+        input.style.resize = "vertical";
+      }
 
       container.appendChild(topLabel);
       container.appendChild(input);
@@ -214,6 +231,7 @@ class TextInputWidget(anywidget.AnyWidget):
     value = traitlets.Unicode("").tag(sync=True)
     label = traitlets.Unicode("Enter text").tag(sync=True)
     url_key = traitlets.Unicode("").tag(sync=True)
+    rows = traitlets.Int(1).tag(sync=True)
 
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)
