@@ -22,6 +22,30 @@ def test_textinput_trait_defaults():
     assert w.disabled is False
     assert w.hidden is False
     assert w.position == "sidebar"
+    assert w.rows == 1
+
+
+def test_textinput_rows_defaults_to_one():
+    w = TextInputWidget()
+    assert w.rows == 1
+
+
+def test_textinput_rows_multiline():
+    w = TextInputWidget(rows=4)
+    assert w.rows == 4
+
+
+def test_textinput_passes_rows_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = TextInput(
+        label="Enter description",
+        value="hello",
+        rows=3,
+    )
+
+    assert widget.rows == 3
 
 
 def test_textinput_passes_disabled_and_hidden_to_widget(monkeypatch):
