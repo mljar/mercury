@@ -7,8 +7,8 @@ import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import MercuryDemo from '../../../../components/MercuryDemoIframe.astro'
 
-The **TextInput** widget displays a single-line text input field.
-It is useful for entering names, labels, filters, search queries, or any short text values in your Mercury App.
+The **TextInput** widget displays a single-line or multi-line text input field.
+It is useful for entering names, labels, filters, search queries, comments, or any short or multi-line text values in your Mercury App.
 
 ## Live Demo
 
@@ -68,6 +68,22 @@ Warsaw
 
 ---
 
+### Multi-line Text Area
+
+Set `rows` to an integer greater than `1` to render a multi-line `<textarea>` widget.
+
+**Code**
+
+```python
+text = mr.TextInput(
+    label="Bio / Notes",
+    value="Line 1\nLine 2",
+    rows=4
+)
+```
+
+---
+
 ### Layout
 
 Use the `position` argument to control where the widget is displayed.
@@ -109,6 +125,17 @@ Initial text value.
 
 * If omitted, defaults to an empty string.
 * The value always reflects the current text entered by the user.
+
+---
+
+### rows
+
+**type:** `int`
+
+Number of visible text rows.
+
+* Default is `1` (single-line `<input>` element).
+* When `rows > 1`, the widget renders as a multi-line `<textarea>` with vertical resizing enabled.
 
 ---
 
