@@ -16,7 +16,13 @@ from mercury.config import build_theme_css_vars, build_theme_font_links
 from ._version import __version__
 from .block_handler import BLOCKED_PATTERNS, BlockedHandler
 from .custom_contents_handler import MercuryContentsHandler
-from .handlers import MAIN_CONFIG, THEME, MercuryHandler, _normalize_starting_icon
+from .handlers import (
+    MAIN_CONFIG,
+    THEME,
+    MercuryHandler,
+    MercuryLogoutHandler,
+    _normalize_starting_icon,
+)
 from .idle_timeout import (
     TimeoutActivityTransform,
     TimeoutManager,
@@ -99,6 +105,7 @@ class MercuryApp(LabServerApp):
         self.handlers.append((r"/", RootIndexHandler))
         self.handlers.append(("/mercury/api/notebooks", NotebooksAPIHandler))
         self.handlers.append(("/mercury/api/theme", ThemeHandler))
+        self.handlers.append(("/mercury/logout", MercuryLogoutHandler))
         self.handlers.append((f"/mercury{path_regex}", MercuryHandler))
         if sys.argv[0].endswith("mercury_app/__main__.py") or \
            sys.argv[0].endswith("mercury"):

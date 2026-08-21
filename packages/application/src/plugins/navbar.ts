@@ -18,6 +18,10 @@ export type MercuryNavbarOptions = {
   notebooksButtonLabel?: string;
   /** URL that returns the notebooks JSON array */
   apiUrl: string;
+  /** Whether Mercury was started with token or password protection */
+  logoutAvailable?: boolean;
+  /** URL that clears the login cookie */
+  logoutUrl?: string;
   /** Callback fired when the header height is known/changes (e.g., mount) */
   onHeightChange?: (px: number) => void;
   /** Where to insert the header; defaults to document.body */
@@ -97,6 +101,11 @@ export class MercuryNavbar {
           font-family: var(--mercury-heading-font-family);
         }
         .mrc-brand:hover { text-decoration: underline; }
+        .mrc-actions {
+          display: flex; align-items: center; gap: .5rem;
+          min-width: 0;
+        }
+        .mrc-notebooks-wrap { position: relative; }
   
         /* Button */
         .mrc-btn {
@@ -172,7 +181,10 @@ export class MercuryNavbar {
 
     // Right side
     const rightWrap = document.createElement('div');
-    rightWrap.style.position = 'relative';
+    rightWrap.className = 'mrc-actions';
+
+    const notebooksWrap = document.createElement('div');
+    notebooksWrap.className = 'mrc-notebooks-wrap';
 
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -204,8 +216,23 @@ export class MercuryNavbar {
     menuList.setAttribute('role', 'none');
 
     menu.appendChild(menuList);
-    rightWrap.appendChild(btn);
-    rightWrap.appendChild(menu);
+    notebooksWrap.appendChild(btn);
+    notebooksWrap.appendChild(menu);
+    rightWrap.appendChild(notebooksWrap);
+
+    if (this.opts.logoutAvailable) {
+      const logout = document.createElement('a');
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete('token');
+      const next = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+      const logoutUrl = this.opts.logoutUrl || `${this.opts.baseUrl}logout`;
+      const separator = logoutUrl.includes('?') ? '&' : '?';
+
+      logout.className = 'mrc-btn mrc-logout';
+      logout.href = `${logoutUrl}${separator}next=${encodeURIComponent(next)}`;
+      logout.textContent = 'Log out';
+      rightWrap.appendChild(logout);
+    }
 
     inner.appendChild(brandWrap);
     inner.appendChild(rightWrap);

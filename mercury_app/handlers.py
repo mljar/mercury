@@ -5,7 +5,9 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
+from urllib.parse import urlparse
 
+from jupyter_server.auth.decorator import allow_unauthenticated
 from jupyter_server.base.handlers import JupyterHandler
 from jupyter_server.extension.handler import (
     ExtensionHandlerJinjaMixin,
@@ -16,6 +18,7 @@ from jupyter_server.utils import url_path_join as ujoin
 from jupyterlab_server.config import LabConfig, get_page_config, recursive_update
 from jupyterlab_server.handlers import _camelCase, is_url
 from tornado import web
+from tornado.httputil import url_concat
 
 from mercury.config import (
     build_theme_css_vars,
@@ -43,6 +46,34 @@ def _normalize_starting_icon(value: str | None) -> str:
     if normalized in {"coffee", "spinner", "none"}:
         return normalized
     return "spinner"
+
+
+def is_logout_available(identity_provider) -> bool:
+    """Return whether Mercury was started with token or password protection."""
+    return bool(
+        getattr(identity_provider, "token", "")
+        or getattr(identity_provider, "hashed_password", "")
+    )
+
+
+def _safe_logout_next_url(value: str | None, base_url: str) -> str:
+    """Keep post-login destinations on this server and under its base URL."""
+    fallback = base_url or "/"
+    candidate = str(value or fallback)
+    if "\\" in candidate:
+        return fallback
+
+    parsed = urlparse(candidate)
+    if parsed.scheme or parsed.netloc or not parsed.path.startswith("/"):
+        return fallback
+
+    normalized_base = fallback.rstrip("/") or "/"
+    if normalized_base != "/" and not (
+        parsed.path == normalized_base
+        or parsed.path.startswith(f"{normalized_base}/")
+    ):
+        return fallback
+    return candidate
 
 
 CONFIG = load_config()
@@ -74,6 +105,7 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
             "notebookPath": notebook_path,
             "title": MAIN_CONFIG.get("title", "Mercury"),
             "notebooksButtonLabel": MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
+            "logoutAvailable": is_logout_available(self.identity_provider),
             "mercuryStandalone": True,
             "themeCssVars": build_theme_css_vars(THEME),
             "themeFontLinks": build_theme_font_links(THEME),
@@ -313,3 +345,20 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
                 loading_message=MAIN_CONFIG.get("starting_message", "Initializing web application..."),
             )
         )
+
+
+class MercuryLogoutHandler(JupyterHandler):
+    """Clear the Jupyter login cookie and return the user to the login page."""
+
+    @allow_unauthenticated
+    def get(self):
+        next_url = _safe_logout_next_url(
+            self.get_argument("next", default=self.base_url),
+            self.base_url,
+        )
+        self.identity_provider.clear_login_cookie(self)
+        login_url = url_concat(
+            ujoin(self.base_url, "login"),
+            {"next": next_url},
+        )
+        self.redirect(login_url)

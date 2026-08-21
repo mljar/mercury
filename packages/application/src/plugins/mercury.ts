@@ -70,6 +70,11 @@ export const plugin: JupyterFrontEndPlugin<void> = {
                 title: PageConfig.getOption('title') || 'Mercury',
                 notebooksButtonLabel: PageConfig.getOption('notebooksButtonLabel') || 'Notebooks',
                 apiUrl: `${baseUrl}mercury/api/notebooks`,
+                logoutAvailable:
+                  String(
+                    PageConfig.getOption('logoutAvailable')
+                  ).toLowerCase() === 'true',
+                logoutUrl: `${baseUrl}mercury/logout`,
                 onHeightChange: px => {
                   // add top padding below fixed header
                   const mercuryMainPanel = mercuryPanel.node.querySelector(
