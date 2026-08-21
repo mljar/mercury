@@ -37,7 +37,7 @@ is no `main()` function and no server entry point to write.
 Docs: https://runmercury.com/docs/
 """
 
-__version__ = "3.2.3"
+__version__ = "3.2.4"
 
 from IPython.display import display
 

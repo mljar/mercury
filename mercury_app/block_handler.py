@@ -5,7 +5,7 @@ from tornado.web import HTTPError, RequestHandler
 
 BLOCKED_PATTERNS = [
     # JupyterLab UI + API
-    r"/lab(?!/(?:extensions/|api/settings(?:/|$)|api/translations(?:/|$)))(?:/.*)?"
+    r"/lab(?!/(?:extensions/|api/settings(?:/|$)|api/translations(?:/|$)))(?:/.*)?",
     r"/api/terminals(?:/.*)?",
     r"/api/shutdown(?:/.*)?",
     r"/files(?:/.*)?",
