@@ -59,6 +59,28 @@ def test_chat_height_accepts_viewport_units(monkeypatch):
     assert chat.vbox.layout.overflow == "auto"
 
 
+def test_multiple_chats_have_isolated_scroll_targets(monkeypatch):
+    monkeypatch.setattr(chat_module, "display", lambda *_: None)
+    monkeypatch.setattr(chat_module, "clear_output", lambda *_, **__: None)
+
+    first = Chat(height="500px")
+    second = Chat(height="500px")
+
+    assert first._chat_css_class != second._chat_css_class
+    assert first._scroller.chat_css_class == first._chat_css_class
+    assert second._scroller.chat_css_class == second._chat_css_class
+    assert first._chat_css_class in first.vbox._dom_classes
+    assert second._chat_css_class in second.vbox._dom_classes
+
+
+def test_scroll_helper_targets_chat_root_before_ancestors():
+    source = chat_module.ScrollHelper._esm
+
+    assert "isScrollable(root) ? root : null" in source
+    assert "getScrollableAncestor(root)" in source
+    assert "getScrollableAncestor(last)" not in source
+
+
 def test_message_append_after_chat_add_schedules_debounced_scroll(monkeypatch):
     monkeypatch.setattr(chat_module, "display", lambda *_: None)
     monkeypatch.setattr(chat_module, "clear_output", lambda *_, **__: None)

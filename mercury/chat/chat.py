@@ -4,6 +4,7 @@
 import ipywidgets as widgets
 from IPython.display import display, clear_output
 from threading import Timer
+from uuid import uuid4
 
 import anywidget
 import traitlets
@@ -24,6 +25,7 @@ class ScrollHelper(anywidget.AnyWidget):
 function render({ model, el }) {
   const LOG_PREFIX = "[ScrollHelper]";
   const MSG_CLASS = model.get("msg_css_class") || "mljar-chat-msg";
+  const CHAT_CLASS = model.get("chat_css_class");
 
   // Just in case, hide the helper element itself
   el.classList.add("mljar-chat-scroll-helper");
@@ -38,22 +40,6 @@ function render({ model, el }) {
       canScroll &&
       (oy === "auto" || oy === "scroll" || o === "auto" || o === "scroll")
     );
-  }
-
-  function findScrollableWithin(rootEl) {
-    if (!rootEl) return null;
-    if (isScrollable(rootEl)) return rootEl;
-
-    const walker = document.createTreeWalker(
-      rootEl,
-      NodeFilter.SHOW_ELEMENT,
-      null
-    );
-    let n = walker.currentNode;
-    while ((n = walker.nextNode())) {
-      if (isScrollable(n)) return n;
-    }
-    return null;
   }
 
   function getScrollableAncestor(node) {
@@ -89,7 +75,13 @@ function render({ model, el }) {
   }
 
   function autoScroll() {
-    const msgs = document.getElementsByClassName(MSG_CLASS);
+    const roots = CHAT_CLASS
+      ? document.getElementsByClassName(CHAT_CLASS)
+      : null;
+    const root = roots && roots.length ? roots[0] : null;
+    if (!root) return;
+
+    const msgs = root.getElementsByClassName(MSG_CLASS);
     if (!msgs || !msgs.length) return;
     const last = msgs[msgs.length - 1];
 
@@ -104,9 +96,13 @@ function render({ model, el }) {
       console.warn(LOG_PREFIX, "bad selector", selector, e);
     }
 
-    const scroller =
-      findScrollableWithin(pref) ||
-      getScrollableAncestor(last) ||
+    // A fixed-height Chat owns the scrollbar. Start ancestor lookup at the
+    // chat root so a nested message/output can never become the scroll target.
+    const preferredScroller =
+      pref && pref.contains(root) && isScrollable(pref) ? pref : null;
+    const scroller = (isScrollable(root) ? root : null) ||
+      getScrollableAncestor(root) ||
+      preferredScroller ||
       document.scrollingElement ||
       document.documentElement;
 
@@ -169,6 +165,7 @@ export default { render };
         "#mercury-main-panel, .mercury-main-panel"
     ).tag(sync=True)
     msg_css_class = traitlets.Unicode("mljar-chat-msg").tag(sync=True)
+    chat_css_class = traitlets.Unicode("").tag(sync=True)
 
 
 class Chat:
@@ -238,6 +235,7 @@ class Chat:
         self.height = str(height or "").strip()
         self.scroll_debounce = max(float(scroll_debounce), 0.0)
         self._scroll_timer = None
+        self._chat_css_class = f"mljar-chat-{uuid4().hex}"
 
         # Placeholder label (same as before)
         self.placeholder_label = widgets.HTML(
@@ -257,11 +255,13 @@ class Chat:
             ),
         )
         self.vbox.add_class("mljar-chat-container")
+        self.vbox.add_class(self._chat_css_class)
 
         # Hidden helper widget that runs JS (via anywidget) for scrolling
         self._scroller = ScrollHelper(
             scroll_container_selector=self.scroll_container_selector,
             msg_css_class=MSG_CSS_CLASS,
+            chat_css_class=self._chat_css_class,
         )
 
         clear_output(wait=True)
