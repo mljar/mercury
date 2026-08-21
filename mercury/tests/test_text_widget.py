@@ -39,6 +39,35 @@ def test_textinput_passes_disabled_and_hidden_to_widget(monkeypatch):
     assert widget.hidden is True
 
 
+def test_textinput_default_rows_is_single_line():
+    w = TextInputWidget()
+    assert w.rows == 1
+
+
+def test_textinput_passes_rows_to_widget(monkeypatch):
+    monkeypatch.setattr(m, "display", lambda *_: None)
+    WidgetsManager.clear()
+
+    widget = TextInput(label="Notes", rows=5)
+
+    assert widget.rows == 5
+
+
+def test_textinput_rows_must_be_positive():
+    w = TextInputWidget()
+    with pytest.raises(TraitError):
+        w.rows = 0
+
+
+def test_textinput_multiline_renders_textarea():
+    esm = TextInputWidget._esm
+    assert "textarea" in esm
+
+    css = TextInputWidget._css
+    assert "textarea.mljar-textinput-input" in css
+    assert "resize: vertical;" in css
+
+
 def test_textinput_invalid_position_raises_traiterror():
     w = TextInputWidget()
     with pytest.raises(TraitError):
