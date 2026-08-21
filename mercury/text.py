@@ -22,6 +22,7 @@ def TextInput(
     position: Position = "sidebar",
     disabled: bool = False,
     hidden: bool = False,
+    rows: int = 1,
     key: str = "",
 ):
     """
@@ -47,6 +48,10 @@ def TextInput(
         If `True`, the widget is visible but cannot be interacted with.
     hidden : bool, optional
         If `True`, the widget exists in the UI state but is not rendered.
+    rows : int, optional
+        Number of visible text rows. When greater than `1`, the widget is
+        rendered as a resizable textarea instead of a single-line input.
+        The default is `1`.
     key : str, optional
         Unique identifier used to differentiate widgets with the same parameters.
 
@@ -57,7 +62,7 @@ def TextInput(
     """
     value = resolve_text_value(value=value, url_key=url_key)
 
-    args = [label, value, url_key, position, disabled, hidden]
+    args = [label, value, url_key, position, disabled, hidden, rows]
     kwargs = {
         "label": label,
         "value": value,
@@ -65,6 +70,7 @@ def TextInput(
         "position": position,
         "disabled": disabled,
         "hidden": hidden,
+        "rows": rows,
     }
 
     code_uid = WidgetsManager.get_code_uid("TextInput", key=key, args=args, kwargs=kwargs)
@@ -89,8 +95,15 @@ class TextInputWidget(anywidget.AnyWidget):
       const topLabel = document.createElement("div");
       topLabel.classList.add("mljar-textinput-top-label");
 
-      const input = document.createElement("input");
-      input.type = "text";
+      const rows = model.get("rows") || 1;
+      const multiline = rows > 1;
+
+      const input = document.createElement(multiline ? "textarea" : "input");
+      if (multiline) {
+        input.rows = rows;
+      } else {
+        input.type = "text";
+      }
       input.classList.add("mljar-textinput-input");
 
       container.appendChild(topLabel);
@@ -121,6 +134,11 @@ class TextInputWidget(anywidget.AnyWidget):
       model.on("change:label", syncFromModel);
       model.on("change:disabled", syncFromModel);
       model.on("change:hidden", syncFromModel);
+      model.on("change:rows", () => {
+        if (input.tagName === "TEXTAREA") {
+          input.rows = model.get("rows") || 1;
+        }
+      });
 
       syncFromModel();
 
@@ -197,6 +215,12 @@ class TextInputWidget(anywidget.AnyWidget):
       box-shadow: none;
     }}
 
+    textarea.mljar-textinput-input {{
+      font-family: inherit;
+      font-size: inherit;
+      resize: vertical;
+    }}
+
     .mljar-textinput-input:disabled {{
       background: #f5f5f5;
       color: #888;
@@ -217,6 +241,17 @@ class TextInputWidget(anywidget.AnyWidget):
 
     disabled = traitlets.Bool(False).tag(sync=True)
     hidden = traitlets.Bool(False).tag(sync=True)
+
+    rows = traitlets.Int(
+        default_value=1,
+        help="Number of visible text rows; values above 1 render a textarea",
+    ).tag(sync=True)
+
+    @traitlets.validate("rows")
+    def _validate_rows(self, proposal):
+        if proposal["value"] < 1:
+            raise traitlets.TraitError("rows must be a positive integer")
+        return proposal["value"]
 
     position = traitlets.Enum(
         values=["sidebar", "inline", "bottom"],
