@@ -15,6 +15,7 @@ from .render_context import LayoutContextOutput, LayoutFrame
 from .theme import THEME
 
 Position = Literal["sidebar", "inline", "bottom"]
+DEFAULT_MIN_WIDTH = "min(260px, 100%)"
 
 
 def _display_style():
@@ -96,7 +97,7 @@ def _normalize_columns_spec(n: int | Sequence[float]) -> tuple[int, tuple[float,
 
 def Columns(
     n: int | Sequence[float] = 2,
-    min_width: str = "100px",
+    min_width: str = DEFAULT_MIN_WIDTH,
     gap: str = "16px",
     border: str | None = None,
     position: Position = "inline",
@@ -118,8 +119,9 @@ def Columns(
         ``Columns([0.4, 0.6])`` creates two columns with a 40/60 width ratio.
         The default is 2.
     min_width : str
-        Minimum width for each column (e.g. `"240px"`).
-        The default is `"100px"`.
+        Minimum width for each column (e.g. `"240px"`). Columns wrap when
+        there is not enough room. By default, columns target a minimum width
+        of 260px while remaining constrained to narrow parent containers.
     gap : str
         Gap between columns (e.g. `"16px"`).
         The default is `"16px"`.
@@ -190,6 +192,7 @@ def Columns(
         ),
         position=position,
     )
+    box.add_class("mljar-columns")
 
     # border resolution
     if border == "":
@@ -206,13 +209,14 @@ def Columns(
 
     for out, weight in zip(outs, column_weights):
         out.layout.min_width = min_width
+        out.layout.max_width = "100%"
+        out.layout.box_sizing = "border-box"
         out.layout.flex = f"{weight:g} 1 0px"
         out.add_class("mljar-column")
 
         if border_to_apply:
             out.layout.border = border_to_apply
             out.layout.padding = "4px"
-            out.layout.box_sizing = "border-box"
         else:
             out.layout.border = None
 

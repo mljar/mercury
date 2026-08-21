@@ -171,6 +171,29 @@ def test_columns_accepts_proportional_widths(monkeypatch):
     assert right.layout.flex == "0.6 1 0px"
 
 
+def test_columns_default_layout_wraps_at_a_mobile_friendly_width(monkeypatch):
+    _disable_display(monkeypatch)
+
+    columns = Columns(2)
+    box, _ = next(iter(WidgetsManager.widgets.values()))
+
+    assert box.layout.flex_flow == "row wrap"
+    assert "mljar-columns" in box._dom_classes
+    assert all(
+        column.layout.min_width == "min(260px, 100%)" for column in columns
+    )
+    assert all(column.layout.max_width == "100%" for column in columns)
+    assert all(column.layout.box_sizing == "border-box" for column in columns)
+
+
+def test_columns_preserves_explicit_minimum_width(monkeypatch):
+    _disable_display(monkeypatch)
+
+    columns = Columns(2, min_width="180px")
+
+    assert all(column.layout.min_width == "180px" for column in columns)
+
+
 def test_columns_accepts_integer_like_width_ratios(monkeypatch):
     _disable_display(monkeypatch)
     WidgetsManager.widgets.clear()

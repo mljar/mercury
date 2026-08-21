@@ -27,6 +27,8 @@ You can check the `Columns` widget directly in this interactive example:
 
 Call `mr.Columns()` to create a row of columns.
 The function returns a **tuple of output widgets** — one for each column.
+Columns are responsive by default: they stay side by side while each column has
+comfortable space and automatically stack as their containing area gets narrower.
 
 ### Basic Example
 
@@ -87,15 +89,22 @@ all work.
 
 ### Minimum Width and Responsiveness
 
-Use `min_width` to control how narrow a column can become.
-When there is not enough horizontal space, columns automatically wrap to the next row.
+No responsive configuration is required. By default, each column targets a minimum
+width of 260px. Two columns therefore stay in one row on desktop and tablet layouts,
+then stack into two rows on a typical mobile screen. Four columns can progressively
+wrap from four to two to one per row as their containing area gets narrower.
+
+Responsiveness is based on the available container width, so it also works for nested
+layouts and pages with a sidebar.
+
+Use `min_width` only when you want columns to wrap earlier or allow a denser layout.
 
 **Code**
 
 ```python
 c1, c2, c3 = mr.Columns(
     n=3,
-    min_width="240px"
+    min_width="320px"
 )
 ```
 
@@ -207,6 +216,7 @@ Integer values must be at least 1. Width-list values must be positive numbers.
 **type:** `string`
 
 Minimum width of each column (CSS value).
+The default targets `260px` without allowing a column to overflow a narrower parent.
 
 Examples:
 
