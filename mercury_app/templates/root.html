@@ -47,6 +47,10 @@
       font-family: var(--mercury-heading-font-family);
       font-size: clamp(16px, 2vw, 20px);
     }
+    .hdr-actions {
+      display: flex; align-items: center; gap: .5rem;
+      min-width: 0;
+    }
     .btn {
       display: inline-flex; align-items: center; gap: .5rem;
       border: 1px solid var(--mercury-topbar-border-color);
@@ -181,9 +185,11 @@
     <div class="hdr-inner">
       <a class="brand" href="{{ base_url or '/' }}">{{ page_title or 'Mercury'}}</a>
 
-      <!-- Render menu button ONLY when there are notebooks -->
-      {% if notebooks %}
-      <div style="position:relative">
+      {% if notebooks or logout_available %}
+      <div class="hdr-actions">
+        <!-- Render menu button ONLY when there are notebooks -->
+        {% if notebooks %}
+        <div style="position:relative">
         <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
          {{ notebooks_button_label or 'Notebooks' }}
           <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -194,6 +200,12 @@
         <div id="nbMenu" class="menu hidden" role="menu" aria-label="Notebook list">
           <div id="nbMenuList" class="menu-list" role="none"></div>
         </div>
+        </div>
+        {% endif %}
+
+        {% if logout_available %}
+        <a id="logoutBtn" class="btn" href="{{ logout_url }}">Log out</a>
+        {% endif %}
       </div>
       {% endif %}
     </div>

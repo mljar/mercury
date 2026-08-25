@@ -2,10 +2,12 @@ import os
 
 import tornado.web
 from jupyter_server.base.handlers import JupyterHandler
+from jupyter_server.utils import url_path_join as ujoin
+from tornado.httputil import url_concat
 
 from mercury.config import build_theme_css_vars, build_theme_font_links
 
-from .handlers import MAIN_CONFIG, THEME, WELCOME_CONFIG
+from .handlers import MAIN_CONFIG, THEME, WELCOME_CONFIG, is_logout_available
 from .notebooks_meta import list_notebooks
 
 
@@ -15,10 +17,23 @@ def should_show_search_filter(notebooks: list[dict], main_config: dict) -> bool:
     return len(notebooks) > 3
 
 
+def get_root_logout_url(identity_provider, base_url: str) -> str | None:
+    """Return the root-page logout URL when token or password auth is enabled."""
+    if not is_logout_available(identity_provider):
+        return None
+
+    normalized_base = base_url or "/"
+    return url_concat(
+        ujoin(normalized_base, "mercury/logout"),
+        {"next": normalized_base},
+    )
+
+
 class RootIndexHandler(JupyterHandler):
     @tornado.web.authenticated
     def get(self):
         base = self.settings.get("base_url", "") or ""
+        logout_url = get_root_logout_url(self.identity_provider, base)
 
         # Same defaults as the API handler
         notebooks_dir = self.settings.get("notebooks_dir", os.getcwd())
@@ -33,6 +48,8 @@ class RootIndexHandler(JupyterHandler):
                 base_url=base,
                 error=f"Notebooks directory '{notebooks_dir}' does not exist.",
                 notebooks_button_label=MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
+                logout_available=logout_url is not None,
+                logout_url=logout_url,
                 theme=THEME,
                 theme_css_vars=build_theme_css_vars(THEME),
                 theme_font_links=build_theme_font_links(THEME),
@@ -95,6 +112,8 @@ class RootIndexHandler(JupyterHandler):
                                         notebooks,
                                         MAIN_CONFIG,
                                     ),
+                                    logout_available=logout_url is not None,
+                                    logout_url=logout_url,
                                     theme=THEME,
                                     theme_css_vars=build_theme_css_vars(THEME),
                                     theme_font_links=build_theme_font_links(THEME))
