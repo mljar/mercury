@@ -45,7 +45,7 @@ def test_chat_height_sets_internal_scroll(monkeypatch):
 
     assert chat.height == "600px"
     assert chat.vbox.layout.height == "600px"
-    assert chat.vbox.layout.overflow == "auto"
+    assert chat.vbox.layout.overflow == "hidden auto"
 
 
 def test_chat_height_accepts_viewport_units(monkeypatch):
@@ -56,7 +56,24 @@ def test_chat_height_accepts_viewport_units(monkeypatch):
 
     assert chat.height == "70vh"
     assert chat.vbox.layout.height == "70vh"
-    assert chat.vbox.layout.overflow == "auto"
+    assert chat.vbox.layout.overflow == "hidden auto"
+
+
+def test_message_expands_instead_of_becoming_a_scroll_container():
+    message = Message(role="assistant")
+
+    assert message.layout.flex == "0 0 auto"
+    assert message.layout.overflow == "visible"
+    assert message.output.layout.overflow == "visible"
+
+
+def test_message_css_disables_nested_vertical_scroll_containers():
+    css = Message._message_css()
+
+    assert "flex: 0 0 auto !important" in css
+    assert css.count("overflow: visible !important") >= 3
+    assert ".mljar-chat-msg-bubble > .jp-OutputArea" in css
+    assert ".mljar-chat-msg-bubble .jp-OutputArea-output" in css
 
 
 def test_multiple_chats_have_isolated_scroll_targets(monkeypatch):

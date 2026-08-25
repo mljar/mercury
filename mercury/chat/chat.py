@@ -251,7 +251,7 @@ class Chat:
                 width="100%",
                 height=self.height or None,
                 padding="4px 4px 0 4px",
-                overflow="auto" if self.height else "visible",
+                overflow="hidden auto" if self.height else "visible",
             ),
         )
         self.vbox.add_class("mljar-chat-container")

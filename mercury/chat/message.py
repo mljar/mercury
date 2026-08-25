@@ -99,8 +99,7 @@ class Message(widgets.HBox):
             layout=widgets.Layout(
                 align_self="flex-start",
                 margin="0 0 0 0",
-                overflow_y="visible",
-                overflow_x="visible",
+                overflow="visible",
                 padding="8px 12px 4px 12px",
                 width="auto",
                 flex="0 1 auto",
@@ -113,6 +112,8 @@ class Message(widgets.HBox):
 
         self.children = [avatar, self.output]
         self.layout.align_items = "flex-start"
+        self.layout.flex = "0 0 auto"
+        self.layout.overflow = "visible"
         self.layout.width = "100%"
         self.add_class("mljar-chat-msg-row")
 
@@ -164,6 +165,8 @@ class Message(widgets.HBox):
             width: 100%;
             box-sizing: border-box;
             align-items: flex-start;
+            flex: 0 0 auto !important;
+            overflow: visible !important;
         }}
 
         .mljar-chat-msg-avatar {{
@@ -193,6 +196,7 @@ class Message(widgets.HBox):
             font-weight: {THEME.get('font_weight', 'normal')};
             line-height: 1.5;
             border: none !important;
+            overflow: visible !important;
         }}
 
         .mljar-chat-msg-bubble > .jp-OutputArea,
@@ -207,6 +211,7 @@ class Message(widgets.HBox):
             box-sizing: border-box;
             margin: 0 !important;
             padding: 0 !important;
+            overflow: visible !important;
         }}
 
         .mljar-chat-msg-bubble .jp-OutputArea-child,
