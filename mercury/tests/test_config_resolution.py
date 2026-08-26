@@ -97,6 +97,22 @@ def test_build_theme_css_vars_contains_normalized_variables():
     assert "--mercury-text-color: #e5e7eb;" in css_vars
 
 
+def test_build_theme_css_vars_exports_component_theme_variables():
+    css_vars = build_theme_css_vars(
+        {
+            "widgetBackgroundColor": "#101820",
+            "borderRadiusLg": "18px",
+            "buttonPrimaryText": "#ffeecc",
+            "dangerColor": "#cc1122",
+        }
+    )
+
+    assert "--mercury-widget-background-color: #101820;" in css_vars
+    assert "--mercury-border-radius-lg: 18px;" in css_vars
+    assert "--mercury-button-primary-text: #ffeecc;" in css_vars
+    assert "--mercury-danger-color: #cc1122;" in css_vars
+
+
 def test_build_theme_font_links_adds_google_font_preconnects():
     links = build_theme_font_links(
         {"font_url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"}

@@ -5,14 +5,195 @@
 
     <meta charset="utf-8">
 
-    <title>{% block title %}Mercury {% endblock %}</title>
+    <title>{% block title %}{{ page_title or 'Mercury' }}{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{{ favicon_emoji or '🎉' }}</text></svg>">
+
+    {{ theme_font_links | default('', true) | safe }}
 
     <link rel="stylesheet" href="{{static_url("style/bootstrap.min.css") }}" />
     <link rel="stylesheet" href="{{static_url("style/bootstrap-theme.min.css") }}" />
     <link rel="stylesheet" href="{{static_url("style/index.css") }}" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+      :root {
+        color-scheme: light;
+        --mercury-background-color: #f9fafb;
+        --mercury-surface-color: #ffffff;
+        --mercury-card-background-color: #ffffff;
+        --mercury-widget-background-color: #ffffff;
+        --mercury-text-color: #0f172a;
+        --mercury-muted-text-color: #475569;
+        --mercury-border-color: #d0d7de;
+        --mercury-primary-color: #007bff;
+        --mercury-focus-border-color: #4c7cf0;
+        --mercury-button-primary-text: #ffffff;
+        --mercury-danger-color: #dc3545;
+        --mercury-warning-color: #f59e0b;
+        --mercury-success-color: #19b96c;
+        --mercury-topbar-background-color: #0b0b0c;
+        --mercury-topbar-text-color: #f3f4f6;
+        --mercury-topbar-border-color: rgba(255,255,255,0.08);
+        --mercury-font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        --mercury-heading-font-family: var(--mercury-font-family);
+        --mercury-font-size: 14px;
+        --mercury-font-weight: normal;
+        --mercury-heading-font-weight: 800;
+        --mercury-border-radius: 6px;
+        --mercury-border-radius-lg: 10px;
+        --mercury-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+        --mercury-button-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        --mercury-button-shadow-hover: 0 2px 6px rgba(0,0,0,0.08);
+        {{ theme_css_vars | default('', true) | safe }}
+      }
+
+      html, body {
+        min-height: 100%;
+        padding: 0;
+        margin: 0;
+        background: var(--mercury-background-color);
+        color: var(--mercury-text-color);
+        font-family: var(--mercury-font-family);
+        font-size: var(--mercury-font-size);
+        font-weight: var(--mercury-font-weight);
+        line-height: 1.55;
+      }
+
+      a {
+        color: var(--mercury-primary-color);
+        text-decoration: none;
+      }
+      a:hover { text-decoration: underline; }
+
+      .mercury-page-header {
+        min-height: 52px;
+        background: var(--mercury-topbar-background-color);
+        color: var(--mercury-topbar-text-color);
+        border-bottom: 1px solid var(--mercury-topbar-border-color);
+      }
+      .mercury-page-header-inner {
+        width: min(100%, calc(56rem + 2rem));
+        min-height: 52px;
+        margin: 0 auto;
+        padding: .7rem 1rem;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+      }
+      .mercury-page-brand {
+        color: var(--mercury-topbar-text-color);
+        font-family: var(--mercury-heading-font-family);
+        font-size: clamp(16px, 2vw, 20px);
+        font-weight: var(--mercury-heading-font-weight);
+        letter-spacing: -.01em;
+      }
+      .mercury-page-main { padding: 2rem 1rem; }
+      .mercury-page-card {
+        width: min(100%, 40rem);
+        margin: 2rem auto;
+        padding: 2rem;
+        box-sizing: border-box;
+        background: var(--mercury-card-background-color);
+        color: var(--mercury-text-color);
+        border: 1px solid var(--mercury-border-color);
+        border-radius: var(--mercury-border-radius-lg);
+        box-shadow: var(--mercury-shadow-sm);
+      }
+      .mercury-page-title {
+        margin: 0 0 1rem;
+        color: var(--mercury-text-color);
+        font-family: var(--mercury-heading-font-family);
+        font-size: 2.2rem;
+        font-weight: var(--mercury-heading-font-weight);
+        line-height: 1.2;
+      }
+      .mercury-page-row { margin: 1rem 0; }
+      .mercury-page-label {
+        display: block;
+        margin-bottom: .35rem;
+        color: var(--mercury-text-color);
+        font-weight: 600;
+      }
+      .mercury-page-input {
+        width: 100%;
+        padding: .65rem .75rem;
+        box-sizing: border-box;
+        background: var(--mercury-widget-background-color);
+        color: var(--mercury-text-color);
+        border: 1px solid var(--mercury-border-color);
+        border-radius: var(--mercury-border-radius);
+        font: inherit;
+      }
+      .mercury-page-input:focus {
+        outline: none;
+        border-color: var(--mercury-focus-border-color);
+        box-shadow: 0 0 0 1px var(--mercury-focus-border-color);
+      }
+      .mercury-page-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: .6rem 1rem;
+        background: var(--mercury-primary-color);
+        color: var(--mercury-button-primary-text);
+        border: 1px solid var(--mercury-primary-color);
+        border-radius: var(--mercury-border-radius);
+        box-shadow: var(--mercury-button-shadow);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .mercury-page-button:hover {
+        color: var(--mercury-button-primary-text);
+        box-shadow: var(--mercury-button-shadow-hover);
+        text-decoration: none;
+      }
+      .mercury-page-button:focus,
+      .mercury-page-button:focus-visible {
+        outline: 2px solid var(--mercury-focus-border-color);
+        outline-offset: 2px;
+      }
+      .mercury-page-message {
+        margin: 1rem 0;
+        padding: .75rem .9rem;
+        color: var(--mercury-text-color);
+        border: 1px solid var(--mercury-border-color);
+        border-radius: var(--mercury-border-radius);
+      }
+      .mercury-page-message.info {
+        background: color-mix(in srgb, var(--mercury-primary-color) 10%, var(--mercury-surface-color));
+        border-color: color-mix(in srgb, var(--mercury-primary-color) 45%, var(--mercury-border-color));
+      }
+      .mercury-page-message.warning,
+      .mercury-page-message.warn {
+        background: color-mix(in srgb, var(--mercury-warning-color) 10%, var(--mercury-surface-color));
+        border-color: color-mix(in srgb, var(--mercury-warning-color) 45%, var(--mercury-border-color));
+      }
+      .mercury-page-message.error {
+        background: color-mix(in srgb, var(--mercury-danger-color) 10%, var(--mercury-surface-color));
+        border-color: color-mix(in srgb, var(--mercury-danger-color) 45%, var(--mercury-border-color));
+      }
+      .mercury-page-muted { color: var(--mercury-muted-text-color); }
+      .mercury-page-card pre {
+        max-width: 100%;
+        padding: .75rem;
+        overflow: auto;
+        box-sizing: border-box;
+        background: var(--mercury-widget-background-color);
+        color: var(--mercury-text-color);
+        border: 1px solid var(--mercury-border-color);
+        border-radius: var(--mercury-border-radius);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      @media (max-width: 480px) {
+        .mercury-page-main { padding: 1.25rem .75rem; }
+        .mercury-page-card { margin: 1rem auto; padding: 1.25rem; }
+        .mercury-page-title { font-size: 1.75rem; }
+      }
+    </style>
 
     {% block stylesheet %}
     {% endblock stylesheet %}

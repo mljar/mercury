@@ -1,0 +1,31 @@
+{% extends "page.html" %}
+
+{% set logged_in = False %}
+
+{% block site %}
+  <header class="mercury-page-header">
+    <div class="mercury-page-header-inner">
+      <div class="mercury-page-brand">{{ page_title or 'Mercury' }}</div>
+    </div>
+  </header>
+
+  <main class="mercury-page-main">
+    <div class="mercury-page-card">
+      <h1 class="mercury-page-title">{% trans %}Logged out{% endtrans %}</h1>
+
+      {% if message %}
+        {% for key in message %}
+          <div class="mercury-page-message {{ key }}">{{ message[key] }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <p>
+        {% if not login_available %}
+          {% trans %}Proceed to the <a href="{{ base_url }}">notebook list{% endtrans %}</a>.
+        {% else %}
+          {% trans %}Proceed to the <a href="{{ base_url }}login">login page{% endtrans %}</a>.
+        {% endif %}
+      </p>
+    </div>
+  </main>
+{% endblock %}
