@@ -63,3 +63,17 @@ def test_error_template_includes_shared_theme_and_error_card():
     assert 'class="mercury-page-card error"' in html
     assert "404: Not Found" in html
     assert "Try another page" in html
+
+
+def test_app_template_uses_versioned_static_url_for_bundle():
+    html = template_environment().get_template("app.html").render(
+        base_url="/",
+        loading_message="Loading",
+        page_config={"fullStaticUrl": "/static/mercury", "theme": {}},
+        starting_icon="spinner",
+        static=lambda path: f"/static/mercury/{path}?v=content-hash",
+        ws_url="",
+    )
+
+    assert 'src="/static/mercury/bundle.js?v=content-hash"' in html
+    assert 'src="/static/mercury/bundle.js"' not in html
