@@ -8,6 +8,7 @@ BLOCKED_PATTERNS = [
     r"/lab(?!/(?:extensions/|api/settings(?:/|$)|api/translations(?:/|$)))(?:/.*)?",
     r"/api/terminals(?:/.*)?",
     r"/api/shutdown(?:/.*)?",
+    r"/api/contents(?:/.*)?",
     r"/files(?:/.*)?",
 ]
 

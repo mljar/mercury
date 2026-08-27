@@ -16,6 +16,8 @@ def test_parse_and_inject_keeps_current_behavior_without_working_dir():
     assert "app.ipynb" in argv
     assert working_dir is None
     assert not any(arg.startswith("--ServerApp.root_dir=") for arg in argv)
+    assert "--IdentityProvider.token=''" in argv
+    assert "--ServerApp.disable_check_xsrf=True" not in argv
 
 
 def test_parse_and_inject_adds_root_dir_and_strips_working_dir(tmp_path):

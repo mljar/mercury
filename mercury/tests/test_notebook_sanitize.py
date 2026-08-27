@@ -70,3 +70,20 @@ def test_sanitize_notebook_removes_runtime_artifacts_and_preserves_app_source():
 
     assert "widgets" in notebook["metadata"]
     assert notebook["cells"][0]["outputs"]
+
+
+def test_sanitize_notebook_assigns_stable_ids_to_legacy_cells():
+    notebook = {
+        "cells": [
+            {"cell_type": "code", "source": "print('first')", "outputs": []},
+            {"cell_type": "code", "source": "print('second')", "outputs": []},
+        ]
+    }
+
+    first = sanitize_notebook_for_mercury_runtime(notebook)
+    second = sanitize_notebook_for_mercury_runtime(notebook)
+    first_ids = [cell["id"] for cell in first["cells"]]
+
+    assert first_ids == [cell["id"] for cell in second["cells"]]
+    assert len(set(first_ids)) == 2
+    assert all(cell_id.startswith("mrc-") for cell_id in first_ids)

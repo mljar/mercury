@@ -26,12 +26,21 @@ from .handlers import (
 from .idle_timeout import (
     TimeoutActivityTransform,
     TimeoutManager,
-    patch_kernel_websocket_handler,
+)
+from .execution import ExecutionRegistry, MercuryKernelWebsocketConnection
+from .execution.handlers import (
+    MercuryCheckpointsHandler,
+    MercuryKernelActionHandler,
+    MercuryKernelHandler,
+    MercuryMainKernelHandler,
+    MercurySessionHandler,
+    MercurySessionRootHandler,
 )
 from .mercury_hybrid_cm import HybridContentsManager
 from .notebooks import NotebooksAPIHandler
 from .root import RootIndexHandler
 from .theme_handler import ThemeHandler
+from .security_mode import detect_standalone_security_mode
 
 
 class SuppressKernelDoesNotExist(logging.Filter):
@@ -123,7 +132,32 @@ class MercuryApp(LabServerApp):
             for pat in BLOCKED_PATTERNS:
                 full_pat = (base_url + pat) if base_url else pat
                 block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
-            app.default_router.rules = block_rules + app.default_router.rules
+            security_handlers = [
+                (
+                    r"/api/contents/(.*\.ipynb)/checkpoints",
+                    MercuryCheckpointsHandler,
+                ),
+                (r"/api/contents/(.*\.ipynb)", MercuryContentsHandler),
+                (
+                    r"/api/sessions/(?P<session_id>\w+-\w+-\w+-\w+-\w+)",
+                    MercurySessionHandler,
+                ),
+                (r"/api/sessions", MercurySessionRootHandler),
+                (
+                    r"/api/kernels/(?P<kernel_id>\w+-\w+-\w+-\w+-\w+)/(?P<action>restart|interrupt)",
+                    MercuryKernelActionHandler,
+                ),
+                (
+                    r"/api/kernels/(?P<kernel_id>\w+-\w+-\w+-\w+-\w+)",
+                    MercuryKernelHandler,
+                ),
+                (r"/api/kernels", MercuryMainKernelHandler),
+            ]
+            security_rules = []
+            for pattern, handler in security_handlers:
+                full_pattern = (base_url + pattern) if base_url else pattern
+                security_rules.append(Rule(PathMatches(full_pattern), handler))
+            app.default_router.rules = security_rules + block_rules + app.default_router.rules
 
     def initialize_templates(self):
         super().initialize_templates()
@@ -140,7 +174,24 @@ class MercuryApp(LabServerApp):
         if is_mercury_app():
             sa = getattr(self, "serverapp", None)
             if not sa:
-                return
+                raise RuntimeError("Mercury execution firewall requires ServerApp")
+
+            if getattr(sa, "disable_check_xsrf", False):
+                raise RuntimeError(
+                    "Mercury standalone mode requires XSRF protection; "
+                    "remove --ServerApp.disable_check_xsrf=True"
+                )
+
+            registry = ExecutionRegistry()
+            security_mode = detect_standalone_security_mode(sa)
+            for settings in (self.settings, sa.web_app.settings):
+                settings["mercury_execution_registry"] = registry
+                settings["mercury_security_mode"] = security_mode.value
+                settings["kernel_websocket_connection_class"] = (
+                    MercuryKernelWebsocketConnection
+                )
+            self.log.warning("Mercury security mode: %s", security_mode.value)
+
             cm = getattr(sa, "contents_manager", None)
             if not cm or getattr(cm, "_mercury_wrapped", False):
                 return
@@ -187,7 +238,6 @@ class MercuryApp(LabServerApp):
             self._timeout_manager = TimeoutManager(self.timeout, self.serverapp)
             self.serverapp.web_app._timeout_manager = self._timeout_manager
             self.serverapp.web_app.add_transform(TimeoutActivityTransform)
-            patch_kernel_websocket_handler()
 
         
 main = launch_new_instance = MercuryApp.launch_instance

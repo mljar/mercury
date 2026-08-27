@@ -8,6 +8,7 @@ import type { Cell } from '@jupyterlab/cells';
 import { IEditorServices } from '@jupyterlab/codeeditor';
 import { PageConfig, signalToPromise } from '@jupyterlab/coreutils';
 import { IDocumentManager } from '@jupyterlab/docmanager';
+import { CommsOverSubshells } from '@jupyterlab/services';
 import { ITranslator } from '@jupyterlab/translation';
 import { PromiseDelegate } from '@lumino/coreutils';
 import { type AppWidget, type MercuryWidget } from '@mljar/mercury-extension';
@@ -36,6 +37,11 @@ export const plugin: JupyterFrontEndPlugin<void> = {
     translator: ITranslator | null
   ) => {
     console.info('[Mercury] Activating standalone app opener');
+    // Public Mercury apps deliberately expose a smaller kernel protocol than
+    // JupyterLab. Keep widget comms on the main shell so JupyterLab does not
+    // create extra execution contexts that the server firewall must expose.
+    app.serviceManager.kernels.commsOverSubshells =
+      CommsOverSubshells.Disabled;
     const { mimeTypeService } = editorServices ?? {};
     Promise.all([app.started, app.restored])
       .then(async () => {
@@ -165,17 +171,31 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               await waitForKernelReady(kernelConnection);
 
               if (kernelConnection) {
+                const standalone =
+                  PageConfig.getOption('mercuryStandalone') === 'true';
                 const syncUrlParamsCode = `
 from mercury.url_params import set_runtime_url_params
 set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
 `.trim();
-                const future = kernelConnection.requestExecute({
-                  code: syncUrlParamsCode,
-                  silent: true,
-                  store_history: false,
-                  stop_on_error: false,
-                  allow_stdin: false
-                });
+                const future = kernelConnection.requestExecute(
+                  {
+                    code: standalone ? '' : syncUrlParamsCode,
+                    silent: true,
+                    store_history: false,
+                    stop_on_error: false,
+                    allow_stdin: false
+                  },
+                  false,
+                  standalone
+                    ? {
+                        mercury: {
+                          kind: 'action',
+                          name: 'url_params.sync',
+                          payload: { params: runtimeUrlParams }
+                        }
+                      }
+                    : undefined
+                );
                 try {
                   await future.done;
                 } catch (err) {

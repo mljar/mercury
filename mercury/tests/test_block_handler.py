@@ -22,4 +22,6 @@ def test_lab_and_other_sensitive_endpoints_are_blocked():
     assert is_blocked("/lab")
     assert is_blocked("/lab/workspaces/default")
     assert is_blocked("/api/shutdown")
+    assert is_blocked("/api/contents")
+    assert is_blocked("/api/contents/secrets.env")
     assert is_blocked("/files/private.txt")
