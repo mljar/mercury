@@ -22,6 +22,7 @@ import {
   codeCellExecute,
   executeWidgetsManagerClearValues
 } from '../../executor/codecell';
+import { isStopExecutionReply } from '../../executor/stop';
 // import {
 //   getWidgetManager,
 //   resolveIpyModel,
@@ -1258,7 +1259,13 @@ export class AppWidget extends Panel {
           continue;
         }
 
-        await codeCellExecute(child, this._model.context.sessionContext);
+        const reply = await codeCellExecute(
+          child,
+          this._model.context.sessionContext
+        );
+        if (isStopExecutionReply(reply)) {
+          break;
+        }
         // await every 5th cell
         // if ((i - fromIndex) % 2 === 0) {
         //   await codeCellExecute(child, this._model.context.sessionContext);
@@ -1349,13 +1356,16 @@ export class AppWidget extends Panel {
 
       const item = this._cellItems.find(w => w.cellId === m.id);
       if (item && item.child instanceof CodeCell) {
-        await codeCellExecute(
+        const reply = await codeCellExecute(
           item.child as CodeCell,
           this._model.context.sessionContext,
           {
             deletedCells: this._model.context.model?.deletedCells ?? []
           }
         );
+        if (isStopExecutionReply(reply)) {
+          break;
+        }
       }
     }
     await executeWidgetsManagerClearValues(this._model.context.sessionContext);

@@ -15,11 +15,11 @@ class StopExecution(Exception):
 
 def Stop():
     """
-    Stop execution of the current notebook cell silently.
+    Stop the current Mercury notebook execution flow silently.
 
     This function raises an internal exception that is intercepted
-    by Jupyter, preventing further execution without showing
-    an error or traceback.
+    by Mercury, preventing the rest of the current cell and following
+    cells from executing without showing an error or traceback.
 
     Examples
     --------

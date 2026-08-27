@@ -7,6 +7,7 @@ import { widgets } from './widgets';
 import { commands } from './commands';
 
 import { mercuryCellExecutor, defaultCellExecutor } from './executor';
+export { isStopExecutionError, isStopExecutionReply } from './executor/stop';
 
 export {
   IMercuryTracker,

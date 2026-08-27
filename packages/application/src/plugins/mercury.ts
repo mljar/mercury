@@ -11,7 +11,11 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { CommsOverSubshells } from '@jupyterlab/services';
 import { ITranslator } from '@jupyterlab/translation';
 import { PromiseDelegate } from '@lumino/coreutils';
-import { type AppWidget, type MercuryWidget } from '@mljar/mercury-extension';
+import {
+  isStopExecutionError,
+  type AppWidget,
+  type MercuryWidget
+} from '@mljar/mercury-extension';
 //import { INotebookCellExecutor } from '@mljar/mercury-tokens';
 
 import { MercuryNavbar } from './navbar';
@@ -211,6 +215,7 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                   console.info('[Mercury] Executing cells');
 
                   const scheduledForExecution = new Set<string>();
+                  let stopExecutionRequested = false;
                   const notebook = mercuryPanel.context.model;
                   const appWidget = mercuryPanel.content.widgets[0] as AppWidget;
                   const totalCells = notebook.cells.length;
@@ -223,8 +228,13 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                     scheduledForExecution.add(args.cell.model.id);
                   };
 
-                  const onCellExecuted = (args: { cell: Cell }) => {
+                  const onCellExecuted = (args: {
+                    cell: Cell;
+                    success: boolean;
+                    error?: { errorName?: string } | null;
+                  }) => {
                     scheduledForExecution.delete(args.cell.model.id);
+                    stopExecutionRequested = isStopExecutionError(args.error);
                   };
 
                   if (appWidget.cellWidgets.length === 0 && totalCells > 0) {
@@ -232,6 +242,7 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                   }
 
                   for (const cellItem of appWidget.cellWidgets) {
+                    stopExecutionRequested = false;
                     if (mimetype) {
                       cellItem.child.model.mimeType = mimetype;
                     }
@@ -245,6 +256,9 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                       sessionDialogs: sessionContextDialogs ?? undefined,
                       translator: translator ?? undefined
                     });
+                    if (stopExecutionRequested) {
+                      break;
+                    }
                   }
 
                   const waitForExecution = new PromiseDelegate<void>();

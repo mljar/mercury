@@ -6,7 +6,7 @@ description: How to stop execution in a Mercury App with mr.Stop
 import { Code } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 
-The **Stop** helper lets you stop executing a notebook cell **silently** inside a Mercury App.
+The **Stop** helper lets you stop the current notebook execution flow **silently** inside a Mercury App.
 It is useful for early exits like validation, missing inputs, or conditional flows (for example: stop until the user uploads a file).
 
 ## Usage
@@ -69,7 +69,7 @@ print("Running with threshold:", threshold.value)
 
 ### mr.Stop()
 
-Stops execution of the current notebook cell.
+Stops the current notebook execution flow. The rest of the current cell and all following cells are skipped.
 
 * It raises an internal exception used only for flow control.
 * It does **not** show a traceback.
