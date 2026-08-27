@@ -215,7 +215,6 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                   console.info('[Mercury] Executing cells');
 
                   const scheduledForExecution = new Set<string>();
-                  let stopExecutionRequested = false;
                   const notebook = mercuryPanel.context.model;
                   const appWidget = mercuryPanel.content.widgets[0] as AppWidget;
                   const totalCells = notebook.cells.length;
@@ -228,13 +227,8 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                     scheduledForExecution.add(args.cell.model.id);
                   };
 
-                  const onCellExecuted = (args: {
-                    cell: Cell;
-                    success: boolean;
-                    error?: { errorName?: string } | null;
-                  }) => {
+                  const onCellExecuted = (args: { cell: Cell }) => {
                     scheduledForExecution.delete(args.cell.model.id);
-                    stopExecutionRequested = isStopExecutionError(args.error);
                   };
 
                   if (appWidget.cellWidgets.length === 0 && totalCells > 0) {
@@ -242,22 +236,29 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                   }
 
                   for (const cellItem of appWidget.cellWidgets) {
-                    stopExecutionRequested = false;
                     if (mimetype) {
                       cellItem.child.model.mimeType = mimetype;
                     }
-                    await executor.runCell({
-                      cell: cellItem.child,
-                      notebook,
-                      notebookConfig: mercuryPanel.content.notebookConfig,
-                      onCellExecuted: onCellExecuted,
-                      onCellExecutionScheduled: onCellExecutionScheduled,
-                      sessionContext: mercuryPanel.context.sessionContext,
-                      sessionDialogs: sessionContextDialogs ?? undefined,
-                      translator: translator ?? undefined
-                    });
-                    if (stopExecutionRequested) {
-                      break;
+                    try {
+                      await executor.runCell({
+                        cell: cellItem.child,
+                        notebook,
+                        notebookConfig: mercuryPanel.content.notebookConfig,
+                        onCellExecuted: onCellExecuted,
+                        onCellExecutionScheduled: onCellExecutionScheduled,
+                        sessionContext: mercuryPanel.context.sessionContext,
+                        sessionDialogs: sessionContextDialogs ?? undefined,
+                        translator: translator ?? undefined
+                      });
+                    } catch (error) {
+                      if (
+                        isStopExecutionError(
+                          error as { errorName?: string; message?: string }
+                        )
+                      ) {
+                        break;
+                      }
+                      throw error;
                     }
                   }
 

@@ -12,6 +12,7 @@ import './extraStyle';
 
 // mercury application
 import mercuryPlugins, { MercuryApp } from 'mercury-application';
+import mercuryExtensionPlugins from '@mljar/mercury-extension';
 
 // mime extensions
 import jsMime from '@jupyterlab/javascript-extension';
@@ -30,6 +31,7 @@ import notebookExt from '@jupyterlab/notebook-extension';
 import rendermimeExt from '@jupyterlab/rendermime-extension';
 import shortcutsExt from '@jupyterlab/shortcuts-extension';
 import translationExt from '@jupyterlab/translation-extension';
+import widgetManagerExt from '@jupyter-widgets/jupyterlab-manager';
 
 // Trick to include package required by ipywidgets in the webpack shared scope.
 import('@jupyterlab/console').catch(reason => {
@@ -103,6 +105,7 @@ async function main() {
   // base mods (no dynamic import())
   const baseMods = [
     // mercury plugins
+    mercuryExtensionPlugins,
     mercuryPlugins,
 
     // @jupyterlab plugins (filtered)
@@ -146,6 +149,7 @@ async function main() {
 
     rendermimeExt,
     shortcutsExt,
+    widgetManagerExt,
 
     filterPlugins(normalizePlugins(translationExt), [
       '@jupyterlab/translation-extension:translator'
@@ -154,7 +158,13 @@ async function main() {
 
   // ---- Federated extensions still supported (Module Federation kept) ----
   const extensionRaw = PageConfig.getOption('federated_extensions');
-  const extension_data = extensionRaw ? JSON.parse(extensionRaw) : [];
+  const bundledExtensions = new Set([
+    '@jupyter-widgets/jupyterlab-manager',
+    '@mljar/mercury-extension'
+  ]);
+  const extension_data = extensionRaw
+    ? JSON.parse(extensionRaw).filter(data => !bundledExtensions.has(data.name))
+    : [];
 
   // Add the base frontend extensions
   baseMods.forEach(p => {

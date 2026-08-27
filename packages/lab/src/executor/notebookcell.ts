@@ -16,6 +16,7 @@ import {
 import { findIndex } from '@lumino/algorithm';
 
 import { codeCellExecute } from './codecell';
+import { isStopExecutionError } from './stop';
 
 export class NotebookCellExecutor implements INotebookCellExecutor {
   async runCell({
@@ -123,6 +124,9 @@ export class NotebookCellExecutor implements INotebookCellExecutor {
               success: false,
               error: reason as any
             });
+            if (isStopExecutionError(reason as KernelError)) {
+              throw reason;
+            }
             // if (cell.isDisposed || (reason as any).message.startsWith('Canceled')) {
             //   ran = false;
             // } else {

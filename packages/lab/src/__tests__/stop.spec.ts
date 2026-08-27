@@ -39,6 +39,11 @@ describe('StopExecution detection', () => {
 
   it('recognizes the KernelError produced for StopExecution', () => {
     expect(isStopExecutionError({ errorName: 'StopExecution' })).toBe(true);
+    expect(
+      isStopExecutionError({
+        message: 'KernelReplyNotOK: StopExecution '
+      })
+    ).toBe(true);
     expect(isStopExecutionError({ errorName: 'ValueError' })).toBe(false);
     expect(isStopExecutionError(undefined)).toBe(false);
   });

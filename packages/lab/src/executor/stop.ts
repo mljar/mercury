@@ -12,7 +12,16 @@ export function isStopExecutionReply(
 }
 
 export function isStopExecutionError(
-  error: { errorName?: string } | null | undefined
+  error:
+    | { errorName?: string; ename?: string; message?: string }
+    | null
+    | undefined
 ): boolean {
-  return error?.errorName === STOP_EXECUTION_ERROR_NAME;
+  return (
+    error?.errorName === STOP_EXECUTION_ERROR_NAME ||
+    error?.ename === STOP_EXECUTION_ERROR_NAME ||
+    error?.message?.includes(
+      `KernelReplyNotOK: ${STOP_EXECUTION_ERROR_NAME}`
+    ) === true
+  );
 }
