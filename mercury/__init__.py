@@ -64,6 +64,7 @@ from .tabs import Tabs
 from .json import JSON
 from .md import Markdown
 from .indicator import Indicator
+from .activity_calendar import ActivityCalendar
 from .table import Table
 from .image import ImageCard
 from .download import Download

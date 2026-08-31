@@ -17,7 +17,8 @@ dependencies = [
     "jupyterlab_server>=2,<3",
     "anywidget>=0.9.0",   
     "toml",
-    "markdown"
+    "markdown",
+    "pandas"
     ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
