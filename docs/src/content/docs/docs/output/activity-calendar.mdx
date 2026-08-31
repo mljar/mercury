@@ -1,0 +1,125 @@
+---
+title: Activity Calendar
+description: Display prepared daily numeric data as a GitHub-style activity calendar
+---
+
+The `ActivityCalendar` output widget displays one numeric value per calendar day. It
+fills missing dates with inactive squares and generates lighter intensity shades from
+one selected color.
+
+`ActivityCalendar` does not aggregate data. Prepare exactly one row per day before
+passing the DataFrame to Mercury.
+
+## Basic usage
+
+```python
+import pandas as pd
+import mercury as mr
+
+df = pd.DataFrame({
+    "date": [
+        "2026-08-20",
+        "2026-08-21",
+        "2026-08-22",
+        "2026-08-23",
+    ],
+    "outage_hours": [0.5, 2.1, 0, 4.8],
+})
+
+mr.ActivityCalendar(
+    df,
+    date="date",
+    value="outage_hours",
+    title="GitHub outages",
+    unit="hours",
+)
+```
+
+Green is the default activity color. Zero values and days missing from the DataFrame
+use the inactive theme color.
+
+## Colors and intensity
+
+Select a green or red calendar with a single option:
+
+```python
+mr.ActivityCalendar(df, date="date", value="outage_hours", color="green")
+mr.ActivityCalendar(df, date="date", value="outage_hours", color="red")
+```
+
+Mercury treats the selected color as the strongest activity level and automatically
+generates lighter shades for lower levels. Named colors use the theme success and
+danger colors, so they follow customized Mercury themes.
+
+You can also provide a custom hex color:
+
+```python
+mr.ActivityCalendar(
+    df,
+    date="date",
+    value="outage_hours",
+    color="#8b5cf6",
+)
+```
+
+With the default `levels=5`, the scale contains one inactive level and four positive
+intensity levels. Positive values are placed on a linear scale from zero to the
+largest value in the displayed date range.
+
+## Date range
+
+By default, the calendar starts at the earliest date and ends at the latest date in
+the DataFrame. Extend or limit the displayed range with inclusive boundaries:
+
+```python
+mr.ActivityCalendar(
+    df,
+    date="date",
+    value="outage_hours",
+    start_date="2026-01-01",
+    end_date="2026-12-31",
+)
+```
+
+Missing days inside the range are rendered as inactive squares. A range spanning
+multiple years is rendered as one calendar per year, using the same intensity scale.
+
+## Optional labels
+
+Month labels, weekday labels, and the legend are enabled by default. Hide any of them
+independently:
+
+```python
+mr.ActivityCalendar(
+    df,
+    date="date",
+    value="outage_hours",
+    show_months=False,
+    show_weekdays=False,
+    show_legend=False,
+)
+```
+
+Every square includes an accessible label and a native tooltip containing the date,
+value, and optional unit. Calendars keep fixed-size squares and scroll horizontally
+inside narrow layouts such as `mr.Columns(2)`.
+
+## Parameters
+
+| Parameter | Description | Default |
+|---|---|---|
+| `data` | A non-empty pandas DataFrame with one row per day | required |
+| `date` | Date column name | `"date"` |
+| `value` | Numeric value column name | `"value"` |
+| `title` | Optional heading | `None` |
+| `unit` | Unit shown in tooltips and near the legend | `None` |
+| `color` | `"green"`, `"red"`, or a hex color | green |
+| `start_date` | Inclusive first displayed day | earliest data date |
+| `end_date` | Inclusive last displayed day | latest data date |
+| `levels` | Total intensity levels, including inactive; minimum `2` | `5` |
+| `show_legend` | Display the Less–More legend | `True` |
+| `show_weekdays` | Display weekday labels | `True` |
+| `show_months` | Display month labels | `True` |
+
+Duplicate normalized dates raise an error. Aggregate duplicate dates yourself before
+constructing the calendar so the widget never silently sums or averages user data.

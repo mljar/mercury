@@ -104,12 +104,48 @@ def test_custom_color_is_the_strongest_level():
     assert 'fill="#f85149"' in html
 
 
-def test_default_strongest_color_uses_mercury_primary_color():
-    html = calendar(
+def test_default_strongest_color_uses_mercury_success_color():
+    widget = calendar(
         pd.DataFrame({"date": ["2026-01-01"], "value": [10]})
-    )._repr_html_()
+    )
+    html = widget._repr_html_()
 
-    assert f'fill="{THEME["primary_color"]}"' in html
+    assert f'fill="{THEME["success_color"]}"' in html
+    assert len(set(widget._active_colors)) == widget.levels - 1
+
+
+@pytest.mark.parametrize(
+    ("color", "theme_color"),
+    [
+        ("green", "success_color"),
+        ("GREEN", "success_color"),
+        ("red", "danger_color"),
+        ("RED", "danger_color"),
+    ],
+)
+def test_named_color_presets_are_case_insensitive(color, theme_color):
+    widget = calendar(
+        pd.DataFrame({"date": ["2026-01-01"], "value": [10]}), color=color
+    )
+
+    assert widget._strongest_color == THEME[theme_color]
+    assert widget._active_colors[-1] == THEME[theme_color]
+
+
+def test_short_custom_hex_color_is_supported_and_expanded_for_intensity():
+    widget = calendar(
+        pd.DataFrame({"date": ["2026-01-01"], "value": [10]}), color="#abc"
+    )
+
+    assert widget._active_colors[-1] == "#aabbcc"
+
+
+@pytest.mark.parametrize("color", ["blue", "#12", "#gggggg", 42])
+def test_invalid_color_is_rejected(color):
+    data = pd.DataFrame({"date": ["2026-01-01"], "value": [1]})
+
+    with pytest.raises(ValueError, match="color must be 'green', 'red'"):
+        calendar(data, color=color)
 
 
 def test_linear_intensity_uses_all_configured_levels():

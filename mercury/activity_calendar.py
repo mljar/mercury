@@ -25,7 +25,8 @@ class ActivityCalendar:
     unit : str or None, optional
         Unit appended to active-day tooltips and displayed by the legend.
     color : str or None, optional
-        Strongest activity color. The Mercury primary color is used by default.
+        Strongest activity color. Use ``"green"``, ``"red"``, or a hex color.
+        Lower intensity colors are generated automatically. Green is the default.
     start_date, end_date : date-like or None, optional
         Inclusive calendar boundaries. Data boundaries are used when omitted.
     levels : int, optional
@@ -47,6 +48,10 @@ class ActivityCalendar:
     _CELL_GAP = 3
     _WEEKDAY_LABEL_WIDTH = 32
     _MONTH_LABEL_HEIGHT = 20
+    _COLOR_PRESETS = {
+        "green": "success_color",
+        "red": "danger_color",
+    }
 
     def __init__(
         self,
@@ -141,7 +146,7 @@ class ActivityCalendar:
         self._max_value = max(positive_values, default=0.0)
         self._inactive_color = THEME.get("panel_bg_hover_2", "#eef2f7")
         self._surface_color = THEME.get("surface_color", "#ffffff")
-        self._strongest_color = color or THEME.get("primary_color", "#007bff")
+        self._strongest_color = self._resolve_color(color)
         self._active_colors = [
             self._mix_colors(
                 self._strongest_color,
@@ -194,6 +199,27 @@ class ActivityCalendar:
             return tuple(int(value[index : index + 2], 16) for index in (0, 2, 4))
         except ValueError:
             return None
+
+    @classmethod
+    def _resolve_color(cls, color):
+        if color is None:
+            color = "green"
+        if not isinstance(color, str):
+            raise ValueError(
+                "ActivityCalendar color must be 'green', 'red', or a hex color."
+            )
+
+        normalized = color.strip()
+        preset = cls._COLOR_PRESETS.get(normalized.lower())
+        if preset is not None:
+            fallback = "#19b96c" if preset == "success_color" else "#dc3545"
+            return THEME.get(preset, fallback)
+        if cls._parse_hex_color(normalized) is not None:
+            return normalized
+        raise ValueError(
+            "ActivityCalendar color must be 'green', 'red', or a hex color "
+            "such as '#f85149'."
+        )
 
     @classmethod
     def _mix_colors(cls, foreground, background, ratio):
