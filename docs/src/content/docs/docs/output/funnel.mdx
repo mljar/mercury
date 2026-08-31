@@ -1,0 +1,138 @@
+---
+title: Funnel
+description: Display conversion stages as a responsive funnel chart
+---
+
+The `Funnel` output widget displays an ordered sequence of stages. Each section's
+width represents its value, and the percentage shows conversion from either the
+previous stage or the first stage.
+
+Prepare one aggregated value per stage before constructing the widget. `Funnel`
+preserves the supplied order and does not sort or aggregate data.
+
+## Basic usage
+
+```python
+import pandas as pd
+import mercury as mr
+
+df = pd.DataFrame({
+    "stage": [
+        "Visitors",
+        "Signups",
+        "Trials",
+        "Customers",
+    ],
+    "users": [
+        10000,
+        3200,
+        1200,
+        340,
+    ],
+})
+
+mr.Funnel(
+    df,
+    stage="stage",
+    value="users",
+)
+```
+
+You can also pass two-item tuples or an ordered dictionary:
+
+```python
+mr.Funnel([
+    ("Visitors", 10000),
+    ("Signups", 3200),
+    ("Trials", 1200),
+    ("Customers", 340),
+])
+```
+
+## Percentages
+
+By default, each percentage compares the stage with the previous stage:
+
+```python
+mr.Funnel(df, stage="stage", value="users", percentage="previous")
+```
+
+Use `percentage="first"` to compare every stage with the first stage:
+
+```python
+mr.Funnel(df, stage="stage", value="users", percentage="first")
+```
+
+The first stage displays `100%`. When the comparison stage is zero, Mercury displays
+an em dash instead of NaN or infinity. Increasing values are supported and can produce
+percentages greater than 100%.
+
+## Customize the funnel
+
+```python
+mr.Funnel(
+    df,
+    stage="stage",
+    value="users",
+    height=500,
+    show_values=True,
+    show_percentage=True,
+    percentage="first",
+    colors=[
+        "#1d4ed8",
+        "#2563eb",
+        "#3b82f6",
+        "#60a5fa",
+    ],
+)
+```
+
+`colors` accepts a list that cycles through stages or a dictionary that assigns colors
+to stage names. When colors are omitted, Mercury generates coordinated shades from the
+theme's primary color.
+
+Hide values or percentages independently:
+
+```python
+mr.Funnel(df, stage="stage", value="users", show_values=False)
+mr.Funnel(df, stage="stage", value="users", show_percentage=False)
+```
+
+## Input requirements
+
+Every stage needs a non-empty name and a finite, non-negative numeric value. Zero values
+are supported. Values do not need to decrease, and stages always remain in input order.
+
+The input should already contain one row per funnel stage:
+
+```text
+stage     | value
+Visitors  | 10000
+Signups   | 3200
+Trials    | 1200
+Customers | 340
+```
+
+## Labels, tooltips, and responsive layout
+
+Labels are placed beside the funnel so they remain readable for very small and zero
+stages. Each section includes a native browser tooltip and an accessible label. The SVG
+fills the available width and scrolls horizontally only when its container becomes too
+narrow to keep labels readable.
+
+## Parameters
+
+| Parameter | Description | Default |
+|---|---|---|
+| `data` | DataFrame, two-item tuples, row dictionaries, or ordered dictionary | required |
+| `stage` | Stage column or row-dictionary key | `"stage"` |
+| `value` | Numeric value column or row-dictionary key | `"value"` |
+| `colors` | Hex color list, stage-color dictionary, or `None` | `None` |
+| `height` | Optional SVG layout height | `None` |
+| `show_values` | Display formatted values | `True` |
+| `show_percentage` | Display conversion percentages | `True` |
+| `percentage` | Compare with `"previous"` or `"first"` stage | `"previous"` |
+| `value_format` | Python numeric format specification | `","` |
+
+The implementation is generated entirely in Python and rendered as SVG. It does not
+load Plotly, D3, or another JavaScript charting library.
