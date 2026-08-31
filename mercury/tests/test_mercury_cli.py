@@ -70,6 +70,43 @@ def test_parse_and_inject_maps_env_timeout_to_server_shutdown(monkeypatch):
     assert "--ServerApp.shutdown_no_activity_timeout=900" in argv
 
 
+def test_parse_and_inject_enables_supported_kernel_encryption(monkeypatch):
+    monkeypatch.setattr(
+        __main__, "_curve_transport_encryption_available", lambda: True
+    )
+
+    argv, _ = __main__._parse_and_inject(["mercury", "app.ipynb"])
+
+    assert "--KernelManager.transport_encryption=auto" in argv
+
+
+def test_parse_and_inject_remains_compatible_without_kernel_encryption(monkeypatch):
+    monkeypatch.setattr(
+        __main__, "_curve_transport_encryption_available", lambda: False
+    )
+
+    argv, _ = __main__._parse_and_inject(["mercury", "app.ipynb"])
+
+    assert not any("transport_encryption" in arg for arg in argv)
+
+
+@pytest.mark.parametrize("policy", ["required", "disabled"])
+def test_parse_and_inject_preserves_explicit_encryption_policy(monkeypatch, policy):
+    monkeypatch.setattr(
+        __main__, "_curve_transport_encryption_available", lambda: True
+    )
+    option = f"--KernelManager.transport_encryption={policy}"
+
+    argv, _ = __main__._parse_and_inject(["mercury", "app.ipynb", option])
+
+    encryption_options = [arg for arg in argv if "transport_encryption" in arg]
+    assert encryption_options == [option]
+
+
+def test_curve_transport_encryption_detection_returns_boolean():
+    assert isinstance(__main__._curve_transport_encryption_available(), bool)
+
+
 def test_main_changes_directory_before_launch(monkeypatch, tmp_path):
     workdir = tmp_path / "apps"
     workdir.mkdir()

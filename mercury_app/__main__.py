@@ -22,6 +22,21 @@ logo = r"""
 
 LEVEL_NAMES = ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
+
+def _curve_transport_encryption_available() -> bool:
+    """Return whether this Jupyter stack can safely enable CurveZMQ."""
+    try:
+        import zmq
+        from jupyter_client import KernelManager
+
+        return (
+            "transport_encryption" in KernelManager.class_traits()
+            and zmq.has("curve")
+        )
+    except (ImportError, AttributeError):
+        return False
+
+
 def _resolve_working_dir(working_dir: str | None) -> str | None:
     if working_dir is None:
         return None
@@ -191,6 +206,13 @@ def _parse_and_inject(argv):
 
     new_argv.append("--ContentsManager.allow_hidden=True")
     new_argv.append("--MappingKernelManager.default_kernel_name='python3'")
+
+    encryption_already_set = any(
+        arg.startswith("--KernelManager.transport_encryption")
+        for arg in new_argv
+    )
+    if not encryption_already_set and _curve_transport_encryption_available():
+        new_argv.append("--KernelManager.transport_encryption=auto")
 
     # Build ServerApp.tornado_settings if not already provided
     tornado_already_set = any(
