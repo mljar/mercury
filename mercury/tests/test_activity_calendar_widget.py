@@ -1,3 +1,5 @@
+import re
+
 import pandas as pd
 import pytest
 
@@ -168,6 +170,7 @@ def test_legend_contains_one_cell_per_level():
     )._repr_html_()
 
     assert html.count('<span class="mljar-activity-calendar-legend-cell"') == 7
+    assert "justify-content: flex-start;" in html
 
 
 def test_title_and_unit_are_rendered_including_tooltip():
@@ -197,6 +200,32 @@ def test_multiple_years_render_separate_calendars_with_one_scale():
     assert '<div class="mljar-activity-calendar-year-label">2026</div>' in html
     assert 'data-date="2025-12-31" data-level="1"' in html
     assert 'data-date="2026-01-01" data-level="4"' in html
+
+
+def test_partial_multi_year_range_aligns_months_on_full_year_grids():
+    html = calendar(
+        pd.DataFrame(
+            {
+                "date": ["2025-06-15", "2026-06-15"],
+                "value": [1, 2],
+            }
+        ),
+        end_date="2026-12-31",
+    )._repr_html_()
+
+    june_positions = re.findall(
+        r'class="mljar-activity-calendar-month" x="(\d+)" y="11">Jun', html
+    )
+    svg_widths = re.findall(
+        r'class="mljar-activity-calendar-svg" width="(\d+)"', html
+    )
+
+    assert len(june_positions) == 2
+    assert len(set(june_positions)) == 1
+    assert int(june_positions[0]) > ActivityCalendar._WEEKDAY_LABEL_WIDTH
+    assert len(svg_widths) == 2
+    assert len(set(svg_widths)) == 1
+    assert 'data-date="2025-01-01"' not in html
 
 
 def test_hidden_legend_is_not_rendered():

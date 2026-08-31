@@ -48,6 +48,7 @@ class ActivityCalendar:
     _CELL_GAP = 3
     _WEEKDAY_LABEL_WIDTH = 32
     _MONTH_LABEL_HEIGHT = 20
+    _MULTI_YEAR_WEEK_COUNT = 54
     _COLOR_PRESETS = {
         "green": "success_color",
         "red": "danger_color",
@@ -310,7 +311,7 @@ class ActivityCalendar:
 .mljar-activity-calendar-legend {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 5px;
     margin-top: 8px;
@@ -343,10 +344,19 @@ class ActivityCalendar:
         }
 
     def _year_svg(self, year):
-        segment_start = max(self.start_date, pd.Timestamp(year=year, month=1, day=1))
-        segment_end = min(self.end_date, pd.Timestamp(year=year, month=12, day=31))
-        week_anchor = segment_start - pd.Timedelta(days=segment_start.weekday())
-        week_count = ((segment_end - week_anchor).days // 7) + 1
+        year_start = pd.Timestamp(year=year, month=1, day=1)
+        year_end = pd.Timestamp(year=year, month=12, day=31)
+        segment_start = max(self.start_date, year_start)
+        segment_end = min(self.end_date, year_end)
+        multiple_years = len(self._years()) > 1
+        layout_start = year_start if multiple_years else segment_start
+        layout_end = year_end if multiple_years else segment_end
+        week_anchor = layout_start - pd.Timedelta(days=layout_start.weekday())
+        week_count = (
+            self._MULTI_YEAR_WEEK_COUNT
+            if multiple_years
+            else ((layout_end - week_anchor).days // 7) + 1
+        )
         step = self._CELL_SIZE + self._CELL_GAP
         left = self._WEEKDAY_LABEL_WIDTH if self.show_weekdays else 0
         top = self._MONTH_LABEL_HEIGHT if self.show_months else 0
@@ -358,7 +368,11 @@ class ActivityCalendar:
             month = segment_start.replace(day=1)
             while month <= segment_end:
                 visible_month_day = max(month, segment_start)
-                week = (visible_month_day - week_anchor).days // 7
+                week = (
+                    round((month.month - 1) * 52 / 12)
+                    if multiple_years
+                    else (visible_month_day - week_anchor).days // 7
+                )
                 x = left + week * step
                 elements.append(
                     f'<text class="mljar-activity-calendar-month" x="{x}" y="11">'
