@@ -188,6 +188,48 @@ def _assign_depths(graph, topological_order):
     return depths
 
 
+def _expand_links_for_layout(graph, depths):
+    """Split links that skip columns into adjacent layout-only segments."""
+    routing_nodes = []
+    layout_links = []
+    for link_index, link in enumerate(graph["links"]):
+        source = link["source"]
+        target = link["target"]
+        previous = source
+        for depth in range(depths[source] + 1, depths[target]):
+            routing_node = ("__mercury_sankey_route__", link_index, depth)
+            routing_nodes.append(routing_node)
+            layout_links.append(
+                {
+                    "source": previous,
+                    "target": routing_node,
+                    "value": link["value"],
+                    "original_source": source,
+                    "original_target": target,
+                }
+            )
+            previous = routing_node
+        layout_links.append(
+            {
+                "source": previous,
+                "target": target,
+                "value": link["value"],
+                "original_source": source,
+                "original_target": target,
+            }
+        )
+
+    layout_graph = _build_graph(layout_links)
+    layout_graph["nodes"] = graph["nodes"] + routing_nodes
+    layout_graph["order"] = {
+        node: index for index, node in enumerate(layout_graph["nodes"])
+    }
+    layout_depths = dict(depths)
+    for routing_node in routing_nodes:
+        layout_depths[routing_node] = routing_node[2]
+    return layout_graph, layout_depths, set(routing_nodes)
+
+
 def _order_nodes(graph, depths, passes=4):
     max_depth = max(depths.values())
     columns = [
@@ -235,6 +277,18 @@ def _order_nodes(graph, depths, passes=4):
                     for link in graph["outgoing"][node]
                 ],
             )
+    # Finish in the direction of flow so each column reflects the ordering of
+    # the column immediately before it. This is especially important for
+    # routing nodes, where a final right-to-left sweep can reintroduce a
+    # crossing between two otherwise parallel ribbons.
+    for depth in range(1, max_depth + 1):
+        reorder(
+            depth,
+            lambda node: [
+                (link["source"], link["value"])
+                for link in graph["incoming"][node]
+            ],
+        )
     return columns
 
 
@@ -254,11 +308,12 @@ def _calculate_node_layout(
     node_width,
     node_padding,
     diagram_width,
+    left_margin=24.0,
+    right_margin=24.0,
+    routing_nodes=None,
 ):
-    top_margin = 20.0
+    top_margin = 36.0
     bottom_margin = 20.0
-    left_margin = 24.0
-    right_margin = 24.0
     values = _node_values(graph)
     scale_candidates = []
     for column in columns:
@@ -277,6 +332,7 @@ def _calculate_node_layout(
 
     max_depth = len(columns) - 1
     horizontal_space = diagram_width - left_margin - right_margin - node_width
+    routing_nodes = routing_nodes or set()
     layout = {}
     for depth, column in enumerate(columns):
         x = left_margin + horizontal_space * depth / max_depth
@@ -288,7 +344,7 @@ def _calculate_node_layout(
             layout[node] = {
                 "x": x,
                 "y": y,
-                "width": node_width,
+                "width": 0 if node in routing_nodes else node_width,
                 "height": node_height,
                 "value": values[node],
                 "depth": depth,
@@ -503,20 +559,57 @@ class Sankey:
         self.graph = _build_graph(self.links)
         self.topological_order = _topological_sort(self.graph)
         self.depths = _assign_depths(self.graph, self.topological_order)
-        self.columns = _order_nodes(self.graph, self.depths)
-        self.diagram_width = max(600.0, len(self.columns) * 180.0)
+        self.layout_graph, self.layout_depths, self.routing_nodes = (
+            _expand_links_for_layout(self.graph, self.depths)
+        )
+        self.columns = _order_nodes(self.layout_graph, self.layout_depths)
+        values = _node_values(self.graph)
+        first_column_labels = [
+            self._label_text(node, values[node]) for node in self.columns[0]
+        ]
+        final_column_labels = [
+            self._label_text(node, values[node]) for node in self.columns[-1]
+        ]
+        self.left_margin = max(
+            24.0,
+            max(self._estimate_label_width(label) for label in first_column_labels)
+            + 12,
+        )
+        self.right_margin = max(
+            24.0,
+            max(self._estimate_label_width(label) for label in final_column_labels)
+            + 12,
+        )
+        self.diagram_width = max(
+            600.0,
+            len(self.columns) * 180.0
+            + self.left_margin
+            + self.right_margin
+            - 48.0,
+        )
         self.node_layout, self.scale = _calculate_node_layout(
-            self.graph,
+            self.layout_graph,
             self.columns,
             self.height,
             self.node_width,
             self.node_padding,
             self.diagram_width,
+            self.left_margin,
+            self.right_margin,
+            self.routing_nodes,
         )
         self.link_layout = _calculate_link_layout(
-            self.graph, self.node_layout, self.scale
+            self.layout_graph, self.node_layout, self.scale
         )
         self.node_colors = _resolve_node_colors(self.graph["nodes"], colors)
+
+    def _label_text(self, node, value):
+        formatted = _format_number(value, self.value_format)
+        return f"{node} · {formatted}" if self.show_values else node
+
+    @staticmethod
+    def _estimate_label_width(label):
+        return max(20.0, len(label) * 7.2)
 
     @staticmethod
     def _positive_number(raw, name, minimum=0, allow_zero=False):
@@ -599,10 +692,12 @@ class Sankey:
             f"{_number(source_x)} {_number(link['source_bottom'])} Z"
         )
         value = _format_number(link["value"], self.value_format)
-        tooltip = f"{link['source']} → {link['target']}: {value}"
+        original_source = link.get("original_source", link["source"])
+        original_target = link.get("original_target", link["target"])
+        tooltip = f"{original_source} → {original_target}: {value}"
         return (
             '<path class="mljar-sankey-link" '
-            f'd="{path}" fill="{self.node_colors[link["source"]]}" '
+            f'd="{path}" fill="{self.node_colors[original_source]}" '
             f'opacity="{_number(self.link_opacity)}" '
             f'aria-label="{escape(tooltip, quote=True)}">'
             f"<title>{escape(tooltip)}</title></path>"
@@ -612,15 +707,22 @@ class Sankey:
         geometry = self.node_layout[node]
         value = _format_number(geometry["value"], self.value_format)
         tooltip = f"{node} — {value}"
+        is_first = geometry["depth"] == 0
         is_final = geometry["depth"] == len(self.columns) - 1
-        label = f"{node} · {value}" if self.show_values else node
-        if is_final:
+        label = self._label_text(node, geometry["value"])
+        label_y = geometry["y"] + geometry["height"] / 2
+        baseline = "middle"
+        if is_first:
             label_x = geometry["x"] - 8
             anchor = "end"
-        else:
+        elif is_final:
             label_x = geometry["x"] + geometry["width"] + 8
             anchor = "start"
-        label_y = geometry["y"] + geometry["height"] / 2
+        else:
+            label_x = geometry["x"] + geometry["width"] / 2
+            label_y = geometry["y"] - 7
+            anchor = "middle"
+            baseline = "auto"
         return (
             f'<g class="mljar-sankey-node-group" role="img" '
             f'aria-label="{escape(tooltip, quote=True)}">'
@@ -629,7 +731,8 @@ class Sankey:
             f'height="{_number(geometry["height"])}" rx="2" '
             f'fill="{self.node_colors[node]}"><title>{escape(tooltip)}</title></rect>'
             f'<text class="mljar-sankey-label" x="{_number(label_x)}" '
-            f'y="{_number(label_y)}" text-anchor="{anchor}">'
+            f'y="{_number(label_y)}" text-anchor="{anchor}" '
+            f'dominant-baseline="{baseline}">'
             f"{escape(label)}</text></g>"
         )
 

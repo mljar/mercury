@@ -229,6 +229,63 @@ def test_node_and_link_thickness_share_one_scale():
         assert target_thickness == pytest.approx(link["value"] * scale)
 
 
+def test_links_that_skip_columns_use_invisible_routing_nodes():
+    widget = Sankey(
+        [
+            ("Website", "Signup", 1000),
+            ("Website", "Left", 400),
+            ("Signup", "Trial", 600),
+            ("Signup", "Left", 250),
+            ("Trial", "Paid", 180),
+            ("Trial", "Left", 170),
+        ]
+    )
+
+    assert len(widget.routing_nodes) == 3
+    assert all(
+        widget.layout_depths[link["target"]]
+        - widget.layout_depths[link["source"]]
+        == 1
+        for link in widget.layout_graph["links"]
+    )
+    assert all(widget.node_layout[node]["width"] == 0 for node in widget.routing_nodes)
+
+    html = widget._repr_html_()
+    assert html.count('<path class="mljar-sankey-link"') == 9
+    assert html.count('<rect class="mljar-sankey-node"') == 5
+    assert "__mercury_sankey_route__" not in html
+    assert "Website → Left: 400" in html
+
+
+def test_docs_funnel_layout_has_no_avoidable_ribbon_crossings():
+    widget = Sankey(
+        [
+            ("Website", "Signup", 1000),
+            ("Website", "Left", 400),
+            ("Signup", "Trial", 600),
+            ("Signup", "Left", 250),
+            ("Trial", "Paid", 180),
+            ("Trial", "Left", 170),
+        ]
+    )
+
+    segments_by_depth = {}
+    for link in widget.link_layout:
+        depth = widget.layout_depths[link["source"]]
+        segments_by_depth.setdefault(depth, []).append(link)
+
+    for segments in segments_by_depth.values():
+        for index, first in enumerate(segments):
+            for second in segments[index + 1 :]:
+                first_source = (first["source_top"] + first["source_bottom"]) / 2
+                first_target = (first["target_top"] + first["target_bottom"]) / 2
+                second_source = (second["source_top"] + second["source_bottom"]) / 2
+                second_target = (second["target_top"] + second["target_bottom"]) / 2
+                assert (first_source - second_source) * (
+                    first_target - second_target
+                ) >= 0
+
+
 def test_svg_contains_nodes_filled_ribbons_labels_and_tooltips():
     html = Sankey([("Visitors", "Signup", 800)])._repr_html_()
 
@@ -243,6 +300,23 @@ def test_svg_contains_nodes_filled_ribbons_labels_and_tooltips():
     assert ">Signup</text>" in html
     assert "Visitors → Signup: 800" in html
     assert "Signup — 800" in html
+
+
+def test_labels_are_positioned_away_from_ribbons():
+    widget = Sankey(
+        [("Website", "Signup", 1000), ("Signup", "Paid", 600)],
+        show_values=True,
+    )
+
+    root_svg = widget._node_svg("Website")
+    intermediate_svg = widget._node_svg("Signup")
+    final_svg = widget._node_svg("Paid")
+
+    assert 'text-anchor="end" dominant-baseline="middle"' in root_svg
+    assert 'text-anchor="middle" dominant-baseline="auto"' in intermediate_svg
+    assert 'text-anchor="start" dominant-baseline="middle"' in final_svg
+    assert widget.left_margin > 24
+    assert widget.right_margin > 24
 
 
 def test_custom_color_list_cycles_and_colors_links_by_source():
