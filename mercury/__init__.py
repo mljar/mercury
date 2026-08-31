@@ -65,6 +65,7 @@ from .json import JSON
 from .md import Markdown
 from .indicator import Indicator
 from .activity_calendar import ActivityCalendar
+from .sankey import Sankey
 from .table import Table
 from .image import ImageCard
 from .download import Download

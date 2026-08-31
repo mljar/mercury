@@ -1,0 +1,133 @@
+---
+title: Sankey
+description: Display source-target-value flows as a responsive Sankey diagram
+---
+
+The `Sankey` output widget displays how a numeric quantity moves between stages or
+categories. Each rectangle is a node, and each ribbon's width represents its value.
+Flows are arranged from left to right.
+
+Prepare the flows before constructing the widget. `Sankey` aggregates duplicate
+source-target pairs, but it does not derive flows from raw event data.
+
+## Basic usage
+
+```python
+import pandas as pd
+import mercury as mr
+
+df = pd.DataFrame({
+    "source": ["Visitors", "Visitors", "Signup", "Signup"],
+    "target": ["Signup", "Left", "Paid", "Free"],
+    "value": [800, 200, 120, 680],
+})
+
+mr.Sankey(
+    df,
+    source="source",
+    target="target",
+    value="value",
+)
+```
+
+You can also pass three-item tuples without creating a DataFrame:
+
+```python
+mr.Sankey([
+    ("Visitors", "Signup", 800),
+    ("Visitors", "Left", 200),
+    ("Signup", "Paid", 120),
+    ("Signup", "Free", 680),
+])
+```
+
+## Customize the diagram
+
+```python
+customer_flows = df.rename(columns={"value": "customers"})
+
+mr.Sankey(
+    customer_flows,
+    source="source",
+    target="target",
+    value="customers",
+    height=500,
+    show_values=True,
+    value_format=",",
+    colors=[
+        "#3b82f6",
+        "#22c55e",
+        "#f59e0b",
+        "#ef4444",
+    ],
+)
+```
+
+`colors` accepts a list that cycles through nodes or a dictionary that assigns colors
+to specific node names:
+
+```python
+mr.Sankey(
+    df,
+    colors={
+        "Visitors": "#2563eb",
+        "Signup": "#16a34a",
+        "Paid": "#f59e0b",
+    },
+)
+```
+
+Links use their source node's color. `link_opacity` controls ribbon transparency.
+Mercury theme colors are used when `colors` is omitted or a dictionary does not map
+every node.
+
+## Input requirements
+
+Every row must contain a non-empty source, a non-empty target, and a finite,
+non-negative numeric value. Zero-value links are omitted, and duplicate links are
+summed.
+
+Sankey diagrams currently require an acyclic graph. Self-links and cycles raise clear
+errors rather than producing an ambiguous layout.
+
+```text
+source | target | value
+```
+
+## Labels, values, and tooltips
+
+Node names are always visible. Enable `show_values` to append each node's total flow
+value to its label. The value is the larger of its total incoming and outgoing flow.
+
+`value_format` accepts a standard Python numeric format specification:
+
+```python
+mr.Sankey(df, show_values=True, value_format=",")
+```
+
+Nodes and ribbons include native browser tooltips. The SVG also includes accessible
+labels and a description, so values are not communicated through color alone.
+
+## Responsive layout
+
+The SVG fills the available width. Diagrams with many stages keep a readable minimum
+width and scroll horizontally inside narrow layouts such as `mr.Columns(2)`.
+
+## Parameters
+
+| Parameter | Description | Default |
+|---|---|---|
+| `data` | DataFrame, three-item tuples, or dictionaries | required |
+| `source` | Source column or dictionary key | `"source"` |
+| `target` | Target column or dictionary key | `"target"` |
+| `value` | Numeric value column or dictionary key | `"value"` |
+| `colors` | Hex color list, node-color dictionary, or `None` | `None` |
+| `height` | SVG layout height | `400` |
+| `node_width` | Node rectangle width | `16` |
+| `node_padding` | Vertical spacing between nodes | `16` |
+| `link_opacity` | Ribbon opacity between zero and one | `0.35` |
+| `show_values` | Append values to node labels | `False` |
+| `value_format` | Python numeric format specification | `None` |
+
+The implementation is generated entirely in Python and rendered as SVG. It does not
+load Plotly, D3, or another JavaScript charting library.
