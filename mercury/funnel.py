@@ -115,7 +115,7 @@ def _format_value(value, value_format=","):
 def _format_percentage(value):
     if value is None:
         return "—"
-    rounded = round(value, 1)
+    rounded = float(round(value, 1))
     if rounded.is_integer():
         return f"{int(rounded)}%"
     return f"{rounded:.1f}%"
