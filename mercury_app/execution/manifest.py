@@ -15,6 +15,7 @@ class NotebookExecutionManifest:
     path: str
     revision: str
     cells: Mapping[str, str]
+    cell_count: int
 
     @classmethod
     def from_notebook(cls, path: str, notebook: Mapping[str, Any]):
@@ -46,7 +47,12 @@ class NotebookExecutionManifest:
             separators=(",", ":"),
         ).encode("utf-8")
         revision = hashlib.sha256(canonical).hexdigest()
-        return cls(path=path, revision=revision, cells=cells)
+        return cls(
+            path=path,
+            revision=revision,
+            cells=cells,
+            cell_count=len(raw_cells),
+        )
 
     def source_for(self, cell_id: str) -> str:
         try:

@@ -85,6 +85,10 @@ export class MercuryPanel extends Panel {
     return this._appWidget.cellWidgets;
   }
 
+  get appWidget(): AppWidget {
+    return this._appWidget;
+  }
+
   private _appWidget: AppWidget;
   private _context: DocumentRegistry.IContext<INotebookModel>;
   private _editorConfig: StaticNotebook.IEditorConfig;

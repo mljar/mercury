@@ -7,7 +7,6 @@ from tornado.web import HTTPError
 
 from .manifest import NotebookExecutionManifest
 
-
 OWNER_COOKIE = "mercury-browser-session"
 
 
@@ -18,6 +17,7 @@ class ExecutionSession:
     kernel_id: str
     manifest: NotebookExecutionManifest
     comm_ids: set[str] = field(default_factory=set)
+    session_ids: set[str] = field(default_factory=set)
 
 
 class ExecutionRegistry:
@@ -55,12 +55,14 @@ class ExecutionRegistry:
         kernel_id: str,
         manifest: NotebookExecutionManifest,
     ) -> ExecutionSession:
-        owned = sum(1 for record in self._sessions.values() if owner in record.owners)
+        owned = sum(1 for record in self._unique_records() if owner in record.owners)
         if owned >= self.max_sessions_per_owner:
             raise HTTPError(429, reason="Too many Mercury sessions")
-        if len(self._sessions) >= self.max_sessions:
+        if len(self._unique_records()) >= self.max_sessions:
             raise HTTPError(503, reason="Mercury session capacity reached")
-        record = ExecutionSession({owner}, session_id, kernel_id, manifest)
+        record = ExecutionSession(
+            {owner}, session_id, kernel_id, manifest, session_ids={session_id}
+        )
         self._sessions[session_id] = record
         self._kernels[kernel_id] = record
         return record
@@ -78,7 +80,20 @@ class ExecutionRegistry:
         return record
 
     def sessions_for_owner(self, owner: str) -> list[ExecutionSession]:
-        return [record for record in self._sessions.values() if owner in record.owners]
+        return [
+            record
+            for record in self._unique_records()
+            if owner in record.owners
+        ]
+
+    def all_sessions(self) -> list[ExecutionSession]:
+        return self._unique_records()
+
+    def session_for_notebook(self, notebook_path: str) -> ExecutionSession | None:
+        for record in self._sessions.values():
+            if record.manifest.path == notebook_path:
+                return record
+        return None
 
     def attach_owner(
         self,
@@ -96,14 +111,43 @@ class ExecutionRegistry:
             raise HTTPError(409, reason="Shared notebook revision changed")
         if owner not in record.owners:
             owned = sum(
-                1 for current in self._sessions.values() if owner in current.owners
+                1 for current in self._unique_records() if owner in current.owners
             )
             if owned >= self.max_sessions_per_owner:
                 raise HTTPError(429, reason="Too many Mercury sessions")
             record.owners.add(owner)
         return record
 
+    def attach_session_alias(
+        self,
+        *,
+        primary_session_id: str,
+        alias_session_id: str,
+        owner: str,
+        manifest: NotebookExecutionManifest,
+    ) -> ExecutionSession:
+        record = self.attach_owner(primary_session_id, owner, manifest)
+        record.session_ids.add(alias_session_id)
+        self._sessions[alias_session_id] = record
+        return record
+
     def unregister_session(self, session_id: str) -> None:
-        record = self._sessions.pop(session_id, None)
-        if record is not None:
-            self._kernels.pop(record.kernel_id, None)
+        record = self._sessions.get(session_id)
+        if record is None:
+            return
+        if session_id != record.session_id:
+            self._sessions.pop(session_id, None)
+            record.session_ids.discard(session_id)
+            return
+        for current_id in list(record.session_ids):
+            self._sessions.pop(current_id, None)
+        self._kernels.pop(record.kernel_id, None)
+
+    def _unique_records(self) -> list[ExecutionSession]:
+        records: list[ExecutionSession] = []
+        seen: set[str] = set()
+        for record in self._sessions.values():
+            if record.session_id not in seen:
+                records.append(record)
+                seen.add(record.session_id)
+        return records

@@ -24,9 +24,11 @@ export async function codeCellExecute(
     return;
   }
   const id = model.sharedModel.getId();
+  const suppliedMercury = (metadata as any)?.mercury ?? {};
   const cellId = {
     cellId: id,
     mercury: {
+      ...suppliedMercury,
       kind: 'cell',
       cell_id: id
     }

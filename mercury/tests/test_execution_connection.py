@@ -8,6 +8,7 @@ from mercury_app.execution.connection import (
 )
 from mercury_app.execution.manifest import NotebookExecutionManifest
 from mercury_app.execution.policy import ExecutionDenied
+from mercury_app.execution.shared_session import SharedSessionCoordinator
 
 
 def connection():
@@ -18,8 +19,16 @@ def connection():
             {"cells": [{"id": "safe", "cell_type": "code", "source": "print('safe')"}]},
         ),
         comm_ids=set(),
+        session_id="session",
     )
     return value
+
+
+class SharedClient:
+    client_id = "client"
+
+    def send_shared_session_message(self, message):
+        self.last_message = message
 
 
 def message(msg_type, *, metadata=None, content=None, buffers=None):
@@ -45,6 +54,49 @@ def test_execute_request_replaces_code_and_user_expressions():
     assert value["content"]["code"] == "print('safe')"
     assert value["content"]["allow_stdin"] is False
     assert value["content"]["user_expressions"] == {}
+
+
+def test_shared_cell_execution_requires_the_active_run_lease():
+    value = connection()
+    coordinator = SharedSessionCoordinator()
+    client = SharedClient()
+    coordinator.join(
+        session_id="session", kernel_id="kernel", cell_count=1, client=client
+    )
+    run = client.last_message
+    # The busy broadcast follows the targeted run message.
+    if run["type"] == "busy":
+        run = value_run = coordinator.room("session").active_run
+        run_id, token = value_run.run_id, value_run.token
+    else:
+        run_id, token = run["run_id"], run["token"]
+    value._shared_session_coordinator = coordinator
+
+    with pytest.raises(ExecutionDenied, match="run lease"):
+        value._authorize_message(
+            "shell",
+            message(
+                "execute_request",
+                metadata={"mercury": {"kind": "cell", "cell_id": "safe"}},
+            ),
+        )
+
+    authorized = message(
+        "execute_request",
+        metadata={
+            "mercury": {
+                "kind": "cell",
+                "cell_id": "safe",
+                "shared_session": {
+                    "client_id": "client",
+                    "run_id": run_id,
+                    "token": token,
+                },
+            }
+        },
+    )
+    authorized["header"]["msg_id"] = "request"
+    value._authorize_message("shell", authorized)
 
 
 @pytest.mark.parametrize(

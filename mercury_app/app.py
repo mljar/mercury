@@ -16,6 +16,20 @@ from mercury.config import build_theme_css_vars, build_theme_font_links
 from ._version import __version__
 from .block_handler import BLOCKED_PATTERNS, BlockedHandler
 from .custom_contents_handler import MercuryContentsHandler
+from .execution import (
+    ExecutionRegistry,
+    MercuryKernelWebsocketConnection,
+    SharedSessionCoordinator,
+)
+from .execution.handlers import (
+    MercuryCheckpointsHandler,
+    MercuryKernelActionHandler,
+    MercuryKernelHandler,
+    MercuryMainKernelHandler,
+    MercurySessionHandler,
+    MercurySessionRootHandler,
+)
+from .execution.sync_handler import SharedSessionWebsocket
 from .handlers import (
     MAIN_CONFIG,
     THEME,
@@ -27,20 +41,11 @@ from .idle_timeout import (
     TimeoutActivityTransform,
     TimeoutManager,
 )
-from .execution import ExecutionRegistry, MercuryKernelWebsocketConnection
-from .execution.handlers import (
-    MercuryCheckpointsHandler,
-    MercuryKernelActionHandler,
-    MercuryKernelHandler,
-    MercuryMainKernelHandler,
-    MercurySessionHandler,
-    MercurySessionRootHandler,
-)
 from .mercury_hybrid_cm import HybridContentsManager
 from .notebooks import NotebooksAPIHandler
 from .root import RootIndexHandler
-from .theme_handler import ThemeHandler
 from .security_mode import detect_standalone_security_mode
+from .theme_handler import ThemeHandler
 
 
 class SuppressKernelDoesNotExist(logging.Filter):
@@ -134,6 +139,10 @@ class MercuryApp(LabServerApp):
                 block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
             security_handlers = [
                 (
+                    r"/mercury/api/shared-sessions/(?P<session_id>\w+-\w+-\w+-\w+-\w+)",
+                    SharedSessionWebsocket,
+                ),
+                (
                     r"/api/contents/(.*\.ipynb)/checkpoints",
                     MercuryCheckpointsHandler,
                 ),
@@ -183,9 +192,13 @@ class MercuryApp(LabServerApp):
                 )
 
             registry = ExecutionRegistry()
+            shared_session_coordinator = SharedSessionCoordinator()
             security_mode = detect_standalone_security_mode(sa)
             for settings in (self.settings, sa.web_app.settings):
                 settings["mercury_execution_registry"] = registry
+                settings["mercury_shared_session_coordinator"] = (
+                    shared_session_coordinator
+                )
                 settings["mercury_security_mode"] = security_mode.value
                 settings["kernel_websocket_connection_class"] = (
                     MercuryKernelWebsocketConnection

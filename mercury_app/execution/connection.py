@@ -12,7 +12,6 @@ from jupyter_server.services.kernels.connection.channels import (
 
 from .policy import ExecutionDenied, authorize_execute_request
 
-
 logger = logging.getLogger("mercury.execution")
 
 MAX_MESSAGE_BYTES = 128 * 1024 * 1024
@@ -32,6 +31,9 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
             raise RuntimeError("Mercury execution registry is not installed")
         owner = registry.owner_for_handler(handler, create=False)
         self._mercury_record = registry.kernel_for_owner(self.kernel_id, owner)
+        self._shared_session_coordinator = handler.settings.get(
+            "mercury_shared_session_coordinator"
+        )
         await super().prepare()
 
     def _deny(self, reason: str) -> None:
@@ -69,6 +71,45 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
             safe_content["allow_stdin"] = False
             safe_content["user_expressions"] = {}
             msg["content"] = safe_content
+            coordinator = getattr(self, "_shared_session_coordinator", None)
+            room = (
+                coordinator.room(self._mercury_record.session_id)
+                if coordinator is not None
+                else None
+            )
+            if room is not None and decision.kind == "cell":
+                mercury = metadata.get("mercury")
+                shared = (
+                    mercury.get("shared_session")
+                    if isinstance(mercury, Mapping)
+                    else None
+                )
+                if not isinstance(shared, Mapping):
+                    raise ExecutionDenied("Shared execution is missing a run lease")
+                client_id = shared.get("client_id")
+                run_id = shared.get("run_id")
+                token = shared.get("token")
+                cell_id = mercury.get("cell_id")
+                message_id = header.get("msg_id")
+                if (
+                    not isinstance(client_id, str)
+                    or not isinstance(run_id, int)
+                    or not isinstance(token, str)
+                    or not isinstance(cell_id, str)
+                    or not isinstance(message_id, str)
+                ):
+                    raise ExecutionDenied("Shared execution has an invalid run lease")
+                try:
+                    coordinator.register_execute(
+                        session_id=self._mercury_record.session_id,
+                        client_id=client_id,
+                        run_id=run_id,
+                        token=token,
+                        message_id=message_id,
+                        cell_id=cell_id,
+                    )
+                except ValueError as exc:
+                    raise ExecutionDenied(str(exc)) from exc
             return msg
 
         if msg_type in INFO_MESSAGES:
@@ -151,6 +192,8 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
             _, fed_msg_list = self.session.feed_identities(outgoing_msg)
             if len(fed_msg_list) >= 5:
                 header = self.session.unpack(fed_msg_list[1])
+                parent_header = self.session.unpack(fed_msg_list[2])
+                metadata = self.session.unpack(fed_msg_list[3])
                 content = self.session.unpack(fed_msg_list[4])
                 msg_type = header.get("msg_type")
                 comm_id = content.get("comm_id") if isinstance(content, Mapping) else None
@@ -159,6 +202,17 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
                         self._mercury_record.comm_ids.add(comm_id)
                     elif msg_type == "comm_close":
                         self._mercury_record.comm_ids.discard(comm_id)
+                coordinator = getattr(self, "_shared_session_coordinator", None)
+                if coordinator is not None:
+                    coordinator.observe_kernel_message(
+                        self._mercury_record.session_id,
+                        {
+                            "header": header,
+                            "parent_header": parent_header,
+                            "metadata": metadata,
+                            "content": content,
+                        },
+                    )
         except Exception:
             logger.exception("Failed to observe outgoing kernel comm lifecycle")
         return super().handle_outgoing_message(stream, outgoing_msg)

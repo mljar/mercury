@@ -66,6 +66,7 @@ def test_shared_session_can_attach_another_browser_to_same_manifest():
     )
 
     registry.attach_owner("shared-session", "browser-b", trusted_manifest)
+    assert registry.session_for_notebook("app.ipynb").session_id == "shared-session"
     assert registry.kernel_for_owner("shared-kernel", "browser-b").session_id == (
         "shared-session"
     )
@@ -77,3 +78,25 @@ def test_shared_session_can_attach_another_browser_to_same_manifest():
     with pytest.raises(HTTPError) as exc_info:
         registry.attach_owner("shared-session", "browser-c", changed_manifest)
     assert exc_info.value.status_code == 409
+
+
+def test_shared_session_alias_uses_the_same_kernel_record():
+    registry = ExecutionRegistry()
+    trusted_manifest = manifest()
+    registry.register(
+        owner="browser-a",
+        session_id="primary",
+        kernel_id="shared-kernel",
+        manifest=trusted_manifest,
+    )
+
+    alias = registry.attach_session_alias(
+        primary_session_id="primary",
+        alias_session_id="alias",
+        owner="browser-b",
+        manifest=trusted_manifest,
+    )
+
+    assert registry.session_for_owner("alias", "browser-b") is alias
+    assert registry.kernel_for_owner("shared-kernel", "browser-b") is alias
+    assert registry.all_sessions() == [alias]

@@ -16,10 +16,12 @@ import {
   type AppWidget,
   type MercuryWidget
 } from '@mljar/mercury-extension';
+import { IMercuryCellExecutor } from '@mljar/mercury-tokens';
 //import { INotebookCellExecutor } from '@mljar/mercury-tokens';
 
+import { SharedSessionClient } from '../sharedSession';
 import { MercuryNavbar } from './navbar';
-import { IMercuryCellExecutor } from '@mljar/mercury-tokens';
+import { SharedSessionIndicator } from './sharedSessionIndicator';
 //import { INotebookCellExecutor } from '@jupyterlab/notebook';
 
 /**
@@ -72,6 +74,17 @@ export const plugin: JupyterFrontEndPlugin<void> = {
 
           const urlParams = new URLSearchParams(window.location.search);
           const skipNavbar = urlParams.has('no-navbar');
+          const keepSession =
+            String(PageConfig.getOption('keepSession')).toLowerCase() ===
+            'true';
+
+          if (keepSession) {
+            const sharedSessionIndicator = new SharedSessionIndicator();
+            sharedSessionIndicator.mount();
+            mercuryPanel.disposed.connect(() =>
+              sharedSessionIndicator.destroy()
+            );
+          }
 
           if (!skipNavbar) {
             try {
@@ -174,7 +187,10 @@ export const plugin: JupyterFrontEndPlugin<void> = {
               }
               await waitForKernelReady(kernelConnection);
 
-              if (kernelConnection) {
+              const syncUrlParams = async () => {
+                if (!kernelConnection) {
+                  return;
+                }
                 const standalone =
                   PageConfig.getOption('mercuryStandalone') === 'true';
                 const syncUrlParamsCode = `
@@ -208,15 +224,18 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                     err
                   );
                 }
+              };
+              if (!keepSession) {
+                await syncUrlParams();
               }
 
+              const appWidget = mercuryPanel.content.appWidget;
               const executeAll = async () => {
                 try {
                   console.info('[Mercury] Executing cells');
 
                   const scheduledForExecution = new Set<string>();
                   const notebook = mercuryPanel.context.model;
-                  const appWidget = mercuryPanel.content.widgets[0] as AppWidget;
                   const totalCells = notebook.cells.length;
                   const info = notebook.getMetadata('language_info');
                   const mimetype = info
@@ -282,7 +301,48 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                 }
               };
 
-              await executeAll();
+              if (keepSession && session) {
+                await waitForCellWidgets(
+                  appWidget,
+                  mercuryPanel.context.model.cells.length
+                );
+                const hideLoader = () => {
+                  const hide = (window as any).hideMercuryLoader;
+                  if (typeof hide === 'function') {
+                    hide();
+                  }
+                };
+                const sharedSession = new SharedSessionClient(session.id, {
+                  onSnapshot: outputs =>
+                    appWidget.applySharedSnapshot(outputs),
+                  onOutput: (cellId, message, reset) =>
+                    appWidget.applySharedOutput(cellId, message, reset),
+                  onRun: async (run, clientId) => {
+                    if (run.initialize) {
+                      await syncUrlParams();
+                    }
+                    await appWidget.runSharedCells(run.fromIndex, {
+                      sessionId: session!.id,
+                      clientId,
+                      runId: run.runId,
+                      token: run.token
+                    });
+                  },
+                  onReady: hideLoader,
+                  onConnectionLost: () => {
+                    window.dispatchEvent(
+                      new CustomEvent('mercury:connection-lost')
+                    );
+                  }
+                });
+                appWidget.setSharedRunRequester(fromIndex =>
+                  sharedSession.requestRun(fromIndex)
+                );
+                mercuryPanel.disposed.connect(() => sharedSession.dispose());
+                await sharedSession.connect();
+              } else {
+                await executeAll();
+              }
             } catch (err) {
               console.error('[Mercury] Failed to prepare kernel execution:', err);
             }

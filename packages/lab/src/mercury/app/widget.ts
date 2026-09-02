@@ -609,6 +609,59 @@ export class AppWidget extends Panel {
     return this._cellItems;
   }
 
+  setSharedRunRequester(requester: ((fromIndex: number) => void) | null): void {
+    this._sharedRunRequester = requester;
+  }
+
+  async runSharedCells(
+    fromIndex: number,
+    lease: { sessionId: string; clientId: string; runId: number; token: string }
+  ): Promise<void> {
+    await this._runCellsFromIndex(fromIndex, {
+      mercury: {
+        shared_session: {
+          session_id: lease.sessionId,
+          client_id: lease.clientId,
+          run_id: lease.runId,
+          token: lease.token
+        }
+      }
+    });
+  }
+
+  applySharedOutput(cellId: string, message: any, reset = false): void {
+    const item = this._cellItems.find(candidate => candidate.cellId === cellId);
+    if (!item || !(item.child instanceof CodeCell)) {
+      return;
+    }
+    const outputArea = item.child.outputArea as any;
+    if (reset) {
+      outputArea.model.clear();
+      if (typeof outputArea._clear === 'function') {
+        outputArea._clear();
+      }
+    }
+    if (typeof outputArea._onIOPub === 'function') {
+      outputArea._onIOPub(message);
+    }
+  }
+
+  applySharedSnapshot(outputs: Record<string, any[]>): void {
+    for (const item of this._cellItems) {
+      if (item.child instanceof CodeCell) {
+        const outputArea = item.child.outputArea as any;
+        outputArea.model.clear();
+        if (typeof outputArea._clear === 'function') {
+          outputArea._clear();
+        }
+      }
+    }
+    for (const [cellId, messages] of Object.entries(outputs)) {
+      messages.forEach(message => this.applySharedOutput(cellId, message));
+    }
+    this.updatePanelVisibility();
+  }
+
   /**
    * Place a code cell's output area into the appropriate panel
    * based on its MERCURY_MIMETYPE metadata or an explicit override.
@@ -1170,6 +1223,7 @@ export class AppWidget extends Panel {
   private _rerunInProgress = false;
   private _pendingRerunFromIndex: number | null = null;
   private _rerunTimer: number | null = null;
+  private _sharedRunRequester: ((fromIndex: number) => void) | null = null;
 
   private onWidgetUpdate = (_model: AppModel, update: IWidgetUpdate) => {
     if (!this._autoRerun || this.isDisposed) {
@@ -1192,6 +1246,11 @@ export class AppWidget extends Panel {
     }
 
     const fromIndex = updatedIndex + 1;
+
+    if (this._sharedRunRequester) {
+      this._sharedRunRequester(fromIndex);
+      return;
+    }
 
     // If we are busy, just remember earliest affected index
     if (!this._acceptWidgetInput || this._rerunInProgress) {
@@ -1221,7 +1280,10 @@ export class AppWidget extends Panel {
     }, 10);
   };
 
-  private async _runCellsFromIndex(fromIndex: number): Promise<void> {
+  private async _runCellsFromIndex(
+    fromIndex: number,
+    executionMetadata?: Record<string, any>
+  ): Promise<void> {
     // If a run is already happening, coalesce and exit
     if (this._rerunInProgress) {
       this._pendingRerunFromIndex =
@@ -1261,7 +1323,8 @@ export class AppWidget extends Panel {
 
         const reply = await codeCellExecute(
           child,
-          this._model.context.sessionContext
+          this._model.context.sessionContext,
+          executionMetadata
         );
         if (isStopExecutionReply(reply)) {
           break;
@@ -1288,7 +1351,7 @@ export class AppWidget extends Panel {
       if (this._pendingRerunFromIndex !== null) {
         const nextFrom = this._pendingRerunFromIndex;
         this._pendingRerunFromIndex = null;
-        void this._runCellsFromIndex(nextFrom);
+        void this._runCellsFromIndex(nextFrom, executionMetadata);
       }
     }
   }

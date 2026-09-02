@@ -207,7 +207,11 @@ If something is missing or you would like to customize more things, please let u
 
 Would you like to see more logs from `mercury`, please use `--log-level=INFO` or `--log-level=DEBUG`. The default log level is `CRITICAL`.
 
-We have option to share the same session between multiple users. What does it mean? You can deploy app, and when you click on it, others will see this. The enable session sharing please use `--keep-session`. Amazing, isn't it?
+Use `--keep-session` to let every viewer of an app share one live Python session.
+Widget changes and their resulting outputs are synchronized across connected browsers.
+Mercury serializes notebook reruns and coalesces changes made while a rerun is busy,
+so one shared app still executes only one rerun at a time. Use the default mode when
+each viewer should have independent widget values and kernel state.
 
 Would you like to limit your server resources with usage timeout? Please set `--timeout=600`, the timeout value is in seconds. Be generous.
 

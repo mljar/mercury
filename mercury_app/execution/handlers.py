@@ -4,6 +4,7 @@ import json
 import posixpath
 from datetime import datetime, timezone
 
+from jupyter_client.jsonutil import json_default
 from jupyter_client.kernelspec import NoSuchKernel
 from jupyter_server.auth.decorator import authorized
 from jupyter_server.services.contents.handlers import ContentsAPIHandler
@@ -14,7 +15,6 @@ from jupyter_server.services.kernels.handlers import (
 )
 from jupyter_server.services.sessions.handlers import SessionHandler, SessionRootHandler
 from jupyter_server.utils import ensure_async, url_path_join
-from jupyter_client.jsonutil import json_default
 from tornado import web
 
 from .manifest import ManifestError, NotebookExecutionManifest
@@ -45,6 +45,10 @@ class ExecutionHandlerMixin:
 
     def browser_owner(self, *, create: bool = True):
         return self.execution_registry.owner_for_handler(self, create=create)
+
+    @property
+    def keep_session(self) -> bool:
+        return bool(self.settings.get("mercury_config", {}).get("keepSession", False))
 
 
 class MercuryCheckpointsHandler(ContentsAPIHandler):
@@ -80,8 +84,17 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
     async def get(self):
         owner = self.browser_owner()
         models = []
-        for record in self.execution_registry.sessions_for_owner(owner):
+        records = (
+            self.execution_registry.all_sessions()
+            if self.keep_session
+            else self.execution_registry.sessions_for_owner(owner)
+        )
+        for record in records:
             try:
+                if self.keep_session and owner not in record.owners:
+                    self.execution_registry.attach_owner(
+                        record.session_id, owner, record.manifest
+                    )
                 models.append(await self.session_manager.get_session(session_id=record.session_id))
             except KeyError:
                 self.execution_registry.unregister_session(record.session_id)
@@ -149,38 +162,94 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
             raise web.HTTPError(400, reason="Notebook cannot be executed safely") from exc
 
         sm = self.session_manager
-        if await ensure_async(sm.session_exists(path=path)):
-            existing = await sm.get_session(path=path)
-            self.execution_registry.attach_owner(existing["id"], owner, manifest)
-            location = url_path_join(self.base_url, "api", "sessions", existing["id"])
+        session_path = path
+        coordinator = self.settings.get("mercury_shared_session_coordinator")
+        lock = (
+            coordinator.notebook_lock(notebook_path)
+            if self.keep_session and coordinator is not None
+            else None
+        )
+
+        async def attach_or_create():
+            if self.keep_session:
+                shared_record = self.execution_registry.session_for_notebook(
+                    notebook_path
+                )
+                if shared_record is not None:
+                    try:
+                        await sm.get_session(
+                            session_id=shared_record.session_id
+                        )
+                    except KeyError:
+                        self.execution_registry.unregister_session(
+                            shared_record.session_id
+                        )
+                    else:
+                        if coordinator is not None:
+                            await coordinator.wait_until_initialized(
+                                shared_record.session_id
+                            )
+                        alias = await sm.create_session(
+                            path=session_path,
+                            kernel_id=shared_record.kernel_id,
+                            name=model.get("name"),
+                            type="notebook",
+                        )
+                        self.execution_registry.attach_session_alias(
+                            primary_session_id=shared_record.session_id,
+                            alias_session_id=alias["id"],
+                            owner=owner,
+                            manifest=manifest,
+                        )
+                        return alias, True
+            elif await ensure_async(sm.session_exists(path=session_path)):
+                existing = await sm.get_session(path=session_path)
+                self.execution_registry.attach_owner(existing["id"], owner, manifest)
+                return existing, False
+
+            kernel_name = kernel.get("name")
+            try:
+                created = await sm.create_session(
+                    path=session_path,
+                    kernel_name=kernel_name,
+                    name=model.get("name"),
+                    type="notebook",
+                )
+            except NoSuchKernel as exc:
+                raise web.HTTPError(
+                    501, reason="Requested kernel is unavailable"
+                ) from exc
+            except Exception as exc:
+                raise web.HTTPError(
+                    500, reason="Notebook session could not be created"
+                ) from exc
+
+            try:
+                self.execution_registry.register(
+                    owner=owner,
+                    session_id=created["id"],
+                    kernel_id=created["kernel"]["id"],
+                    manifest=manifest,
+                )
+            except Exception:
+                await ensure_async(sm.delete_session(created["id"]))
+                raise
+            return created, True
+
+        if lock is None:
+            session_model, created = await attach_or_create()
+        else:
+            async with lock:
+                session_model, created = await attach_or_create()
+
+        if not created:
+            location = url_path_join(
+                self.base_url, "api", "sessions", session_model["id"]
+            )
             self.set_header("Location", location)
             self.set_status(201)
-            self.finish(json.dumps(existing, default=json_default))
+            self.finish(json.dumps(session_model, default=json_default))
             return
-
-        kernel_name = kernel.get("name")
-        try:
-            session_model = await sm.create_session(
-                path=path,
-                kernel_name=kernel_name,
-                name=model.get("name"),
-                type="notebook",
-            )
-        except NoSuchKernel as exc:
-            raise web.HTTPError(501, reason="Requested kernel is unavailable") from exc
-        except Exception as exc:
-            raise web.HTTPError(500, reason="Notebook session could not be created") from exc
-
-        try:
-            self.execution_registry.register(
-                owner=owner,
-                session_id=session_model["id"],
-                kernel_id=session_model["kernel"]["id"],
-                manifest=manifest,
-            )
-        except Exception:
-            await ensure_async(sm.delete_session(session_model["id"]))
-            raise
 
         location = url_path_join(self.base_url, "api", "sessions", session_model["id"])
         self.set_header("Location", location)
@@ -240,11 +309,18 @@ class MercurySessionHandler(ExecutionHandlerMixin, SessionHandler):
     @authorized
     async def delete(self, session_id):
         self._owned(session_id)
+        if self.keep_session:
+            self.set_status(204)
+            self.finish()
+            return
         try:
             await self.session_manager.delete_session(session_id)
         except KeyError as exc:
             raise web.HTTPError(410, reason="Kernel deleted before session") from exc
         self.execution_registry.unregister_session(session_id)
+        coordinator = self.settings.get("mercury_shared_session_coordinator")
+        if coordinator is not None:
+            coordinator.remove(session_id)
         self.set_status(204)
         self.finish()
 
@@ -285,8 +361,15 @@ class MercuryKernelHandler(ExecutionHandlerMixin, KernelHandler):
     @authorized
     async def delete(self, kernel_id):
         record = self._owned(kernel_id)
+        if self.keep_session:
+            self.set_status(204)
+            self.finish()
+            return
         await ensure_async(self.kernel_manager.shutdown_kernel(kernel_id))
         self.execution_registry.unregister_session(record.session_id)
+        coordinator = self.settings.get("mercury_shared_session_coordinator")
+        if coordinator is not None:
+            coordinator.remove(record.session_id)
         self.set_status(204)
         self.finish()
 
