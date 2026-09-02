@@ -80,6 +80,8 @@
 
 .mercury-main-panel {
   --mercury-sidebar-outer-width: 330px;
+  --mercury-content-left-padding: 27px;
+
   position: relative;
   display: block;
   width: 100%;
@@ -300,7 +302,7 @@
   position: relative;
   background: var(--mercury-surface-color); 
   padding-top: 0px;
-  padding-left: 14px;
+  padding-left: var(--mercury-content-left-padding);
   padding-right: 5px;
   padding-bottom: 5px;
 }
@@ -315,14 +317,14 @@
 }
 
 .mercury-right-top-panel.mercury-right-top-panel-with-sidebar-toggle {
-  padding-left: 14px;
+  padding-left: var(--mercury-content-left-padding);
 }
 
 .mercury-right-bottom-panel {
   background: var(--mercury-surface-color);
   overflow: hidden !important;
   padding-top: 5px;
-  padding-left: 14px;
+  padding-left: var(--mercury-content-left-padding);
   padding-right: 5px;
   padding-bottom: 5px;
 }
@@ -334,7 +336,7 @@
 .mercury-right-top-panel.mercury-right-limited,
 .mercury-right-bottom-panel.mercury-right-limited {
   box-sizing: border-box;
-  padding-left: 14px !important; 
+  padding-left: var(--mercury-content-left-padding) !important;
   padding-right: 5px !important;
 }
 
