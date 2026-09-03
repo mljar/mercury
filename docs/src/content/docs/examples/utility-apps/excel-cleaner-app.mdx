@@ -183,14 +183,17 @@ This way the user can always see what changed.
 
 ```python
 if file.name is None:
-    mr.Markdown("# Upload the Excel file to start")
+    _ = mr.Markdown("# Upload the Excel file to start")
 else:
-    mr.Markdown(f"# Uploaded file: {file.name}", key='title_md')
+    _ = mr.Markdown(f"# Uploaded file: {file.name}", key='title_md')
 ```
 
 A simple branch: when nothing has been uploaded yet, show the welcome heading; otherwise show the filename of the uploaded workbook.
 
-Calling `mr.Markdown(...)` directly inside a cell renders it — no `display()` wrapper needed when the Mercury widget is created right there. The same inline pattern shows up in every conditional cell below.
+`mr.Markdown(...)` renders immediately, so no `display()` wrapper is needed.
+Assigning its returned widget to `_` prevents IPython from displaying the last
+expression a second time. The same pattern appears in every conditional cell
+below.
 
 ## 7. Show the sheets overview
 
@@ -226,7 +229,7 @@ We use `sheet_names.index(sheet_select.value)` later to look up the right DataFr
 
 ```python
 if file.name is not None:
-    mr.Markdown(f"## Sheet: {sheet_select.value}", key='sheet_md')
+    _ = mr.Markdown(f"## Sheet: {sheet_select.value}", key='sheet_md')
 else:
     clear_output()
 ```
@@ -254,7 +257,7 @@ Note the dynamic `key` — it includes the sheet name. Mercury uses `key` to ide
 
 ```python
 if file.name is not None:
-    mr.Markdown("### Choose operation", position="sidebar", key='checkboxes')
+    _ = mr.Markdown("### Choose operation", position="sidebar", key='checkboxes')
     normalize_col_names_checkbox = mr.CheckBox(
         label="Normalize column names",
         appearance="box",
@@ -309,7 +312,7 @@ The disabling step is a small UX touch — once you've cleaned the data, you can
 ```python
 if file.name is not None:
     if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
-        mr.Markdown("## Results", key='results')
+        _ = mr.Markdown("## Results", key='results')
         edited_data_table = mr.Table(
             ready_df[sheet_names.index(sheet_select.value)],
             page_size=20,
@@ -337,7 +340,7 @@ if file.name is not None:
 ```python
 if file.name is not None:
     if normalize_col_names_checkbox.value or remove_duplicate_rows_checkbox.value:
-        mr.Markdown("### Download edited sheet", position="sidebar", key='download')
+        _ = mr.Markdown("### Download edited sheet", position="sidebar", key='download')
         mr.Download(
             data=csv_data,
             filename=f"{normalize_column_name(sheet_select.value)}-edited.csv",

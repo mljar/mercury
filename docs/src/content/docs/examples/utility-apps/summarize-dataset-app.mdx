@@ -251,12 +251,14 @@ The last cells switch between the welcome state and the populated state, dependi
 ```python
 # welcome message
 if input_file.name is None:
-    mr.Markdown("# Upload the dataset and check the summary")
+    _ = mr.Markdown("# Upload the dataset and check the summary")
 else:
-    mr.Markdown("# Dataset summary", key="title")
+    _ = mr.Markdown("# Dataset summary", key="title")
 ```
 
-Calling `mr.Markdown(...)` directly inside a cell renders it — no `display()` wrapper needed when the Mercury widget is created right there.
+`mr.Markdown(...)` renders immediately, so no `display()` wrapper is needed.
+Assigning its returned widget to `_` prevents IPython from displaying the last
+expression a second time.
 
 The same conditional pattern repeats for the indicators, the column type table, and the data preview:
 
@@ -267,7 +269,7 @@ else:
     clear_output(wait=False)
 ```
 
-`clear_output()` hides the cell output entirely when there's nothing to show, so the app doesn't leave empty gaps on first load. `display(ind_basic)` is needed here because `ind_basic` was created earlier in the computation cell — for Mercury widgets created inline (like the markdown headings and the column type table), the bare call is enough.
+`clear_output()` hides the cell output entirely when there's nothing to show, so the app doesn't leave empty gaps on first load. `display(ind_basic)` is needed here because `ind_basic` was created earlier in the computation cell. Mercury widgets created inline display immediately; assign their return values to avoid IPython displaying them again.
 
 ## 9. Run as a web app
 

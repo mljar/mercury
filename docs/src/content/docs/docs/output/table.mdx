@@ -5,6 +5,7 @@ description: How to use the Table widget in the interactive Mercury App
 
 import { Code } from '@astrojs/starlight/components';
 import { Image } from 'astro:assets';
+import { Aside } from '@astrojs/starlight/components';
 
 import simpleTable from "../../../../assets/table/simple-table.webp"
 import tableWithFeatures from "../../../../assets/table/table-with-features.webp"
@@ -35,6 +36,17 @@ df = pd.DataFrame({
 **Code**
 
 <Code code={`t = Table(df)`} lang="python"/>
+
+<Aside type="note" title="Avoid duplicate output in notebooks">
+With the default `display_now=True`, `Table()` displays the table immediately
+and returns its widget. IPython also displays an unassigned object when it is
+the last expression in a cell, so a bare `Table(df)` call can render twice.
+
+Assign the result, as in `table = Table(df)`, when using immediate display. If
+you want to control when it appears, use `display_now=False` and call
+`display(table)` later—but do not combine explicit `display()` with the default
+immediate-display behavior.
+</Aside>
 
 **Preview**
 
@@ -167,6 +179,9 @@ Default is `"inline"`.
 Controls whether the table is displayed immediately after construction.
 Set to `False` when you want to return the widget and display it later yourself. Default is `True`.
 
+When `display_now=True`, assign the returned widget to a variable (or `_`) so
+IPython does not display the final expression a second time.
+
 ### key
 
 **type:** `string`
@@ -179,3 +194,4 @@ Use it when you intentionally want separate table widget instances for the same 
 * Table widgets are cached based on the input data content and constructor options.
 * `display_now` is not part of the cache key. It only controls whether the widget is displayed immediately.
 * Use `key` to force separate table instances for the same data.
+* Use either immediate display with assignment or `display_now=False` followed by `display()`, not both.

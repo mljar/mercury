@@ -146,7 +146,7 @@ aov = (total_revenue / orders) if orders else 0.0
 This is the “report” part: you render a summary as Markdown, using live values from widgets and KPIs.
 
 ```python
-mr.Markdown(
+_ = mr.Markdown(
     f"""
 ### Report scope
 
@@ -162,6 +162,10 @@ mr.Markdown(
 """
 )
 ```
+
+Assigning the returned widget to `_` prevents IPython from rendering the final
+cell expression a second time. Mercury already displays `Markdown()`
+immediately.
 
 Why it's useful:
 
@@ -247,4 +251,3 @@ Sales are very good
 ```
 
 This is where you can add interpretation, notes, and next steps.
-

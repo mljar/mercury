@@ -28,10 +28,20 @@ Render Markdown in the main view:
 ```python
 import mercury as mr
 
-mr.Markdown(
+_ = mr.Markdown(
     "# Hello\nThis is **Markdown** rendered in Mercury."
 )
 ```
+
+<Aside type="note" title="Avoid duplicate output in notebooks">
+`Markdown()` displays the widget immediately and returns the widget instance.
+IPython also displays an unassigned object when it is the last expression in a
+cell, so a bare `mr.Markdown(...)` call at the end of a cell can appear twice.
+
+Assign the result to a descriptive variable when you need the widget later, or
+to `_` when you only need the immediate display. Do not wrap an immediately
+displayed Markdown widget in an additional `display()` call.
+</Aside>
 
 ## Layout
 
@@ -40,7 +50,7 @@ Use `position` to control where the Markdown is displayed:
 ```python
 import mercury as mr
 
-mr.Markdown(
+_ = mr.Markdown(
     "## Sidebar note\nYou can put documentation or hints here.",
     position="sidebar"
 )
@@ -49,7 +59,7 @@ mr.Markdown(
 ```python
 import mercury as mr
 
-mr.Markdown(
+_ = mr.Markdown(
     "_Footer-style text_ shown at the bottom.",
     position="bottom"
 )
@@ -151,3 +161,14 @@ Default: `"inline"`
 
 Unique identifier used to reuse the same widget instance.
 
+## Return value and display behavior
+
+`Markdown()` returns a `MarkdownWidget` and displays it immediately. Assign the
+return value to prevent IPython from automatically rendering the same widget a
+second time when the call is the final expression in a notebook cell:
+
+```python
+message = mr.Markdown("**Rendered once**")
+```
+
+Use `_ = mr.Markdown(...)` when you do not need to access the returned widget.
