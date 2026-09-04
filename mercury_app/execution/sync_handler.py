@@ -67,10 +67,16 @@ class SharedSessionWebsocket(JupyterHandler, websocket.WebSocketHandler):
             message_type = message.get("type")
             if message_type == "rerun_request":
                 from_index = message.get("from_index")
+                recovery = message.get("recovery", False)
                 if not isinstance(from_index, int) or isinstance(from_index, bool):
                     raise ValueError("rerun_request requires an integer from_index")
+                if not isinstance(recovery, bool):
+                    raise ValueError("rerun_request recovery must be a boolean")
                 self._coordinator.request_run(
-                    self.session_id, self.client_id, from_index
+                    self.session_id,
+                    self.client_id,
+                    from_index,
+                    prefer_other=recovery,
                 )
             elif message_type == "run_complete":
                 run_id = message.get("run_id")

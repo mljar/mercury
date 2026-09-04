@@ -317,7 +317,7 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                     const snapshotReady =
                       await appWidget.applySharedSnapshot(outputs);
                     if (!snapshotReady) {
-                      sharedSession.requestRun(0);
+                      sharedSession.requestRun(0, true);
                     }
                     return snapshotReady;
                   },

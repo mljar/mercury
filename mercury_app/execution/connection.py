@@ -16,6 +16,7 @@ logger = logging.getLogger("mercury.execution")
 
 MAX_MESSAGE_BYTES = 128 * 1024 * 1024
 MAX_COMM_DATA_BYTES = 2 * 1024 * 1024
+SHARED_KERNEL_INFO_TIMEOUT = 5.0
 INFO_MESSAGES = {"kernel_info_request", "comm_info_request"}
 COMM_MESSAGES = {"comm_msg", "comm_close"}
 FRONTEND_COMM_TARGETS = {"jupyter.widget.control"}
@@ -34,6 +35,19 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
         self._shared_session_coordinator = handler.settings.get(
             "mercury_shared_session_coordinator"
         )
+        coordinator = self._shared_session_coordinator
+        if (
+            coordinator is not None
+            and coordinator.room(self._mercury_record.session_id) is not None
+        ):
+            # A shared kernel can be busy running another viewer's request.
+            # Jupyter's default 60-second kernel-info wait can exceed common
+            # reverse-proxy WebSocket timeouts and surface as HTTP 502. The
+            # connection remains usable when this probe times out; Jupyter's
+            # channel implementation continues opening the ZMQ streams.
+            self.kernel_info_timeout = min(
+                self.kernel_info_timeout, SHARED_KERNEL_INFO_TIMEOUT
+            )
         await super().prepare()
 
     def _deny(self, reason: str) -> None:

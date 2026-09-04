@@ -64,6 +64,31 @@ def test_requests_are_coalesced_to_earliest_cell():
     assert follow_up["from_index"] == 3
 
 
+def test_recovery_run_prefers_another_connected_client():
+    coordinator = SharedSessionCoordinator()
+    healthy = Client("healthy")
+    joining = Client("joining")
+    coordinator.join(
+        session_id="session", kernel_id="kernel", cell_count=5, client=healthy
+    )
+    initial = messages(healthy, "run")[-1]
+    coordinator.complete_run(
+        "session", "healthy", initial["run_id"], initial["token"]
+    )
+    coordinator.join(
+        session_id="session", kernel_id="kernel", cell_count=5, client=joining
+    )
+
+    recovery = coordinator.request_run(
+        "session", "joining", 0, prefer_other=True
+    )
+
+    assert recovery is not None
+    assert recovery.client_id == "healthy"
+    assert messages(healthy, "run")[-1]["from_index"] == 0
+    assert messages(joining, "run") == []
+
+
 def test_executor_disconnect_reassigns_the_run():
     coordinator = SharedSessionCoordinator()
     first = Client("first")

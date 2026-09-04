@@ -185,23 +185,43 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                             shared_record.session_id
                         )
                     else:
-                        if coordinator is not None:
-                            await coordinator.wait_until_initialized(
+                        try:
+                            kernel_alive = await ensure_async(
+                                self.kernel_manager.is_alive(
+                                    shared_record.kernel_id
+                                )
+                            )
+                        except KeyError:
+                            kernel_alive = False
+                        if not kernel_alive:
+                            self.log.warning(
+                                "Discarding dead shared kernel %s for %s",
+                                shared_record.kernel_id,
+                                notebook_path,
+                            )
+                            self.execution_registry.unregister_session(
                                 shared_record.session_id
                             )
-                        alias = await sm.create_session(
-                            path=session_path,
-                            kernel_id=shared_record.kernel_id,
-                            name=model.get("name"),
-                            type="notebook",
-                        )
-                        self.execution_registry.attach_session_alias(
-                            primary_session_id=shared_record.session_id,
-                            alias_session_id=alias["id"],
-                            owner=owner,
-                            manifest=manifest,
-                        )
-                        return alias, True
+                            if coordinator is not None:
+                                coordinator.remove(shared_record.session_id)
+                        else:
+                            if coordinator is not None:
+                                await coordinator.wait_until_initialized(
+                                    shared_record.session_id
+                                )
+                            alias = await sm.create_session(
+                                path=session_path,
+                                kernel_id=shared_record.kernel_id,
+                                name=model.get("name"),
+                                type="notebook",
+                            )
+                            self.execution_registry.attach_session_alias(
+                                primary_session_id=shared_record.session_id,
+                                alias_session_id=alias["id"],
+                                owner=owner,
+                                manifest=manifest,
+                            )
+                            return alias, True
             elif await ensure_async(sm.session_exists(path=session_path)):
                 existing = await sm.get_session(path=session_path)
                 self.execution_registry.attach_owner(existing["id"], owner, manifest)

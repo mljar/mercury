@@ -79,8 +79,8 @@ export class SharedSessionClient {
     });
   }
 
-  requestRun(fromIndex: number): void {
-    this.send({ type: 'rerun_request', from_index: fromIndex });
+  requestRun(fromIndex: number, recovery = false): void {
+    this.send({ type: 'rerun_request', from_index: fromIndex, recovery });
   }
 
   dispose(): void {

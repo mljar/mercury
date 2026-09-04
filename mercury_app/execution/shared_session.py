@@ -144,7 +144,12 @@ class SharedSessionCoordinator:
             )
 
     def request_run(
-        self, session_id: str, client_id: str, from_index: int
+        self,
+        session_id: str,
+        client_id: str,
+        from_index: int,
+        *,
+        prefer_other: bool = False,
     ) -> RunLease | None:
         room = self._require_room(session_id)
         self._validate_client(room, client_id)
@@ -158,7 +163,17 @@ class SharedSessionCoordinator:
                 else min(room.pending_from_index, from_index)
             )
             return None
-        return self._grant(room, client_id, from_index)
+        preferred_client = client_id
+        if prefer_other:
+            preferred_client = next(
+                (
+                    connected_id
+                    for connected_id in room.clients
+                    if connected_id != client_id
+                ),
+                client_id,
+            )
+        return self._grant(room, preferred_client, from_index)
 
     def complete_run(
         self, session_id: str, client_id: str, run_id: int, token: str

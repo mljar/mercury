@@ -42,6 +42,25 @@ import {
   IPageConfigLike
 } from '../themeCssVars';
 
+async function settleWithin<T>(
+  promise: Promise<T>,
+  timeoutMs: number
+): Promise<T | undefined> {
+  let timer: number | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<undefined>(resolve => {
+        timer = window.setTimeout(() => resolve(undefined), timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timer !== undefined) {
+      window.clearTimeout(timer);
+    }
+  }
+}
+
 function readShowCodeFromContext(
   context: DocumentRegistry.IContext<INotebookModel>
 ): boolean | undefined {
@@ -630,6 +649,12 @@ export class AppWidget extends Panel {
     if (!item || !(item.child instanceof CodeCell)) {
       return;
     }
+    // Shared outputs are captured from this app's live kernel, just like the
+    // messages handled by a normal cell execution. Late joiners have not run
+    // those cells locally, however, so their models can still be untrusted.
+    // JupyterLab only considers the ipywidget renderer for trusted outputs and
+    // otherwise falls back to text/plain (the Python object repr).
+    item.child.model.trusted = true;
     const outputArea = item.child.outputArea as any;
     if (reset) {
       outputArea.model.clear();
@@ -643,6 +668,19 @@ export class AppWidget extends Panel {
   }
 
   async applySharedSnapshot(outputs: Record<string, any[]>): Promise<boolean> {
+    // The notebook model can contain a text/plain fallback for widget outputs.
+    // Remove it immediately so late joiners never see Python object reprs while
+    // their live widget models are being restored.
+    for (const item of this._cellItems) {
+      if (item.child instanceof CodeCell) {
+        const outputArea = item.child.outputArea as any;
+        outputArea.model.clear();
+        if (typeof outputArea._clear === 'function') {
+          outputArea._clear();
+        }
+      }
+    }
+
     const widgetModelsReady = await this.waitForSharedWidgetModels(outputs);
     if (this.isDisposed) {
       return false;
@@ -653,15 +691,6 @@ export class AppWidget extends Panel {
       );
       return false;
     }
-    for (const item of this._cellItems) {
-      if (item.child instanceof CodeCell) {
-        const outputArea = item.child.outputArea as any;
-        outputArea.model.clear();
-        if (typeof outputArea._clear === 'function') {
-          outputArea._clear();
-        }
-      }
-    }
     for (const [cellId, messages] of Object.entries(outputs)) {
       messages.forEach(message => this.applySharedOutput(cellId, message));
     }
@@ -671,7 +700,7 @@ export class AppWidget extends Panel {
 
   private async waitForSharedWidgetModels(
     outputs: Record<string, any[]>,
-    timeoutMs = 30000
+    timeoutMs = 10000
   ): Promise<boolean> {
     const modelIds = new Set<string>();
     for (const messages of Object.values(outputs)) {
@@ -699,12 +728,19 @@ export class AppWidget extends Panel {
 
     const deadline = Date.now() + timeoutMs;
     while (!this.isDisposed && Date.now() < deadline) {
-      const manager = await getWidgetManager(this._model.rendermime);
+      const remaining = deadline - Date.now();
+      const manager = await settleWithin(
+        getWidgetManager(this._model.rendermime),
+        Math.min(1000, remaining)
+      );
       if (manager) {
-        const models = await Promise.all(
-          Array.from(modelIds, modelId => resolveIpyModel(manager, modelId))
+        const models = await settleWithin(
+          Promise.all(
+            Array.from(modelIds, modelId => resolveIpyModel(manager, modelId))
+          ),
+          Math.min(1000, Math.max(1, deadline - Date.now()))
         );
-        if (models.every(model => model && model.comm_live !== false)) {
+        if (models?.every(model => model && model.comm_live !== false)) {
           return true;
         }
         // A completed restore with unresolved ids means the snapshot refers to
