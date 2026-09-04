@@ -313,8 +313,14 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                   }
                 };
                 const sharedSession = new SharedSessionClient(session.id, {
-                  onSnapshot: outputs =>
-                    appWidget.applySharedSnapshot(outputs),
+                  onSnapshot: async outputs => {
+                    const snapshotReady =
+                      await appWidget.applySharedSnapshot(outputs);
+                    if (!snapshotReady) {
+                      sharedSession.requestRun(0);
+                    }
+                    return snapshotReady;
+                  },
                   onOutput: (cellId, message, reset) =>
                     appWidget.applySharedOutput(cellId, message, reset),
                   onRun: async (run, clientId) => {

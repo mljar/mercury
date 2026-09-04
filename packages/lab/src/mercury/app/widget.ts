@@ -23,11 +23,7 @@ import {
   executeWidgetsManagerClearValues
 } from '../../executor/codecell';
 import { isStopExecutionReply } from '../../executor/stop';
-// import {
-//   getWidgetManager,
-//   resolveIpyModel,
-//   getWidgetModelIdsFromCell
-// } from './ipyWidgetsHelpers';
+import { getWidgetManager, resolveIpyModel } from './ipyWidgetsHelpers';
 
 import {
   hideErrorOutputsOnChange,
@@ -646,7 +642,17 @@ export class AppWidget extends Panel {
     }
   }
 
-  applySharedSnapshot(outputs: Record<string, any[]>): void {
+  async applySharedSnapshot(outputs: Record<string, any[]>): Promise<boolean> {
+    const widgetModelsReady = await this.waitForSharedWidgetModels(outputs);
+    if (this.isDisposed) {
+      return false;
+    }
+    if (!widgetModelsReady) {
+      console.warn(
+        '[Mercury] Shared widget models are unavailable; requesting a recovery rerun'
+      );
+      return false;
+    }
     for (const item of this._cellItems) {
       if (item.child instanceof CodeCell) {
         const outputArea = item.child.outputArea as any;
@@ -660,6 +666,61 @@ export class AppWidget extends Panel {
       messages.forEach(message => this.applySharedOutput(cellId, message));
     }
     this.updatePanelVisibility();
+    return true;
+  }
+
+  private async waitForSharedWidgetModels(
+    outputs: Record<string, any[]>,
+    timeoutMs = 30000
+  ): Promise<boolean> {
+    const modelIds = new Set<string>();
+    for (const messages of Object.values(outputs)) {
+      for (const message of messages) {
+        const widgetView =
+          message?.content?.data?.[
+            'application/vnd.jupyter.widget-view+json'
+          ];
+        let modelId = widgetView?.model_id;
+        if (typeof widgetView === 'string') {
+          try {
+            modelId = JSON.parse(widgetView)?.model_id;
+          } catch {
+            modelId = undefined;
+          }
+        }
+        if (typeof modelId === 'string' && modelId) {
+          modelIds.add(modelId);
+        }
+      }
+    }
+    if (modelIds.size === 0) {
+      return true;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    while (!this.isDisposed && Date.now() < deadline) {
+      const manager = await getWidgetManager(this._model.rendermime);
+      if (manager) {
+        const models = await Promise.all(
+          Array.from(modelIds, modelId => resolveIpyModel(manager, modelId))
+        );
+        if (models.every(model => model && model.comm_live !== false)) {
+          return true;
+        }
+        // A completed restore with unresolved ids means the snapshot refers to
+        // models that are no longer present in the kernel. Waiting longer
+        // cannot repair that state; let the coordinator schedule a fresh run.
+        if (manager.restoredStatus === true) {
+          return false;
+        }
+      }
+      await new Promise(resolve => window.setTimeout(resolve, 100));
+    }
+
+    console.warn(
+      `[Mercury] Timed out waiting for ${modelIds.size} shared widget models`
+    );
+    return false;
   }
 
   /**

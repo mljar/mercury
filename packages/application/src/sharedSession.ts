@@ -8,7 +8,7 @@ export type SharedRun = {
 };
 
 export type SharedSessionCallbacks = {
-  onSnapshot: (outputs: Record<string, any[]>) => void;
+  onSnapshot: (outputs: Record<string, any[]>) => Promise<boolean> | boolean;
   onRun: (run: SharedRun, clientId: string) => Promise<void>;
   onReady: () => void;
   onOutput: (cellId: string, message: any, reset: boolean) => void;
@@ -35,31 +35,34 @@ export class SharedSessionClient {
         const message = JSON.parse(String(event.data));
         if (message.type === 'welcome') {
           this.clientId = String(message.client_id);
-          this.callbacks.onSnapshot(message.outputs ?? {});
           connected = true;
-          resolve();
-          if (message.initialized) {
-            this.callbacks.onReady();
-          }
+          this.messageQueue = this.messageQueue
+            .then(async () => {
+              const snapshotReady = await this.callbacks.onSnapshot(
+                message.outputs ?? {}
+              );
+              resolve();
+              if (message.initialized && snapshotReady) {
+                this.callbacks.onReady();
+              }
+            })
+            .catch(error => {
+              console.error(
+                '[Mercury] Failed to restore shared session snapshot:',
+                error
+              );
+              reject(error);
+            });
           return;
         }
-        if (message.type === 'run') {
-          void this.handleRun(message);
-          return;
-        }
-        if (message.type === 'output') {
-          if (message.executor_client_id !== this.clientId) {
-            this.callbacks.onOutput(
-              String(message.cell_id),
-              message.message,
-              message.reset === true
+        this.messageQueue = this.messageQueue
+          .then(() => this.handleMessage(message))
+          .catch(error => {
+            console.error(
+              '[Mercury] Failed to process shared session message:',
+              error
             );
-          }
-          return;
-        }
-        if (message.type === 'run_complete') {
-          this.callbacks.onReady();
-        }
+          });
       };
       socket.onerror = () => {
         if (!connected) {
@@ -104,6 +107,26 @@ export class SharedSessionClient {
     }
   }
 
+  private async handleMessage(message: any): Promise<void> {
+    if (message.type === 'run') {
+      await this.handleRun(message);
+      return;
+    }
+    if (message.type === 'output') {
+      if (message.executor_client_id !== this.clientId) {
+        this.callbacks.onOutput(
+          String(message.cell_id),
+          message.message,
+          message.reset === true
+        );
+      }
+      return;
+    }
+    if (message.type === 'run_complete') {
+      this.callbacks.onReady();
+    }
+  }
+
   private send(message: Record<string, unknown>): void {
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
@@ -113,4 +136,5 @@ export class SharedSessionClient {
   private socket: WebSocket | null = null;
   private clientId = '';
   private disposed = false;
+  private messageQueue: Promise<void> = Promise.resolve();
 }
