@@ -72,6 +72,7 @@ from .image import ImageCard
 from .download import Download
 from .pdf import PDF
 from .progressbar import ProgressBar
+from .status_lights import StatusLights
 from .download import Download
 
 # chat widgets

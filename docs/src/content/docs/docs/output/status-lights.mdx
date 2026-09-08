@@ -1,0 +1,185 @@
+---
+title: StatusLights
+description: Display animated service and workflow status lamps in a Mercury App
+---
+
+The **StatusLights** output widget displays a group of compact status lamps inspired
+by industrial control panels and classic computer consoles. It is useful for service
+monitoring, pipelines, ETL jobs, ML workflows, and agent execution.
+
+## Basic usage
+
+```python
+import mercury as mr
+
+lights = mr.StatusLights({
+    "Database": "ok",
+    "API": "ok",
+    "Model": "warning",
+    "Worker": "error",
+})
+```
+
+Lamps are rendered in dictionary insertion order and automatically wrap into a
+responsive grid.
+
+Set `orientation="vertical"` to display a single-column stack instead:
+
+```python
+mr.StatusLights(
+    {"Database": "ok", "API": "active", "Worker": "off"},
+    orientation="vertical",
+)
+```
+
+## States
+
+Five states are available:
+
+| State | Appearance |
+|---|---|
+| `"off"` | Dim gray |
+| `"ok"` | Green |
+| `"warning"` | Amber |
+| `"error"` | Red |
+| `"active"` | Mercury blue |
+
+State names are case-insensitive and normalized to lowercase.
+
+## Animation
+
+Pass lamp labels to `blink` or `pulse`:
+
+```python
+lights = mr.StatusLights(
+    {
+        "Database": "ok",
+        "Model": "warning",
+        "Worker": "error",
+    },
+    blink=["Worker"],
+    pulse=["Model"],
+)
+```
+
+A lamp cannot blink and pulse simultaneously. Animation is disabled automatically
+when the browser requests reduced motion; the color and textual state remain visible.
+
+## Live updates
+
+`StatusLights()` returns the displayed widget. Update it directly while code is
+running:
+
+```python
+lights = mr.StatusLights(
+    {"Extract": "active", "Transform": "off", "Load": "off"},
+    pulse=["Extract"],
+    key="etl",
+)
+
+lights.set("Extract", "ok")
+lights.set("Transform", "active")
+lights.set_animation("Extract", None)
+lights.set_animation("Transform", "pulse")
+
+lights.update({
+    "Transform": "ok",
+    "Load": "active",
+})
+```
+
+Available update methods:
+
+- `set(name, state)` adds or updates one lamp in place.
+- `update(statuses)` merges several lamp states in place.
+- `set_animation(name, "blink")` enables blinking.
+- `set_animation(name, "pulse")` enables pulsing.
+- `set_animation(name, None)` removes animation.
+
+## Title and placement
+
+```python
+mr.StatusLights(
+    {"API": "ok", "Queue": "active"},
+    title="Production",
+    position="sidebar",
+    key="production-health",
+)
+```
+
+`position` accepts `"inline"`, `"sidebar"`, or `"bottom"`.
+
+The title and both border levels can be hidden independently:
+
+```python
+mr.StatusLights(
+    {"API": "ok", "Queue": "active"},
+    title="Production",
+    show_title=False,
+    show_group_border=False,
+    show_item_borders=False,
+)
+```
+
+Leaving `title=""` also omits the title automatically.
+
+## Theme configuration
+
+StatusLights uses Mercury's shared CSS variables for typography, surfaces,
+borders, radii, shadows, and semantic colors. Changes to `config.toml` therefore
+apply to the lamps and their containers:
+
+```toml
+[theme]
+primary_color = "#00d9ff"  # active
+success_color = "#00ff85"  # ok
+warning_color = "#ffe600"  # warning
+danger_color = "#ff1744"   # error
+```
+
+The radial highlight, saturation, and multi-layer glow are applied on top of
+those configured colors to produce the neon lamp effect.
+
+Use a stable `key` when statuses are recreated by a reactive notebook cell or when
+multiple status groups appear in the same cell. The existing widget is reused and
+updated instead of creating another frontend model.
+
+## Parameters
+
+### `statuses`
+
+Required mapping of non-empty labels to supported state names. An empty mapping is
+allowed and can be populated later with `set()` or `update()`.
+
+### `blink` / `pulse`
+
+Optional sequences of labels from `statuses`.
+
+### `title`
+
+Optional heading displayed above the lamps. Default: `""`.
+
+### `orientation`
+
+`"horizontal"` for a responsive row or `"vertical"` for a single-column stack.
+Default: `"horizontal"`.
+
+### `show_title`
+
+Show a non-empty title. Default: `True`.
+
+### `show_group_border`
+
+Show the outer panel surface and border. Default: `True`.
+
+### `show_item_borders`
+
+Show the surface and border around each lamp item. Default: `True`.
+
+### `position`
+
+Mercury layout placement. Default: `"inline"`.
+
+### `key`
+
+Stable identifier used for widget reuse across cell executions.
