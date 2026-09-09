@@ -10,6 +10,7 @@ import anywidget
 import traitlets
 
 from .message import Message, MSG_CSS_CLASS
+from ..render_context import get_render_context
 from ..theme import THEME
 
 
@@ -264,7 +265,8 @@ class Chat:
             chat_css_class=self._chat_css_class,
         )
 
-        clear_output(wait=True)
+        if get_render_context().render_slot_id is None:
+            clear_output(wait=True)
         # Display both the visible chat and the hidden scroller
         display(self.vbox, self._scroller)
 

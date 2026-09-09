@@ -1,6 +1,11 @@
 import mercury.chat.chat as chat_module
+import mercury.columns as columns_module
+import mercury.md as md_module
 from mercury.chat.chat import Chat
 from mercury.chat.message import DEFAULT_EMOJI_BACKGROUND, Message
+from mercury.columns import Columns
+from mercury.md import Markdown
+from mercury.render_context import get_render_context
 
 
 class FakeTimer:
@@ -57,6 +62,48 @@ def test_chat_height_accepts_viewport_units(monkeypatch):
     assert chat.height == "70vh"
     assert chat.vbox.layout.height == "70vh"
     assert chat.vbox.layout.overflow == "hidden auto"
+
+
+def test_chat_clears_current_cell_output_outside_layout(monkeypatch):
+    monkeypatch.setattr(chat_module, "display", lambda *_: None)
+
+    clear_calls = []
+    monkeypatch.setattr(
+        chat_module,
+        "clear_output",
+        lambda *_, **kwargs: clear_calls.append(kwargs),
+    )
+
+    Chat()
+
+    assert clear_calls == [{"wait": True}]
+
+
+def test_column_displays_label_and_chat_together(monkeypatch):
+    monkeypatch.setattr(columns_module, "display", lambda *_: None)
+    monkeypatch.setattr(columns_module, "_display_style", lambda: None)
+
+    displayed_by_slot = {}
+
+    def capture_display(*objects):
+        slot_id = get_render_context().render_slot_id
+        displayed_by_slot.setdefault(slot_id, []).extend(objects)
+
+    def capture_clear_output(*_, **__):
+        slot_id = get_render_context().render_slot_id
+        displayed_by_slot.setdefault(slot_id, []).clear()
+
+    monkeypatch.setattr(md_module, "display", capture_display)
+    monkeypatch.setattr(chat_module, "display", capture_display)
+    monkeypatch.setattr(chat_module, "clear_output", capture_clear_output)
+
+    column = Columns(1, key="chat-parent-output-regression")[0]
+    with column:
+        label = Markdown("### Model name")
+        chat = Chat()
+
+    slot_id = column.layout_frame.slot_id
+    assert displayed_by_slot[slot_id] == [label, chat.vbox, chat._scroller]
 
 
 def test_message_expands_instead_of_becoming_a_scroll_container():
