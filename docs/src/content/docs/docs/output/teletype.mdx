@@ -1,0 +1,182 @@
+---
+title: Teletype
+description: Reveal plain text like an old terminal and append live output in a Mercury App
+---
+
+The **Teletype** output widget reveals plain text character by character like an old
+terminal or teleprinter. It is useful for agent execution, AI output, logs,
+simulations, data-processing status, and narrative dashboards.
+
+## Basic usage
+
+```python
+import mercury as mr
+
+output = mr.Teletype(
+    "Loading dataset...\n"
+    "Analyzing 18,420 rows...\n"
+    "Done."
+)
+```
+
+Spaces, tabs, and newline characters are preserved. `Teletype` deliberately renders
+plain text rather than Markdown or HTML, so partially revealed content is always safe
+and visually stable.
+
+## Speed and cursor
+
+`speed` is the delay in milliseconds per visible character:
+
+```python
+status = mr.Teletype(
+    "SYSTEM READY",
+    speed=30,
+    cursor=True,
+)
+```
+
+The default is `30`. Set `speed=0` to display content immediately, which is useful
+when an AI provider or another process already controls the arrival rate. The cursor
+remains solid while text is being written and blinks while idle. Hide it with
+`cursor=False`.
+
+Animation and cursor blinking are removed automatically when the browser requests
+reduced motion. Emoji and combined Unicode characters are revealed as complete
+visible characters rather than being split into invalid fragments.
+
+## Append text incrementally
+
+`Teletype()` returns its live widget object. Call `append()` from later notebook code
+to add output without replaying text that is already present:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+terminal = mr.Teletype("", speed=20, key="agent-log")
+
+# %%
+terminal.append("Loading dataset...")
+terminal.append("\nAnalyzing 18,420 rows...")
+terminal.append("\nDone.")
+```
+
+Each `# %%` above starts a separate notebook cell. If new text arrives while the
+widget is still typing, it joins the same animation queue instead of interrupting or
+restarting it.
+
+For a real streaming response, append each plain-text chunk as it arrives:
+
+```python
+# %%
+response = mr.Teletype("", speed=0, key="model-response")
+
+# %%
+for chunk in model.generate_stream(prompt):
+    response.append(chunk)
+```
+
+Use Mercury's chat messages instead when the output needs Markdown formatting or chat
+roles.
+
+## Replace or clear the output
+
+Assign to `text` or call `set()` to replace the target text:
+
+```python
+terminal.text = "Starting another operation..."
+terminal.set("Operation complete.")
+terminal.clear()
+```
+
+Unrelated replacement text starts a fresh reveal. If the assigned text is an exact
+extension of the current target, only its new suffix is queued. Assigning identical
+text does nothing, preventing reactive notebook reruns from replaying the animation.
+
+## Reactive updates
+
+Use a stable `key` when a lower notebook cell recreates the output:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+stage = mr.Slider(label="Stage", value=1, min=1, max=3)
+
+# %%
+messages = [
+    "Connecting...",
+    "Connecting...\nDownloading records...",
+    "Connecting...\nDownloading records...\nDone.",
+]
+terminal = mr.Teletype(
+    messages[stage.value - 1],
+    speed=24,
+    key="pipeline-status",
+)
+```
+
+Moving the slider reruns the cell below it. The stable key reuses the frontend widget,
+so only the newly added suffix is animated.
+
+## Auto-scroll
+
+With the default `auto_scroll=True`, new output remains visible while the reader is
+already near the bottom of its scrolling container. If the reader scrolls upward to
+inspect previous output, the widget stops pulling the view downward. Set
+`auto_scroll=False` to disable this behavior completely.
+
+## Theme configuration
+
+The surface, text, border, radius, font size, and cursor colors use Mercury's runtime
+theme variables generated from `config.toml`. For example:
+
+```toml
+[theme]
+card_background_color = "#101419"
+text_color = "#d8f3dc"
+border_color = "#324238"
+primary_color = "#52d273"
+accent_color = "#7bf1a8"
+border_radius = "6px"
+font_size = "15px"
+```
+
+The output uses a system monospace font stack while inheriting the surrounding
+application's configured colors.
+
+## Parameters
+
+### `text`
+
+Required plain-text string. Whitespace and line breaks are preserved.
+
+### `speed`
+
+Finite non-negative milliseconds per visible character. Default: `30`. Use `0` for
+immediate display.
+
+### `cursor`
+
+Show the terminal cursor. Default: `True`.
+
+### `auto_scroll`
+
+Keep new output visible while the reader remains near the bottom. Default: `True`.
+
+### `position`
+
+Mercury layout placement: `"inline"`, `"sidebar"`, or `"bottom"`.
+Default: `"inline"`.
+
+### `key`
+
+Stable identifier used to reuse the widget across reactive cell executions.
+
+## Accessibility
+
+Visual text is hidden from assistive technology while a separate polite log announces
+complete appended chunks. Screen readers therefore do not announce every individual
+character. The visual cursor is not included in selected or copied text.

@@ -74,6 +74,7 @@ from .pdf import PDF
 from .progressbar import ProgressBar
 from .status_lights import StatusLights
 from .split_flap import SplitFlap
+from .teletype import Teletype
 from .vu_meter import VUMeter
 from .download import Download
 
