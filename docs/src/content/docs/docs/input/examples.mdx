@@ -1,0 +1,169 @@
+---
+title: Examples
+description: Populate Mercury input widgets from named predefined examples
+---
+
+The **Examples** component displays named presets that populate existing Mercury
+input widgets. It lets users try meaningful inputs without entering every value
+manually.
+
+## Basic usage
+
+Define the input widgets first, place `Examples` after them, and put calculations
+below it. Each `# %%` starts a separate notebook cell:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+age = mr.NumberInput(
+    label="Age",
+    value=30,
+    min=18,
+    max=100,
+    key="age",
+)
+
+# %%
+country = mr.Select(
+    label="Country",
+    value="Poland",
+    choices=["Poland", "Germany", "France"],
+    url_key="country",
+)
+
+# %%
+presets = mr.Examples(
+    examples={
+        "Young customer": {
+            "age": 25,
+            "country": "Poland",
+        },
+        "Enterprise customer": {
+            "age": 45,
+            "country": "Germany",
+        },
+    }
+)
+
+# %%
+print(age.value, country.value)
+```
+
+`Examples` appears in the sidebar by default. Clicking a named example updates all
+valid target inputs and then triggers one reactive execution of the cells below the
+component.
+
+## Matching input widgets
+
+Each field name is matched against an input widget's exact, case-sensitive `key`
+first. If no key matches, Mercury looks for the same `url_key`:
+
+```python
+age = mr.NumberInput(key="age")
+country = mr.Select(choices=["Poland", "Germany"], url_key="country")
+```
+
+The example identifiers are therefore `"age"` and `"country"`. Python variable
+names and visible labels are not used for matching.
+
+If one widget uses `key="country"` while another uses `url_key="country"`, the key
+match wins. Reusing the same key or URL key across multiple inputs is ambiguous; that
+field is skipped and a warning is displayed.
+
+## Execution behavior
+
+Mercury applies an example in three phases:
+
+1. Resolve and validate every provided field.
+2. Update every valid target widget.
+3. Request one notebook execution after the updates are complete.
+
+Missing, ambiguous, or invalid fields do not prevent other valid fields from being
+applied. If no value changes, the notebook is not rerun.
+
+The component follows the app's global auto-rerun setting. When auto-rerun is disabled,
+values are populated but execution waits for the normal **Run** action.
+
+Cell order is important. Inputs must exist before `Examples` so they can be found, and
+code that consumes their values must be in cells below `Examples` so it is included in
+the single reactive execution.
+
+## Warnings
+
+Problems are shown below the example buttons and also emitted as Python warnings:
+
+```text
+⚠ Widget not found: customer_segment.
+```
+
+Warnings cover:
+
+- missing widget identifiers;
+- identifiers shared by multiple input widgets;
+- values with the wrong type;
+- numbers outside an input's range;
+- unknown Select or MultiSelect choices;
+- invalid dates, times, or date ranges.
+
+Warnings clear when another example is selected.
+
+## Supported inputs
+
+The first version supports explicit values for:
+
+- `TextInput`
+- `NumberInput`
+- `Slider`
+- `Select`
+- `MultiSelect`
+- `CheckBox`
+- `DateInput`
+- `TimeInput`
+- `DateTimeInput`
+- `DateRange`
+
+Target a `DateRange` by its widget key and provide its complete range:
+
+```python
+period = mr.DateRange(label="Period", key="reporting-period")
+
+presets = mr.Examples({
+    "First quarter": {
+        "reporting-period": ["2026-01-01", "2026-03-31"],
+    }
+})
+```
+
+Buttons, file uploads, layout widgets, output widgets, and arbitrary third-party
+ipywidgets are not targets in this version.
+
+## Position
+
+The default is `position="sidebar"`. Use `"inline"` or `"bottom"` when the examples
+should appear with notebook output:
+
+```python
+presets = mr.Examples(examples, position="inline")
+```
+
+Buttons are displayed vertically in dictionary insertion order. Their typography,
+colors, borders, selected state, focus ring, and warnings use runtime Mercury theme
+variables from `config.toml`, including `border_radius` for the button corners.
+
+## Parameters
+
+### `examples`
+
+Required non-empty mapping of example names to mappings of widget identifiers and
+explicit values. Example names and widget identifiers must be non-empty strings.
+
+### `position`
+
+Mercury layout placement: `"sidebar"`, `"inline"`, or `"bottom"`.
+Default: `"sidebar"`.
+
+### `key`
+
+Stable identifier used to reuse the component across cell executions.

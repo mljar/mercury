@@ -70,6 +70,7 @@ from .funnel import Funnel
 from .table import Table
 from .image import ImageCard
 from .download import Download
+from .examples import Examples
 from .pdf import PDF
 from .progressbar import ProgressBar
 from .status_lights import StatusLights

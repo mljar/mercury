@@ -1,12 +1,24 @@
-import logging
 import hashlib
+import logging
+from dataclasses import dataclass
 
 log = logging.getLogger(__name__)
 
 MERCURY_MIMETYPE = "application/mercury+json"
 
+
 class WidgetException(Exception):
     pass
+
+
+@dataclass(frozen=True)
+class InputWidgetRegistration:
+    """Search metadata for a value-bearing Mercury input widget."""
+
+    code_uid: str
+    widget: object
+    key: str = ""
+    url_key: str = ""
 
 
 def _safe_str(obj):
@@ -44,6 +56,7 @@ def _config_hash(args, kwargs):
 
 class WidgetsManager:
     widgets = {}  # model_id -> widget
+    input_widgets = {}  # code_uid -> InputWidgetRegistration
 
     @staticmethod
     def get_code_uid(widget_type="widget", key="", index=None, args=[], kwargs={}):
@@ -61,6 +74,38 @@ class WidgetsManager:
     @staticmethod
     def add_widget(code_uid, widget):
         WidgetsManager.widgets[code_uid] = widget
+
+    @staticmethod
+    def register_input(code_uid, widget, key="", url_key=""):
+        """Register explicit lookup aliases for a supported input widget."""
+        WidgetsManager.input_widgets[code_uid] = InputWidgetRegistration(
+            code_uid=code_uid,
+            widget=widget,
+            key=key,
+            url_key=url_key,
+        )
+
+    @staticmethod
+    def resolve_input(identifier):
+        """Resolve by key first and then by url_key.
+
+        Returns ``(source, matches)`` where source is ``"key"``, ``"url_key"``,
+        or ``None``. Stale registrations are ignored.
+        """
+        active = [
+            registration
+            for code_uid, registration in WidgetsManager.input_widgets.items()
+            if WidgetsManager.widgets.get(code_uid) is registration.widget
+        ]
+        key_matches = [item for item in active if item.key and item.key == identifier]
+        if key_matches:
+            return "key", key_matches
+        url_matches = [
+            item for item in active if item.url_key and item.url_key == identifier
+        ]
+        if url_matches:
+            return "url_key", url_matches
+        return None, []
 
     @staticmethod
     def get_widget(code_uid):
