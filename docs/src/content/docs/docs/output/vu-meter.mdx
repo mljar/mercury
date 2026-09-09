@@ -1,0 +1,196 @@
+---
+title: VUMeter
+description: Display live values on a retro analog instrument in a Mercury App
+---
+
+The **VUMeter** output widget presents a numeric value like a physical analog
+instrument. Its needle moves smoothly when the value changes, making it useful for
+utilization, confidence, performance, anomaly, and percentage metrics.
+
+## Basic usage
+
+```python
+import mercury as mr
+
+meter = mr.VUMeter(
+    value=73,
+    min=0,
+    max=100,
+    label="CPU LOAD",
+)
+```
+
+`VUMeter()` displays the instrument and returns its live widget object.
+
+The dial uses one thin Indicator-style container border with no additional casing or
+inner outline.
+
+## Zones
+
+Pass two thresholds to divide the scale into three semantic zones:
+
+```python
+mr.VUMeter(
+    value=0.82,
+    min=0,
+    max=1,
+    label="MODEL CONFIDENCE",
+    zones=[0.5, 0.8],
+)
+```
+
+By default, higher values are considered better. The zones progress from danger to
+warning to success. For metrics where increasing values indicate trouble, reverse
+the colors with `higher_is_better=False`:
+
+```python
+mr.VUMeter(
+    value=73,
+    min=0,
+    max=100,
+    label="CPU LOAD",
+    zones=[60, 85],
+    higher_is_better=False,
+)
+```
+
+Without `zones`, the scale uses Mercury's primary color.
+
+## Reactive updates
+
+Use a stable `key` when a reactive notebook cell recreates the meter. Each `# %%`
+below marks a separate notebook cell:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+load = mr.Slider(
+    label="CPU load",
+    value=42,
+    min=0,
+    max=100,
+)
+
+# %%
+meter = mr.VUMeter(
+    value=load.value,
+    min=0,
+    max=100,
+    label="CPU LOAD",
+    zones=[60, 85],
+    higher_is_better=False,
+    key="cpu-meter",
+)
+```
+
+Changing the slider reruns the meter cell. Its stable key preserves the frontend
+instrument, allowing the needle to animate from its previous position.
+
+You can also update a displayed meter directly from a later cell:
+
+```python
+meter.value = 73
+meter.set(88)
+```
+
+The exact value is deliberately not repeated below the needle. If you want it visible,
+include it in the face label:
+
+```python
+cpu = 73
+mr.VUMeter(
+    value=cpu,
+    label=f"CPU LOAD · {cpu}%",
+)
+```
+
+In a reactive app, build the label from the same input value used by the meter.
+
+Out-of-range values are clamped to the physical scale and emit a Python warning.
+
+## Animation and sizes
+
+The initial value is positioned immediately. Later changes use a lightweight CSS
+transform that retargets smoothly during rapid updates. Disable it with
+`animate=False`:
+
+```python
+mr.VUMeter(42, label="SIGNAL", animate=False)
+```
+
+Use `size="small"`, `"medium"`, or `"large"`. The instrument remains responsive
+and shrinks when its container is narrower than the selected maximum width.
+
+## Theme configuration
+
+The dial, typography, needle, zones, and container use runtime Mercury CSS variables
+generated from `config.toml`. The meter background uses `card_background_color`, with
+`panel_bg` as its fallback, matching its role as a dashboard card. For example:
+
+```toml
+[theme]
+font_family = "IBM Plex Mono, ui-monospace, monospace"
+card_background_color = "#f4e9c8"
+panel_bg = "#f4e9c8"
+text_color = "#231f1a"
+muted_text_color = "#625b4e"
+border_color = "#776b58"
+primary_color = "#d97706"
+success_color = "#31965a"
+warning_color = "#d99b21"
+danger_color = "#c43d32"
+border_radius_lg = "12px"
+shadow_md = "0 8px 22px rgba(0, 0, 0, 0.24)"
+```
+
+The physical highlights and shading are mixed from these configured colors, so the
+same meter adapts to light, dark, and branded applications.
+
+## Parameters
+
+### `value`
+
+Required finite numeric value. Values outside the scale are clamped.
+
+### `min` / `max`
+
+Finite scale bounds where `min < max`. Defaults: `0` and `100`.
+
+### `label`
+
+Text printed inside the instrument face. Default: `""`, displayed as `"VU"`.
+
+### `zones`
+
+Optional sequence of exactly two ascending thresholds strictly inside the scale.
+
+### `higher_is_better`
+
+If `True`, zones progress from danger to success. If `False`, they progress from
+success to danger. Default: `True`.
+
+### `size`
+
+`"small"`, `"medium"`, or `"large"`. Default: `"medium"`.
+
+### `animate`
+
+Animate needle changes. Default: `True`. Browser reduced-motion preferences are
+respected automatically.
+
+### `position`
+
+Mercury layout placement: `"inline"`, `"sidebar"`, or `"bottom"`.
+Default: `"inline"`.
+
+### `key`
+
+Stable identifier used to reuse the meter across reactive cell executions.
+
+## Accessibility
+
+The instrument uses the semantic `meter` role with its current value and bounds.
+The exact value is available to assistive technology, and the scale remains readable
+without relying on animation or color alone.
