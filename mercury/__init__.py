@@ -73,6 +73,7 @@ from .download import Download
 from .pdf import PDF
 from .progressbar import ProgressBar
 from .status_lights import StatusLights
+from .split_flap import SplitFlap
 from .download import Download
 
 # chat widgets

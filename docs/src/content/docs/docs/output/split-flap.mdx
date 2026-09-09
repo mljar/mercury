@@ -1,0 +1,144 @@
+---
+title: SplitFlap
+description: Display animated numbers and short text on a retro split-flap board
+---
+
+The **SplitFlap** output widget presents numbers and short text like an old airport
+or railway departure board. Changed characters rotate through a two-part mechanical
+flip, making it useful for KPIs, counters, rankings, scores, and dashboard headlines.
+
+## Basic usage
+
+```python
+import mercury as mr
+
+board = mr.SplitFlap(value="12,482")
+```
+
+`SplitFlap()` displays the board and returns the live widget object.
+
+## Sizes
+
+Use `size="small"`, `"medium"`, or `"large"`:
+
+```python
+mr.SplitFlap(
+    value="$42,810",
+    size="large",
+)
+```
+
+The default is `"medium"`. Boards keep their characters on one line and scroll
+horizontally in a container that is too narrow.
+
+## Live updates
+
+Call `set()` to change the value of an existing board:
+
+```python
+scoreboard = mr.SplitFlap("042")
+scoreboard.set("105")
+```
+
+In a served Mercury app, use a stable `key` and drive changes with an input widget
+in an earlier cell. Each `# %%` below represents a separate notebook cell:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+score = mr.Slider(
+    label="Score",
+    value=42,
+    min=0,
+    max=999,
+    position="inline",
+)
+
+# %%
+scoreboard = mr.SplitFlap(
+    value=f"{score.value:03}",
+    size="large",
+    key="scoreboard",
+)
+```
+
+Moving the slider reruns the cell below it. The stable key reuses the same frontend
+board, so changed digits visibly flip rather than creating a second widget.
+
+## Animation
+
+Animation is enabled by default and applies only to character positions that change.
+Adjacent changes have a short mechanical stagger. Disable it when an immediate update
+is more appropriate:
+
+```python
+mr.SplitFlap("ON TIME", animate=False)
+```
+
+Motion is also removed automatically when the browser requests reduced motion. The
+new value remains available as an accessible live status announcement.
+
+## Values
+
+`value` accepts a string, integer, or float. Numbers are converted to text without
+automatic currency or thousands formatting, so supply the exact presentation you
+want:
+
+```python
+mr.SplitFlap(f"${revenue:,.0f}")
+```
+
+Capitalization, punctuation, and spaces are preserved. Length changes are supported.
+
+Use newline characters to create a single multi-row board. Pad the strings when you
+want table-like column alignment:
+
+```python
+mr.SplitFlap(
+    "SYMBOL    PRICE   CHANGE\n"
+    "AAPL    $231.42   ▲0.10%\n"
+    "MSFT    $417.10   ▼0.10%",
+    size="small",
+)
+```
+
+Rows share one board frame and changed characters animate independently.
+
+## Theme configuration
+
+`SplitFlap` renders the board directly, without a surrounding card, border, or label.
+Its accent and corner radius follow Mercury's shared theme variables, which can be
+changed in `config.toml`:
+
+```toml
+[theme]
+primary_color = "#ffb000"
+border_radius = "6px"
+```
+
+The character tiles retain their dark, high-contrast mechanical appearance.
+
+## Parameters
+
+### `value`
+
+Required string, integer, or float displayed on the board.
+
+### `size`
+
+`"small"`, `"medium"`, or `"large"`. Default: `"medium"`.
+
+### `animate`
+
+Animate character changes. Default: `True`.
+
+### `position`
+
+Mercury layout placement: `"inline"`, `"sidebar"`, or `"bottom"`.
+Default: `"inline"`.
+
+### `key`
+
+Stable identifier used to reuse and update the widget across reactive cell executions.
