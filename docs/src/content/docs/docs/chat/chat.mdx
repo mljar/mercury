@@ -63,6 +63,9 @@ Whenever a new message is added:
 
 * the chat scrolls to the **most recent message**
 * scrolling waits briefly to allow large outputs (plots, images) to finish rendering
+* a fixed-height chat stops following new content when the reader scrolls upward
+
+Auto-follow resumes when the reader returns near the bottom of the fixed-height chat.
 
 This makes `Chat` suitable for:
 
@@ -207,7 +210,9 @@ Default: `""`
 
 If empty, Chat keeps its natural content height and the surrounding app/page
 container scrolls. If provided, Chat uses that fixed height and enables internal
-vertical scrolling.
+vertical scrolling. A fixed-height chat always owns its scrollbar, even before its
+content is tall enough to overflow, so multiple chats cannot compete for the page
+scroll position.
 
 Examples:
 

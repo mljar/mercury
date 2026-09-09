@@ -27,6 +27,7 @@ function render({ model, el }) {
   const LOG_PREFIX = "[ScrollHelper]";
   const MSG_CLASS = model.get("msg_css_class") || "mljar-chat-msg";
   const CHAT_CLASS = model.get("chat_css_class");
+  const OWNS_SCROLL = model.get("owns_scroll") === true;
 
   // Just in case, hide the helper element itself
   el.classList.add("mljar-chat-scroll-helper");
@@ -67,6 +68,13 @@ function render({ model, el }) {
     container.scrollTop = target;
   }
 
+  function isNearBottom(container) {
+    if (!container) return true;
+    return (
+      container.scrollHeight - container.scrollTop - container.clientHeight < 40
+    );
+  }
+
   function scrollPageFallback(elem) {
     try {
       elem.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -97,12 +105,17 @@ function render({ model, el }) {
       console.warn(LOG_PREFIX, "bad selector", selector, e);
     }
 
-    // A fixed-height Chat owns the scrollbar. Start ancestor lookup at the
-    // chat root so a nested message/output can never become the scroll target.
+    // A fixed-height Chat owns scrolling even before its content overflows.
+    // This prevents several chats from competing for a shared page scroller.
+    if (OWNS_SCROLL) {
+      if (pinnedToBottom) root.scrollTop = root.scrollHeight;
+      return;
+    }
+
+    // Natural-height chats scroll their nearest surrounding container.
     const preferredScroller =
       pref && pref.contains(root) && isScrollable(pref) ? pref : null;
-    const scroller = (isScrollable(root) ? root : null) ||
-      getScrollableAncestor(root) ||
+    const scroller = getScrollableAncestor(root) ||
       preferredScroller ||
       document.scrollingElement ||
       document.documentElement;
@@ -114,11 +127,29 @@ function render({ model, el }) {
     }
   }
 
+  let frameId = null;
+  let timerId = null;
+  let pinnedToBottom = true;
+
+  function trackScrollPosition() {
+    pinnedToBottom = isNearBottom(root);
+  }
+
   function scheduleScroll() {
     // Give big outputs (plots, images) a moment to layout
-    requestAnimationFrame(() => {
-      setTimeout(autoScroll, 100);
+    if (frameId !== null) cancelAnimationFrame(frameId);
+    if (timerId !== null) clearTimeout(timerId);
+    frameId = requestAnimationFrame(() => {
+      frameId = null;
+      timerId = setTimeout(() => {
+        timerId = null;
+        autoScroll();
+      }, 100);
     });
+  }
+
+  if (OWNS_SCROLL) {
+    root.addEventListener("scroll", trackScrollPosition, { passive: true });
   }
 
   // initial scroll attempt (in case messages already present)
@@ -126,6 +157,13 @@ function render({ model, el }) {
 
   // each time Python bumps `tick`, schedule scroll
   model.on("change:tick", scheduleScroll);
+
+  return () => {
+    if (frameId !== null) cancelAnimationFrame(frameId);
+    if (timerId !== null) clearTimeout(timerId);
+    model.off("change:tick", scheduleScroll);
+    if (OWNS_SCROLL) root.removeEventListener("scroll", trackScrollPosition);
+  };
 }
 export default { render };
     """
@@ -167,6 +205,7 @@ export default { render };
     ).tag(sync=True)
     msg_css_class = traitlets.Unicode("mljar-chat-msg").tag(sync=True)
     chat_css_class = traitlets.Unicode("").tag(sync=True)
+    owns_scroll = traitlets.Bool(False).tag(sync=True)
 
 
 class Chat:
@@ -263,6 +302,7 @@ class Chat:
             scroll_container_selector=self.scroll_container_selector,
             msg_css_class=MSG_CSS_CLASS,
             chat_css_class=self._chat_css_class,
+            owns_scroll=bool(self.height),
         )
 
         if get_render_context().render_slot_id is None:

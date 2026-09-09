@@ -39,6 +39,7 @@ def test_chat_default_height_preserves_natural_layout(monkeypatch):
     assert chat.height == ""
     assert chat.vbox.layout.height is None
     assert chat.vbox.layout.overflow == "visible"
+    assert chat._scroller.owns_scroll is False
     assert "mljar-chat-container" in chat.vbox._dom_classes
 
 
@@ -51,6 +52,7 @@ def test_chat_height_sets_internal_scroll(monkeypatch):
     assert chat.height == "600px"
     assert chat.vbox.layout.height == "600px"
     assert chat.vbox.layout.overflow == "hidden auto"
+    assert chat._scroller.owns_scroll is True
 
 
 def test_chat_height_accepts_viewport_units(monkeypatch):
@@ -62,6 +64,7 @@ def test_chat_height_accepts_viewport_units(monkeypatch):
     assert chat.height == "70vh"
     assert chat.vbox.layout.height == "70vh"
     assert chat.vbox.layout.overflow == "hidden auto"
+    assert chat._scroller.owns_scroll is True
 
 
 def test_chat_clears_current_cell_output_outside_layout(monkeypatch):
@@ -137,12 +140,23 @@ def test_multiple_chats_have_isolated_scroll_targets(monkeypatch):
     assert second._chat_css_class in second.vbox._dom_classes
 
 
-def test_scroll_helper_targets_chat_root_before_ancestors():
+def test_fixed_height_scroll_helper_never_targets_an_ancestor():
     source = chat_module.ScrollHelper._esm
 
-    assert "isScrollable(root) ? root : null" in source
+    assert "if (OWNS_SCROLL)" in source
+    assert "root.scrollTop = root.scrollHeight" in source
     assert "getScrollableAncestor(root)" in source
     assert "getScrollableAncestor(last)" not in source
+
+
+def test_scroll_helper_pauses_when_reader_leaves_bottom_and_cancels_stale_work():
+    source = chat_module.ScrollHelper._esm
+
+    assert "pinnedToBottom = isNearBottom(root)" in source
+    assert 'root.addEventListener("scroll", trackScrollPosition' in source
+    assert "if (frameId !== null) cancelAnimationFrame(frameId)" in source
+    assert "if (timerId !== null) clearTimeout(timerId)" in source
+    assert 'model.off("change:tick", scheduleScroll)' in source
 
 
 def test_message_append_after_chat_add_schedules_debounced_scroll(monkeypatch):

@@ -80,7 +80,7 @@
 
 .mercury-main-panel {
   --mercury-sidebar-outer-width: 330px;
-  --mercury-content-left-padding: 27px;
+  --mercury-content-horizontal-padding: 15px;
 
   position: relative;
   display: block;
@@ -301,10 +301,7 @@
 .mercury-right-top-panel {
   position: relative;
   background: var(--mercury-surface-color); 
-  padding-top: 0px;
-  padding-left: var(--mercury-content-left-padding);
-  padding-right: 5px;
-  padding-bottom: 5px;
+  padding: 0 var(--mercury-content-horizontal-padding) 5px;
 }
 
 .mercury-right-top-panel > .lm-Widget {
@@ -316,17 +313,10 @@
   background: var(--mercury-surface-color);
 }
 
-.mercury-right-top-panel.mercury-right-top-panel-with-sidebar-toggle {
-  padding-left: var(--mercury-content-left-padding);
-}
-
 .mercury-right-bottom-panel {
   background: var(--mercury-surface-color);
   overflow: hidden !important;
-  padding-top: 5px;
-  padding-left: var(--mercury-content-left-padding);
-  padding-right: 5px;
-  padding-bottom: 5px;
+  padding: 5px var(--mercury-content-horizontal-padding);
 }
 
 .mercury-right-bottom-panel > .lm-Widget {
@@ -336,8 +326,8 @@
 .mercury-right-top-panel.mercury-right-limited,
 .mercury-right-bottom-panel.mercury-right-limited {
   box-sizing: border-box;
-  padding-left: var(--mercury-content-left-padding) !important;
-  padding-right: 5px !important;
+  padding-left: var(--mercury-content-horizontal-padding) !important;
+  padding-right: var(--mercury-content-horizontal-padding) !important;
 }
 
 .mercury-right-top-panel.mercury-right-limited > .lm-Widget,
@@ -408,7 +398,6 @@
   }
 
   .mercury-right-top-panel.mercury-right-top-panel-with-sidebar-toggle {
-    padding-left: 5px;
     padding-top: 40px;
   }
 
