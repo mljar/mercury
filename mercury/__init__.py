@@ -50,6 +50,7 @@ from .select import Select
 from .slider import Slider
 from .text import TextInput
 from .file import UploadFile
+from .camera import Camera
 from .date import DateInput
 from .time import TimeInput
 from .datetime_input import DateTimeInput

@@ -1,0 +1,181 @@
+---
+title: Camera
+description: Show a live browser camera preview and capture photos or short videos in a Mercury App
+---
+
+The **Camera** input widget displays a live camera preview directly in the notebook
+and Mercury App. It can capture a photo or record a short video and makes the completed
+result available to Python as bytes.
+
+## Live photo camera
+
+Put the camera and the code that reads its value in separate notebook cells:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+camera = mr.Camera(
+    mode="photo",
+    label="Document camera",
+)
+
+# %%
+if camera.value is not None:
+    print(camera.filename)
+    print(camera.mime_type)
+    print(camera.size)
+```
+
+The browser requests camera permission when the widget appears. Once permission is
+granted, the live feed is shown inside the widget. Select **Take photo** to freeze the
+frame or **Retake** to return to the live preview and clear the current result.
+
+The live preview stays entirely in the browser. Preview frames are not sent to the
+Mercury server and do not execute notebook cells.
+
+## Read a photo in Python
+
+`camera.value` contains the captured bytes. For example, open a photo with Pillow:
+
+```python
+# %%
+from io import BytesIO
+from PIL import Image
+
+if camera.value is not None:
+    image = Image.open(BytesIO(camera.value))
+    display(image)
+```
+
+## Record a short video
+
+Use `mode="video"` to show the same live preview with recording controls:
+
+```python
+# %%
+camera = mr.Camera(
+    mode="video",
+    label="Record a sample",
+    max_duration=15,
+    audio=False,
+)
+```
+
+Select **Start recording** and **Stop recording**. Recording stops automatically at
+`max_duration`. The completed video can be reviewed in the widget before it is retaken.
+
+The browser selects a supported recording format. Chromium and Firefox commonly use
+WebM, while Safari may use MP4, so inspect `camera.mime_type` instead of assuming a
+specific format.
+
+## Front and rear cameras
+
+Prefer the rear camera for documents, OCR, and object recognition:
+
+```python
+camera = mr.Camera(facing_mode="environment")
+```
+
+Prefer the front camera for webcam applications:
+
+```python
+camera = mr.Camera(facing_mode="user")
+```
+
+`facing_mode` is a browser preference. The available camera hardware determines which
+device is ultimately selected.
+
+## Reactive execution
+
+The camera updates Python only after a complete action:
+
+* **Take photo** sends one image buffer.
+* **Stop recording** sends one completed video buffer.
+* Automatic video completion sends one completed video buffer.
+* **Retake** clears the current result.
+
+Each action changes the widget once and executes cells below the Camera cell once. A
+live preview or an in-progress recording does not execute notebook code.
+
+## Result properties
+
+### `value`
+
+Captured image or video data as `bytes`, or `None` before capture and after Retake.
+
+### `mime_type`
+
+The browser-reported MIME type, such as `"image/jpeg"`, `"video/webm"`, or
+`"video/mp4"`. It is an empty string when no capture is available.
+
+### `filename`
+
+A generated timestamped filename with an extension matching the captured format.
+
+### `size`
+
+Size of the captured data in bytes.
+
+### `duration`
+
+Recorded video duration in seconds. It is `0` for photos.
+
+## Parameters
+
+### `mode`
+
+`"photo"` or `"video"`. Default: `"photo"`.
+
+### `label`
+
+Text displayed above the preview. Default: `"Camera"`. Use an empty string to hide
+the label.
+
+### `facing_mode`
+
+Preferred camera direction: `"environment"` or `"user"`. Default:
+`"environment"`.
+
+### `max_duration`
+
+Maximum video recording length from 1 to 300 seconds. Default: `30`.
+
+### `audio`
+
+Request microphone audio with a video recording. Default: `False`. This option is
+ignored in photo mode.
+
+### `position`
+
+Mercury layout placement: `"inline"`, `"sidebar"`, or `"bottom"`. Default:
+`"inline"`.
+
+### `disabled`
+
+Disable controls and stop the active media stream. Default: `False`.
+
+### `hidden`
+
+Hide the widget and stop the active media stream. Default: `False`.
+
+### `key`
+
+Stable identifier used to reuse the widget across reactive cell executions.
+
+## Permissions and deployment
+
+Browsers allow camera access only from a secure context: an HTTPS deployment or
+`localhost` during development. The user must grant permission for the app's browser
+origin. Mercury cannot override denied browser permission.
+
+Camera and microphone tracks are stopped when the widget is hidden, disabled, or
+removed from the page. Captured media is transferred directly through the notebook
+widget connection; Mercury does not automatically write it to a temporary file.
+
+## Theme configuration
+
+The label, controls, borders, colors, shadows, and corner radius use the Mercury theme
+loaded from `config.toml`, including `primary_color`, `danger_color`, `border_color`,
+`border_radius`, and `border_radius_lg`.
