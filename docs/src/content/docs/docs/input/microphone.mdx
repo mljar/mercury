@@ -1,0 +1,153 @@
+---
+title: Microphone
+description: Record audio in the browser and access it as bytes in a Mercury App
+---
+
+The **Microphone** input widget records audio in the browser and makes the
+completed recording available to Python as bytes. It is useful for speech-to-text,
+voice assistants, transcription, audio classification, and multimodal applications.
+
+## Basic usage
+
+Put the recorder and code that reads its value in separate notebook cells:
+
+```python
+# %%
+import mercury as mr
+
+# %%
+microphone = mr.Microphone(
+    label="Record audio",
+    max_duration=60,
+)
+
+# %%
+if microphone.value is not None:
+    print(microphone.filename)
+    print(microphone.mime_type)
+    print(microphone.size)
+    print(microphone.duration)
+```
+
+Select **Start recording** to request microphone permission and begin recording.
+Select **Stop recording** to finish. Recording also stops automatically when it reaches
+`max_duration`.
+
+After recording, an audio player appears so the result can be reviewed. Select
+**Record again** to clear it and return to the initial state.
+
+## Read audio in Python
+
+`microphone.value` contains the complete recorded bytes:
+
+```python
+# %%
+from io import BytesIO
+
+if microphone.value is not None:
+    audio_data = BytesIO(microphone.value)
+    transcription = speech_to_text(audio_data)
+    print(transcription)
+```
+
+Libraries that require a path can be given an explicitly created temporary file:
+
+```python
+# %%
+import tempfile
+
+if microphone.value is not None:
+    suffix = ".mp4" if "mp4" in microphone.mime_type else ".webm"
+    with tempfile.NamedTemporaryFile(suffix=suffix) as recording:
+        recording.write(microphone.value)
+        recording.flush()
+        result = transcribe_file(recording.name)
+```
+
+Mercury does not automatically create a temporary file, so its ownership and lifetime
+remain explicit in notebook code.
+
+## Recording format
+
+The browser selects a supported format. Chromium commonly produces Opus audio in a
+WebM container, Firefox may use WebM or Ogg, and Safari may use MP4. Always inspect
+`microphone.mime_type` instead of assuming a format.
+
+## Reactive execution
+
+The microphone updates Python only after a complete action:
+
+* **Stop recording** sends one complete audio buffer.
+* Reaching `max_duration` sends one complete audio buffer.
+* **Record again** clears the current result.
+
+Each action changes the widget once and executes cells below the Microphone cell once.
+Waiting for permission and recording in progress do not execute notebook code or send
+live audio chunks to Python.
+
+## Result properties
+
+### `value`
+
+Recorded audio as `bytes`, or `None` before recording and after Record again.
+
+### `mime_type`
+
+The browser-reported MIME type, such as `"audio/webm;codecs=opus"`, `"audio/ogg"`,
+or `"audio/mp4"`. It is empty when no recording is available.
+
+### `filename`
+
+A generated timestamped filename with an extension matching the recording container.
+
+### `size`
+
+Size of the recorded data in bytes.
+
+### `duration`
+
+Recording duration in seconds.
+
+## Parameters
+
+### `label`
+
+Text displayed above the recorder. Default: `"Record audio"`. Use an empty string to
+hide the label.
+
+### `max_duration`
+
+Maximum recording length from 1 to 300 seconds. Default: `60`.
+
+### `position`
+
+Mercury layout placement: `"inline"`, `"sidebar"`, or `"bottom"`. Default:
+`"inline"`.
+
+### `disabled`
+
+Disable the controls and stop an active recording without saving it. Default: `False`.
+
+### `hidden`
+
+Hide the widget and stop an active recording without saving it. Default: `False`.
+
+### `key`
+
+Stable identifier used to reuse the widget across reactive cell executions.
+
+## Permissions and privacy
+
+The microphone is never activated automatically. Access is requested only after the
+user selects **Start recording**. Browsers permit microphone access only from an HTTPS
+deployment or `localhost`, and the user must grant permission for the app's origin.
+
+Audio remains in the browser while recording. Only the completed recording is sent
+through the notebook widget connection. Microphone tracks are stopped after recording,
+or when the widget is hidden, disabled, or removed.
+
+## Theme configuration
+
+The recorder uses Mercury theme values loaded from `config.toml`, including
+`widget_background_color`, `text_color`, `primary_color`, `danger_color`,
+`border_color`, `border_radius`, and `border_radius_lg`.
