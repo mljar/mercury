@@ -14,7 +14,7 @@ export type MercuryNavbarOptions = {
   baseUrl: string;
   /** Title from PageConfig.getOption('title') */
   title: string;
-   /** Label for the notebooks dropdown button */
+  /** Label for the notebooks dropdown button */
   notebooksButtonLabel?: string;
   /** URL that returns the notebooks JSON array */
   apiUrl: string;
@@ -40,6 +40,7 @@ export class MercuryNavbar {
   private menuOpen = false;
   private clickAway?: (e: MouseEvent) => void;
   private keyHandler?: (e: KeyboardEvent) => void;
+  private resizeHandler?: () => void;
 
   constructor(opts: MercuryNavbarOptions) {
     this.opts = { ...opts, attachTo: opts.attachTo ?? document.body };
@@ -48,7 +49,10 @@ export class MercuryNavbar {
   async mount(): Promise<void> {
     this.injectStyles();
     this.buildHeader();
-    this.opts.attachTo!.insertBefore(this.header!, this.opts.attachTo!.firstChild);
+    this.opts.attachTo!.insertBefore(
+      this.header!,
+      this.opts.attachTo!.firstChild
+    );
     document.body.classList.add('mercury-has-header');
 
     // Notify consumer about height so they can add padding to content below
@@ -99,6 +103,7 @@ export class MercuryNavbar {
           font-size: clamp(16px, 2vw, 20px);
           text-decoration: none;
           font-family: var(--mercury-heading-font-family);
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .mrc-brand:hover { text-decoration: underline; }
         .mrc-actions {
@@ -106,6 +111,7 @@ export class MercuryNavbar {
           min-width: 0;
         }
         .mrc-notebooks-wrap { position: relative; }
+        .mrc-notebooks-wrap.mrc-empty { display: none; }
   
         /* Button */
         .mrc-btn {
@@ -132,6 +138,7 @@ export class MercuryNavbar {
           box-shadow: none;
         }
         .mrc-caret { transition: transform .15s ease; }
+        .mrc-hamburger { display: none; }
   
         /* Menu (dropdown) */
         .mrc-menu{
@@ -141,6 +148,9 @@ export class MercuryNavbar {
           box-shadow: var(--mercury-shadow-lg);
         }
         .mrc-menu-list{ padding:.4rem; }
+        .mrc-menu-heading,
+        .mrc-menu-separator,
+        .mrc-menu-logout { display:none; }
         .mrc-menu-item{
           display:flex; align-items:center; gap:.7rem;
           padding:.6rem .65rem; border-radius:.75rem;
@@ -155,6 +165,38 @@ export class MercuryNavbar {
           width:36px; height:28px; border-radius:.6rem;
           display:grid; place-items:center; font-weight:700; line-height:1;
           box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mercury-border-color) 60%, transparent);
+        }
+
+        @media (max-width: 768px) {
+          .mrc-hdr-inner { padding: .45rem .75rem; }
+          .mrc-brand-wrap { flex: 1; overflow: hidden; }
+          .mrc-brand { font-size: 16px; }
+          .mrc-desktop-logout { display: none; }
+          .mrc-notebooks-wrap.mrc-empty.mrc-has-logout { display: block; }
+          .mrc-btn.mrc-menu-toggle {
+            width: 44px; height: 44px; padding: 0;
+            justify-content: center; border: 0;
+          }
+          .mrc-menu-toggle-label,
+          .mrc-caret { display: none; }
+          .mrc-hamburger { display: block; }
+          .mrc-menu {
+            position: absolute; top: 100%; right: 0;
+            width: min(22rem, calc(100vw - 1.5rem));
+            max-height: calc(100dvh - 70px - env(safe-area-inset-bottom));
+            margin-top: .35rem;
+          }
+          .mrc-menu-heading {
+            display: block; padding: .45rem .65rem .3rem;
+            color: var(--mercury-muted-text-color); font-size: 12px;
+            font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+            font-family: var(--mercury-font-family);
+          }
+          .mrc-menu-separator {
+            display: block; height: 1px; margin: .4rem .65rem;
+            border: 0; background: var(--mercury-border-color);
+          }
+          .mrc-menu-logout { display: flex; }
         }
       `;
     document.head.appendChild(style);
@@ -188,11 +230,17 @@ export class MercuryNavbar {
 
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'mrc-btn';
+    btn.className = 'mrc-btn mrc-menu-toggle';
     btn.id = 'mrcNbBtn';
-    btn.setAttribute('aria-haspopup', 'menu');
+    btn.setAttribute('aria-haspopup', 'true');
     btn.setAttribute('aria-expanded', 'false');
-    btn.textContent = this.opts.notebooksButtonLabel || 'Notebooks';
+    btn.setAttribute('aria-controls', 'mrcNbMenu');
+    btn.setAttribute('aria-label', 'Open navigation menu');
+
+    const btnLabel = document.createElement('span');
+    btnLabel.className = 'mrc-menu-toggle-label';
+    btnLabel.textContent = this.opts.notebooksButtonLabel || 'Notebooks';
+    btn.appendChild(btnLabel);
 
     const caret = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     caret.setAttribute('class', 'mrc-caret');
@@ -201,19 +249,32 @@ export class MercuryNavbar {
     caret.setAttribute('viewBox', '0 0 20 20');
     caret.setAttribute('fill', 'currentColor');
     caret.setAttribute('aria-hidden', 'true');
-    caret.innerHTML = `<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>`;
+    caret.innerHTML =
+      '<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>';
     btn.appendChild(caret);
+
+    const hamburger = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    );
+    hamburger.setAttribute('class', 'mrc-hamburger');
+    hamburger.setAttribute('width', '22');
+    hamburger.setAttribute('height', '22');
+    hamburger.setAttribute('viewBox', '0 0 24 24');
+    hamburger.setAttribute('fill', 'none');
+    hamburger.setAttribute('aria-hidden', 'true');
+    hamburger.innerHTML =
+      '<path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+    btn.appendChild(hamburger);
 
     const menu = document.createElement('div');
     menu.id = 'mrcNbMenu';
     menu.className = 'mrc-menu mrc-hidden';
-    menu.setAttribute('role', 'menu');
-    menu.setAttribute('aria-label', 'Notebook list');
+    menu.setAttribute('aria-label', 'Navigation');
 
     const menuList = document.createElement('div');
     menuList.id = 'mrcNbMenuList';
     menuList.className = 'mrc-menu-list';
-    menuList.setAttribute('role', 'none');
 
     menu.appendChild(menuList);
     notebooksWrap.appendChild(btn);
@@ -228,7 +289,7 @@ export class MercuryNavbar {
       const logoutUrl = this.opts.logoutUrl || `${this.opts.baseUrl}logout`;
       const separator = logoutUrl.includes('?') ? '&' : '?';
 
-      logout.className = 'mrc-btn mrc-logout';
+      logout.className = 'mrc-btn mrc-logout mrc-desktop-logout';
       logout.href = `${logoutUrl}${separator}next=${encodeURIComponent(next)}`;
       logout.textContent = 'Log out';
       rightWrap.appendChild(logout);
@@ -239,9 +300,11 @@ export class MercuryNavbar {
     header.appendChild(inner);
 
     // Events
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', e => {
       e.preventDefault();
-      if (!this.notebooks.length) return;
+      if (!this.notebooks.length && !this.opts.logoutAvailable) {
+        return;
+      }
       this.setMenu(!this.menuOpen);
     });
 
@@ -250,30 +313,55 @@ export class MercuryNavbar {
     this.menu = menu;
     this.menuList = menuList;
     this.caret = caret;
+    if (this.opts.logoutAvailable) {
+      this.renderMenu([]);
+    }
   }
 
   private bindGlobalHandlers() {
     this.clickAway = (e: MouseEvent) => {
-      if (!this.menuOpen || !this.menu || !this.btn) return;
+      if (!this.menuOpen || !this.menu || !this.btn) {
+        return;
+      }
       const t = e.target as Node;
-      if (!this.menu.contains(t) && !this.btn.contains(t)) this.setMenu(false);
+      if (!this.menu.contains(t) && !this.btn.contains(t)) {
+        this.setMenu(false);
+      }
     };
     this.keyHandler = (e: KeyboardEvent) => {
-      if (String(e.key).toLowerCase() === 'escape') this.setMenu(false);
+      if (String(e.key).toLowerCase() === 'escape' && this.menuOpen) {
+        this.setMenu(false);
+        this.btn?.focus();
+      }
     };
+    this.resizeHandler = () => this.setMenu(false);
     document.addEventListener('click', this.clickAway!);
     document.addEventListener('keydown', this.keyHandler!);
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   private unbindGlobalHandlers() {
-    if (this.clickAway) document.removeEventListener('click', this.clickAway);
-    if (this.keyHandler) document.removeEventListener('keydown', this.keyHandler);
+    if (this.clickAway) {
+      document.removeEventListener('click', this.clickAway);
+    }
+    if (this.keyHandler) {
+      document.removeEventListener('keydown', this.keyHandler);
+    }
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
   }
 
   private setMenu(open: boolean) {
-    if (!this.menu || !this.btn || !this.caret) return;
+    if (!this.menu || !this.btn || !this.caret) {
+      return;
+    }
     this.menu.classList.toggle('mrc-hidden', !open);
     this.btn.setAttribute('aria-expanded', String(open));
+    this.btn.setAttribute(
+      'aria-label',
+      open ? 'Close navigation menu' : 'Open navigation menu'
+    );
     this.caret.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
     this.menuOpen = open;
   }
@@ -281,20 +369,31 @@ export class MercuryNavbar {
   private sizeThumb(el: HTMLElement) {
     const txt = (el.textContent || '').trim();
     let fs = '1.0rem';
-    if (txt.length > 6) fs = '0.4rem';
-    else if (txt.length > 4) fs = '0.6rem';
-    else if (txt.length > 2) fs = '0.8rem';
+    if (txt.length > 6) {
+      fs = '0.4rem';
+    } else if (txt.length > 4) {
+      fs = '0.6rem';
+    } else if (txt.length > 2) {
+      fs = '0.8rem';
+    }
     el.style.fontSize = fs;
   }
 
   private renderMenu(items: NotebookItem[]) {
-    if (!this.menuList) return;
+    if (!this.menuList || !this.menu || !this.btn) {
+      return;
+    }
     const frag = document.createDocumentFragment();
+    if (items.length) {
+      const heading = document.createElement('div');
+      heading.className = 'mrc-menu-heading';
+      heading.textContent = this.opts.notebooksButtonLabel || 'Notebooks';
+      frag.appendChild(heading);
+    }
     for (const nb of items) {
       const a = document.createElement('a');
       a.className = 'mrc-menu-item';
       a.href = nb.slug || '#';
-      a.setAttribute('role', 'menuitem');
 
       const t = document.createElement('div');
       t.className = 'mrc-menu-thumb';
@@ -310,32 +409,59 @@ export class MercuryNavbar {
       a.appendChild(span);
       frag.appendChild(a);
     }
+    if (this.opts.logoutAvailable) {
+      if (items.length) {
+        const separator = document.createElement('hr');
+        separator.className = 'mrc-menu-separator';
+        frag.appendChild(separator);
+      }
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete('token');
+      const next = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
+      const logoutUrl = this.opts.logoutUrl || `${this.opts.baseUrl}logout`;
+      const separator = logoutUrl.includes('?') ? '&' : '?';
+      const logout = document.createElement('a');
+      logout.className = 'mrc-menu-item mrc-menu-logout';
+      logout.href = `${logoutUrl}${separator}next=${encodeURIComponent(next)}`;
+      logout.textContent = 'Log out';
+      frag.appendChild(logout);
+    }
     this.menuList.innerHTML = '';
     this.menuList.appendChild(frag);
+    const wrap = this.btn.parentElement;
+    wrap?.classList.toggle('mrc-empty', items.length === 0);
+    wrap?.classList.toggle(
+      'mrc-has-logout',
+      Boolean(this.opts.logoutAvailable)
+    );
+    this.btn.style.display =
+      items.length || this.opts.logoutAvailable ? '' : 'none';
+    if (!items.length && !this.opts.logoutAvailable) {
+      this.menu.remove();
+    }
   }
 
   private async loadNotebooks() {
-    if (!this.btn || !this.menu) return;
+    if (!this.btn || !this.menu) {
+      return;
+    }
     try {
-      this.btn.disabled = true;
+      this.btn.disabled = !this.opts.logoutAvailable;
       const resp = await fetch(this.opts.apiUrl, {
         method: 'GET',
         credentials: 'same-origin',
         headers: { Accept: 'application/json' }
       });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
       const data = (await resp.json()) as NotebookItem[] | undefined;
       this.notebooks = Array.isArray(data) ? data : [];
-      if (this.notebooks.length === 0) {
-        this.btn.style.display = 'none';
-        this.menu.remove();
-        return;
-      }
       this.renderMenu(this.notebooks);
     } catch (err) {
       console.warn('[Mercury] Failed to load notebooks menu:', err);
-      this.btn.style.display = 'none';
-      this.menu?.remove();
+      this.notebooks = [];
+      this.renderMenu([]);
     } finally {
       this.btn.disabled = false;
     }

@@ -60,6 +60,7 @@ def test_root_template_hides_logout_for_unprotected_server():
     )
 
     assert 'id="logoutBtn"' not in html
+    assert 'id="nbBtn"' not in html
 
 
 def test_root_template_shows_logout_for_protected_server():
@@ -72,3 +73,26 @@ def test_root_template_shows_logout_for_protected_server():
     assert 'id="logoutBtn"' in html
     assert 'href="/mercury/logout?next=%2F"' in html
     assert ">Log out</a>" in html
+    assert 'id="nbBtn"' in html
+    assert 'class="menu-wrap empty has-logout"' in html
+    assert 'class="hamburger"' in html
+
+
+def test_root_mobile_menu_uses_configured_notebooks_label():
+    html = render_root_template(
+        notebooks=[
+            {
+                "name": "Sales dashboard",
+                "slug": "/app/sales",
+                "description": "",
+            }
+        ],
+        notebooks_button_label="Applications",
+        logout_available=True,
+        logout_url="/mercury/logout?next=%2F",
+    )
+
+    assert '<span class="menu-toggle-label">Applications</span>' in html
+    assert '<div class="menu-heading">Applications</div>' in html
+    assert "separator.className = 'menu-separator'" in html
+    assert "logout.className = 'menu-item menu-logout'" in html

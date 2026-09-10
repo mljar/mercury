@@ -46,11 +46,13 @@
       color: var(--mercury-topbar-text-color);
       font-family: var(--mercury-heading-font-family);
       font-size: clamp(16px, 2vw, 20px);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .hdr-actions {
       display: flex; align-items: center; gap: .5rem;
       min-width: 0;
     }
+    .menu-wrap.empty { display: none; }
     .btn {
       display: inline-flex; align-items: center; gap: .5rem;
       border: 1px solid var(--mercury-topbar-border-color);
@@ -71,6 +73,7 @@
       box-shadow: none;
     }
     .caret { transition: transform .15s ease; }
+    .hamburger { display: none; }
 
     /* Menu (context dropdown) */
     .menu{
@@ -80,6 +83,9 @@
       box-shadow:var(--mercury-shadow-lg);
     }
     .menu-list{ padding:.4rem; }
+    .menu-heading,
+    .menu-separator,
+    .menu-logout { display:none; }
     .menu-item{
       display:flex; align-items:center; gap:.7rem;
       padding:.6rem .65rem; border-radius:.75rem;
@@ -94,6 +100,35 @@
       width:36px; height:28px; border-radius:.6rem;
       display:grid; place-items:center; font-weight:700; line-height:1;
       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mercury-border-color) 60%, transparent);
+    }
+    @media (max-width: 768px) {
+      .hdr-inner { padding: .45rem .75rem; }
+      .brand { min-width: 0; flex: 1; font-size: 16px; }
+      .desktop-logout { display: none; }
+      .menu-wrap.empty.has-logout { display: block; }
+      .btn.menu-toggle {
+        width: 44px; height: 44px; padding: 0;
+        justify-content: center; border: 0;
+      }
+      .menu-toggle-label,
+      .caret { display: none; }
+      .hamburger { display: block; }
+      .menu {
+        position: absolute; top: 100%; right: 0;
+        width: min(22rem, calc(100vw - 1.5rem));
+        max-height: calc(100dvh - 70px - env(safe-area-inset-bottom));
+        margin-top: .35rem;
+      }
+      .menu-heading {
+        display: block; padding: .45rem .65rem .3rem;
+        color: var(--mercury-muted-text-color); font-size: 12px;
+        font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+      }
+      .menu-separator {
+        display: block; height: 1px; margin: .4rem .65rem;
+        border: 0; background: var(--mercury-border-color);
+      }
+      .menu-logout { display: flex; }
     }
 
     /* Main layout */
@@ -187,24 +222,26 @@
 
       {% if notebooks or logout_available %}
       <div class="hdr-actions">
-        <!-- Render menu button ONLY when there are notebooks -->
-        {% if notebooks %}
-        <div style="position:relative">
-        <button id="nbBtn" type="button" class="btn" aria-haspopup="menu" aria-expanded="false">
-         {{ notebooks_button_label or 'Notebooks' }}
+        <div class="menu-wrap{% if not notebooks %} empty{% endif %}{% if logout_available %} has-logout{% endif %}" style="position:relative">
+        <button id="nbBtn" type="button" class="btn menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="nbMenu" aria-label="Open navigation menu">
+          <span class="menu-toggle-label">{{ notebooks_button_label or 'Notebooks' }}</span>
           <svg class="caret" id="nbCaret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 0 1 1.08 1.04l-4.25 4.25a.75.75 0 0 1-1.06 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
           </svg>
+          <svg class="hamburger" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </button>
 
-        <div id="nbMenu" class="menu hidden" role="menu" aria-label="Notebook list">
-          <div id="nbMenuList" class="menu-list" role="none"></div>
+        <div id="nbMenu" class="menu hidden" aria-label="Navigation">
+          <div id="nbMenuList" class="menu-list">
+            {% if notebooks %}<div class="menu-heading">{{ notebooks_button_label or 'Notebooks' }}</div>{% endif %}
+          </div>
         </div>
         </div>
-        {% endif %}
 
         {% if logout_available %}
-        <a id="logoutBtn" class="btn" href="{{ logout_url }}">Log out</a>
+        <a id="logoutBtn" class="btn desktop-logout" href="{{ logout_url }}">Log out</a>
         {% endif %}
       </div>
       {% endif %}
@@ -374,20 +411,19 @@
       return { card, name, desc };
     });
 
-    // If no cards exist, hide menu button (in case template couldn't detect)
-    if (cards.length === 0) {
-      if ($btn) $btn.style.display = 'none';
-      if ($menu) $menu.remove?.();
-    }
-
     function renderMenu(){
-      if(!$menuList || cards.length === 0) return;
+      if(!$menuList) return;
       const frag = document.createDocumentFragment();
+      if (cards.length) {
+        const heading = document.createElement('div');
+        heading.className = 'menu-heading';
+        heading.textContent = $btn?.querySelector('.menu-toggle-label')?.textContent || 'Notebooks';
+        frag.appendChild(heading);
+      }
       cards.forEach(({ card }) => {
         const a = document.createElement('a');
         a.className = 'menu-item';
         a.href = card.getAttribute('href') || '#';
-        a.setAttribute('role','menuitem');
 
         const t = document.createElement('div');
         t.className = 'menu-thumb';
@@ -402,6 +438,18 @@
         a.appendChild(t); a.appendChild(span);
         frag.appendChild(a);
       });
+      {% if logout_available %}
+      if (cards.length) {
+        const separator = document.createElement('hr');
+        separator.className = 'menu-separator';
+        frag.appendChild(separator);
+      }
+      const logout = document.createElement('a');
+      logout.className = 'menu-item menu-logout';
+      logout.href = qs('#logoutBtn')?.getAttribute('href') || '#';
+      logout.textContent = 'Log out';
+      frag.appendChild(logout);
+      {% endif %}
       $menuList.innerHTML = '';
       $menuList.appendChild(frag);
     }
@@ -424,6 +472,7 @@
       if (!$menu) return;
       $menu.classList.toggle('hidden', !open);
       $btn?.setAttribute('aria-expanded', String(open));
+      $btn?.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
       if ($caret) $caret.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
     }
     let menuOpen = false;
@@ -436,9 +485,10 @@
     });
     document.addEventListener('keydown', e => {
       const key = String(e.key).toLowerCase();
-      if (key === 'escape') { menuOpen = false; setMenu(false); }
+      if (key === 'escape' && menuOpen) { menuOpen = false; setMenu(false); $btn?.focus(); }
       if ((e.metaKey || e.ctrlKey) && key === 'k') { e.preventDefault(); $search?.focus(); $search?.select(); }
     });
+    window.addEventListener('resize', () => { menuOpen = false; setMenu(false); });
   </script>
 </body>
 </html>
