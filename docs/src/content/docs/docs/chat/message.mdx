@@ -141,6 +141,15 @@ Rich outputs (plots, tables, images) are always displayed using `display()`.
 
 ### Markdown
 
+Messages support Markdown formatting, including code blocks and tables.
+Mercury automatically removes scripts and custom HTML styles from messages,
+including streamed responses added with `append_markdown()`.
+
+Math typesetting and code syntax highlighting are not available in the default
+renderer. For content you write and trust, `mr.Message(..., unsafe_allow_html=True)`
+uses the original Jupyter renderer. This also allows JavaScript, so leave it off
+for user messages and AI responses.
+
 ```python
 msg = mr.Message()
 msg.set_content(markdown="### Title\nSome **bold** text")
@@ -163,7 +172,8 @@ msg.set_content(html="<b style='color:red'>Error</b>")
 ```
 
 <Aside>
-Use raw HTML carefully. Invalid HTML may break layout or styling.
+Raw HTML can run JavaScript. Use `html=` and `append_html()` only for content you
+write and trust. For user messages or AI responses, use Markdown instead.
 </Aside>
 
 

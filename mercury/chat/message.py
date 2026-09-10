@@ -17,6 +17,7 @@ import ipywidgets as widgets
 from IPython.display import display, HTML as DHTML, Javascript, Markdown
 
 from ..theme import THEME
+from .._markdown import render_markdown
 
 MSG_CSS_CLASS = "mljar-chat-msg"
 DEFAULT_EMOJI_BACKGROUND = "#e5e7eb"
@@ -62,7 +63,10 @@ class Message(widgets.HBox):
     >>> msg.append_markdown("world!")
     """
 
-    def __init__(self, markdown="", role="user", emoji="👤", emoji_background=None):
+    def __init__(
+        self, markdown="", role="user", emoji="👤", emoji_background=None, *,
+        unsafe_allow_html=False
+    ):
         """
         Initialize a Message widget.
 
@@ -76,8 +80,13 @@ class Message(widgets.HBox):
             Emoji shown in the avatar.
         emoji_background : str, optional
             Avatar background color as a hex string.
+        unsafe_allow_html : bool, optional
+            Allow trusted raw HTML in Markdown. Defaults to False. Never enable
+            for user input, uploaded files, or API/LLM responses. Explicit html=
+            and append_html() remain trusted-only raw HTML APIs.
         """
         super().__init__()
+        self.unsafe_allow_html = unsafe_allow_html
 
         avatar_bg = str(emoji_background or DEFAULT_EMOJI_BACKGROUND)
         avatar_fg = self._get_avatar_foreground(avatar_bg)
@@ -286,7 +295,11 @@ class Message(widgets.HBox):
         self.output.clear_output(wait=True)
         with self.output:
             if self._mode == "markdown":
-                display(Markdown(self._md_buffer))
+                if self.unsafe_allow_html:
+                    # Preserve Jupyter's rich Markdown renderer for trusted input.
+                    display(Markdown(self._md_buffer))
+                else:
+                    display(DHTML(render_markdown(self._md_buffer)))
             elif self._mode == "html":
                 display(DHTML(self._html_buffer))
             elif self._mode == "text":
@@ -344,7 +357,7 @@ class Message(widgets.HBox):
         text : str, optional
             Plain text content (no formatting).
         html : str, optional
-            Raw HTML content.
+            Raw HTML content, trusted only. This bypasses sanitization.
 
         Raises
         ------
@@ -386,7 +399,7 @@ class Message(widgets.HBox):
 
     def append_html(self, chunk: str):
         """
-        Append raw HTML and re-render.
+        Append trusted raw HTML and re-render, bypassing sanitization.
         """
         self._set_mode("html")
         self._html_buffer += chunk

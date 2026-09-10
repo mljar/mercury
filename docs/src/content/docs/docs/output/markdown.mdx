@@ -10,6 +10,17 @@ The **Markdown** widget displays Markdown-formatted text in a Mercury App.
 It converts Markdown to HTML and renders it as a first-class widget with full
 Mercury layout support.
 
+Markdown supports headings, lists, code blocks, tables, links, and images.
+Mercury automatically removes scripts and custom HTML styles, including when
+you update the widget using `.text`.
+
+<Aside title="Using custom HTML">
+If your existing content relies on custom HTML styles, you can pass
+`unsafe_allow_html=True` to `mr.Markdown()`. Use this only for content you write
+and trust—it also allows JavaScript. Leave it off for user input, uploaded files,
+or AI responses. To update Markdown content, use `.text` rather than `.value`.
+</Aside>
+
 The Markdown rendering dependency is **installed automatically with the `mercury`
 package**, so no additional setup is required.
 

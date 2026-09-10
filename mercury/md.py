@@ -1,7 +1,7 @@
 # markdown.py
 
 from html import escape
-import re
+from html.parser import HTMLParser
 
 import ipywidgets as widgets
 import traitlets
@@ -10,12 +10,55 @@ from IPython.display import display
 from .manager import WidgetsManager, MERCURY_MIMETYPE
 from .render_context import apply_widget_render_metadata, with_widget_render_metadata
 from .theme import THEME
+from ._markdown import render_markdown
 
-try:
-    # Optional: nice markdown → HTML conversion
-    import markdown as md_lib
-except ImportError:
-    md_lib = None
+
+class _InlineStyleParser(HTMLParser):
+    """Style actual elements, never tag-like text inside attribute values."""
+
+    def __init__(self, tag, style):
+        super().__init__(convert_charrefs=False)
+        self.tag = tag
+        self.style = style
+        self.parts = []
+
+    def handle_starttag(self, tag, attrs):
+        self._start(tag, attrs, ">")
+
+    def handle_startendtag(self, tag, attrs):
+        self._start(tag, attrs, " />")
+
+    def _start(self, tag, attrs, closing):
+        if tag != self.tag:
+            self.parts.append(self.get_starttag_text())
+            return
+        attrs = dict(attrs)
+        attrs["style"] = (
+            f"{attrs['style']}; {self.style}" if attrs.get("style") else self.style
+        )
+        serialized = "".join(
+            f' {name}="{escape(value, quote=True)}"' if value is not None else f" {name}"
+            for name, value in attrs.items()
+        )
+        self.parts.append(f"<{tag}{serialized}{closing}")
+
+    def handle_endtag(self, tag):
+        self.parts.append(f"</{tag}>")
+
+    def handle_data(self, data):
+        self.parts.append(data)
+
+    def handle_entityref(self, name):
+        self.parts.append(f"&{name};")
+
+    def handle_charref(self, name):
+        self.parts.append(f"&#{name};")
+
+    def handle_comment(self, data):
+        self.parts.append(f"<!--{data}-->")
+
+    def handle_decl(self, decl):
+        self.parts.append(f"<!{decl}>")
 
 
 class MarkdownWidget(widgets.HTML):
@@ -39,7 +82,11 @@ class MarkdownWidget(widgets.HTML):
     render_slot_id = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
     layout_path = traitlets.Unicode(default_value=None, allow_none=True).tag(sync=True)
 
-    def __init__(self, text: str = "hello", position: str = "inline", **kwargs):
+    def __init__(
+        self, text: str = "hello", position: str = "inline", *,
+        unsafe_allow_html: bool = False, **kwargs
+    ):
+        self.unsafe_allow_html = unsafe_allow_html
         # store raw markdown
         self._raw_text = text
 
@@ -55,30 +102,15 @@ class MarkdownWidget(widgets.HTML):
     # -------- markdown → HTML handling ----------------------------------------
 
     def _to_html(self, text: str) -> str:
-        """Convert markdown to HTML if possible; otherwise use <pre>."""
-        if md_lib is not None:
-            body = md_lib.markdown(text)
-        else:
-            # Fallback: keep it visible, but not nicely formatted
-            body = f"<pre>{escape(text)}</pre>"
-
+        """Sanitize rendered content before adding trusted theme styles."""
+        body = render_markdown(text, unsafe_allow_html=self.unsafe_allow_html)
         return self._apply_inline_theme(body)
 
     def _add_inline_style(self, html: str, tag: str, style: str) -> str:
-        pattern = rf"<{tag}(\s[^>]*)?>"
-
-        def repl(match):
-            attrs = match.group(1) or ""
-            if "style=" in attrs:
-                return re.sub(
-                    r'style=(["\'])(.*?)\1',
-                    lambda m: f'style={m.group(1)}{m.group(2)}; {style}{m.group(1)}',
-                    match.group(0),
-                    count=1,
-                )
-            return f"<{tag}{attrs} style=\"{style}\">"
-
-        return re.sub(pattern, repl, html)
+        parser = _InlineStyleParser(tag, style)
+        parser.feed(html)
+        parser.close()
+        return "".join(parser.parts)
 
     def _apply_inline_theme(self, body: str) -> str:
         radius_sm = THEME.get("border_radius_sm", "4px")
@@ -207,6 +239,8 @@ def Markdown(
     text: str = "hello",
     position: str = "inline",
     key: str = "",
+    *,
+    unsafe_allow_html: bool = False,
 ) -> MarkdownWidget:
     """
     Display Markdown text with Mercury 'position' support.
@@ -220,6 +254,9 @@ def Markdown(
         Default is "inline" (main panel).
     key : str
         Optional cache key for reuse (same idea as in Slider/Columns).
+    unsafe_allow_html : bool
+        Bypass HTML sanitization for trusted content only. Defaults to False.
+        Never enable for user input, uploaded files, or API/LLM responses.
 
     Returns
     -------
@@ -227,13 +264,14 @@ def Markdown(
         The widget instance.
     """
     args = [text, position]
-    kwargs = {"text": text, "position": position}
+    kwargs = {"text": text, "position": position, "unsafe_allow_html": unsafe_allow_html}
 
     code_uid = WidgetsManager.get_code_uid("Markdown", key=key, args=args, kwargs=kwargs)
     cached = WidgetsManager.get_widget(code_uid)
 
     if cached is not None:
         widget: MarkdownWidget = cached
+        widget.unsafe_allow_html = unsafe_allow_html
         widget.text = text
         widget.position = position
         apply_widget_render_metadata(widget)
