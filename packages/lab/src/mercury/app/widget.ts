@@ -9,6 +9,7 @@ import {
   type RawCellModel
 } from '@jupyterlab/cells';
 import { Message } from '@lumino/messaging';
+import { PageConfig } from '@jupyterlab/coreutils';
 import { Signal } from '@lumino/signaling';
 import { Panel, SplitPanel, Widget } from '@lumino/widgets';
 import { CellItemWidget } from './item/widget';
@@ -306,6 +307,9 @@ export class AppWidget extends Panel {
     const pageConfig = getPageConfig();
 
     this._model = model;
+    this.node.dataset.scenarioNotebook =
+      PageConfig.getBaseUrl() +
+      (PageConfig.getOption('originalNotebookPath') || model.context.path);
 
     this.id = 'mercury-main-panel';
     this.addClass('mercury-main-panel');
@@ -448,6 +452,8 @@ export class AppWidget extends Panel {
   }
 
   private onExecutionError(_model: AppModel, err: IExecutionError): void {
+    this.node.dataset.scenarioFailed = 'true';
+    this.node.dispatchEvent(new Event('mercury:scenario-execution'));
     if (!this._toastContainer) {
       this.createToastContainer();
       if (!this._toastContainer) {
@@ -622,6 +628,14 @@ export class AppWidget extends Panel {
 
   get cellWidgets(): CellItemWidget[] {
     return this._cellItems;
+  }
+
+  setScenarioExecutionState(running: boolean): void {
+    this.node.dataset.scenarioRunning = String(running);
+    if (running) {
+      this.node.dataset.scenarioFailed = 'false';
+    }
+    this.node.dispatchEvent(new Event('mercury:scenario-execution'));
   }
 
   setSharedRunRequester(requester: ((fromIndex: number) => void) | null): void {
@@ -1392,6 +1406,7 @@ export class AppWidget extends Panel {
 
     this._rerunInProgress = true;
     this._acceptWidgetInput = false;
+    this.setScenarioExecutionState(true);
 
     this._busy?.begin();
     try {
@@ -1423,6 +1438,9 @@ export class AppWidget extends Panel {
           this._model.context.sessionContext,
           executionMetadata
         );
+        if (!reply && child.model.sharedModel.getSource().trim()) {
+          this.node.dataset.scenarioFailed = 'true';
+        }
         if (isStopExecutionReply(reply)) {
           break;
         }
@@ -1439,8 +1457,10 @@ export class AppWidget extends Panel {
         this._model.context.sessionContext
       );
     } catch (e) {
+      this.node.dataset.scenarioFailed = 'true';
       console.error('[Mercury][autoRerun] chain failed:', e);
     } finally {
+      this.setScenarioExecutionState(false);
       this._busy?.finish();
       this._acceptWidgetInput = true;
       this._rerunInProgress = false;
@@ -1507,28 +1527,33 @@ export class AppWidget extends Panel {
   // ────────────────────────────────────────────────────────────────────────────
 
   private async reexecuteAllCodeCells(): Promise<void> {
-    const cells = this._model.cells;
-    for (let i = 0; i < cells.length; i++) {
-      const m = cells.get(i);
-      if (m.type !== 'code') {
-        continue;
-      }
+    this.setScenarioExecutionState(true);
+    try {
+      const cells = this._model.cells;
+      for (let i = 0; i < cells.length; i++) {
+        const m = cells.get(i);
+        if (m.type !== 'code') {
+          continue;
+        }
 
-      const item = this._cellItems.find(w => w.cellId === m.id);
-      if (item && item.child instanceof CodeCell) {
-        const reply = await codeCellExecute(
-          item.child as CodeCell,
-          this._model.context.sessionContext,
-          {
-            deletedCells: this._model.context.model?.deletedCells ?? []
+        const item = this._cellItems.find(w => w.cellId === m.id);
+        if (item && item.child instanceof CodeCell) {
+          const reply = await codeCellExecute(
+            item.child as CodeCell,
+            this._model.context.sessionContext,
+            {
+              deletedCells: this._model.context.model?.deletedCells ?? []
+            }
+          );
+          if (isStopExecutionReply(reply)) {
+            break;
           }
-        );
-        if (isStopExecutionReply(reply)) {
-          break;
         }
       }
+      await executeWidgetsManagerClearValues(this._model.context.sessionContext);
+    } finally {
+      this.setScenarioExecutionState(false);
     }
-    await executeWidgetsManagerClearValues(this._model.context.sessionContext);
   }
 
   private async checkWidgetModels(): Promise<void> {

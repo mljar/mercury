@@ -103,6 +103,7 @@ class MercuryHandler(ExtensionHandlerJinjaMixin, ExtensionHandlerMixin, JupyterH
             "fullStaticUrl": ujoin(self.base_url, "static", self.name),
             "frontendUrl": ujoin(self.base_url, "mercury/"),
             "notebookPath": notebook_path,
+            "originalNotebookPath": notebook_path,
             "title": MAIN_CONFIG.get("title", "Mercury"),
             "notebooksButtonLabel": MAIN_CONFIG.get("notebooks_button_label", "Notebooks"),
             "logoutAvailable": is_logout_available(self.identity_provider),

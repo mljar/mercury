@@ -231,6 +231,7 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
 
               const appWidget = mercuryPanel.content.appWidget;
               const executeAll = async () => {
+                appWidget.setScenarioExecutionState(true);
                 try {
                   console.info('[Mercury] Executing cells');
 
@@ -294,6 +295,7 @@ set_runtime_url_params(${JSON.stringify(runtimeUrlParams)})
                 } catch (err) {
                   console.error('[Mercury] Failed while executing cells:', err);
                 } finally {
+                  appWidget.setScenarioExecutionState(false);
                   const hideLoader = (window as any).hideMercuryLoader;
                   if (typeof hideLoader === 'function') {
                     hideLoader();

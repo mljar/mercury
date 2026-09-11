@@ -1,0 +1,152 @@
+---
+title: Scenarios
+description: Save and compare what-if analyses with values, tables, and plot snapshots
+---
+
+`mr.Scenarios` lets app users save named versions of an analysis, reload their
+inputs, and compare their saved results. Scalars, pandas/Polars DataFrames, and
+static Matplotlib plots can be compared together.
+
+## Basic usage
+
+Put each input in its own cell. Put `Scenarios` in a cell **after all calculations**
+whose results you want to capture. Its controls appear in the sidebar by default,
+regardless of that cell's position in the notebook.
+
+```python
+# %%
+import mercury as mr
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import display
+
+# %%
+growth = mr.Slider(value=5, min=0, max=30, label="Monthly growth (%)")
+
+# %%
+price = mr.NumberInput(value=50, min=10, max=100, label="Price ($)")
+
+# %%
+months = list(range(1, 13))
+units = [1000 * (1 + growth.value / 100) ** (month - 1) for month in months]
+forecast = pd.DataFrame({
+    "Month": months,
+    "Revenue": [round(count * price.value, 2) for count in units],
+})
+revenue = forecast["Revenue"].sum()
+profit = revenue * 0.3
+fig, ax = plt.subplots(figsize=(6, 3))
+ax.plot(months, forecast["Revenue"], marker="o")
+ax.set(xlabel="Month", ylabel="Revenue ($)", title="Monthly forecast")
+plt.close(fig)
+
+# %%
+display(fig)
+
+# %%
+mr.Table(forecast)
+
+# %%
+scenarios = mr.Scenarios(
+    inputs={"Growth": growth, "Price": price},
+    outputs={
+        "Revenue": f"${revenue:,.0f}",
+        "Profit": f"${profit:,.0f}",
+        "Monthly forecast": forecast,
+        "Revenue chart": fig,
+    },
+    key="forecast-scenarios",
+)
+```
+
+Install `matplotlib` to run the plot example. Polars is optional and is imported
+only when your notebook uses it. Pass the input **widgets**, rather than their
+`.value` attributes. Dictionary keys are display labels; widget `key` or `url_key`
+arguments are not required.
+
+## Saving
+
+Click **Save** beside the scenario selector, enter a name, and confirm **Save**. Reusing a name asks for
+confirmation before replacing the saved snapshot. A snapshot contains its name,
+save time, input values, and the outputs from the latest successful calculation.
+
+Changing inputs, an execution in progress, or a failed execution prevents saving
+outdated results. Re-run the analysis through the `Scenarios` cell to make saving
+available again. Saving and comparing do not execute notebook cells.
+
+Snapshots are independent copies. Changing a DataFrame, modifying a figure, or
+re-executing the notebook does not alter already saved scenarios. The component
+captures output data when its cell runs; **Save** stores that completed snapshot.
+Passing outputs to `Scenarios` does not display them in the main app. Use
+`display(fig)` and `mr.Table(forecast)` in separate cells to show the current plot
+and table as well as keeping them in saved comparisons.
+
+## Loading
+
+Choose a saved scenario and click **Load**. Mercury validates all its inputs before
+applying them together. Changed widget types, missing fields, unavailable choices,
+disabled inputs, or values outside current limits prevent loading and display an
+explanation. Validating fails before any inputs are changed.
+
+In a Mercury app, one automatic execution starts **below the earliest changed
+input cell**, not below the `Scenarios` cell. With automatic execution disabled,
+click the app's normal **Run** button after loading. In a regular Jupyter notebook,
+loading populates the widgets; run the calculation cells manually.
+
+Loading recalculates current results. The scenario's saved results remain intact,
+so comparison continues to show what was saved even if source data has changed.
+In shared-session apps, loading changes the shared inputs for everyone using that
+kernel, while the saved scenario collection remains local to each browser.
+
+## Comparing values, tables, and plots
+
+Click **Compare** and select two to four saved scenarios.
+
+- Scalars appear in one table with inputs first and outputs second. Values that
+  differ from the first selected scenario are highlighted.
+- Each DataFrame output appears in its own section, with scenario tables next to
+  each other. Each table has independent column sorting and pagination (10 rows
+  per page). Named or non-default pandas indexes are shown as row labels.
+- Matplotlib Figures and Axes appear as static PNG snapshots next to each other.
+  Plot axes and scales are captured as drawn; use consistent limits in your
+  notebook when visual comparisons require the same scale.
+
+On mobile, table and plot panels stack vertically, and wide tables scroll within
+their panels. Tables are compared visually; rows are not automatically joined or
+matched across scenarios. Interactive Plotly/Altair objects are not accepted in
+this version; pass a Matplotlib figure for a plot snapshot.
+
+Scalar values can be strings, numbers, booleans, `None`, dates, datetimes, or common
+NumPy scalars. Table cells use these same types. Missing values and non-finite
+numbers display as `—`. Integers outside JavaScript's exact range retain their
+digits. Format scalar outputs as strings when you want currency or percentage
+formatting. Nested table cells and arbitrary Python objects produce a validation
+message rather than being converted to executable HTML or silently stringified.
+
+## Browser storage
+
+Scenarios are stored in IndexedDB in the current browser profile, scoped to the
+app and component key. They survive refreshing the app and restarting its kernel.
+Use a stable `key` when editing or moving the component's notebook cell; without
+one, Mercury uses the source cell ID where available. Give separate components
+different keys. Changing the app URL or key selects a different collection.
+
+They are not written to the notebook or synchronized across devices. Clearing the
+site's browser data removes them, and private browsing may discard them when the
+window closes. **Delete** removes an individual scenario after confirmation.
+
+Limits are 5,000 rows and 100 columns per table, 5 MiB per snapshot, and 20 scenarios
+or 20 MiB per component. Oversized snapshots are rejected without truncating data.
+If browser storage is unavailable or full, the component displays an error.
+
+## Arguments
+
+| Argument | Description | Default |
+| --- | --- | --- |
+| `inputs` | Mapping of display labels to Mercury input widgets | Required |
+| `outputs` | Mapping of display labels to values, DataFrames, or Matplotlib Figures/Axes | Required |
+| `position` | `"sidebar"`, `"inline"`, or `"bottom"` | `"sidebar"` |
+| `key` | Stable component and storage identifier | Source cell ID when available |
+
+Controls and comparison dialogs use Mercury's fonts, colors, borders, and corner
+radius from `config.toml`.

@@ -289,6 +289,7 @@ export class AppModel {
     }
 
     this._ipywidgetToCellId.clear();
+    this._scenarioRequests.clear();
     this._outputsToCell = new WeakMap();
 
     Signal.clearData(this);
@@ -487,6 +488,7 @@ export class AppModel {
     >
   ): void {
     const prev = changes.oldValue;
+    this._scenarioRequests.clear();
     if (prev) {
       prev.anyMessage.disconnect(this._onKernelMessage, this);
       // remove old connectionStatus listener
@@ -518,6 +520,13 @@ export class AppModel {
         const commMsg = msg as ICommMsgMsg<'shell'>;
         const data: any = (commMsg as any)?.content?.data ?? {};
         const commId = commMsg.content.comm_id;
+        if (
+          data?.method === 'custom' &&
+          data?.content?.event === 'scenario_load' &&
+          typeof data.content.request_id === 'string'
+        ) {
+          this._scenarioRequests.set(data.content.request_id, commId);
+        }
         // handle custom cell_id_detected message
         if (
           data?.method === 'custom' &&
@@ -550,6 +559,37 @@ export class AppModel {
 
     if (direction !== 'recv' || msg.channel !== 'iopub') {
       return;
+    }
+
+    // A scenario's cell follows its calculations. Route the single acknowledged
+    // batch to the earliest changed input instead of rerunning below that cell.
+    if (msg.header.msg_type === 'comm_msg') {
+      const content = (msg as ICommMsgMsg<'iopub'>).content;
+      const data = content.data as any;
+      const response = data?.content;
+      if (
+        data?.method === 'custom' &&
+        ['scenario_loaded', 'scenario_error'].includes(response?.event) &&
+        this._scenarioRequests.get(response?.request_id) === content.comm_id
+      ) {
+        this._scenarioRequests.delete(response.request_id);
+        if (
+          response.event === 'scenario_loaded' &&
+          response.changed &&
+          Array.isArray(response.source_cell_ids)
+        ) {
+          const ids = new Set(response.source_cell_ids);
+          for (const cell of this.cells) {
+            if (ids.has(cell.id)) {
+              this._widgetUpdated.emit({
+                widgetModelId: content.comm_id,
+                cellModelId: cell.id
+              });
+              break;
+            }
+          }
+        }
+      }
     }
 
     let commId = '';
@@ -857,6 +897,7 @@ export class AppModel {
 
   /** Update ipywidget message per widget ID (only keep latest). */
   private _updateMessages = new Map<string, IHeader>();
+  private _scenarioRequests = new Map<string, string>();
   private _widgetUpdated = new Signal<AppModel, IWidgetUpdate>(this);
   private _mercuryWidgetAdded = new Signal<
     this,
