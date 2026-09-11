@@ -20,6 +20,13 @@ from tornado import web
 from .manifest import ManifestError, NotebookExecutionManifest
 
 
+def is_missing_resource_error(exc: Exception) -> bool:
+    """Return whether Jupyter reports that a session or kernel disappeared."""
+    return isinstance(exc, KeyError) or (
+        isinstance(exc, web.HTTPError) and exc.status_code == 404
+    )
+
+
 def resolve_session_notebook_path(path, name) -> str:
     """Resolve JupyterLab's temporary session path to its shadow notebook."""
     if not isinstance(path, str) or not path:
@@ -49,6 +56,26 @@ class ExecutionHandlerMixin:
     @property
     def keep_session(self) -> bool:
         return bool(self.settings.get("mercury_config", {}).get("keepSession", False))
+
+    def discard_stale_session(self, record, *, source: str) -> None:
+        """Remove a vanished Jupyter session from Mercury-owned state."""
+        self.log.warning(
+            "Discarding stale Mercury session %s with kernel %s (%s)",
+            record.session_id,
+            record.kernel_id,
+            source,
+        )
+        self.execution_registry.unregister_session(record.session_id)
+        coordinator = self.settings.get("mercury_shared_session_coordinator")
+        if coordinator is not None:
+            coordinator.remove(record.session_id)
+
+    def discard_stale_notebook_sessions(
+        self, owner: str, notebook_path: str, *, source: str
+    ) -> None:
+        for record in self.execution_registry.sessions_for_owner(owner):
+            if record.manifest.path == notebook_path:
+                self.discard_stale_session(record, source=source)
 
 
 class MercuryCheckpointsHandler(ContentsAPIHandler):
@@ -95,9 +122,13 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                     self.execution_registry.attach_owner(
                         record.session_id, owner, record.manifest
                     )
-                models.append(await self.session_manager.get_session(session_id=record.session_id))
-            except KeyError:
-                self.execution_registry.unregister_session(record.session_id)
+                models.append(
+                    await self.session_manager.get_session(session_id=record.session_id)
+                )
+            except (KeyError, web.HTTPError) as exc:
+                if not is_missing_resource_error(exc):
+                    raise
+                self.discard_stale_session(record, source="session listing")
         self.finish(json.dumps(models, default=json_default))
 
     @web.authenticated
@@ -180,9 +211,11 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                         await sm.get_session(
                             session_id=shared_record.session_id
                         )
-                    except KeyError:
-                        self.execution_registry.unregister_session(
-                            shared_record.session_id
+                    except (KeyError, web.HTTPError) as exc:
+                        if not is_missing_resource_error(exc):
+                            raise
+                        self.discard_stale_session(
+                            shared_record, source="shared session lookup"
                         )
                     else:
                         try:
@@ -191,19 +224,14 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                                     shared_record.kernel_id
                                 )
                             )
-                        except KeyError:
+                        except (KeyError, web.HTTPError) as exc:
+                            if not is_missing_resource_error(exc):
+                                raise
                             kernel_alive = False
                         if not kernel_alive:
-                            self.log.warning(
-                                "Discarding dead shared kernel %s for %s",
-                                shared_record.kernel_id,
-                                notebook_path,
+                            self.discard_stale_session(
+                                shared_record, source="shared kernel unavailable"
                             )
-                            self.execution_registry.unregister_session(
-                                shared_record.session_id
-                            )
-                            if coordinator is not None:
-                                coordinator.remove(shared_record.session_id)
                         else:
                             if coordinator is not None:
                                 await coordinator.wait_until_initialized(
@@ -222,10 +250,24 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                                 manifest=manifest,
                             )
                             return alias, True
-            elif await ensure_async(sm.session_exists(path=session_path)):
-                existing = await sm.get_session(path=session_path)
-                self.execution_registry.attach_owner(existing["id"], owner, manifest)
-                return existing, False
+            else:
+                existing = None
+                try:
+                    if await ensure_async(sm.session_exists(path=session_path)):
+                        existing = await sm.get_session(path=session_path)
+                except (KeyError, web.HTTPError) as exc:
+                    if not is_missing_resource_error(exc):
+                        raise
+                    self.discard_stale_notebook_sessions(
+                        owner,
+                        notebook_path,
+                        source="independent session lookup",
+                    )
+                if existing is not None:
+                    self.execution_registry.attach_owner(
+                        existing["id"], owner, manifest
+                    )
+                    return existing, False
 
             kernel_name = kernel.get("name")
             try:
@@ -353,9 +395,15 @@ class MercuryMainKernelHandler(ExecutionHandlerMixin, MainKernelHandler):
         models = []
         for record in self.execution_registry.sessions_for_owner(owner):
             try:
-                models.append(await ensure_async(self.kernel_manager.kernel_model(record.kernel_id)))
-            except KeyError:
-                self.execution_registry.unregister_session(record.session_id)
+                models.append(
+                    await ensure_async(
+                        self.kernel_manager.kernel_model(record.kernel_id)
+                    )
+                )
+            except (KeyError, web.HTTPError) as exc:
+                if not is_missing_resource_error(exc):
+                    raise
+                self.discard_stale_session(record, source="kernel listing")
         self.finish(json.dumps(models, default=json_default))
 
     @web.authenticated
