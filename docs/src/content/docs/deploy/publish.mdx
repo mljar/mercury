@@ -1,0 +1,97 @@
+---
+title: Publish from the terminal
+description: Sign in, create a website, and upload Mercury notebooks with mercury publish
+---
+
+Run this command in the directory containing your notebooks:
+
+```bash
+mercury publish
+```
+
+The guided CLI opens browser sign-in, asks for a website title and subdomain,
+and lets you select files with an interactive checkbox picker. Use arrow keys
+to navigate, **Space** to select, and **Enter** to continue. Review the destination,
+file list, and total size, then confirm publishing.
+
+This command does not start a local Mercury server or execute your notebooks.
+Authentication and website management use [MLJAR Platform](https://platform.mljar.com).
+New websites are **public**, and the command displays their full address before
+creating them. The default hosting domain is `ismvp.org`.
+
+## Files and dependencies
+
+Select the notebooks and supporting files your app needs: Python helpers, data,
+images, models, `requirements.txt`, `runtime.txt`, and `config.toml`.
+At least one notebook must be selected. Notebooks and the three configuration
+files are preselected on the first publish; other files require explicit selection.
+
+Hidden files/directories, common virtual environments, caches, build directories,
+symlinks, and common credential/key files are excluded from the picker. This is
+not a secret scanner: review your notebooks (including saved outputs), data, and
+configuration before uploading. Configure secrets on the platform instead of
+putting credentials in uploaded files.
+
+Relative file paths are sent unchanged, including paths such as `data/sales.csv`.
+The platform must support these paths; a rejected upload reports the failing
+filename rather than silently flattening directories.
+
+Include a `requirements.txt` listing the Python dependencies needed by your app.
+The CLI warns if it is not selected; it does not generate one from your local
+environment. For example:
+
+```text
+mercury
+pandas
+matplotlib
+```
+
+## Updating a website
+
+After website creation, Mercury records the destination and selection in
+`.mercury-publish.json` in the project directory. After all uploads succeed, it
+also records file sizes, SHA-256 hashes, and the successful upload timestamp.
+No authentication tokens are saved in this file; sign in again on each publish.
+
+Run `mercury publish` again to update the same website. The CLI verifies that your
+account can access its saved site ID, reuses your file selection, shows new,
+changed, and unchanged files, and asks for confirmation. You can change the file
+selection on every run. All selected files are uploaded, including unchanged ones.
+
+Matching remote filenames are overwritten. Missing or deselected local files
+**do not delete remote files**. If the saved website is missing or inaccessible,
+the command stops rather than creating a replacement.
+
+Uploads are per file, not an atomic release. A failure may leave some files
+updated remotely. The saved site ID and pending selection allow the next publish
+to retry the same destination; the previous successful upload record is retained.
+
+“Upload complete” means the platform accepted the files, not that the app has
+finished dependency installation or restart. Check the app and platform dashboard
+after publishing. The CLI does not poll deployment readiness.
+
+Keep the state file locally to retain the update destination. It can be excluded
+from version control using your project's `.gitignore`. Treat it as deployment
+configuration and review changes before publishing from an unfamiliar checkout.
+
+## Options
+
+```bash
+mercury publish --working-dir ./my-app
+mercury publish --no-browser
+mercury publish --login-timeout 600
+mercury publish --help
+```
+
+- `--working-dir`: project directory; defaults to the current directory.
+- `--no-browser`: print the sign-in link without opening a browser.
+- `--login-timeout`: seconds allowed for browser sign-in; defaults to 300.
+
+Publishing requires an interactive terminal. **Ctrl+C** cancels it without
+removing previously uploaded remote files. A project lock prevents two concurrent
+publishes; after a hard crash, remove `.mercury-publish.lock` only after checking
+that the other publishing process has stopped.
+
+For alternate platform installations, `MLJAR_PLATFORM_BASE_URL` selects the HTTPS
+platform origin for a new deployment and `MLJAR_PLATFORM_DEFAULT_DOMAIN` selects
+its hosting domain. Existing deployments keep the saved platform origin.

@@ -133,6 +133,7 @@ export default defineConfig({
               { label: 'Get started', slug: 'deploy' },
               { label: 'Dockerfile', slug: 'deploy/dockerfile' },
               { label: 'Cloud', slug: 'deploy/cloud' },
+              { label: 'Publish CLI', slug: 'deploy/publish' },
               
             ],
           },

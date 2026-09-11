@@ -274,6 +274,9 @@ def _activate_working_dir(working_dir: str | None) -> None:
 def main(argv=None):
     if argv is None:
         argv = sys.argv
+    if len(argv) > 1 and argv[1] == "publish":
+        from mercury_app.publish import main as publish_main
+        return publish_main(argv[2:])
     print(logo)
     print(f"Version: {__version__}")
     try:
