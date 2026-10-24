@@ -3,8 +3,10 @@
 
 import datetime
 
+from jupyter_server.auth.decorator import authorized
 from jupyter_server.services.contents.handlers import ContentsHandler
 from jupyter_server.utils import ensure_async
+from tornado import web
 from tornado.web import HTTPError
 
 
@@ -29,6 +31,8 @@ def convert_datetimes(obj):
         return obj
 
 class MercuryContentsHandler(ContentsHandler):
+    @web.authenticated
+    @authorized
     async def get(self, path=""):
         if path.endswith("/checkpoints"):
             return await super().get(path)
@@ -37,6 +41,8 @@ class MercuryContentsHandler(ContentsHandler):
         self.set_header("Content-Type", "application/json")
         self.finish(model)
 
+    @web.authenticated
+    @authorized
     async def put(self, path=""):
         model = await ensure_async(self.contents_manager.get(path, content=True, type=None, format=None))
         model = convert_datetimes(model)

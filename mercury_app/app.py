@@ -14,7 +14,7 @@ from traitlets import Bool, Integer
 from mercury.config import build_theme_css_vars, build_theme_font_links
 
 from ._version import __version__
-from .block_handler import BLOCKED_PATTERNS, BlockedHandler
+from .block_handler import build_block_rules
 from .custom_contents_handler import MercuryContentsHandler
 from .execution import (
     ExecutionRegistry,
@@ -133,10 +133,7 @@ class MercuryApp(LabServerApp):
                 return
             app = sa.web_app
             base_url = (sa.base_url or "").rstrip("/")
-            block_rules = []
-            for pat in BLOCKED_PATTERNS:
-                full_pat = (base_url + pat) if base_url else pat
-                block_rules.append(Rule(PathMatches(full_pat), BlockedHandler))
+            block_rules = build_block_rules(base_url, self.settings_url)
             security_handlers = [
                 (
                     r"/mercury/api/shared-sessions/(?P<session_id>\w+-\w+-\w+-\w+-\w+)",

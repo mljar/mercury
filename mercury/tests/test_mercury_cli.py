@@ -18,6 +18,17 @@ def test_parse_and_inject_keeps_current_behavior_without_working_dir():
     assert not any(arg.startswith("--ServerApp.root_dir=") for arg in argv)
     assert "--IdentityProvider.token=''" in argv
     assert "--ServerApp.disable_check_xsrf=True" not in argv
+    assert "--ServerApp.terminals_enabled=False" in argv
+
+
+@pytest.mark.parametrize(
+    "options",
+    [["--ServerApp.terminals_enabled=True"], ["--ServerApp.terminals_enabled", "True"]],
+)
+def test_explicit_terminal_configuration_is_preserved(options):
+    argv, _ = __main__._parse_and_inject(["mercury", *options])
+    assert "--ServerApp.terminals_enabled=False" not in argv
+    assert all(option in argv for option in options)
 
 
 def test_parse_and_inject_adds_root_dir_and_strips_working_dir(tmp_path):

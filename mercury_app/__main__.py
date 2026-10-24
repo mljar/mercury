@@ -192,6 +192,15 @@ def _parse_and_inject(argv):
     # ----------------------------
     # OTHER DEFAULTS
     # ----------------------------
+    # Standalone apps do not use terminals. Route guards still apply if an
+    # operator explicitly enables the extension.
+    if not any(
+        a == "--ServerApp.terminals_enabled"
+        or a.startswith("--ServerApp.terminals_enabled=")
+        for a in new_argv
+    ):
+        new_argv.append("--ServerApp.terminals_enabled=False")
+
     if working_dir and not any(a.startswith("--ServerApp.root_dir=") for a in new_argv):
         new_argv.append(f"--ServerApp.root_dir={working_dir}")
 
