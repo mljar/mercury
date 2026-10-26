@@ -264,6 +264,9 @@ class MercurySessionRootHandler(ExecutionHandlerMixin, SessionRootHandler):
                         source="independent session lookup",
                     )
                 if existing is not None:
+                    # A notebook path is an identifier, not permission to join
+                    # another browser's independent kernel.
+                    self.execution_registry.session_for_owner(existing["id"], owner)
                     self.execution_registry.attach_owner(
                         existing["id"], owner, manifest
                     )

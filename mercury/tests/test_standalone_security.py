@@ -11,6 +11,7 @@ from pathlib import Path
 import nbformat
 import pytest
 import requests
+import websocket
 
 
 @pytest.fixture(
@@ -57,6 +58,26 @@ def server(request, tmp_path_factory):
         },
     )
     nbformat.write(notebook, root / "notebooks" / "app.ipynb")
+    kernel_dir = root / "data" / "kernels" / "security-audit"
+    kernel_dir.mkdir(parents=True)
+    (kernel_dir / "kernel.json").write_text(
+        json.dumps(
+            {
+                "argv": [
+                    sys.executable,
+                    "-m",
+                    "ipykernel_launcher",
+                    "-f",
+                    "{connection_file}",
+                ],
+                "display_name": "Security audit",
+                "language": "python",
+                "env": {"API_KEY": "KERNEL_SECRET_CANARY"},
+                "metadata": {"private": "KERNEL_SECRET_CANARY"},
+            }
+        )
+    )
+    (kernel_dir / "private.txt").write_text("KERNEL_SECRET_CANARY")
     # Seed an existing PTY without exposing a creation endpoint or executing shell
     # commands. This catches the gap between terminal REST and WebSocket routes.
     (root / "terminal_fixture.py").write_text(
@@ -228,3 +249,86 @@ def test_app_and_required_read_routes_still_load(server):
     for path in paths:
         response = server["client"].get(server["url"] + path, timeout=10)
         assert response.status_code == 200, (path, response.text)
+
+
+def test_kernel_specs_do_not_expose_launch_secrets_in_standalone(server):
+    for path in ("/api/kernelspecs", "/api/kernelspecs/security-audit"):
+        response = server["client"].get(server["url"] + path, timeout=10)
+        assert response.status_code == 200, response.text
+        assert "Security audit" in response.text
+        assert ("KERNEL_SECRET_CANARY" in response.text) == server["extension"]
+        if not server["extension"]:
+            data = response.json()
+            model = data.get("kernelspecs", {}).get("security-audit", data)
+            assert model["spec"]["argv"] == []
+            assert model["spec"]["env"] == {}
+            assert model["resources"] == {}
+    for name in ("kernel.json", "private.txt"):
+        response = server["client"].get(
+            server["url"] + "/kernelspecs/security-audit/" + name, timeout=10
+        )
+        assert response.status_code == (200 if server["extension"] else 403)
+        assert ("KERNEL_SECRET_CANARY" in response.text) == server["extension"]
+
+
+def test_independent_session_cannot_be_claimed_by_another_browser(server):
+    client, url = server["client"], server["url"]
+    payload = {
+        "path": "app.ipynb",
+        "name": "app.ipynb",
+        "type": "notebook",
+        "kernel": {"name": "python3"},
+    }
+    first = client.post(url + "/api/sessions", json=payload, timeout=20)
+    assert first.status_code == 201, first.text
+    session_id = first.json()["id"]
+    with requests.Session() as other:
+        other.trust_env = False
+        other.get(url + "/login", timeout=10)
+        other.headers["X-XSRFToken"] = other.cookies.get("_xsrf")
+        if "Authorization" in client.headers:
+            other.headers["Authorization"] = client.headers["Authorization"]
+        response = other.post(url + "/api/sessions", json=payload, timeout=20)
+        assert response.status_code == (
+            201 if server["extension"] else 404
+        ), response.text
+        response = other.get(url + "/api/sessions/" + session_id, timeout=10)
+        assert response.status_code == (200 if server["extension"] else 404)
+    # Reopening from the original browser must still work.
+    same = client.post(url + "/api/sessions", json=payload, timeout=20)
+    assert same.status_code == 201
+    assert same.json()["id"] == session_id
+
+
+def test_server_events_are_not_shared_with_app_viewers(server):
+    client, url = server["client"], server["url"]
+    headers = []
+    if "Authorization" in client.headers:
+        headers.append("Authorization: " + client.headers["Authorization"])
+    sock = websocket.create_connection(
+        url.replace("http://", "ws://") + "/api/events/subscribe",
+        cookie="; ".join(f"{c.name}={c.value}" for c in client.cookies),
+        header=headers,
+        origin=url.split("/prefix")[0],
+        timeout=1,
+    )
+    try:
+        response = client.post(
+            url + "/api/events",
+            json={
+                "schema_id": "https://events.jupyter.org/jupyter_server/contents_service/v1",
+                "version": "1",
+                "data": {"action": "get", "path": "EVENT_CANARY.ipynb"},
+            },
+            timeout=10,
+        )
+        assert response.status_code == (204 if server["extension"] else 403)
+        response = client.get(url + "/api/contents/app.ipynb", timeout=10)
+        assert response.status_code == 200
+        if server["extension"]:
+            assert "EVENT_CANARY" in sock.recv()
+        else:
+            with pytest.raises(websocket.WebSocketTimeoutException):
+                sock.recv()
+    finally:
+        sock.close()

@@ -1,6 +1,6 @@
 {
     "name": "@mljar/mercury-extension",
-    "version": "3.2.12",
+    "version": "3.2.13",
     "description": "Mercury core logic and extension to preview apps inside JupyterLab.",
     "keywords": [
         "jupyter",
@@ -57,7 +57,7 @@
     "dependencies": {
         "@jupyter-widgets/base": "^6.0.6",
         "@jupyter-widgets/jupyterlab-manager": "^5.0.9",
-        "@jupyter/ydoc": "^1.0.0 || ^ 2.0.0 || ^3.0.0",
+        "@jupyter/ydoc": "^4.0.0",
         "@jupyterlab/application": "^4.0.0",
         "@jupyterlab/apputils": "^4.0.0",
         "@jupyterlab/cells": "^4.0.0",

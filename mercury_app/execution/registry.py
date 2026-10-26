@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from tornado.web import HTTPError
 
 from .manifest import NotebookExecutionManifest
+from .widget_policy import WidgetPolicy
 
 OWNER_COOKIE = "mercury-browser-session"
 
@@ -17,6 +18,7 @@ class ExecutionSession:
     kernel_id: str
     manifest: NotebookExecutionManifest
     comm_ids: set[str] = field(default_factory=set)
+    comm_policies: dict[str, WidgetPolicy] = field(default_factory=dict)
     session_ids: set[str] = field(default_factory=set)
 
 

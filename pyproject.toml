@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "hatchling>=1.5.0",
-    "jupyterlab>=4.0.0,<5",
+    "jupyterlab>=4.6.4,<5",
     "hatch-nodejs-version>=0.3.2",
 ]
 build-backend = "hatchling.build"
@@ -10,11 +10,11 @@ build-backend = "hatchling.build"
 name = "mercury"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
-    "jupyterlab>=4,<5",
-    "jupyter_server>=2.0.1,<3",
-    "jupyterlab_server>=2,<3",
+    "jupyterlab>=4.6.4,<5",
+    "jupyter_server>=2.21.1,<3",
+    "jupyterlab_server>=2.28.1,<3",
     "anywidget>=0.9.0",   
     "toml",
     "markdown",
@@ -94,7 +94,7 @@ version-cmd = "npm version --workspaces --include-workspace-root --workspaces-up
 
 [tool.jupyter-releaser.hooks]
 before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
+    "python -m pip install 'jupyterlab>=4.6.4,<5'",
     "jlpm",
     "jlpm build:prod",
 ]

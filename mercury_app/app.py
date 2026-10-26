@@ -3,6 +3,7 @@
 
 import logging
 import os
+import re
 import sys
 from os.path import join as pjoin
 
@@ -45,6 +46,7 @@ from .mercury_hybrid_cm import HybridContentsManager
 from .notebooks import NotebooksAPIHandler
 from .root import RootIndexHandler
 from .security_mode import detect_standalone_security_mode
+from .standalone_handlers import MercuryEventsWebsocket, MercuryKernelSpecsHandler
 from .theme_handler import ThemeHandler
 
 
@@ -135,6 +137,11 @@ class MercuryApp(LabServerApp):
             base_url = (sa.base_url or "").rstrip("/")
             block_rules = build_block_rules(base_url, self.settings_url)
             security_handlers = [
+                (r"/api/events/subscribe", MercuryEventsWebsocket),
+                (
+                    r"/api/kernelspecs(?:/(?P<kernel_name>[\w.\-%]+))?",
+                    MercuryKernelSpecsHandler,
+                ),
                 (
                     r"/mercury/api/shared-sessions/(?P<session_id>\w+-\w+-\w+-\w+-\w+)",
                     SharedSessionWebsocket,
@@ -161,7 +168,7 @@ class MercuryApp(LabServerApp):
             ]
             security_rules = []
             for pattern, handler in security_handlers:
-                full_pattern = (base_url + pattern) if base_url else pattern
+                full_pattern = re.escape(base_url) + pattern
                 security_rules.append(Rule(PathMatches(full_pattern), handler))
             app.default_router.rules = security_rules + block_rules + app.default_router.rules
 

@@ -19,6 +19,7 @@ def connection():
             {"cells": [{"id": "safe", "cell_type": "code", "source": "print('safe')"}]},
         ),
         comm_ids=set(),
+        comm_policies={},
         session_id="session",
     )
     return value
@@ -117,7 +118,11 @@ def test_comm_messages_require_a_kernel_registered_comm_id():
 
     value._mercury_record.comm_ids.add("known")
     value._authorize_message(
-        "shell", message("comm_msg", content={"comm_id": "known", "data": {"x": 1}})
+        "shell",
+        message(
+            "comm_msg",
+            content={"comm_id": "known", "data": {"method": "request_state"}},
+        ),
     )
 
 
@@ -153,11 +158,26 @@ class SizedBuffer:
 def test_widget_buffers_support_upload_limit_but_reject_larger_payloads():
     value = connection()
     value._mercury_record.comm_ids.add("upload")
+    value._observe_comm(
+        "comm_open",
+        {
+            "comm_id": "upload",
+            "data": {
+                "state": {
+                    "_model_module": "anywidget",
+                    "_anywidget_id": "mercury.file.UploadFileWidget",
+                }
+            },
+        },
+    )
     value._authorize_message(
         "shell",
         message(
             "comm_msg",
-            content={"comm_id": "upload", "data": {}},
+            content={
+                "comm_id": "upload",
+                "data": {"method": "custom", "content": {"event": "upload_files"}},
+            },
             buffers=[SizedBuffer(100 * 1024 * 1024)],
         ),
     )
@@ -168,5 +188,95 @@ def test_widget_buffers_support_upload_limit_but_reject_larger_payloads():
                 "comm_msg",
                 content={"comm_id": "upload", "data": {}},
                 buffers=[SizedBuffer(MAX_MESSAGE_BYTES + 1)],
+            ),
+        )
+
+
+def test_kernel_widget_identity_controls_which_fields_the_browser_can_update():
+    value = connection()
+    value._observe_comm(
+        "comm_open",
+        {
+            "comm_id": "widget",
+            "data": {
+                "state": {
+                    "_model_module": "anywidget",
+                    "_anywidget_id": "mercury.text.TextInputWidget",
+                }
+            },
+        },
+    )
+
+    def update(state):
+        return message(
+            "comm_msg",
+            content={
+                "comm_id": "widget",
+                "data": {"method": "update", "state": state},
+            },
+        )
+
+    value._authorize_message("shell", update({"value": "hello"}))
+    for field in ("_esm", "label", "_anywidget_id"):
+        with pytest.raises(ExecutionDenied):
+            value._authorize_message("shell", update({field: "untrusted"}))
+    with pytest.raises(ExecutionDenied, match="already registered"):
+        value._authorize_message(
+            "shell",
+            message(
+                "comm_open",
+                content={
+                    "comm_id": "widget",
+                    "target_name": "jupyter.widget.control",
+                },
+            ),
+        )
+    value._observe_comm("comm_close", {"comm_id": "widget"})
+    assert "widget" not in value._mercury_record.comm_ids
+    assert "widget" not in value._comm_policies
+
+
+def test_control_snapshot_recovers_policies_for_existing_widgets():
+    value = connection()
+    value._authorize_message(
+        "shell",
+        message(
+            "comm_open",
+            content={
+                "comm_id": "control",
+                "target_name": "jupyter.widget.control",
+            },
+        ),
+    )
+    value._observe_comm(
+        "comm_msg",
+        {
+            "comm_id": "control",
+            "data": {
+                "method": "update_states",
+                "states": {
+                    "output": {
+                        "state": {
+                            "_model_module": "@jupyter-widgets/controls",
+                            "_model_name": "HTMLModel",
+                        }
+                    }
+                },
+            },
+        },
+    )
+    assert "output" in value._mercury_record.comm_ids
+    with pytest.raises(ExecutionDenied):
+        value._authorize_message(
+            "shell",
+            message(
+                "comm_msg",
+                content={
+                    "comm_id": "output",
+                    "data": {
+                        "method": "update",
+                        "state": {"value": "<script>attack()</script>"},
+                    },
+                },
             ),
         )

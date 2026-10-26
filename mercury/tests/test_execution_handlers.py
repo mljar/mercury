@@ -59,9 +59,12 @@ class HandlerDouble(ExecutionHandlerMixin):
 
 
 def test_browser_style_session_path_resolves_to_shadow_notebook():
-    assert resolve_session_notebook_path(
-        ".mercury_sessions/browser-id", "app__mercury__12345678.ipynb"
-    ) == ".mercury_sessions/app__mercury__12345678.ipynb"
+    assert (
+        resolve_session_notebook_path(
+            ".mercury_sessions/browser-id", "app__mercury__12345678.ipynb"
+        )
+        == ".mercury_sessions/app__mercury__12345678.ipynb"
+    )
 
 
 @pytest.mark.parametrize(
@@ -244,3 +247,43 @@ def test_independent_session_reopens_after_lookup_http_404():
     )
     assert handler.status == 201
     assert json.loads(handler.finished)["id"] == "new-session"
+
+
+@pytest.mark.parametrize("existing_owner", ["browser-a", "browser-b"])
+def test_independent_session_path_does_not_grant_ownership(existing_owner):
+    registry = ExecutionRegistry()
+    record = registry.register(
+        owner=existing_owner,
+        session_id="existing",
+        kernel_id="kernel",
+        manifest=manifest(),
+    )
+    handler = HandlerDouble(registry)
+    handler.base_url = "/"
+    handler.get_json_body = Mock(return_value={"path": "app.ipynb", "kernel": {}})
+    handler.contents_manager = SimpleNamespace(
+        get=AsyncMock(
+            return_value={
+                "type": "notebook",
+                "content": {
+                    "cells": [{"id": "safe", "cell_type": "code", "source": "1 + 1"}]
+                },
+            }
+        )
+    )
+    handler.session_manager = SimpleNamespace(
+        session_exists=AsyncMock(return_value=True),
+        get_session=AsyncMock(
+            return_value={"id": "existing", "kernel": {"id": "kernel"}}
+        ),
+        create_session=AsyncMock(),
+    )
+    if existing_owner == "browser-a":
+        asyncio.run(undecorated(MercurySessionRootHandler.post)(handler))
+        assert handler.status == 201
+    else:
+        with pytest.raises(HTTPError) as error:
+            asyncio.run(undecorated(MercurySessionRootHandler.post)(handler))
+        assert error.value.status_code == 404
+    assert record.owners == {existing_owner}
+    handler.session_manager.create_session.assert_not_called()

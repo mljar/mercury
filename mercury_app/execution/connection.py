@@ -11,6 +11,7 @@ from jupyter_server.services.kernels.connection.channels import (
 )
 
 from .policy import ExecutionDenied, authorize_execute_request
+from .widget_policy import WidgetPolicy
 
 logger = logging.getLogger("mercury.execution")
 
@@ -53,6 +54,41 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
     def _deny(self, reason: str) -> None:
         logger.warning("Rejected kernel websocket message: %s", reason)
         self.websocket_handler.close(code=1008, reason="Kernel request denied")
+
+    @property
+    def _comm_policies(self):
+        return self._mercury_record.comm_policies
+
+    def _observe_comm(self, msg_type, content):
+        if not isinstance(content, Mapping):
+            return
+        comm_id = content.get("comm_id")
+        if not isinstance(comm_id, str):
+            return
+        data = content.get("data", {})
+        if msg_type == "comm_open":
+            self._mercury_record.comm_ids.add(comm_id)
+            state = data.get("state", {}) if isinstance(data, Mapping) else {}
+            self._comm_policies[comm_id] = WidgetPolicy.from_state(state)
+        elif msg_type == "comm_close":
+            self._mercury_record.comm_ids.discard(comm_id)
+            self._comm_policies.pop(comm_id, None)
+        elif (
+            msg_type == "comm_msg"
+            and self._comm_policies.get(comm_id, WidgetPolicy()).control
+            and isinstance(data, Mapping)
+            and data.get("method") == "update_states"
+        ):
+            # A newly connected client can recover widgets created before it
+            # connected. This snapshot comes from the kernel, never the browser.
+            states = data.get("states", {})
+            if isinstance(states, Mapping):
+                for widget_id, model in states.items():
+                    if isinstance(widget_id, str) and isinstance(model, Mapping):
+                        self._mercury_record.comm_ids.add(widget_id)
+                        self._comm_policies[widget_id] = WidgetPolicy.from_state(
+                            model.get("state", {})
+                        )
 
     @staticmethod
     def _serialized_size(value) -> int:
@@ -138,7 +174,10 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
             target_name = content.get("target_name")
             if not isinstance(comm_id, str) or target_name not in FRONTEND_COMM_TARGETS:
                 raise ExecutionDenied("Browser-created comm target is not allowed")
+            if comm_id in self._mercury_record.comm_ids:
+                raise ExecutionDenied("Comm id is already registered")
             self._mercury_record.comm_ids.add(comm_id)
+            self._comm_policies[comm_id] = WidgetPolicy(control=True)
             return msg
 
         if msg_type in COMM_MESSAGES:
@@ -151,6 +190,10 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
                 raise ExecutionDenied("Comm payload is too large")
             if msg_type == "comm_close":
                 self._mercury_record.comm_ids.discard(comm_id)
+                self._comm_policies.pop(comm_id, None)
+            else:
+                policy = self._comm_policies.get(comm_id, WidgetPolicy())
+                policy.authorize(content.get("data", {}), buffers)
             return msg
 
         raise ExecutionDenied(f"Kernel message type {msg_type!r} is not allowed")
@@ -210,12 +253,7 @@ class MercuryKernelWebsocketConnection(ZMQChannelsWebsocketConnection):
                 metadata = self.session.unpack(fed_msg_list[3])
                 content = self.session.unpack(fed_msg_list[4])
                 msg_type = header.get("msg_type")
-                comm_id = content.get("comm_id") if isinstance(content, Mapping) else None
-                if isinstance(comm_id, str):
-                    if msg_type == "comm_open":
-                        self._mercury_record.comm_ids.add(comm_id)
-                    elif msg_type == "comm_close":
-                        self._mercury_record.comm_ids.discard(comm_id)
+                self._observe_comm(msg_type, content)
                 coordinator = getattr(self, "_shared_session_coordinator", None)
                 if coordinator is not None:
                     coordinator.observe_kernel_message(

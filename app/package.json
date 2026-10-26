@@ -1,6 +1,6 @@
 {
   "name": "mercury-app",
-  "version": "3.2.12",
+  "version": "3.2.13",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
@@ -21,7 +21,7 @@
     "@jupyter-widgets/jupyterlab-manager": "5.0.15",
     "@jupyter/react-components": "0.16.7",
     "@jupyter/web-components": "0.16.7",
-    "@jupyter/ydoc": "^1.0.0 || ^2.0.0 || ^3.0.0",
+    "@jupyter/ydoc": "^4.0.0",
     "@jupyterlab/application-extension": "^4.0.0",
     "@jupyterlab/apputils-extension": "^4.0.0",
     "@jupyterlab/codemirror-extension": "^4.0.0",

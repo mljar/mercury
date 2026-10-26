@@ -48,12 +48,12 @@ fi
   die "Python build module is missing. Install it with: $PYTHON_BIN -m pip install build"
 }
 
+log "Installing JavaScript dependencies"
+jlpm install --immutable
+
 log "Cleaning generated artifacts"
 rm -rf dist build ./*.egg-info
 jlpm clean:all
-
-log "Installing JavaScript dependencies"
-jlpm install --immutable
 
 log "Building production frontend artifacts"
 jlpm build:prod
@@ -146,7 +146,7 @@ trap 'rm -rf "$tmpdir"' EXIT
 "$PYTHON_BIN" -m venv "$tmpdir/venv"
 "$tmpdir/venv/bin/python" -m pip install --upgrade pip >/dev/null
 "$tmpdir/venv/bin/python" -m pip install "$WHEEL" >/dev/null
-"$tmpdir/venv/bin/python" - "$VERSION" <<'PY'
+"$tmpdir/venv/bin/python" -I - "$VERSION" <<'PY'
 import sys
 
 expected = sys.argv[1]
